@@ -29,9 +29,40 @@ ipak(packages)
 
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 library(readxl)
-ClinicalTrials_D01 <- read_excel("./ClinicalTrial.xlsx")
+ClinicalTrials_D01 <- read_excel("./01_ClinicalTrials/ClinicalTrial.xlsx")
 ```
   
+
+```{r , echo=FALSE, fig.align="center", out.width = '100%'} 
+knitr::include_graphics("./02_Plots/PharmaLogo.png")
+```
+
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+data_summary <- ClinicalTrials_D01 %>%
+  group_by(`Therapeutic Area`) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count))
+
+# Creating the bar chart
+plot <- ggplot(data_summary, aes(x = `Therapeutic Area`, y = Count, fill = `Therapeutic Area`)) +
+  geom_bar(stat = "identity", width = 0.7, show.legend = FALSE) +
+  geom_text(aes(label = Count), vjust = -0.3, size = 3.5) +
+  labs(title = "Number of Clinical Studies by Therapeutic Area",
+       x = " ", y = "Number of Studies") +
+  scale_y_continuous(limits = c(0, 16)) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+        plot.title = element_text(hjust = 0.5), # Centering the title
+        panel.grid.major = element_blank(), # Removing major grid lines
+        panel.grid.minor = element_blank(), # Removing minor grid lines
+        panel.border = element_rect(colour = "grey", fill=NA, size=1)) # Adding a border
+
+# Display the plot
+print(plot)
+```
 
 
 ## Oncology
