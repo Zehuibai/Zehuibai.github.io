@@ -1,0 +1,359 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Powering Phase IV Trials - Design Considerations for Post Marketing Surveillance 
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+packages<-c("tidyverse", "kableExtra")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+```
+
+
+## Post-Marketing Surveillance
+
+
+**Introduction:**
+Post Marketing Surveillance (PMS) involves the monitoring of medical devices or therapeutics in real-world settings after they have been approved for clinical use. This monitoring is crucial as it observes various outcomes that are of significant interest both to regulatory bodies and to the sponsors of the products.
+
+Post-marketing surveillance is especially critical for products that have received accelerated approvals, where traditional, lengthy testing phases may have been abbreviated to expedite the product’s availability to the public. It's also vital for pediatric and underrepresented groups as well as medical devices, where real-world data can significantly supplement the initial testing and approval.
+
+**Key Areas of Interest:**
+
+1. **Safety:** Monitoring for rare side effects that might not have been apparent during pre-marketing trials.
+2. **Efficacy:** Evaluating the effectiveness of the therapy or device when used in general practice, outside of the controlled clinical trial settings.
+3. **Alternative Indications:** Investigating additional uses for a therapeutic or device that may not have been the original focus during its approval.
+4. **Subgroup Effects:** Observing how different groups (e.g., pediatric, geriatric, underrepresented populations) respond to the therapy or device, which can vary from the general population.
+ 
+**Sources of Post-Marketing Data:**
+Data for PMS can be sourced from various avenues including:
+- Public databases maintained by regulatory agencies like the FDA (Food and Drug Administration) and EMA (European Medicines Agency).
+- Reports from healthcare professionals and patients.
+- Studies sponsored by pharmaceutical companies or independent researchers.
+ 
+**Discussion Points:**
+- The real-world application of therapies and devices and the continuous assessment of their performance.
+- The complexities and challenges of monitoring therapies in uncontrolled, everyday environments compared to the structured settings of clinical trials.
+- The potential discoveries that post-marketing surveillance can reveal about a therapy or device, such as new side effects, efficacy metrics, or potential new indications.
+
+## Phase IV Clinical Trials
+
+### Development and Approval Process
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/PIV_Overview.png")
+```
+
+The development and approval process for new therapeutics involves several distinct phases, each designed to assess different aspects of the drug's safety, efficacy, and optimal dosage. Here's a detailed look into these phases:
+
+#### Phase I: Initial Human Trials
+Phase I trials are the first stage where a new drug is tested in humans. These trials primarily aim to determine the safety profile of the drug and establish a range of acceptable dosages. The participants in these trials typically do not have the disease for which the drug is intended.
+
+- **Maximum Tolerable Dose (MTD):** In oncology, the objective often is to find the highest dose of a drug that is tolerable without causing unacceptable side effects. This concept is based on the traditional approach where higher doses are believed to be more effective, especially in treatments like chemotherapy.
+  
+- **Optimal Biological Dose (OBD):** Increasingly, the goal in both oncology and other therapeutic areas is to determine the optimal biological dose, which might not necessarily be the maximum dose. This dose is identified based on its biological effectiveness, as indicated by biomarkers or surrogate measures of efficacy.
+
+#### Phase II: Treatment Efficacy and Dose Ranging
+Phase II trials focus on evaluating the efficacy of the drug and further refining the dose range:
+
+- **Efficacy Signal:** This phase tests whether the drug produces a desired effect at the determined dose in patients with the disease.
+  
+- **Dose Optimization:** Researchers work to identify the most effective dose that has acceptable safety levels. Many drugs fail during this phase if they do not demonstrate a clear benefit in the target patient population.
+
+- **Phase 1B/2A Studies:** These are transitional studies that may blend objectives from both Phase I and II, such as further dose refinement and early efficacy signals.
+
+#### Phase III: Pivotal Trials
+Phase III trials are large, conclusive studies that are intended to firmly establish the drug's efficacy and safety:
+
+- **Randomized Controlled Trials (RCTs):** These are comprehensive studies where the drug is tested against a placebo or a standard treatment to measure its effectiveness and safety in a larger population.
+  
+- **Regulatory Scrutiny:** Phase III trials are rigorously regulated and involve complex protocols, including randomization and blinding to ensure unbiased results.
+
+- **Endpoints:** The trials aim to demonstrate clinical benefits, such as improved survival rates in oncology, based on predefined endpoints.
+
+#### Phase IV: Post-Marketing Surveillance
+Once a drug has been approved and is on the market, Phase IV trials monitor its performance in the general population:
+
+- **Long-Term Safety and Efficacy:** These studies look at longer-term effects of the drug, exploring rare side effects and confirming the drug's effectiveness over time.
+  
+- **Real-World Data:** Phase IV provides valuable information on how the drug performs outside the controlled conditions of clinical trials.
+
+### Phase IV Summary
+
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/PIV_Summary.png")
+```
+
+
+Phase IV trials, also known as post-marketing surveillance studies, are crucial in the lifecycle of a drug as they provide insights into the effects of the drug once it is used in the general population outside of controlled clinical trial settings. These studies primarily focus on safety surveillance to identify any rare adverse effects that may not have been detectable in earlier phases due to the relatively smaller sample sizes.
+
+#### Objectives of Phase IV Trials
+- **Safety Surveillance:** To monitor the safety profile of a drug under broader conditions with a larger and more diverse population. This includes identifying rare side effects and adverse events that occur at a frequency of less than 1 in 10,000.
+- **Efficacy Confirmation:** To confirm and further detail the efficacy of the drug in real-world conditions, often exploring additional therapeutic benefits not initially targeted.
+
+#### Regulatory Framework
+Phase IV trials are often instigated by regulatory requirements:
+
+- **Postmarketing Requirements (PMRs):** These are mandatory studies required by regulatory bodies such as the FDA or EMA when there are specific safety concerns that need to be addressed post-approval.
+- **Postmarketing Commitments (PMCs):** These are studies that a drug sponsor agrees to conduct after the drug has been approved to further assess safety and efficacy, although these commitments are not always mandated by regulations.
+
+#### Decision Triggers for Phase IV Trials
+- **Adverse Events:** If unexpected serious adverse events or deaths occur, regulators or the sponsor may decide to conduct a Phase IV study to investigate potential causal links and assess risk.
+- **Regulatory Directives:** Based on new safety information that emerges from ongoing surveillance or other sources, regulators may require a Phase IV trial to ensure continued safety and efficacy of the drug.
+
+#### Historical Context and Legislative Changes
+Significant events, such as the withdrawal of Vioxx due to safety concerns, have historically prompted enhancements in regulatory frameworks, leading to more stringent requirements for post-marketing surveillance. Such incidents have underscored the importance of Phase IV trials in maintaining drug safety standards and protecting public health.
+
+#### Implementation and Impact
+- **Scope and Scale:** Phase IV trials can be extensive, often involving thousands of participants and spanning several years. They are resource-intensive, potentially costing tens to hundreds of millions of dollars.
+- **Outcome of Trials:** While a small percentage of drugs may be withdrawn from the market following Phase IV trials (estimated at 3-4%), more commonly, these studies result in changes to the drug’s labeling to reflect new safety findings.
+- **Pediatric and Specific Populations Studies:** Certain drugs approved on adult data or surrogate endpoints might require specific Phase IV studies to assess safety and efficacy in pediatric populations or other specific groups.
+
+#### Importance in Clinical Practice
+Phase IV trials serve multiple purposes:
+
+- **Long-term Safety and Efficacy:** They provide crucial data on how a drug performs over an extended period, which is vital for chronic therapies.
+- **Label Updates:** Modifications to labeling based on Phase IV outcomes can include new dosing regimens, additional warnings, or changes in contraindications, which help refine the drug’s use in clinical practice.
+- **Public Health:** They enhance patient safety by continuously monitoring drug effects in broader and more varied patient populations than those typically included in pre-marketing studies.
+
+### Types of Phase IV Trials
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/PIV_Type.png")
+```
+
+**Regulatory and Practical Considerations**
+
+Regulatory agencies like the FDA often mandate or encourage certain types of Phase IV studies based on the drug’s initial approval conditions. For example, drugs approved under accelerated conditions might need to undergo specific post-marketing requirements (PMRs) to confirm their safety profile.
+
+Practical considerations in Phase IV trials include the need for extensive collaboration across multiple treatment centers and the ability to recruit large patient populations to ensure that the findings are statistically significant and generalizable.
+
+#### Observational Studies
+
+Observational studies in Phase IV are non-interventional and typically divided into two main types:
+
+1. **Retrospective Studies**: These involve looking back at existing data to evaluate the drug's effects. Data sources can include registries such as the FDA's FAERS (FDA Adverse Event Reporting System), where adverse events are documented. Researchers analyze these data to identify patterns or concerns that weren't apparent in clinical trials.
+
+2. **Prospective Studies (Cohort or Case-Control)**: 
+   - **Cohort Studies**: In these studies, one group (cohort) of patients who are using the drug is observed over time and compared against a historical control (previous data) or against a group not using the drug. This method is beneficial for tracking outcomes and adverse events in a real-world setting.
+   - **Case-Control Studies**: This approach involves identifying patients who have experienced an adverse event (cases) and comparing them to those who have not (controls), looking to see if exposure to the drug is higher in the cases than the controls.
+
+3. **Meta-Analysis**: This method aggregates data from multiple studies, including RCTs, to provide a more comprehensive assessment of the drug’s adverse event rates across various settings and populations.
+
+#### Randomized Studies
+These studies are interventional and aim to provide higher quality evidence by controlling for biases that might affect the results:
+
+1. **Randomized Controlled Trial (RCT)**: 
+* Subjects are randomly assigned to either the new treatment or a standard treatment to compare outcomes. This setup helps to establish a causal relationship between the drug and the observed effects.
+* atients are randomly assigned to either receive the study treatment or a control treatment (which could be a placebo or another standard treatment). This is the gold standard for testing efficacy and safety.
+
+2. **Large Simple Trials**: 
+* These are a kind of RCT where the procedures are simplified to make the trial more feasible on a large scale. Subjects are randomized to treatment options, but the treatment follows standard clinical practices, making it easier to implement across various settings.
+* Simplified RCTs that are designed to include a broader patient population. They reduce complexity by minimizing strict inclusion/exclusion criteria, aiming to reflect a more general treatment population.
+
+#### Other Types of Studies
+
+Besides observational and randomized studies, Phase IV trials can also include:
+
+- **Animal Studies and In-Vitro Studies**: These are usually done to further investigate specific findings from human trials, such as mechanisms of drug action or effects not possible to study in humans.
+- **Pharmacokinetic (PK) Studies**: These assess how the drug is processed in the body over time, which can be critical for understanding interactions, dosing, and effects in specific populations (e.g., renal impairment).
+- **Interaction Studies**: These evaluate the effects of the drug when taken with other medications, which is crucial for safety in patients who are on multiple therapies.
+- **Natural History Studies**: These studies track the progression of disease over time without the intervention of a drug, providing background rates of disease progression for comparison.
+- **Physician Experience Studies and Drug Utilization Studies**: These studies look at how drugs are used in real-world clinical settings, providing insight into prescribing behaviors, adherence rates, and practical challenges in drug administration.
+
+## Phase IV Design Considerations
+
+### General Consideration
+
+Designing a Phase IV trial involves multiple considerations to ensure the study is robust, ethical, and capable of providing the necessary data to address specific regulatory and safety concerns. Here are key elements in designing these trials, particularly focusing on safety through Post Marketing Commitments (PMCs) or requirements:
+
+#### 1. **Identifying the Objective and Key Safety Concerns**
+- **Define the Adverse Events of Interest**: Based on prior safety data, including incidents from Phase III trials or newly emerging safety information post-approval. Understanding which specific adverse events or side effects are of primary concern will guide the design of the study.
+- **Consider Subpopulations**: Identify if certain subpopulations need particular attention due to increased risks or different responses to the drug.
+#
+#### 2. **Choosing the Study Design**
+- **Cohort Studies**: Can be retrospective (using existing data) or prospective (enrolling patients going forward). These studies can track adverse events in patients prescribed the drug under normal clinical conditions.
+- **Case-Control Studies**: Useful for investigating specific adverse events by comparing patients who experience these events against those who do not, matched on various factors.
+- **Randomized Controlled Trials (RCTs)**: Though less common in Phase IV, RCTs can be implemented if there’s a need to thoroughly test hypotheses about drug safety or efficacy under controlled conditions.
+- **Registry-Based Studies**: Utilizing existing registries to monitor adverse events and outcomes. These can be efficient in gathering large-scale data across diverse populations and settings.
+
+#### 3. **Determining Sample Size**
+- **Statistical Power**: The sample size should be large enough to detect differences in safety outcomes between the drug and comparators or within the cohort. This involves statistical calculations to ensure the study can reliably detect or rule out the hypothesized effects.
+- **Incidence of Adverse Events**: The rarer the adverse event, the larger the sample size needed to observe sufficient instances of the event to draw meaningful conclusions.
+- **Subgroup Analysis**: Consideration for potential subgroup analyses, as they may require larger sample sizes to ensure adequate power within each subgroup.
+
+#### 4. **Comparative Data Sources**
+- **Choosing Comparators**: Determining appropriate comparators can be complex, especially if the standard treatment includes multiple different drugs. The choice depends on the therapeutic area and the typical treatment regimen.
+- **Historical Data**: Utilizing historical control data can be a method, but this must be carefully matched to the cohort in terms of demographics, disease severity, and other relevant factors.
+
+#### 5. **Data Collection and Analysis**
+- **Endpoints**: Defining clear, measurable endpoints that are directly related to the adverse events of interest. These can be incidence rates, severity of events, time to event, etc.
+- **Data Integrity**: Ensuring high-quality data collection, whether prospectively or retrospectively. This includes maintaining the fidelity of the data and minimizing missing data, which can bias results.
+
+#### 6. **Regulatory Compliance and Ethical Considerations**
+- **Ethical Approval**: All aspects of the trial must be approved by relevant ethics committees, ensuring that the rights and well-being of participants are safeguarded.
+- **Regulatory Requirements**: Compliance with regulatory guidelines and requirements, such as those from the FDA or EMA, is critical. This includes adhering to any specific directives for post-marketing surveillance.
+
+#### 7. **Logistical and Operational Planning**
+- **Recruitment and Follow-Up**: Effective strategies must be in place to recruit the necessary number of participants and maintain follow-up to capture all relevant data on outcomes and adverse events.
+- **Budget and Resources**: Adequate budgeting and resource allocation are essential to support the scale and duration of the study, including staffing, data management, and participant follow-up.
+
+
+Let's integrate the specific mathematical formulas described in your image into the detailed explanation regarding the determination of sample size for Phase IV clinical trials.
+
+### Sample Size Determination Overview
+
+Phase IV trials are essential for assessing the real-world safety and efficacy of drugs. Determining an appropriate sample size involves considering:
+
+- **Regulatory Requirements:** Compliance with regulatory guidelines and specifications for allowable study designs is critical. Often, a Phase IV study is mandated by a regulatory authority to address specific safety concerns observed during earlier phases or post-marketing.
+- **Cost and Feasibility:** Registry-based studies are generally more cost-effective compared to randomized controlled trials (RCTs). However, the choice of study design should balance cost, feasibility, and the ability to provide meaningful and valid data.
+- **Design Negotiations:** The specific design of the study may require negotiations with regulatory bodies to ensure that it meets safety monitoring needs while also being feasible and scientifically sound.
+
+#### Key Considerations in Sample Size Calculation
+
+- **Design Choices:** The methodology (cohort, case-control, RCT) influences how data is gathered and analyzed.
+- **Endpoint Definition:** Clearly define the safety endpoint. Is it a specific adverse event (AE), a rate of incidence, or severity of outcomes? The rarity and severity of the AE will significantly influence sample size calculations.
+- **Background Incidence Rate:** Determining whether there is a known background incidence rate of the AE can dictate the statistical model used:
+  - **No Background Incidence:** This scenario might call for a model that assumes any observed event is significant, typically relying on Poisson distribution for rare events.
+  - **Known Background Incidence:** If there is a historical or expected rate of AE, the study can be designed to detect deviations from this rate, often using comparative statistics.
+
+#### Statistical Methods for Sample Size Calculation
+
+- **Simple Cohort Designs:** For studies without a control group where the background incidence is unknown, calculations often assume a conservative approach to ensure that even rare events are detected with sufficient power.
+- **Two-Arm Cohort Designs:** When background rates are known, comparative studies are designed to test whether the new data significantly deviates from the control or historical data.
+- **Improving Efficiency with Controls:** In cases where obtaining data from the treatment group is more expensive or difficult, increasing the number of controls can enhance the study's power cost-effectively.
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/PIV_SSC.png")
+```
+
+- **No Background Incidence:**
+   \[
+   \sum_{x=0}^{\infty} \left( \frac{(\lambda N)^x e^{-\lambda N}}{x!} \right) = \beta
+   \]
+   This formula models the probability of observing \( x \) events, where \( \lambda \) is the expected incidence rate, and \( N \) is the sample size, ensuring the cumulative probability meets a significance level \( \beta \).
+
+- **Known Background Incidence:**
+   \[
+   N = \frac{(Z_{1-\alpha/\sigma} \sqrt{\lambda_0} + Z_{1-\beta}(\sqrt{\lambda_0 + \delta}))^2}{\delta^2}
+   \]
+   Where \( \lambda_0 \) is the known incidence rate, \( \delta \) is the effect size, and \( Z \) values are from the standard normal distribution corresponding to the specified type I error (\( \alpha \)) and type II error (\( \beta \)) rates.
+   
+- **Unknown Background Incidence:**
+   \[
+   n = \frac{[Z_{1-\alpha}(IC + 1)(\lambda_0) - \lambda_0 + C \lambda_0 + \delta)(\lambda_0 - \delta)]^2}{C \lambda_0^2}
+   \]
+   This formula accounts for additional uncertainty in estimating \( \lambda_0 \), the base rate of incidence.
+ 
+- **Sample Size for Case-Control Studies:**
+   \[
+   n = \frac{1}{(\lambda_0 - \Omega)^2} \left(\frac{1 + 1/C}{\pi - 1} + \pi \right) + \frac{2\pi (\lambda_0 - \Omega) + \Omega}{C}
+   \]
+   Here, \( \pi \) represents the ratio of controls to cases, \( \lambda_0 \) the baseline incidence rate in the control group, \( \Omega \) the increased rate in the exposed group, and \( C \) the control-to-case ratio.
+
+#### Additional Considerations
+
+- **Powering for Safety Endpoints:** Unlike efficacy endpoints typical in earlier trial phases, Phase IV studies often focus on detecting and quantifying safety risks. Therefore, these studies are powered around safety endpoints, requiring robust calculations to detect even rare adverse events accurately.
+- **Integration of Historical Data:** Leveraging existing data can improve the efficiency and power of the study, allowing for more nuanced analyses with potentially lower overall sample sizes.
+- **Bonferroni Adjustment for Multiple Endpoints:** If multiple safety endpoints are monitored, adjustments for multiple comparisons, such as the Bonferroni correction, may be necessary to control the Type I error rate across all tests.
+- **Recruitment Strategies:** Effective recruitment strategies are crucial, especially when large sample sizes are needed for detecting rare events. This might involve multicenter collaboration or international sites to ensure a diverse and adequately sized sample.
+- **Data Collection and Management:** High-quality data collection processes are essential, particularly in large-scale observational studies or registries, to ensure that data are accurate, complete, and verifiable.
+
+
+### Case Studies 
+
+#### Case 1 - No Background Incidence
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/PIV_Case1.png")
+```
+
+**Objective:**
+- To detect at least one occurrence of an adverse event with a 3-year incidence rate of 0.1% (0.033% per year) with a 95% probability.
+
+**Study Design Specifics:**
+- **Initial Sample Size:** Determined by the requirement to detect an AE with an incidence rate of 0.1% over three years.
+- **Statistical Power:** Set at 95%, meaning there is a 95% chance of detecting an AE if it occurs at the assumed rate.
+- **Dropout Rate:** An anticipated dropout rate of 25% influenced the final sample size needed.
+ 
+**Pre-Dropout Sample Size:**
+   - Calculated as 3000 participants, which is the number required to detect an AE with a 3-year incidence rate of 0.1% with 95% power.
+
+**Adjustment for Dropout:**
+   - To account for an expected 25% dropout rate, the sample size was increased to 4000 participants. This ensures that even after potential dropouts, the study retains sufficient power to meet its objectives.
+
+#### Case 2 - With Known Background Incidence
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/PIV_Case2.png")
+```
+
+**Study Objective:**
+
+- **Primary Concern:** To detect a significant increase in the incidence of diarrhea as a serious adverse drug reaction (ADR).
+- **Historical Context:** The cumulative incidence of serious ADRs in prior phase II and III studies was observed to be 0.9% (2/224 patients). 
+- **Significance Level:** A two-sided test with a significance level of 0.05, meaning the study aims to detect differences from the control or historical rate with 95% confidence.
+- **Incidence Rates:**
+  - **Standard Incidence Rate:** 0.9% (or 0.009 when converted to a proportion for calculation purposes).
+  - **Treatment Incidence Rate:** Anticipated to be twice the standard rate, thus 1.8% or 0.018 as a proportion.
+  - **Additional Incidence:** The difference aimed to be detected, calculated as 0.018 (treatment) - 0.009 (standard) = 0.009.
+- **Sample Size:** 1200 patients. This number is calculated to be sufficient to detect a two-fold increase in the incidence from 0.9% to 1.8% with a power of 80%. This means there is an 80% probability that the study will detect a true increase in the incidence of the specified adverse event if it exists.
+- **Power:** The study is designed to have over 80% power, ensuring a robust capacity to identify a statistically significant increase in ADR incidence assuming it is true.
+
+
+## Reference
+  
+
+1. The European Patients’ Academy on Therapeutic Innovation (EUPATI), "Phases of clinical development," September 2015. Available at: [https://toolbox.eupati.eu/resources/phases-of-clinical-development/](https://toolbox.eupati.eu/resources/phases-of-clinical-development/).
+2. Wong, H.H., Jessup, A., Sertkaya, A., Birkenbach, A., Berlind, A., and Eyraud, J., "Examination of clinical trial costs and barriers for drug development," Office of the Assistant Secretary for Planning and Evaluation, US Department of Health & Human Services, 2014, pp. 1-92.
+3. Moore, T.J., Zhang, H., Anderson, G., and Alexander, G.C., "Estimated costs of pivotal trials for novel therapeutic agents approved by the US Food and Drug Administration, 2015-2016," JAMA Internal Medicine, vol. 178, no. 11, pp. 1451-1457, 2018.
+4. Waller, P.C., Wood, S.M., Langman, M.J., Breckenridge, A.M., and Rawlins, M.D., "Review of company postmarketing surveillance studies," British Medical Journal, vol. 304, no. 6840, pp. 1470-1472, 1992.
+5. Yoshioka, K., Kosasayama, A., Yoshida, M., Toshikura, M., Nasu, K., Funabashi, S., Yamada, A., and Okada, S., "Post-marketing surveillance of 13 products: safety and effectiveness," Pharmacoepidemiology and Drug Safety, vol. 8, no. 1, pp. 31-43, 1999.
+6. Schaefer, C., Hannemann, D., and Meister, R., "Post-marketing surveillance system for drugs in pregnancy—15 years experience of ENTIS," Reproductive Toxicology, vol. 20, no. 3, pp. 331-343, 2005.
+7. Onakpoya, I.J., Heneghan, C.J., and Aronson, J.K., "Post-marketing withdrawal of 462 medicinal products because of adverse drug reactions: a systematic review of the world literature," BMC Medicine, vol. 14, pp. 1-11, 2016.
+8. Zhang, X., Zhang, Y., Ye, X., Guo, X., Zhang, T., and He, J., "Overview of phase IV clinical trials for postmarket drug safety surveillance: a status report from the ClinicalTrials.gov registry," BMJ Open, vol. 6, no. 11, article e010643, 2016.
+9. Henry, B.M., Lippi, G., Nasser, A., and Ostrowski, P., "Characteristics of Phase IV clinical trials in oncology: an analysis using the ClinicalTrials.gov registry data," Current Oncology, vol. 30, no. 6, pp. 5932-5945, 2023.
+10. Madigan, D., Ryan, P., Simpson, S., and Zorych, I., "Bayesian methods in pharmacovigilance," Bayesian Statistics, vol. 9, pp. 421-438, 2010.
+11. U.S. Food and Drug Administration, "Guidance for the Use of Bayesian Statistics in Medical Device Clinical Trials," February 2010. Available at: [https://www.fda.gov/media/71512/download](https://www.fda.gov/media/71512/download).
+12. Jaeger, T., and Deshpande, R., "Choosing a Phase IV Study Design," Pharm Mark, pp. 29-30, 2003.
+13. Machin, D., Campbell, M.J., Tan, S.B., and Tan, S.H., "Sample sizes for clinical, laboratory and epidemiology studies," John Wiley & Sons, 2018.
+14. Lewis, J.A., "Post-marketing surveillance: how many patients?" Trends in Pharmacological Sciences, vol. 2, pp. 93-94, 1981.
+15. Schneiweiss, F., and Uthoff, V.A., "Sample size and postmarketing surveillance," Drug Information Journal, vol. 19, no. 1, pp. 13-16, 1985.
+16. Tubert-Bitter, P., Begaud, B., Moride, Y., and Abenhaim, L., "Sample size calculations for single group post-marketing cohort studies," Journal of Clinical Epidemiology, vol. 47, no. 4, pp. 435-439, 1994.
+17. Strom, B.L., "Sample size considerations for pharmacoepidemiologic studies," Pharmacoepidemiology, pp. 60-70, 2019.
+18. Wu, Y.T., and Makuch, R.W., "Detecting rare adverse events in postmarketing studies: sample size considerations," Drug Information Journal: DIJ/Drug Information Association, vol. 40, pp. 89-98, 2006.
+19. Wu, Y.T., and Makuch, R.W., "Sample size for post-marketing safety studies based on historical controls," Pharmacoepidemiology and Drug Safety, vol. 19, no. 8, pp. 869-875, 2010.
+20. Ding, Y., Markatou, M., and Ball, R., "An evaluation of statistical approaches to postmarketing surveillance," Statistics in Medicine, vol. 39, no. 7, pp. 845-874, 2020.
+21. European Centre for Disease Prevention and Control (ECDC), "Sample size guidance for surveillance data." Available at: [https://www.ecdc.europa.eu/en/publications-data/sample-size-guidance-surveillance-data](https://www.ecdc.europa.eu/en/publications-data/sample-size-guidance-surveillance-data).
+22. Fosgate, G.T., "Practical sample size calculations for surveillance and diagnostic investigations," Journal of Veterinary Diagnostic Investigation, vol. 21, no. 1, pp. 3-14, 2009.
+23. Murata, T., Husemoen, L.L.N., Nemoto, S., and Matsuhisa, M., "Safety and glycemic control with insulin degludec use in clinical practice: results from a 3-year Japanese post-marketing surveillance study," Diabetology International, vol. 15, no. 1, pp. 76-85, 2024.
+24. Takata, K., Nakazawa, M., Honda, K., and Hashimoto, S., "Post-marketing surveillance of the safety and effectiveness of naldemedine in the management of opioid-induced constipation in patients with cancer pain in Japan," Supportive Care in Cancer, vol. 30, no. 5, pp. 3943-3954, 2022.
+ 
+

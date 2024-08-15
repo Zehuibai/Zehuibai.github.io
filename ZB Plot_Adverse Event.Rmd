@@ -1,0 +1,225 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Analysis of Adverse Event
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                    1. load the required packages                       -->
+# <!-- ---------------------------------------------------------------------- --> 
+
+## if(!require(psych)){install.packages("psych")}
+
+packages<-c("tidyverse", "kableExtra", 
+            "gtsummary","inTextSummaryTable",
+            "Hmisc","htmltools","clinUtils")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                        2. Basic system settings                        -->
+# <!-- ---------------------------------------------------------------------- -->
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+
+
+## Open the folder
+open_folder <-function(dir){
+	if (.Platform['OS.type'] == "windows"){
+	shell.exec(dir)  
+	} else {
+	system(paste(Sys.getenv("R_BROWSER"), dir))
+  }
+}
+open_folder(getwd())
+
+## convert backslash to forward slash in R
+# gsub('"', "", gsub("\\\\", "/", readClipboard()))
+
+### get the path
+# rstudioapi::getSourceEditorContext()$path
+# dirname(rstudioapi::getSourceEditorContext()$path)
+
+### set working directory
+# getwd()
+# setwd("c:/Users/zbai/Desktop")
+# Sys.setlocale("LC_ALL","English")
+
+### get the R Version
+# paste(R.Version()[c("major", "minor")], collapse = ".")
+
+### convert backslash to forward slash 
+# scan("clipboard",what="string")
+# gsub('"', "", gsub("\\\\", "/", readClipboard())) 
+
+## Load all r functions
+## The directory where all source code files are saved.
+source_code_dir <- "C:/Users/baiz/Downloads/Data-Analyst-with-R/00 R Function/ZB Function/"  
+file_path_vec <- list.files(source_code_dir, full.names = T)
+for(f_path in file_path_vec){source(f_path)}
+ 
+```
+
+
+
+# Statistical Analysis of AEs
+
+Efficacy and safety are two crucial aspects of assessing the risk-benefit ratio of a drug. When a drug's efficacy meets the regulatory requirements, its safety profile must also be within a reasonable range. However, clinical trials sometimes reveal peculiar adverse reactions that attract regulatory attention, such as immune-related adverse events (irAEs) from PD-1/L1 inhibitors, bone damage from BTK inhibitors, and bleeding events from EGFR inhibitors. In such cases, sponsors are often required to conduct more in-depth analyses to clarify the drug’s safety. Based on past clinical trial experiences and literature, here have summarized some analytical methods for adverse events that sponsors and regulatory bodies might require for your reference.
+
+## Incidence
+
+Calculating the incidence rate is a fundamental requirement for AE analysis. This includes overall incidence rates, incidence by preferred terms (PT), standard of care (SOC), and by severity levels, including AEs that lead to drug discontinuation, interruption of treatment, or death.
+
+## Time to Occurrence and Duration
+
+The time from drug administration to the occurrence of an AE and the duration of the AE are two important dimensions of AE analysis. If an AE persists, it indicates that this type of AE tends to last long clinically and may require the sponsor to explain how to manage and ensure safety, especially for AEs of grade 3 or higher, which are of greater concern. The following table displays a common summary format:
+
+![](./02_Plots/AE_Time2Onset.png)
+*Source: John Shaik et al., PharmaSUG 2016.*
+
+The figure below demonstrates the use of Kaplan-Meier (KM) curves to analyze the occurrence of AEs.
+   
+![](./02_Plots/AE_KMPlot.png)
+*Source: Kriss Harris et al., PhUSE 2017*
+
+
+## Temporal Distribution of AEs
+
+Analyzing the patterns of AE occurrence over different time periods. For example, although an AE may occur rapidly, it might disappear quickly or be transient, thus having a minimal impact. If a certain type of AE continues throughout the medication period and is of a higher CTCAE grade, it is likely drug-related and clinical considerations for management are necessary.
+
+The following figure shows the distribution over time of three types of AEs in melanoma patients treated with Nivo+Ipi. It can be observed that most skin-related AEs cease to appear after 3 months, and GI and liver-related AEs significantly decrease after 6 months.
+   
+![](./02_Plots/AE_Temporal Distribution.png)
+## Outcome Summary of Adverse Events (AEs)
+
+The outcome of an AE represents whether interventions against the AE are effective. If there is no recovery, the duration of the AE will be prolonged, indicating that effective intervention for this type of AE is challenging.
+
+## Analysis of Factors Influencing AEs
+
+If the AEs in the experimental group are particularly prominent (e.g., significantly more bleeding events or a higher mortality rate in the experimental group compared to controls), regulatory bodies often require an analysis of influencing factors. If clinical influencing factors can be identified, measures can be taken to control them, also indicating that the AEs are predictable.
+
+Sometimes, to reduce the bias due to timing in between-group comparisons, a landmark analysis strategy might be used, which excludes patients who stopped treatment or died prematurely. For example, patients who terminated treatment or died within two months may be excluded.
+
+## Hazard Ratio (HR) of AE Occurrence
+
+This is also a method for analyzing differences in AE characteristics between two groups, using survival analysis to study the hazard ratio of AE occurrence. The figure below shows the risk of irAEs in the Keynote-054 study comparing Drug K with a placebo (HR = 5.0), indicating that the risk of irAEs is significantly higher in the experimental group.
+
+
+![](./02_Plots/AE_HR.png)
+
+# AE Frequent by Relative Risk/Forest Plot
+
+## Analysis
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+load(file = "./03_Datasets/adae.rda")
+load(file = "./03_Datasets/adsl.rda")
+
+### Subset the population dataset ADSL on SAFFL safety flag 
+### consider only two treatments for comparison.
+### convert all the upcase variables in ADSL and ADAE to lower case
+adsl2  <- adsl %>% 
+  rename_with(tolower) %>%
+  filter(saffl=='Y' & trt01a==c('Xan_Hi','Pbo')) %>%         
+  select(usubjid,saffl,trt01a)
+  
+adae2  <- adae %>% rename_with(tolower) 
+
+adsl_cnt2 <- adsl2 %>% 
+  group_by(trt01a) %>% 
+  dplyr::summarise(bign=n()) %>%
+  pivot_wider(names_from = trt01a, values_from = bign) 
+
+### separate variables/macro variable to store those values two treatment counts
+adsl_cnt2
+pbo <- adsl_cnt2$Pbo
+xan <- adsl_cnt2$Xan_Hi 
+
+### Merge the ADSL and ADAE on usubjid variable, keep only the required variables and remove the duplicate records, group by treatment and aedecod. Get the count of each aedecod per treatment and then derive the percentage. While deriving the population we are using the macro variables pbo and xan which has the population bign count.
+adsl_adae = inner_join(adsl2,adae2,by=c("usubjid")) %>% 
+  select(usubjid,aedecod,trt01a.x)  %>%
+  distinct(usubjid,aedecod,trt01a.x) %>% 
+  group_by(trt01a.x,aedecod) %>% 
+  dplyr::summarise(cnt=n(),.groups = 'drop') %>% 
+  ungroup() %>% 
+  mutate(pct=ifelse(trt01a.x=='Pbo',cnt/pbo,cnt/xan)) %>% 
+  ungroup() %>% 
+  arrange(aedecod,trt01a.x) 
+
+### Derive the mean relative risk, lcl and ucl 
+adsl_adae2 <- adsl_adae %>% 
+  select(-pct) %>% 
+  pivot_wider(names_from = c(trt01a.x), values_from = cnt) %>%
+  mutate(nb=Pbo, na=Xan_Hi, snb=pbo, sna=xan, a=na/sna,
+         b=nb/snb,factor=1.96*sqrt(a*(1-a)/sna + b*(1-b)/snb),
+         lcl=a-b-factor,ucl=a-b+factor,mean=0.5*(lcl+ucl)) %>% 
+  filter(!is.na(mean)) 
+
+
+### Plot 1: AE Proportion dot plot
+ggplot(adsl_adae %>% filter(aedecod %in% adsl_adae2$aedecod) %>%
+         arrange(desc(aedecod)),aes(x=pct,y=reorder(aedecod,desc(aedecod)))) + 
+  geom_point(shape = 17,size=2,aes(colour = factor(trt01a.x))) +
+  ggtitle("Proportion") +
+  xlab('Proportion') + ylab('') +
+  scale_colour_manual(values = c("Blue", "Red")) +
+  theme(legend.position="bottom") + labs(col="Treatment:") 
+
+### Plot 2: Relative Risk
+ggplot(data=adsl_adae2, aes(x=reorder(aedecod,desc(aedecod)), y=mean, ymin=lcl, ymax=ucl)) +
+  geom_pointrange() + 
+  geom_hline(yintercept=0, lty=2) +  # add a dotted line at x=1 after flip
+  coord_flip() +  # flip coordinates (puts labels on y axis)
+  xlab("") + ylab("Mean (95% CI)") +
+  ggtitle("Risk Difference with 0.95CI") +
+  theme(axis.ticks = element_blank(),legend.position="none")
+
+
+### align the above two images side by side, use the package cowplot.
+library(cowplot)
+p2 <- ggplot(data=adsl_adae2, aes(x=reorder(aedecod,desc(aedecod)), y=mean, ymin=lcl, ymax=ucl)) +
+  geom_pointrange() + 
+  geom_hline(yintercept=0, lty=2) +  # add a dotted line at x=1 after flip
+  coord_flip() +  # flip coordinates (puts labels on y axis)
+  xlab("") + ylab("Mean (95% CI)") +
+  ggtitle("Risk Difference with 0.95CI") +
+  theme(axis.text.y = element_blank(),axis.ticks = element_blank(),legend.position="none")
+
+p1 <- ggplot(adsl_adae %>% filter(aedecod %in% adsl_adae2$aedecod) %>% 
+         arrange(desc(aedecod)),aes(x=pct,y=reorder(aedecod,desc(aedecod)))) + 
+  geom_point(shape = 17,size=2,aes(colour = factor(trt01a.x))) +
+  ggtitle("Proportion") +
+  xlab('Proportion') + ylab('') +
+  scale_colour_manual(values = c("Blue", "Red")) +
+  theme(legend.position="bottom") + labs(col="Treatment:")
+
+plot_grid(p1,  p2, labels = "AUTO",nrow = 1,rel_widths = c(0.8, 0.5))
+```
+
+## Reference
+
+* [Most Frequent AE by Relative Risk/Forest Plot using](https://www.linkedin.com/pulse/most-frequent-ae-relative-risk-using-r-jagadish-katam/?trackingId=GllB04d3RAe%2BIPwtx1czFg%3D%3D)

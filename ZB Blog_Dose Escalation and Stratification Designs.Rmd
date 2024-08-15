@@ -1,0 +1,499 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Dose Escalation and Stratification Designs in Early Oncology Development
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                    1. load the required packages                       -->
+# <!-- ---------------------------------------------------------------------- --> 
+
+## if(!require(psych)){install.packages("psych")}
+
+packages<-c("tidyverse", "kableExtra", 
+            "gtsummary","inTextSummaryTable",
+            "Hmisc","htmltools","clinUtils")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                        2. Basic system settings                        -->
+# <!-- ---------------------------------------------------------------------- -->
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+
+
+## Open the folder
+open_folder <-function(dir){
+	if (.Platform['OS.type'] == "windows"){
+	shell.exec(dir)  
+	} else {
+	system(paste(Sys.getenv("R_BROWSER"), dir))
+  }
+}
+open_folder(getwd())
+
+## convert backslash to forward slash in R
+# gsub('"', "", gsub("\\\\", "/", readClipboard()))
+
+### get the path
+# rstudioapi::getSourceEditorContext()$path
+# dirname(rstudioapi::getSourceEditorContext()$path)
+
+### set working directory
+# getwd()
+# setwd("c:/Users/zbai/Desktop")
+# Sys.setlocale("LC_ALL","English")
+
+### get the R Version
+# paste(R.Version()[c("major", "minor")], collapse = ".")
+
+### convert backslash to forward slash 
+# scan("clipboard",what="string")
+# gsub('"', "", gsub("\\\\", "/", readClipboard())) 
+
+## Load all r functions
+## The directory where all source code files are saved.
+source_code_dir <- "C:/Users/baiz/Downloads/Data-Analyst-with-R/00 R Function/ZB Function/"  
+file_path_vec <- list.files(source_code_dir, full.names = T)
+for(f_path in file_path_vec){source(f_path)}
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                         3. Import the datasets                         -->
+# <!-- ---------------------------------------------------------------------- -->
+
+# <!-- ---------------------------- -->
+# <!-- --3.1 Import csv data ------ -->
+# <!-- ---------------------------- -->
+
+# pfad <- "~/Desktop/SASUniversityEdition/myfolders/Daten"
+# mydata1 <- read.csv(file.path(pfad, "yourcsv_data.csv"), 
+#                     sep=";", 
+#                     header=TRUE)   
+
+## Import all csv data from folder
+# list_csv_files <- list.files(path = "./csvfolder/")
+# do.call(rbind, lapply(list_csv_files, function(x) read.csv(x, stringsAsFactors = FALSE)))
+
+# <!-- ---------------------------- -->
+# <!-- --3.2 Import xlsx data ----- -->
+# <!-- ---------------------------- -->
+
+# library(readxl)
+# mydata2 <- read_excel("C:/Users/zbai/Documents/GitHub/R-Projects/SAS/Yimeng/results-text.xlsx")
+
+# <!-- ---------------------------- -->
+# <!-- --3.3 Import sas7dbat data - -->
+# <!-- ---------------------------- -->
+
+# library(sas7bdat)
+# mydata3 <- read.sas7bdat("~/Desktop/SASUniversityEdition/myfolders/Daten/uis.sas7bdat")
+
+## Import all sas7dbat data from SASfolder
+# ZB.import.sas.folder("./SASfolder/")
+
+# <!-- ---------------------------- -->
+# <!-- --3.4 Import from copyboard --->
+# <!-- ---------------------------- -->
+# copdat <- read.delim("clipboard")
+# Data_D01 <- copdat
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                           4. Some Tools                                -->
+# <!-- ---------------------------------------------------------------------- -->
+
+## To check out vignettes for one specific package
+# browseVignettes("sjPlot")      ## sjPlot for Models Summary
+# browseVignettes("gtsummary")
+
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                           5. Citation                                -->
+# <!-- ---------------------------------------------------------------------- -->
+# citation("gtsummary")
+# <!-- ---------------------------------------------------------------------- -->
+```
+
+ 
+**Summary Info**
+
+1. **Targeted Oncology Drug Development**:
+   - There is a trend toward aligning the clinical development of new oncology drugs with strategies used in other therapeutic areas, focusing on achieving precise therapeutic outcomes.
+
+2. **Exposure-Response Studies**:
+   - These studies are critical for correctly determining the dose, requiring robust characterization of PK and PD endpoints that demonstrate both target engagement and ideally a direct link to clinical efficacy.
+
+3. **Shift From MTD to MAD**:
+   - Modern oncology trials are moving away from finding the Maximum Tolerated Dose (MTD) to identifying the Minimum Active Dose (MAD), supported by detailed exposure-response modeling and simulation.
+
+4. **Integration of PK/PD Sampling in Protocols**:
+   - From the start of the trial, there is a strong emphasis on integrating PK and PD sampling within the trial protocol to ensure comprehensive data collection.
+
+5. **Consideration of Covariates and Disease States**:
+   - Evaluating how different covariates and patient-specific disease states affect drug exposure is essential for tailoring therapy to individual needs.
+
+## FDA’s Project Optimus 
+
+(FDA’s Project Optimus: Redefining Oncology Drug Dosage for Better Patient Outcomes)[https://www.cytel.com/perspectives/fdas-project-optimus-redefining-oncology-drug-dosage-for-better-patient-outcomes/]
+
+## Dose Escalation 
+
+### Dose Ranging {-}
+
+The evolution of cancer treatment strategies and trial designs has undergone significant transformations since the 1960s and 1970s. Initially, the predominant treatment for cancer involved chemotherapeutics, guided by the principle that the largest feasible dose was likely the most effective. This notion shaped early clinical trial designs, which were primarily based on establishing the maximum tolerated dose (MTD) of a drug, assuming that the highest dose that a patient could tolerate without severe toxicity would also be the most effective for treating cancer.
+
+However, this assumption is no longer valid with the advent of modern oncology therapies, particularly targeted therapies and immunotherapies. These newer treatments have shifted the focus from MTD to identifying an optimal therapeutic dose that balances efficacy with minimal toxicity. This shift necessitates a different approach in clinical trial design.
+
+Today's oncology trials often utilize **pharmacokinetics, pharmacodynamics, and biomarkers** to determine the most effective dose. This is distinct from simply escalating doses until unacceptable toxicity levels are reached. The concept of a "therapeutic window" is now crucial, which represents a range where a drug is effective without causing significant side effects. This window is typically identified by analyzing the relationship between the probability of efficacy (represented by a green line) and the probability of toxicity (represented by a red line).
+ 
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/DOSE_TP Windows.png")
+``` 
+
+Modern trial designs also consider the dynamics of how drugs affect the body over time and how tumors respond to drugs. Unlike the past, where efficacy might be immediately apparent, newer treatments might show gradual improvements or require longer durations to assess true benefits, complicating the determination of when to judge efficacy or futility.
+
+Additionally, the patient population for these trials is often selected based on specific biomarkers, which can predict a more favorable response to certain therapies. This biomarker-driven selection is part of a broader strategy of personalized medicine, which tailors treatments based on individual patient characteristics, potentially improving outcomes and reducing unnecessary exposure to ineffective treatments.
+
+### Challenges in Targeted Oncology Drug Development {-}
+
+The challenges in contemporary oncology trials include:
+
+- Designing studies that accommodate delayed treatment effects and variable response rates.
+- Managing complex dosing regimens, especially in trials involving combination therapies where interactions between drugs must be considered.
+- Addressing the potential for both acute and delayed toxicities, which requires ongoing monitoring and possibly adjusting trial protocols in response to emerging safety data.
+
+In Details
+
+1. **Optimal Dose Not Based on Maximum Tolerated Dose:**
+
+   - **Use of PD Biomarkers are Necessary**: Pharmacodynamic (PD) biomarkers are crucial for determining the biological response a drug has at a particular dose, rather than simply escalating doses until toxicities become intolerable. This shift from a Maximum Tolerated Dose (MTD) approach to one that relies on biomarkers allows for more precise dosing that maximizes therapeutic effects while minimizing side effects.
+
+2. **Population May Be Defined by a Biomarker Signature:**
+
+   - **Co-development of Diagnostic Biomarker**: Targeted therapies often require the identification and validation of biomarkers that can predict which patients will respond to a treatment. This necessitates the simultaneous development of diagnostic tests alongside new therapies, a process known as 'companion diagnostics'. This approach ensures that the right patients receive the right treatment based on their unique genetic makeup.
+
+3. **Long Term Immune-Related Toxicity May Exist:**
+
+   - **Late Onset Toxicity**: Unlike traditional chemotherapeutics, some targeted therapies and immunotherapies can cause delayed toxicities that may not appear until months or years after treatment. These toxicities can be challenging to predict and manage, requiring long-term patient monitoring and potentially complicating the assessment of a drug's safety profile.
+
+4. **Traditional Efficacy Measures May Not Be Appropriate:**
+
+   - **Early Pseudo-progression Using RECIST**: Some cancer treatments, particularly immunotherapies, can initially cause tumors to appear larger or remain stable before they shrink, a phenomenon known as pseudo-progression. Traditional response criteria like RECIST (Response Evaluation Criteria in Solid Tumors) may not accurately reflect true therapeutic benefits in these cases.
+   - **RECIST/PFS May Not Be Correlated with Overall Survival**: In targeted therapy, standard measures like progression-free survival (PFS) may not always correlate with overall survival, which is the ultimate goal of treatment. This discrepancy can complicate the evaluation of a drug's clinical benefit.
+   - **Increasing Efficacy Over Time**: The effectiveness of some therapies may increase over time, meaning early assessments might underestimate long-term benefits. This necessitates a reevaluation of when and how efficacy is measured in clinical trials to ensure accurate assessments of therapeutic potential.
+
+To tackle these complexities, adaptive trial designs are increasingly used. These designs allow modifications to the trial procedures based on interim data, which can include dose adjustments, sample size recalculations, or even changes in the study endpoint. Such adaptive designs are particularly useful in trials for combination therapies or for novel agents where the optimal therapeutic strategy is not yet well-defined.
+
+
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/DOSE_ExampleP12.png")
+```
+ 
+### Issues associated with the 3+3 design {-}
+
+3+3 design, a traditional method used in the dose-escalation phase of clinical oncology trials. This design has historically been a cornerstone in determining the maximum tolerated dose (MTD) but has encountered significant criticism for various limitations.  
+
+Historically, the 3+3 design has been a staple in oncology trials for determining the maximum tolerated dose (MTD). However, it has well-documented limitations such as the risk of choosing suboptimal doses for Phase 2 trials and the inability to efficiently include intermediate dose levels or handle varying cohort sizes (e.g., N=2, 4, 5).
+
+
+1. **High Risk of Recommending Incorrect Phase 2 Dose**:
+   - The 3+3 design often results in recommending a dose for Phase 2 that may not be optimal. Because the design focuses on toxicity without integrating other pharmacodynamic data or intermediate doses, the chosen dose may either be too low (ineffective) or too high (toxic), necessitating dose adjustments in future trials.
+
+2. **Limitations with Cohort Size Variability**:
+   - The 3+3 design typically enrolls cohorts of three patients and expands to six if one patient experiences dose-limiting toxicity (DLT). However, issues arise when the cohort sizes do not neatly fit this pattern (e.g., N=2, 4, 5), potentially skewing the data and complicating dose escalation decisions.
+
+3. **Inertia in Clinical Trial Methodology**:
+   - There is considerable resistance among trialists to move away from the 3+3 design despite known limitations. This inertia may be due to familiarity, simplicity, or regulatory precedent, which discourages innovation in trial design.
+
+4. **Exclusion of Intermediate Doses**:
+   - The 3+3 design typically tests increasing dose levels but often skips potential therapeutic doses that lie between the tested levels. This can result in missing the 'sweet spot'—a dose that is both effective and has manageable toxicity.
+
+5. **Lack of Guidance for Combination Therapies**:
+   - The design does not provide information on how to step from monotherapy to combination therapy dosing, an increasingly common approach in oncology, where drugs are used in synergy to improve efficacy.
+
+6. **Necessity for Repeated Dosing Confirmation**:
+   - Because the 3+3 design focuses on identifying the MTD based on short-term toxicity, there's often a need to validate the chosen dose in additional cohorts to confirm long-term safety and efficacy, which can delay the development process.
+
+These limitations highlight the need for more sophisticated designs in early-phase clinical trials, such as adaptive designs, Bayesian models, or model-informed drug development strategies. These approaches can offer more flexibility, utilize mathematical and statistical models to predict outcomes better, and are more responsive to data gathered during the trial. Such improvements could lead to more accurate dosing recommendations, reduced trial durations, and better overall outcomes for patients in clinical trials.
+
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/DOSE_Escalation Methods.png")
+knitr::include_graphics("./02_Plots/DOSE_Escalation Methods Comp.png")
+```
+ 
+- **Emergence of Algorithm-Based and Model-Informed Approaches**: In response to these limitations, new methods have been developed. Algorithm-based methods follow predefined rules in the protocol, which can be rigid. Model-informed approaches, including statistical modeling and adaptive designs, leverage existing data to make more nuanced decisions about dose escalation, including the use of intermediate doses and integration of combination therapies.
+- **Basket Trials and Multi-Indication Studies**: Modern trial designs, like basket trials, allow the testing of a drug across multiple indications simultaneously. This is particularly useful for targeted therapies where the drug may be effective across different cancers with the same genetic mutations. This approach helps in identifying the most promising application to accelerate into further development.
+- **Adaptive Designs**: These designs allow for modifications based on interim data. This flexibility can lead to more efficient trials by accommodating changes in trial protocols in response to early results, which is crucial in rapidly evolving fields like oncology.
+
+### Regulatory and Methodological Innovations {-}
+
+- **FDA Guidance on Dose Optimization**: Recent FDA draft guidance and other materials focus on optimizing dosing strategies before large-scale trial phases. This includes recommendations for randomizing between doses to better establish efficacy and safety profiles without the constraints of traditional dose escalation methods.
+
+- **Incorporation of Real-World Data and Biomarkers**: There's an increasing emphasis on integrating biomarkers and real-world data into trial designs. This approach helps in refining patient selection and enhancing the predictive accuracy of trial outcomes, facilitating personalized treatment strategies.
+ 
+- **Late Toxicities and Safety-Efficacy Balancing**: One of the persistent challenges in oncology drug development is managing late-onset toxicities. Research continues into how to incorporate safety and efficacy data into trial designs effectively, ensuring that treatments are both safe and beneficial over the long term.
+
+- **Optimizing Combination Therapies**: As oncology treatments increasingly involve combinations of drugs, figuring out how to dose each component effectively while managing interaction effects is a major focus area. This includes determining how to sequence drugs and adjust dosages based on patient response and toxicity.
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/DOSE_Example Combination.png")
+```
+
+
+ 
+## Dose Optimization Design 
+
+### Project Optimus Guidance (FDA) {-}
+
+[Optimizing the Dosage of Human Prescription Drugs and Biological Products for the Treatment of Oncologic Diseases](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/optimizing-dosage-human-prescription-drugs-and-biological-products-treatment-oncologic-diseases)
+
+The Guidance is designed to enhance the clinical trial process by focusing on optimizing dosing strategies before the commencement of large-scale approval trials. 
+
+1. **Explore Optimal Dose Prior to Approval Trials**:
+   - This guideline stresses the importance of identifying the most effective and safest dose of a new therapeutic before proceeding to Phase 3 trials or regulatory approval processes. By determining the optimal dose early, the efficacy of the treatment can be maximized while minimizing adverse effects, leading to more successful clinical outcomes and a smoother regulatory review.
+
+2. **Randomize Between Doses**:
+   - Randomization between different dose levels is recommended to objectively assess the efficacy and safety profiles of each dose without bias. This approach helps in comparing multiple dosing strategies directly against each other within the same trial, providing robust data on which doses are most effective and tolerable.
+
+3. **Examine More Than One Dose**:
+   - Evaluating multiple doses simultaneously allows researchers to understand the dose-response relationship and to identify not only the maximum tolerated dose but also lower doses that might be equally efficacious with fewer side effects. This is particularly important for treatments where the therapeutic window is narrow.
+
+4. **Not Statistically Powered to Compare Doses**:
+   - Often, early-phase trials are not designed to have the statistical power to definitively compare the efficacy between doses. Instead, they are intended to eliminate clearly suboptimal doses and to select promising ones for more rigorous testing. The goal is to gather sufficient preliminary evidence to justify further exploration in more targeted, statistically powered studies.
+
+5. **Adaptively Design to Drop One Dose**:
+   - Adaptive trial designs are increasingly used to enhance the efficiency and flexibility of clinical trials. Such designs allow for modifications based on interim data analysis. For example, if one dose is found to be less effective or more toxic during the initial phases of the trial, it can be dropped from further investigation. This dynamic approach helps focus resources on more promising therapeutic options, speeding up the development process and reducing unnecessary exposure of participants to suboptimal treatments.
+
+
+
+### Dose Comparison Study Design {-}
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/DOSE_Comparison Study.png")
+```
+
+#### Objectives {-}
+
+- **Safety, Toxicity, PK, PD, PGenomics**: The primary objectives of a dose comparison study are to evaluate the safety profile of the drug, understand its toxicity levels, and assess its pharmacokinetics (PK) and pharmacodynamics (PD). Pharmacogenomics (PGenomics) may also be included to understand how genetic variations influence drug responses and adverse effects across different patient groups.
+
+#### Design {-}
+
+- **Randomized, Parallel, Dose Response Trial**: The study design is typically randomized and parallel, meaning each participant is randomly assigned to a treatment group, and multiple groups are treated simultaneously with different doses. This design helps to minimize bias and allows for direct comparison of the responses to each dose.
+- **Two or More Doses**: Multiple dosing levels are tested to identify the dose-response relationship, determining the optimal therapeutic dose that balances efficacy and safety.
+- **Adaptive Design is Recommended**: An adaptive design is suggested because it allows the study to be modified based on interim results. For example, doses may be adjusted, or dosing groups may be added or removed based on early safety and efficacy data. This flexibility can lead to more efficient trials that are better tailored to finding the most appropriate dosage.
+
+#### Sample Size {-}
+
+- **Sized for Sufficient Assessment of Activity, Safety, and Toxicity**: The trial should have enough participants to reliably assess the drug's effects and safety at each dose level.
+- **Not Sized to Statistically Compare Between Dose Groups**: While the study aims to collect data on multiple doses, it is typically not powered enough to provide definitive statistical comparisons between doses. The primary goal is to rule out suboptimal doses rather than to provide a detailed comparison of all dosages.
+- **In Practice, 20-30 Subjects Per Dose Group**: This number of participants is generally considered sufficient to observe the drug’s effects while managing resource allocation efficiently.
+
+#### Decision Making {-}
+
+- **Safety**: Safety assessments are paramount, ensuring that the drug does not produce intolerable or dangerous side effects.
+- **Bayesian Probability Response Rate > Target Levels**: Decision-making often incorporates Bayesian statistics, where prior knowledge and current trial results are combined to update the probability of a dose being optimal. Decisions are made based on whether the probability that a dose achieves a target response rate exceeds a pre-specified threshold, which allows for more dynamic and informed decision-making during the trial.
+
+#### Example Dose Escalation + Dose Comparison {-}
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/DOSE_Example Escalation Comparison.png")
+```
+
+- **Dose Levels**: The flowchart depicts multiple dose levels (Dose Level 1 to Dose Level 4), with each level being tested in combination with another agent or regimen (noted as "Comb").
+- **Escalation and Toxicity Assessment**: The escalation from one dose to the next depends on the safety and toxicity profile observed. Dose-limiting toxicity (DLT) at each level is a critical evaluation point, determining whether it is safe to proceed to the next higher dose.
+- **Adaptive Elements**: The flowchart includes a decision point marked by “R” which likely represents a review or reassessment stage where data are evaluated to make decisions about proceeding with the current dosing strategy, adapting it, or stopping escalation.
+- **Interim and Final Analysis**: The process culminates in interim and final analyses where efficacy biomarkers and other outcomes are assessed to determine the optimal therapeutic dose.
+
+
+## Modelling and Simulation
+
+### Traditional vs. Targeted Therapies in Oncology {-}
+
+Shift in paradigms for dose determination in oncology from the traditional Maximum Tolerated Dose (MTD) to the Minimally Active Dose (MAD) in the context of targeted immuno-oncology agents.
+
+
+1. **Traditional Paradigm (MTD):**
+   - **Maximum Tolerated Dose (MTD)**: Historically, oncology has focused on finding the highest dose of a drug that a patient can tolerate without unacceptable side effects. This approach was particularly relevant for cytotoxic agents where efficacy was often proportional to dose, up to the threshold of tolerable toxicity.
+   - **Similarity of MTD and MAD**: With cytotoxic agents, the minimally active dose that produces a therapeutic effect was often close to the maximum tolerated dose, explaining why MTD dominated early oncology treatments.
+   - **Lack of Dose-Ranging**: Traditionally, extensive dose-ranging studies were not performed, primarily due to the narrow therapeutic window of cytotoxic drugs—efficacy and high toxicity were closely linked.
+
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/DOSE_MTD MAD 1.png")
+```
+
+
+
+2. **Targeted Immuno-Oncology Paradigm:**
+   - **Minimally Active Dose (MAD)**: The focus has shifted toward determining the lowest dose that effectively modulates the target and provides a clinical benefit, particularly with targeted therapies and immunotherapies. This approach reflects an increased understanding of the drugs' mechanisms of action and their interactions with specific cancer cell pathways or the immune system.
+   - **Decreased Emphasis on MTD**: With targeted therapies, increasing the dose does not necessarily enhance efficacy and may lead to unnecessary toxicity. Hence, the therapeutic window is broader, and the optimal therapeutic dose may be much lower than the MTD.
+   - **Therapeutic Window and Dose Exploration**: The targeted nature of these new therapies implies that there can be a wider therapeutic window, allowing for an effective dose that is lower and has fewer side effects. This is illustrated in the dose-response curve where the green curve (efficacy) plateaus, indicating that increasing the dose beyond a certain point does not significantly increase efficacy but continues to increase toxicity (red curve).
+   
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/DOSE_MTD MAD 2.png")
+```
+
+For Clinical Implications:
+
+- **Precision in Dosing**: Identifying the MAD requires precise understanding and monitoring of the drug's effects at various levels, often facilitated by biomarkers.
+- **Patient Safety and Efficacy**: The goal is to maximize patient benefit while minimizing side effects, which may enhance patient compliance and overall treatment outcomes.
+
+This transition in dosing strategy highlights a fundamental change in how newer oncologic therapies are developed and administered, emphasizing the need for a personalized approach to cancer treatment. 
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/DOSE_MTD MAD Example.png")
+```
+
+
+### Improve ImmunoOncology Drug Development {-}
+
+1. **Use of Informative Biomarkers During Dose Escalation to Confirm Target Engagement**:
+   - **Purpose**: To ensure that the drug engages effectively with its intended target in the body. Biomarkers are biological molecules found in blood, other body fluids, or tissues that are a sign of a normal or abnormal process, or of a condition or disease. They are used here to verify that the drug is interacting with its target, which is crucial for its intended therapeutic effect.
+   - **Application**: Biomarkers can provide early indications of whether a drug is likely to be effective at a given dose, helping to optimize the dose escalation process by confirming biological activity before more significant side effects occur.
+
+2. **Measure Drug Exposure (PK) During Dose Escalation and Evaluate on a By-cohort Basis**:
+   - **Purpose**: Pharmacokinetics (PK) measures how the body absorbs, distributes, metabolizes, and excretes a drug. Measuring PK during dose escalation helps to understand how different doses of a drug behave in the body.
+   - **Application**: Evaluating PK data by cohort allows researchers to see variations in drug behavior across different groups of patients, which can inform safer and more effective dosing strategies.
+
+3. **Build Exposure-Response Models Early in the Dose Escalation Phase**:
+   - **Purpose**: Exposure-response models analyze the relationship between the drug dose and its effects on the body. Establishing these models early helps predict how changes in dose will affect efficacy and toxicity.
+   - **Application**: These models aid in identifying the optimal dose that maximizes therapeutic benefits while minimizing adverse effects, enabling more precise dose adjustments during the trial.
+
+4. **Using Exposure-Response Modeling (Along with Safety Analysis) to Guide Dose Escalation and Choose Doses for Dose-Ranging Study**:
+   - **Purpose**: To integrate safety and efficacy data comprehensively, providing a balanced approach to dose determination that considers both the beneficial and adverse effects of the drug.
+   - **Application**: This strategy uses statistical models to integrate data from PK studies and safety assessments, helping to identify which doses are safe and effective for further testing in more extensive dose-ranging studies.
+   - **Phase 1B/2 Trials**: Modeling and simulation play a critical role in these early trial phases, where dose-finding is key. Typically, two doses are selected based on exposure-response relationships and safety data.
+   - **Choosing Distinct Doses**: It’s important to select doses that are sufficiently distinct to clearly delineate their effects, avoiding minimal differences like choosing doses of 100 and 110, which would not provide clear comparative data.
+   - **Trial Advancement**: Insights gained from early phase trials using these methods can seamlessly feed into later-stage studies, including randomized trials and phase 2 studies with interim analyses.
+
+### Exposure-Response Modeling {-}
+
+**Exposure-Response Modeling in Clinical Development**
+
+1. **Overview of the Process**:
+   - **Exposure-response modeling** is a technique used to understand the relationship between drug exposure (dose and concentration in the body) and the pharmacological response. This modeling is crucial for determining the optimal dose that maximizes efficacy while minimizing toxicity.
+
+2. **Integration into Drug Development Phases**:
+   - **Pre-IND (Investigational New Drug) Phase**: Before an IND is filed, initial modeling efforts focus on projecting human doses from preclinical data (translational PK/PD) and determining how the drug interacts with its target (tissue engagement).
+   - **Phase I/II/III**: Throughout these phases, exposure-response modeling is used to refine dosage based on clinical pharmacokinetics and pharmacodynamics data. This includes optimizing dosing regimens, understanding the impact of intrinsic factors (like patient-specific metabolism) and extrinsic factors (such as drug-drug interactions), and assessing safety profiles related to drug concentration.
+   - **Phase IV**: Post-marketing, the modeling helps in further validating dose recommendations and adjusting them based on a broader patient population's real-world data.
+
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/DOSE_Exposure-Response Modeling.png")
+```
+
+
+**Regulatory Emphasis on Dose-Finding Trials**
+
+1. **Initial Dose Escalation**:
+   - In the early stages, different doses are tested to determine how they affect the drug's pharmacokinetics and pharmacodynamics. The goal here is to identify a range of potentially effective doses with acceptable safety profiles.
+
+2. **Dose-Finding Randomized Trial**:
+   - After initial dose escalation, a randomized trial is conducted to compare the effects of at least two selected doses. These doses are chosen based on their distinct pharmacokinetic profiles to minimize overlap, ensuring that the differences in response can be accurately attributed to the differences in dose.
+   - This approach allows for more precise identification of the optimal dose for further testing in larger clinical trials.
+
+3. **Advantages of Integrated Dose-Finding**:
+   - Such trials enable seamless transition into later phases (Phase 2-3), where efficacy and safety are further assessed.
+   - They allow for interim analyses and adaptations, such as dose adjustments and the exploration of different drug combinations and dosing schedules.
+
+```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
+knitr::include_graphics("./02_Plots/DOSE_Finding.png")
+```
+
+
+**Importance of Modeling and Simulation**
+
+- **Modeling and simulation** play a crucial role across all phases, providing a robust framework for decision-making based on quantitative data.
+- These techniques help in predicting outcomes, optimizing trial design, and ultimately ensuring that the drug development process is both efficient and tailored to produce the best therapeutic outcomes.
+
+### Advantages of performing a dose-finding trial after the dose escalation study {-}
+
+- **Comprehensive Assessment**: Beyond merely establishing safety and tolerability, this approach integrates the evaluation of how well the drug engages its target and the corresponding biomarker responses. This holistic assessment helps in making a scientifically grounded decision about the optimal therapeutic dose that should be carried forward into further clinical trials.
+
+- **Flexibility in Treatment Options**: By thoroughly understanding the dose-response relationship and having clear documentation, it becomes easier to make post-approval adjustments such as combining the drug with other therapies, modifying the treatment regimen, or altering the route of administration. These modifications can help optimize therapy based on real-world efficacy and safety data or new scientific findings.
+
+- **Enhanced Confidence in Dosing Decisions**: By the time a drug enters Phase 3 trials, having a well-characterized dose-response from earlier phases reduces the uncertainty and risk associated with efficacy and safety outcomes. This can lead to more efficient Phase 3 trials with a higher likelihood of successful outcomes.
+
+- **Streamlined Regulatory Review**: Comprehensive dose-finding studies provide robust data that can facilitate smoother regulatory review processes. Regulators are equipped with clear evidence supporting the chosen dosages, which can expedite approval timelines and decrease the likelihood of regulatory delays due to inadequate dosing data.
+
+Overall, incorporating a dose-finding trial after initial dose escalation is crucial for refining dosage recommendations, ensuring regulatory compliance, and ultimately enhancing the drug's clinical success by firmly grounding dosing decisions in scientific evidence. This approach is particularly important in the field of immuno-oncology, where the therapeutic window can vary significantly among patients and targeted mechanisms.
+
+> Note: Biomarkers assuming increasing importance in Phase 1 trials
+
+> The use of biomarkers in Phase 1 trials of immuno-oncology agents is increasingly pivotal. Data from a study encompassing trials from 2014 to 2020 shows that biomarkers are commonly measured in blood and significantly influence clinical development decisions, including dosage adjustments.
+
+> Biomarkers confirm that the drug is affecting its intended target (target engagement), enhancing the understanding of the drug's mechanism of action. More than 50% of the studies reported that biomarkers had a direct impact on clinical decisions.
+
+> Recent regulatory changes emphasize the need for informative PD biomarkers in trial designs. These changes are expected to play a significant role in future clinical trial setups and drug development strategies.
+
+
+## Data for Exposure Response
+
+### Challenges in Pharmacokinetics Sampling in Oncology Trials {-}
+
+1. **Typical Phase 1 Sampling Limitations**:
+   - **Outpatient Basis**: Many Phase 1 trials are conducted on an outpatient basis, which limits the availability of participants for frequent sampling necessary for PK studies.
+   - **Operating Hours**: Community oncology centers, where many trials are conducted, often close early (around 4:30-5 PM), further restricting the timeframe in which samples can be collected.
+   - **Recruitment and Sampling Density**: The need for dense sampling, required for accurate pharmacokinetics studies, can deter participants due to the inconvenience, potentially hindering recruitment efforts. There's a balance that needs to be maintained between participant convenience and the quality of data obtained.
+
+2. **Venous Access Issues**:
+   - **Limited Availability**: Dedicated venous access, crucial for repeated blood draws, may not always be possible or available in every setting, complicating the process of obtaining samples at the needed intervals.
+
+3. **Use of PICC Lines**:
+   - **Risk of Contamination**: Sampling from peripherally inserted central catheter (PICC) lines, while convenient, may introduce contamination from drug infusion. Proper flushing of the line is necessary to avoid this, but it can still be a concern.
+
+4. **Delays in Sample Analysis**:
+   - **Common Delays**: There are often delays in the analysis of collected samples, which can affect the timeliness and potentially the reliability of pharmacokinetic data due to degradation or changes in the sample integrity over time.
+   
+   
+### Sampling Strategies {-}
+
+1. **Adaptive Sampling Protocol**:
+   - The PK section of the clinical protocol should be designed flexibly to allow changes in the sampling schedule based on emerging data. This adaptability helps to refine the sampling strategy as more is learned about the drug's behavior in real time.
+
+2. **Real-Time PK Modeling**:
+   - Utilizing real-time pharmacokinetic modeling helps in selecting optimal time points for sample collection, ensuring that data collected are most informative for dose adjustments.
+
+3. **Formal Sampling Optimization**:
+   - Techniques such as D-optimality are used to optimize sampling times. This method focuses on selecting times that maximize the amount of pharmacodynamic information obtained, thereby enhancing the quality of the PK/PD model.
+
+4. **Importance of Every Sample**:
+   - Especially for drugs with short half-lives, ensuring that each sample collected provides meaningful data is crucial, emphasizing that routine collection of samples at trough levels may not always yield useful information.
+
+5. **Collaboration with Translational Research**:
+   - It's important to integrate efforts with translational research, particularly in the context of selecting biomarker sampling times that are informed by expected drug exposure and response patterns.
+
+6. **Cost-Effectiveness of Real-Time Analysis**:
+   - While costly, real-time sample analysis provides valuable data that can significantly influence decision-making processes during the clinical trial, potentially leading to more effective dosing strategies and outcomes.
+  
+## Source
+
+Project Optimus, Dose Escalation and Stratification Designs in Early Oncology Development
