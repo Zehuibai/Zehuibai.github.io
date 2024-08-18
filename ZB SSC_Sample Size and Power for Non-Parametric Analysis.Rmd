@@ -1,0 +1,243 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Sample Size and Power for Non-Parametric Analysis
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+packages<-c("tidyverse", "kableExtra")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+```
+
+
+
+## Parametric Assumptions
+
+Parametric assumptions are foundational in statistical analysis, involving assumptions about the form or distribution of the underlying data. These assumptions allow statisticians and researchers to model data using a specified, finite set of parameters, which simplifies analysis and aids in making predictions and inferences.
+
+**Examples and Implications of Parametric Assumptions**
+
+1. **Normal Distribution Assumption:**
+   - Commonly, statistical methods like t-tests and ANOVA assume that data are normally distributed. This assumption allows for the derivation of confidence intervals and hypothesis testing using standard statistical tables.
+   - When the normality assumption is met, parametric tests are generally more powerful than non-parametric tests, meaning they are more likely to detect true effects when they exist.
+
+2. **Linear Regression:**
+   - Assumes linearity in the relationship between dependent and independent variables, normality in the residuals, homoscedasticity (constant variance of residuals), and independence of residuals.
+
+3. **Generalized Linear Models (e.g., Logistic Regression, Poisson Regression):**
+   - These models extend linear regression by allowing for response variables that have error distribution models other than a normal distribution. They are still parametric because they specify a particular form for the distribution of the response (e.g., binomial for logistic regression).
+
+**Limitations of Parametric Tests**
+
+Despite their widespread use, parametric tests have limitations, particularly when the assumptions they rely on do not hold. For example, real clinical data often do not follow simple parametric distributions; they may show skewness, kurtosis, or contain extreme outliers. In such cases, applying parametric models without adjusting for these features can lead to biased and misleading results.
+
+**Non-Parametric and Semi-Parametric Methods**
+
+In contrast to purely parametric methods, non-parametric and semi-parametric methods provide flexibility to deal with data that do not meet the strict assumptions of parametric tests.
+
+1. **Non-Parametric Methods:**
+   - These methods do not assume a specific distribution for the data. Examples include the Wilcoxon tests and Kruskal-Wallis test, which are based on ranks rather than the raw data values.
+   - They are particularly useful when dealing with ordinal data, non-linear relationships, or when the sample size is small.
+
+2. **Semi-Parametric Methods:**
+   - These methods combine parametric and non-parametric elements. An example is the Cox Proportional Hazards model used in survival analysis, which does not assume a specific baseline hazard function.
+   - They allow for greater modeling flexibility while still incorporating some parametric components (e.g., linear predictors).
+   
+## Non-Parametric Methods
+
+Non-parametric methods are statistical techniques that make few or no assumptions about the underlying distribution of the data. This feature distinguishes them from parametric methods, which require specific distributional assumptions like normality. Non-parametric methods are especially useful in handling data types that are difficult to fit into classical parametric frameworks, such as data with extreme outliers, infinite variance, or ordinal and interval scales.
+
+**Characteristics and Uses of Non-Parametric Methods**
+
+1. **Minimal Assumptions:**
+   Non-parametric methods require fewer assumptions about the data’s distribution. This characteristic can be beneficial when data do not conform to the stringent requirements of parametric methods, such as normal distribution or homoscedasticity.
+
+2. **Interpretability and Power:**
+   The lack of assumptions can sometimes result in lower statistical power compared to parametric tests, which means non-parametric methods might need larger sample sizes to achieve similar power. Additionally, because these methods do not assume a specific distribution, the results can be less interpretable in terms of parameters that describe the population.
+
+3. **Application to Complex Data:**
+   - These methods are particularly valuable for analyzing complex continuous data with issues like outliers or non-standard distributions, as well as ordered data like ordinal or interval data.
+   - In cases where covariate adjustment is necessary, semi-parametric methods like the proportional odds model may be more suitable than purely non-parametric methods because they allow for some parametric assumptions which can simplify analysis and improve interpretability.
+**Popular Non-Parametric Methods**
+
+1. **Rank Tests:**
+   - Rank tests are widely used in non-parametric statistics. They do not consider the actual values of the data but rather the relative rankings. These are beneficial for complex continuous data and ordinal or interval data.
+   - Common rank tests include the Wilcoxon-Mann-Whitney U-test, which is often used as a non-parametric equivalent to the t-test under certain conditions, specifically the location shift model.
+
+2. **Median Tests:**
+   - These tests, such as the sign test or the median test, focus on whether two groups differ in their medians rather than means, useful when the mean is not a good measure of central tendency due to skewed data.
+
+3. **Log-Rank Test:**
+   - Used primarily in survival analysis to compare the survival distributions of two or more groups. It’s a special case of the more general Cox regression model, a semi-parametric method that can adjust for additional covariates.
+
+4. **Non-Parametric Regression:**
+   - Methods like quantile regression allow for modeling without making assumptions about the residuals' distribution across the range of data, providing a robust alternative to standard linear regression.
+   
+|     Parametric   Test           |     Non-Parametric   Equivalent                                |
+|---------------------------------|----------------------------------------------------------------|
+|     One-Sample/Paired t-test    |     Wilcoxon Signed Rank Test                                  |
+|     Two-Sample t-test           |     (Wilcoxon-)Mann-Whitney U-test                             |
+|     ANOVA                       |     Kruskal-Wallis (One-way), Friedman (Repeated Measures)     |
+|     Pearson Correlation         |     Spearman Correlation                                       |
+
+
+## Sample Size for Non-Parametric Tests
+ 
+Calculating the sample size required for non-parametric tests involves different considerations and methodologies depending on the type of data (continuous or ordinal) and the specifics of the hypothesis being tested. Non-parametric methods typically require larger sample sizes than parametric methods to achieve comparable power because of their reliance on fewer assumptions about the underlying data distribution.
+
+
+|     Power   Methods for Continuous     |     Asymptotic Relative Efficiency   (A.R.E.), Calculation of Moment(s), Direct Input of Moments (e.g. p1 =   P[X&gt;Y]), Exemplary Dataset Approach, Simulation-based power    |
+|:--------------------------------------:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|       Power   Methods for Ordinal      |     Calculation of Moment(s) (e.g. Kolassa   or O’Brien &amp; Castelloe for Mann-Whitney U-test), Exemplary Dataset Approach,   Simulation-based power                          |
+
+### Power Analysis for Continuous Data
+
+When designing a study involving continuous data, non-parametric tests often assume a location shift hypothesis—this means the distributions of two groups are identical except for a shift in location. The required sample size can depend heavily on this assumption:
+
+1. **Asymptotic Relative Efficiency (A.R.E.):**
+   - This method compares the efficiency of a non-parametric test relative to its parametric counterpart, usually under the normality assumption. A.R.E. is useful for estimating how much larger the sample size for a non-parametric test needs to be to achieve the same power as a parametric test.
+
+2. **Calculation of Moment(s):**
+   - Moments (e.g., means, variances) of the distribution can be used to approximate the effect size, which plays a crucial role in power analysis. Knowing the moments, you can calculate the required sample size to detect a specified difference with a given power and significance level.
+
+3. **Direct Input of Moments (e.g., \( p_1 = P[X > Y] \)):**
+   - This method involves directly estimating the probability that a random observation from one group exceeds a random observation from another group. It requires a good understanding of the distribution or empirical data to estimate this probability.
+
+4. **Exemplary Dataset Approach:**
+   - Using an existing dataset that reflects the characteristics of the expected data can help simulate the power and determine the required sample size. This method is practical when similar studies or pilot data are available.
+
+5. **Simulation-based Power:**
+   - Simulation involves generating data based on specified distributions and calculating the power of a test across various sample sizes. This method is particularly flexible and can accommodate various complexities in data structure and analysis plans.
+
+### Power Analysis for Ordinal Data
+
+Ordinal data, which involve rankings or ordered categories, require specific methods that consider the nature of the data:
+
+1. **Calculation of Moment(s):**
+   - Techniques like those proposed by Kolassa or O’Brien & Castelloe for the Mann-Whitney U-test involve calculating moments based on rank data. These moments help estimate the effect size, which is critical for sample size determination.
+
+2. **Exemplary Dataset Approach:**
+   - Similar to continuous data, using an exemplary dataset that represents the ordinal nature of the prospective study can help in simulating different scenarios to find the appropriate sample size.
+
+3. **Simulation-based Power:**
+   - Simulating ordinal data under various assumptions about the distribution of ranks across groups can provide a more tailored approach to determining sample size. This method allows researchers to model the ordinal data more realistically and evaluate the impact of different sample sizes on the power of the test.
+   
+   
+## (Wilcoxon-) Mann-Whitney U-test
+
+**Case Study**
+
+The study sample was set … 70 per group were fully assessable. This number was estimated by assuming that all patients would achieve ulcer healing by the end of week 24±1, and that mean (SD) time to healing would be 84 (42) days in the placebo group and 63 (42) days in the mesoglycan group. The specified significance level was 0.05 (two-tailed) and statistical power was 0.80.
+
+
+1. **Understand the Effect Size**: For the Mann-Whitney U-test, the effect size can be approximated by converting the difference between groups into a standardized effect size (Cohen's d for example), or by estimating the probability that a randomly picked score from one group will be higher than a randomly picked score from another group.
+
+2. **Conversion to Z-Score**: You'll need to convert this effect size into a z-score under the normal curve, which can be used directly in non-parametric calculations or approximated for use in R's power calculation functions.
+
+3. **Using Simulation**: Since direct calculation methods for non-parametric tests are not always straightforward in standard R packages, simulating data based on the assumed distributions and then applying the Mann-Whitney U-test repeatedly to estimate power is a more accurate approach.
+
+**For parametric method using two sample t-test below**
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE} 
+library(pwr)
+# Assuming normal distribution to calculate Cohen's d
+mean1 <- 84
+sd1 <- 42
+mean2 <- 63
+sd2 <- 42
+
+# Calculate Cohen's d
+cohen_d <- (mean1 - mean2) / sqrt((sd1^2 + sd2^2)/2)
+
+# Calculate sample size using the pwr package
+result <- pwr.t.test(d = cohen_d, sig.level = 0.05, power = 0.80, type = "two.sample", alternative = "two.sided")
+
+# Print the result
+print(result)
+```
+
+This approach below uses an assumption that the data are approximately normally distributed to calculate Cohen's d. Since you are actually using a non-parametric test, the next step would be to simulate data that match the descriptions and perform the Mann-Whitney U-test multiple times to empirically determine the power. Here's a simple way to do that using simulation:
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE} 
+# Load necessary library
+library(MASS)
+
+# Function to simulate power
+simulate_power <- function(n, mu1, mu2, sd1, sd2, nsim=1000) {
+  power_count <- 0
+  
+  for (i in 1:nsim) {
+    group1 <- rnorm(n, mu1, sd1)
+    group2 <- rnorm(n, mu2, sd2)
+    test <- wilcox.test(group1, group2)
+    if (test$p.value < 0.05) {
+      power_count <- power_count + 1
+    }
+  }
+  
+  return(power_count / nsim)
+}
+
+# Perform the simulation
+simulate_power(n = 70, mu1 = 84, mu2 = 63, sd1 = 42, sd2 = 42)
+```
+   
+   
+## Reference
+ 
+1. Noether, G. E. (1987). Sample size determination for some common nonparametric tests. *Journal of the American Statistical Association*, 82(398), 645–647.
+
+2. Shieh, G., Jan, S. L., & Randles, R. H. (2007). Power and sample size determinations for the Wilcoxon signed-rank test. *Journal of Statistical Computation and Simulation*, 77(8), 717–724.
+
+3. Wang, H., Chen, B., & Chow, S. C. (2003). Sample size determination based on rank tests in clinical trials. *Journal of Biopharmaceutical Statistics*, 13(4), 735–751.
+
+4. Kolassa, J. E. (1995). A comparison of size and power calculations for the Wilcoxon statistic for ordered categorical data. *Statistics in Medicine*, 14(14), 1577–1581.
+
+5. Whitehead, J. (1993). Sample size calculations for ordered categorical data. *Statistics in Medicine*, 12(24), 2257–2271.
+
+6. Dixon, W. J., & Massey, F. J. (1983). *Introduction to Statistical Analysis* (4th ed.). New York: McGraw-Hill.
+
+7. O'Brien, R. G., & Muller, K. E. (1993). Unified power analysis for t-tests through multivariate hypotheses. In L. K. Edwards (Ed.), *Statistics: Textbooks and Monographs, Vol. 137. Applied Analysis of Variance in Behavioral Science* (pp. 297–344). New York: Marcel Dekker.
+
+8. Divine, G., Kapke, A., Havstad, S., & Joseph, C. L. (2009). Exemplary data set sample size calculation for Wilcoxon–Mann–Whitney tests. *Statistics in Medicine*, 29(1), 108–115.
+
+9. Tang, Y. (2011). Size and power estimation for the Wilcoxon–Mann–Whitney test for ordered categorical data. *Statistics in Medicine*, 30(29), 3461–3470.
+
+10. Arosio, E., Ferrari, G., Santoro, L., Gianese, F., & Coccheri, S. (2001). A placebo-controlled, double-blind study of mesoglycan in the treatment of chronic venous ulcers. *European Journal of Vascular and Endovascular Surgery*, 22(4), 365–372.
+
+11. Segal, I., Khamis, S., Sagie, L., Genizi, J., Azriel, D., Katzenelenbogen, S., & Fattal‐Valevski, A. (2023). Functional benefit and orthotic effect of dorsiflexion-FES in children with hemiplegic cerebral palsy. *Children* (Basel), 10(3), 531.
+
+12. Schaller, S., Kiselev, J., Loidl, V., Quentin, W., Schmidt, K., Mörgeli, R., Rombey, T., Busse, R., Mansmann, U., Spies, C., Marschall, U., Eckardt-Felmberg, R., Landgraf, I., Schwantes, U., Busse, R., & Mansmann, U. (2022). Prehabilitation of elderly frail or pre-frail patients prior to elective surgery (PRAEP-GO): Study protocol for a randomized, controlled, outcome assessor-blinded trial. *Trials*, 23(1).
+
+13. Harrell, F. E., Jr. (n.d.). *Biostatistics for Biomedical Research*. Retrieved from https://hbiostat.org/bbr/
+
+14. Harrell, F. (n.d.). Statistical thinking - What does a statistical method assume? Retrieved from https://www.fharrell.com/post/assume/
+
+15. Conroy, R. (2012). What hypotheses do “nonparametric” two-group tests actually test? *The Stata Journal*, 12(2), 182-192.
+ 

@@ -1,0 +1,69 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Phase III Trials - Design Considerations
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+packages<-c("tidyverse", "kableExtra")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+```
+
+## Phase III Trials Design
+
+Phase III clinical trials are the **gold standard** to demonstrate the effects of an experimental therapy compared to standard therapy for a disease of interest. The first step in planning a Phase III trial is to clearly specify the statistical hypothesis that the trial aims to test, which usually posits that the experimental therapy provides some efficacy benefit over standard therapy, without adding significant harm. In a Phase III trial, a pre-specified number of patients from the target population are randomized to receive either the experimental or standard therapy. Patients are treated and followed up according to a protocol that also defines the endpoints of interest, particularly the primary endpoint, which is chosen to reflect a clinical benefit of the experimental therapy over standard therapy. The trial data are typically monitored by an independent committee who may recommend stopping the trial early, if appropriate. The benefit of the experimental therapy over standard therapy, if any, may be observed across all patients, or may be confined to a subset of patients.
+
+
+## Non-inferiority and Equivalence Three-armed trial
+
+Non-inferiority testing is a common hypothesis test in the development of generic medicines and medical devices. The most common design compares the proposed non-inferior treatment to the standard treatment alone, but this leaves uncertain whether the treatment effect is the same as from previous studies. This "assay sensitivity" problem can be resolved by using a three-arm trial which includes a placebo alongside the new and reference treatments for direct comparison.
+
+A three-arm non-inferiority (NI) trial can simultaneously test the superiority of the reference relative to the placebo, and the NI superiority of the experimental treatment relative to the reference. As two-sample NI trials without a placebo arm cannot confirm the effectiveness of the positive control drug, it introduces issues such as assay sensitivity and stability of the positive control drug. Therefore, due to external verification, NI trials are required to be of high quality. Under ethically permissible conditions, adding a placebo arm to achieve internal verification is a good choice. A three-arm non-inferiority trial with a placebo arm can evaluate whether the test drug is non-inferior to the positive control drug and whether it is superior to the placebo.
+
+### Design Method of the Three-arm Non-inferiority Trial
+
+- Traditional test method with a fixed value as the non-inferiority margin.
+- Pigeot method, which integrates the test with part of the positive control effect as the non-inferiority margin. (With the same sample size, the Pigeot method has higher test efficiency, making full use of all sample information, improving test efficiency, and reducing the cost of clinical trials.)
+
+#### Pigeot Method
+
+Some literature recommends making full use of the added placebo group information, defining Δ as part of the positive drug effect (the difference in therapeutic effect between the positive drug and placebo), i.e., for quantitative data:
+
+$$\Delta=f \cdot\left(\mu_{R}-\mu_{P}\right), f \geqslant-1$$
+
+The FDA recommends using half (1/2) as a method to determine the non-inferiority margin. The Pigeot and others' method for determining the non-inferiority margin is based on this method. The hypothesis test for non-inferiority traditionally:
+$$\mathrm{H}_{0}: \mu_{E}-\mu_{R} \leqslant \Delta, \mathrm{H}_{1}: \mu_{E}-\mu_{R}>\Delta$$
+is transformed into:
+$$\mathrm{H}_{0}: \mu_{E}-\mu_{R} \leqslant f\left(\mu_{R}-\mu_{P}\right) \text { vs } \mathrm{H}_{1}: \mu_{E}-\mu_{R}>f\left(\mu_{R}-\mu_{P}\right)$$
+where $E, R$, and $P$ represent the experimental drug, positive control drug, and placebo, respectively,
+$\mu_{E}, \mu_{R}$, and $\mu_{P}$ are the mean values for the experimental, positive control, and placebo groups respectively. Let $f=\theta-1, \theta \in[0, \infty)$,
+
+$$
+\mathrm{H}_{0}: \mu_{E}-\mu_{P} \leqslant \theta\left(\mu_{R}-\mu_{P}\right) \mathrm{vs} \mathrm{H}_{1}: \mu_{E}-\mu_{P}>\theta\left(\mu_{R}-\mu_{P}\right)
+$$

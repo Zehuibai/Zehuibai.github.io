@@ -1,0 +1,166 @@
+# Randomization
+
+```{r, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                    1. load the required packages                       -->
+# <!-- ---------------------------------------------------------------------- --> 
+
+## if(!require(psych)){install.packages("psych")}
+
+packages<-c("tidyverse", "kableExtra", "gtsummary","inTextSummaryTable",
+            "Hmisc","htmltools","clinUtils")
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                        2. Basic system settings                        -->
+# <!-- ---------------------------------------------------------------------- -->
+# setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+```
+
+
+<!-- ----------------------------------------- -->
+<!-- -----------Mind Map of ToC--------------- -->
+<!-- ----------------------------------------- -->
+
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+library(mindr)
+input <- rstudioapi::getSourceEditorContext()$path 
+input_txt <- readLines(input, encoding = "UTF-8")
+## Widget Output
+mm_output <- mm(input_txt, 
+                output_type = c("widget"),
+                root = "")
+mm_output$widget
+```
+
+
+
+
+### Simple randomization
+
+Randomization based on a single sequence of random assignments is known
+as simple randomization.
+
+> 对于两个治疗组（对照组与治疗组），硬币的侧面（即正面-对照组，反面-治疗）确定每个受试者的分配。其他方法包括使用经过洗牌的纸牌（例如，偶数控制，奇数处理）或掷骰子（例如，低于并等于3控制，超过3处理）这种随机方法简单易行，可在临床研究中实施。在大型临床研究中，可以相信简单随机会在组之间生成相似数量的主题。但是，在相对较小的样本量临床研究中，随机化结果可能会出现问题，从而导致组中参与者的数量不相等。
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+set.seed(888)
+treatment <- c("A","B")
+simple.list <- sample(treatment, 20, replace=TRUE)
+cat(simple.list,sep="\n")
+table(simple.list)
+```
+
+### Block randomization
+
+The block randomization method is designed to randomize subjects into
+groups that result in equal sample sizes. This method is used to ensure
+a balance in sample size across groups over time. Blocks are small and
+balanced with predetermined group assignments, which keeps the numbers
+of subjects in each group similar at all times. The block size is
+determined by the researcher and should be a multiple of the number of
+groups (i.e., with two treatment groups, block size of either 4, 6, or
+8). Blocks are best used in smaller increments as researchers can more
+easily control balance.
+
+> 块随机化方法旨在将受试者随机分组，从而产生相同的样本量。使用此方法可确保随着时间的推移，各个组之间的样本量保持平衡。区块很小，并且通过预定的小组分配来平衡，这使每个小组中的被试人数始终保持相似。区块大小由研究人员确定，并且应为组数的倍数（即，对于两个治疗组，区块大小为4、6或8）。最好以较小的增量使用块，因为研究人员可以更轻松地控制平衡。
+
+After block size has been determined, all possible balanced combinations
+of assignment within the block (i.e., equal number for all groups within
+the block) must be calculated. Blocks are then randomly chosen to
+determine the patients' assignment into the groups.
+
+> 确定块大小后，必须计算该块内分配的所有可能平衡组合（即，该块内所有组的数量均相等）。然后随机选择块来确定患者的分组。
+
+**Example 以区组长度4为例**
+
+-   一个区组内的4个研究对象可以有6种排列方式：1. AABB, 2. ABAB, 3.
+    ABBA, 4. BAAB, 5. BABA, 6. BBAA
+-   确定好所有的排列形式后，接下来需要将6个区组随机排列。我们可以用各种方式（如SPSS、Excel、SAS等）产生一串随机数字.
+    因为只有6种排列方式，因此可以只选择1-6之间的数字，25126423121362555343526422
+-   按照上述随机数字排列区组
+
+**BLOCKED RANDOMIZATION USING THE PROC PLAN**
+
+    * randomization within block;
+    %macro ran_block (blockNum);
+    …
+    %if &seed= %then %do;
+     proc plan;
+     factors N=&blocksize / noprint;
+     output data=One out=Two
+     run;
+    %end;
+    %else %do;
+     Proc plan seed=%eval (&seed+blockNum);
+     Factors N=&blockSize / noprint;
+     Output data=One out=Two;
+     Run;
+    %end;
+    …
+    %mend ran_block;
+
+**BLOCKED RANDOMIZATION USING psych Package**
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library("psych")
+my.cond <- block.random (n=96,c( drug=2,time=3,imp=2)) 
+headtail(my.cond) 
+## Visualizing block randomization
+pairs.panels (my.cond)
+```
+
+**BLOCKED RANDOMIZATION USING blockrand Package**
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+### Generate a block randomization for a clinical trial;
+library("blockrand")
+set.seed(888)
+block.list <- blockrand(n=20, num.levels = 2,block.sizes = c(2,2))
+block.list
+block.list2 <- blockrand(n=20, num.levels = 2,block.sizes = c(1,2))
+block.list2
+plot(block.list2)
+```
+
+### Stratified randomization
+
+The stratified randomization method addresses the need to control and
+balance the influence of covariates. This method can be used to achieve
+balance among groups in terms of subjects' baseline characteristics
+(covariates). Specific covariates must be identified by the researcher
+who understands the potential influence each covariate has on the
+dependent variable. Stratified randomization is achieved by generating a
+separate block for each combination of covariates, and subjects are
+assigned to the appropriate block of covariates. After all subjects have
+been identified and assigned into blocks, simple randomization is
+performed within each block to assign subjects to one of the groups.
+
+> 分层随机方法解决了控制和平衡协变量影响的需求。此方法可用于在受试者的基线特征（协变量）方面实现组间的平衡。研究人员必须确定特定的协变量，他们必须了解每个协变量对因变量的潜在影响。分层随机化是通过为协变量的每种组合生成一个单独的块来实现的，并将主题分配给合适的协变量块。在确定了所有主题并将其分配到块中之后，在每个块内执行简单的随机化以将主题分配给其中一个组。
+
+$$
+\begin{array}{|l|c|c|}
+\hline \text { Stratum } & \text { Age Group } & \text { Severity Score } \\
+\hline 1 & \geq 50 \text { years } & \geq 7 \\
+\hline 2 & <50 \text { years } & \geq 7 \\
+\hline 3 & \geq 50 \text { years } & <7 \\
+\hline 4 & <50 \text { years } & <7 \\
+\hline
+\end{array}
+$$
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+over50.severe.list <- blockrand(n=100, num.levels = 2,
+                                block.sizes = c(1,2,3,4), 
+                                stratum='Over 50, Severe',id.prefix='O50_S', block.prefix='O50_S')
+headtail(over50.severe.list)
+```

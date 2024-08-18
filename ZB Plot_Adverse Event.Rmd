@@ -46,17 +46,7 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 getwd()
 Sys.setlocale("LC_ALL","English")
 
-
-## Open the folder
-open_folder <-function(dir){
-	if (.Platform['OS.type'] == "windows"){
-	shell.exec(dir)  
-	} else {
-	system(paste(Sys.getenv("R_BROWSER"), dir))
-  }
-}
-open_folder(getwd())
-
+ 
 ## convert backslash to forward slash in R
 # gsub('"', "", gsub("\\\\", "/", readClipboard()))
 
@@ -114,6 +104,7 @@ Analyzing the patterns of AE occurrence over different time periods. For example
 The following figure shows the distribution over time of three types of AEs in melanoma patients treated with Nivo+Ipi. It can be observed that most skin-related AEs cease to appear after 3 months, and GI and liver-related AEs significantly decrease after 6 months.
    
 ![](./02_Plots/AE_Temporal Distribution.png)
+
 ## Outcome Summary of Adverse Events (AEs)
 
 The outcome of an AE represents whether interventions against the AE are effective. If there is no recovery, the duration of the AE will be prolonged, indicating that effective intervention for this type of AE is challenging.
@@ -131,13 +122,13 @@ This is also a method for analyzing differences in AE characteristics between tw
 
 ![](./02_Plots/AE_HR.png)
 
-# AE Frequent by Relative Risk/Forest Plot
+# AE Visualization
 
-## Analysis
-
+## Relative Risk/Forest Plot
+ 
 ```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
-load(file = "./03_Datasets/adae.rda")
-load(file = "./03_Datasets/adsl.rda")
+load(file = "./01_Datasets/adae.rda")
+load(file = "./01_Datasets/adsl.rda")
 
 ### Subset the population dataset ADSL on SAFFL safety flag 
 ### consider only two treatments for comparison.
@@ -220,6 +211,214 @@ p1 <- ggplot(adsl_adae %>% filter(aedecod %in% adsl_adae2$aedecod) %>%
 plot_grid(p1,  p2, labels = "AUTO",nrow = 1,rel_widths = c(0.8, 0.5))
 ```
 
-## Reference
+
+## Heat Map
+
+Using a heatmap to display adverse event (AE) co-occurrence can be an effective visual tool in medical research to identify and analyze patterns of symptoms or side effects that frequently appear together.
+
+Heat maps are charts with values being represented by colors. The intensity of the color is an indication of the number i.e.
+higher the value more intense will be the color. 
+ 
+
+**HEAT MAP FOR NUMBER OF ADVERSE EVENTS PER TREATMENT PER SYSTEM ORGAN CLASS (SOC):**
+
+A heat map can be generated to visualize the number of adverse events recorded per SOC per treatment. We will plot the treatments on x-axis and the SOCs on y-axis. Each tile of the heat map will be colored as per the number of events recorded for that particular combination. The color of the tile will vary from yellow to red, with low counts shown in yellow and high counts in red. The tiles with white color denote the absence of events for a particular combination of SOC and treatment. The number of events will be printed in either black or white as per a predefined threshold; counts below or equal to the threshold will be printed in black, remaining will be in white.
+
+In this plot, we are able to see the number of events reported for every SOC for all 5 arms. As seen in the legend, tiles with count less than 100 are yellow with varying intensity as per the actual count for that tile. For e.g. if we check the number of adverse events in the gastrointestinal system for treatments X and Y, the count is 11 and 26 respectively. The color of the tile for Y is deeper than the tile for X. The color starts changing from yellow to orange and then to red as the number of events increases. This is observed in the “Psychiatric” SOC counts, with 31 events Y has a yellow tile, 257 events lead to treatment A having an orange tile and the treatment Z has a red tile due to the 311 events reported. Here the threshold for number of events has been set to 100. We can quickly identify the SOCs with number of events greater than 100 as they are printed in white. We can observe white tiles for SOCs with no events for a particular treatment like Reproductive system and treatment X.
+
+![](./02_Plots/AE_Heat Map 1.png)
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+# tb1 <-aggregate(USUBJID~TRTA+SOC, data=aeord, FUN=function(x) c(ln=length(x)))
+# head(tb1)
+# names(tb1)[names(tb1)=="USUBJID"]<- "OBS"
+
+tb1 <- data.frame(
+  TRTA = c("Y", "X", "Z", "A", "B", "Y", "X", "B", "A"),
+  SOC = c("NERVOUS", "NERVOUS", "PSYCHIATRIC", "PSYCHIATRIC", "PSYCHIATRIC", "PSYCHIATRIC", "PSYCHIATRIC", "RENAL", "RENAL"),
+  OBS = c(27, 12, 311, 257, 219, 31, 14, 17, 7)
+)
+
+p1 <- ggplot(tb1, (aes(x = TRTA, y = SOC, fill=OBS))) + geom_raster() +
+geom_text(aes(label = paste0("N=",round(OBS, 1)), color = OBS < 100),show.legend = F)+
+scale_fill_gradient(low="yellow",high="red",na.value="white")+
+scale_color_manual(values = c("FALSE" = "white", "TRUE" = "black")) +
+scale_x_discrete("Treatment") + scale_y_discrete("System Organ Class") +
+ theme_classic()+ggtitle("Heatmap for Number of Adverse Events per Treatment per SOC")+
+ theme(plot.title = element_text(hjust = 0.5)) + labs(fill="Number of Events")
+p1
+```
+
+**HEAT MAP FOR NUMBER OF SERIOUS AND NON SERIOUS ADVERSE EVENTS PER SOC PER TREATMENT**
+
+The adverse events are classified as either ‘Non Serious’ or ‘Serious’. We can plot the number of serious and non serious events occurring per SOC per treatment as shown in the heat map below. In this plot, both the counts will be displayed in the same tile and the color of the tile will be decided by the maximum of the number of events if both events are present.
+
+![](./02_Plots/AE_Heat Map 2.png)
+
+**HEAT MAP FOR NUMBER OF ADVERSE EVENTS PER TREATMENT PER PREFERRED TERM (PT) FOR A SINGLE SOC**
+
+As mentioned earlier, we can analyze the psychiatric disorders further by generating a heat map of the events reported under this SOC for all treatments. We will generate a heat map of all PTs with number of reported events greater than 10. 
+
+![](./02_Plots/AE_Heat Map 3.png)
+
+<!-- sub <- subset(aeord,aeord$SOC=="PSYCHIATRIC") -->
+<!-- tb4 <-aggregate(USUBJID~TRTA+AEDECOD, data=sub, FUN=function(x) c(ln=length(x))) -->
+<!-- names(tb4)[names(tb4)=="USUBJID"]<- "OBS" -->
+<!-- p3 <- ggplot(tb4[tb4$OBS>10,], (aes(x = TRTA, y = AEDECOD, fill = OBS))) + geom_raster() + -->
+<!-- geom_text(aes(label = paste0("N=",round(OBS, 1)), color = OBS < 40), show.legend = -->
+<!-- F,size=4)+ scale_fill_gradient(low="yellow",high="red",na.value="white")+ -->
+<!-- scale_color_manual(values = c("FALSE" = "white", "TRUE" = "black")) + -->
+<!-- scale_x_discrete("Treatment") + scale_y_discrete(name = "Adverse Event Term") + -->
+<!--  theme_classic()+ -->
+<!-- ggtitle("Heat Map for Number of Adverse Events per Treatment per Preferred Term for -->
+<!-- Psychiatric Disorders") + theme(plot.title = element_text(hjust = 0.5)) + -->
+<!--  labs(fill="Number of Events") -->
+<!-- p3 -->
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+# tb2 <- aggregate(USUBJID~TRTA+SOC+AESER, data=aeord, FUN=function(x) c(ln=length(x)))
+# names(tb2)[names(tb2)=="USUBJID"]<- "OBS"
+tb2 <- data.frame(
+  TRTA = c("Y", "X", "Z", "A", "B", "Y", "X", "B", "A"),
+  SOC = c("NERVOUS", "NERVOUS", "PSYCHIATRIC", "PSYCHIATRIC", "PSYCHIATRIC", "PSYCHIATRIC", "PSYCHIATRIC", "RENAL", "RENAL"),
+  AESER = c("Y","Y","N","N","Y","N","Y","N","Y"),
+  OBS = c(27, 12, 311, 257, 219, 31, 14, 17, 7)
+)
+
+tb3 <-tb2[order(tb2$TRTA, tb2$SOC, tb2$OBS),]
+p2 <- ggplot(tb3, aes(TRTA, SOC, fill = OBS)) + geom_raster() +
+geom_text(data=tb3[tb3$AESER=="N",],aes(label = paste0("NSER=",round(OBS, 1))),
+show.legend = F,size=2.9, vjust=0, hjust=1) +
+geom_text(data=tb3[tb3$AESER=="Y",],aes(label = paste0("SER=",round(OBS, 1))),
+show.legend = F,size=2.9, vjust=1, hjust=0)+
+scale_fill_gradient(low="yellow",high="red",na.value="white")+
+scale_x_discrete("Treatment") + scale_y_discrete(name = "System Organ Class") +
+theme_classic()+
+ggtitle("Heatmap for Number of Serious and Non Serious Adverse Events per SOC per
+Treatment") + theme(plot.title = element_text(hjust = 0.5)) + labs(fill="Number of
+Events")
+p2
+```
+
+
+**HEAT MAP FOR NUMBER OF ADVERSE EVENTS OF PTS OF A SINGLE SOC OF A SINGLE TREATMENT PER SEVERITY**
+
+We can check the severity of all the PTs for a single SOC for a single treatment. Let us analyze the Psychiatric Disorder PTs reported for treatment Z. We will plot the number of events reported for PTs against their severity which will have the value as Mild, Moderate or Severe
+
+![](./02_Plots/AE_Heat Map 4.png)
+
+<!-- sub1 <- subset(aeord,aeord$SOC=="PSYCHIATRIC" & TRTA=="Z") -->
+<!-- tb5 <- aggregate(USUBJID~AEDECOD+AESEV, data=sub1, FUN=function(x) c(ln=length(x))) -->
+<!-- names(tb5)[names(tb5)=="USUBJID"]<- "OBS" -->
+<!-- p4 <- ggplot(tb5, aes(AESEV, AEDECOD, fill = OBS)) + geom_raster() + -->
+<!-- geom_text(aes(label=paste0("N=",round(OBS,1)),color=OBS<10), show.legend = F,size=3)+ -->
+<!-- scale_fill_gradient(low="yellow",high="red",na.value="white")+ -->
+<!-- scale_color_manual(values = c("FALSE" = "white", "TRUE" = "black")) + -->
+<!-- scale_x_discrete("Severity") + scale_y_discrete(name = "Adverse Event Term") + -->
+<!-- theme_classic()+ ggtitle("Heat Map for Number of Adverse Events of PTs of Psychiatric -->
+<!-- Disorders of Treatment Z per Severity") + theme(plot.title = element_text(hjust = -->
+<!-- 0.5)) + labs(fill="Number of Events") -->
+<!-- p4 -->
+
+**HEAT MAP FOR NUMBER OF RELATED AND NOT RELATED ADVERSE EVENTS PER PT PER SEVERITY FOR A SINGLE TREATMENT**
+
+We can check the causality of the events reported in the above plot along with their severity. Let us once again consider the psychiatry PTs reported for treatment Z. We will plot the number of events reported for PTs with their causality which will have values as ‘Related’ or ‘Not Related’ against severity
+
+![](./02_Plots/AE_Heat Map 5.png)
+
+<!-- tb6 <- aggregate(USUBJID~AEDECOD+AESEV+AEREL, data=sub1, FUN=function(x) c(ln=length(x))) -->
+<!-- names(tb6)[names(tb6)=="USUBJID"]<- "OBS" -->
+<!-- tb6 <-tb6[order(tb6$AEDECOD,tb6$AESEV, tb6$OBS),] -->
+<!-- p5 <- ggplot(tb6, aes(AESEV, AEDECOD, fill = OBS)) + geom_raster() + -->
+<!-- geom_text(data=tb6[tb6$AEREL=="NOT RELATED",],aes(label=paste0("NREL=",round(OBS,1))), -->
+<!-- show.legend = F,size=2.8, vjust=0, hjust=1) + -->
+<!-- geom_text(data=tb6[tb6$AEREL=="RELATED",],aes(label = paste0("REL=",round(OBS, 1))), -->
+<!-- show.legend = F,size=2.8, vjust=1, hjust=0)+ -->
+<!-- scale_fill_gradient(low="yellow",high="red",na.value="white")+ -->
+<!-- scale_x_discrete("Severity") + scale_y_discrete(name = "Adverse Event Term") + -->
+<!-- theme_classic()+ -->
+<!-- ggtitle("Heat Map for Number of Related and Not Related Adverse Events per PT per -->
+<!-- Severity for Psychiatric Disorders of Treatment Z") + theme(plot.title = -->
+<!-- element_text(hjust = 0.5)) + labs(fill="Number of Events") -->
+<!-- p5 -->
+
+
+*Source: https://www.lexjansen.com/phuse/2018/dv/DV11.pdf*
+
+ 
+ 
+## Volcano Plot
+
+A volcano plot is a type of scatter-plot that is used to quickly identify changes in large data sets composed of replicate data. It plots significance versus fold-change on the y and x axes, respectively. It is constructed by plotting the negative log of the p value on the y axis (usually base 10). This results in data points with low p values (highly significant) appearing toward the top of the plot. The x axis is the log of the fold change between the two conditions. The log of the fold change is used so that changes in both directions appear equidistant from the center. In the clinical domain, a volcano plot is used to view Risk Difference (RD), Relative Risk or Odds Ratio of AE occurrence between the treatment groups by preferred term.
+
+**VOLCANO PLOT OF TREATMENT EMERGENT ADVERSE EVENT AT PT LEVEL**
+
+Volcano plots are also generated on the same data which is used for heat maps. Here, we have plotted negative log10-transformed p-value calculated using Fisher exact test on Y-axis and Log2-transformed relative risk on x-axis.
+
+The dashed red line on y-axis shows where p = 0.05 with points above the line having p < 0.05 and points below the line having p > 0.05. Note that smaller the p-value larger is the number on y-axis. For this graph, we have labeled the AE terms with p-values < 0.05 as they are significant.
+
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+# Set the seed for reproducibility
+set.seed(123)
+
+# Create a data frame with synthetic data
+total <- data.frame(
+  AETERM = c("NECK SHOULDER PAIN", "SINUSITIS", "DECREASED APPETITE", "DRY MOUTH", "UPPER RESPIRATORY INFECTION",
+             "COLD SYMPTOMS", "DRYNESS IN MOUTH", "WEIGHT GAIN", "HYPERHIDROSIS", "INCREASED IRRITABILITY",
+             "INCREASED THIRST", "LOWER BACK PAIN", "NUMBNESS (BOTH HANDS)"),
+  rr = runif(13, 0.1, 6),  # Uniform distribution between 0.01 and 6
+  log2rr = log(runif(13, 0.1, 6), 2),  # Normal distribution with mean -3 and sd 1
+  p = runif(13, 0.0001, 0.1),  # Uniform distribution for p-values
+  Total = sample(2:50, 13, replace = TRUE),  # Random sampling for total count
+  term = c(NA, NA, "DECREASED APPETITE", "DRY MOUTH", NA, NA, NA, NA, NA, NA, NA, NA, NA)
+) 
+
+total %>%
+  kable(caption = "DATA SNIPPET", format = "html") %>%
+  kable_styling(latex_options = "striped")
+
+#Make a basic volcano plot
+with(total, plot(log2rr, -log10(p), pch=20, main="Volcano Plots of Treatment Emergent Adverse
+Events at PT Level", xlim=c(-8.5,8), abline(h = 1.3, col="red", lty=2), xlab="Log2 (Relative
+Risk)", ylab="-Log10 (p-value)"))
+#Add colored points: red if padj<0.05, orange of log2rr>1, green if both)
+with(subset(total, p<.05 ), points(log2rr, -log10(p), pch=20, col="red"))
+with(subset(total, abs(log2rr)>1), points(log2rr, -log10(p), pch=20, col="orange"))
+with(subset(total, p<.05 & abs(log2rr)>1), points(log2rr, -log10(p), pch=20, col="green"))
+
+#Label points with the textxy function from the calibrate plot
+library(calibrate)
+with(subset(total, p<.05 & abs(log2rr)>1), textxy(log2rr, -log10(p), labs=AETERM, cex=.7))
+```
+
+
+## Bubble Plot
+
+**BUBBLE PLOT OF -LOG10 (P-VALUE) BY RELATIVE RISK SIZED BY COUNTS**
+
+The x-axis represents the log2 relative risk and y-axis represents the –log10 p-values computed using the fisher exact test. Each bubble represents an adverse event, with bubble size indicative of the total number of adverse events that occur for both treatments combined. Specifically, the bubble area is proportional to the total number of events.
+
+Log2 (Relative Risk) of 0 represents no difference in risk between the 2 treatment groups, while bubbles to the right indicate a higher risk for subjects in treatment group Y (i.e. – If Log2 (RR) = 1, that is the same as an RR=2), and bubbles to the left indicate a higher risk for subjects in treatment group Z. Color, green and blue helps to emphasize adverse events that are more common for treatment Y or Z, respectively. The size of the bubble represents the total number of occurrences of the AE of interest. Names of events with total number of occurrences greater than 10 are displayed.
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+library(plotly)
+p <-plot_ly(total, x = ~ log2rr, y = ~ -log10(p), text = ~ AETERM, type = 'scatter', mode =
+'markers', color=~ log2rr, colors=c("blue","green") , marker = list(size = ~ Total, opacity =
+0.9)) %>%
+layout(title = 'Bubble Plot Treatment Emergent Adverse Event of Significance versus Relative
+Risk', xaxis = list(showgrid = FALSE, title = 'Log2 (Relative Risk)'), yaxis = list(showgrid
+= FALSE, title = '-Log10 (p-value)')) %>%
+add_annotations(x = total$log2rr, y = total$p1, text = total$term, xref = "x", yref = "y",
+ showarrow = FALSE, font = list(size = 10))
+p
+```
+
+# Reference
 
 * [Most Frequent AE by Relative Risk/Forest Plot using](https://www.linkedin.com/pulse/most-frequent-ae-relative-risk-using-r-jagadish-katam/?trackingId=GllB04d3RAe%2BIPwtx1czFg%3D%3D)
+
+## Heat Map
+
+* [Adverse Event Data – gRaphically](https://www.lexjansen.com/phuse/2018/dv/DV11.pdf)
+* 

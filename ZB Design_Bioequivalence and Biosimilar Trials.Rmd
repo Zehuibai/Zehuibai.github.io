@@ -1,0 +1,171 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Bioequivalence and Biosimilar Trials
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+packages<-c("tidyverse", "kableExtra")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+```
+
+ 
+
+# Statistical Considerations for the Design and Analysis of Candidate Biosimilar Trials
+
+## Introduction
+
+### Biological Medicines (Biologics)
+Biological medicines, commonly referred to as biologics, are drugs that are derived from natural, living sources such as animal and plant cells, or microorganisms like bacteria and yeast. These sources can contribute various biological substances, including proteins, sugars, or combinations of these, which are used to create the medicines.
+
+Biologics are typically more complex than chemically synthesized drugs. This complexity arises from their biological origins and the intricate processes involved in their production, which include purification and manufacturing. Due to their complexity, biologics often require specialized handling and administration methods.
+
+### Biosimilars
+Biosimilars are a specific type of biologic drug designed to be highly similar to an existing FDA-approved biologic, known as the original biologic or the reference product. Although biosimilars are similar to their reference products, they are not exact replicas, which is a key distinction from generic drugs in the context of traditional, non-biological medications.
+
+The development of biosimilars involves ensuring that there are no clinically meaningful differences from the reference product in terms of safety, purity, and potency. This means that a biosimilar is expected to perform in the same way as its reference product in any given treatment, providing the same therapeutic benefits and safety profile.
+
+## Regulatory Guidelines
+
+* Key FDA guidance documents can be found online: https://www.fda.gov/vaccines-blood-biologics/general-biologics-guidances/biosimilars-guidances
+* Key EMA guidance documents can be found online: https://www.ema.europa.eu/en/human-regulatory-overview/research-and-development/scientific-guidelines/multidisciplinary-guidelines/multidisciplinary-biosimilar
+
+### Key Differences FDA vs EMA
+
+To demonstrate biosimilarity, bioequivalence in the pharmacokinetics between the candidate biosimilar and the reference product is required. For both the FDA and EMA it is necessary demonstrate that the 90% confidence interval (CI) for the Geometric Mean Ratio (GMR) for the PK endpoint(s) of AUC and/or Cmax falls within the equivalence limits of 0.8 to 1.25.
+
+The key differences between the regulatory requirements arises in the requirements for the clinical equivalence which must be demonstrated between the candidate biosimilar and reference product:
+
+* The FDA requires the margin be set to preserve 50% of the lower 95% CI of the treatment effect for the reference versus placebo and requires the 90% CI for the treatment effect of the candidate biosimilar versus the reference to fall within this margin.
+* The EMA requires the margin be set to preserve 50% of the point estimate of the treatment effect for the reference versus placebo and requires the 95% CI for the treatment effect of the candidate biosimilar versus the reference to fall within this margin.
+
+Other differences, which may vary according to the specific biologic medicine and indication, include:
+
+* The duration of treatment
+* Timing of the primary endpoint assessment
+The FDA may also require an assessment of interchangeability if this is desired for the label, i.e. an assessment of the impact of changing treatment from the reference to the candidate biosimilar.  
+
+### Requirements for Comparative Clinical Studies for a Candidate Biosimilar
+
+In most cases separate US-sourced and EU-sourced reference products are available and it will be necessary to show bioequivalence of the candidate biosimilar to both sources of the reference. Bioequivalence can be demonstrated in either healthy volunteers or in patients.
+In addition, demonstration of equivalence in relevant clinical or pharmacodynamic (PD) endpoints in a comparative patient study is required. Whilst many biological medicines are approved for use in several indications, there is no requirement to evaluate the candidate biosimilar in each of the approved indications. When it can be assumed that the mechanism of action is the same across indications, as is often the case for auto-immune diseases, for example, evaluation in a single indication will suffice. The choice of which indication is often a pragmatic one, weighing up the number of patients that would need to be recruited to demonstrate equivalence on the endpoint of interest, with the available pool of patients.
+
+### Bioequivalence Study in Healthy Volunteers
+
+Bioequivalence (BE) should usually be demonstrated in healthy volunteers, as this is considered the most homogeneous and sensitive population, i.e., the one in which differences between the biosimilar candidate and reference are most likely to be detected. If a biologic medicine is not considered safe to administer to healthy volunteers, bioequivalence will need to be demonstrated in patients, often as part of a Phase I/III study 
+
+**Study Designs**: There are two study designs that can be used for such studies; crossover or parallel group. A crossover study offers advantages in terms of sample size requirements. However, if the half-life of the biologic medicine is long, such a study is not practical and a parallel group study is required.
+
+   - **Crossover Design**: Volunteers receive both the reference product and the biosimilar in two separate treatment periods, with a washout period in between. This design reduces the required sample size but is only feasible if the biologic’s half-life is short enough to allow for quick elimination from the body.
+   - **Parallel Group Design**: Used when the biologic’s half-life is too long for a crossover design. Participants are randomly assigned to receive either the reference product or the biosimilar, and they stick to their assigned treatment throughout the study.
+
+**Primary Pharmacokinetic Endpoints**: The primary pharmacokinetic (PK) endpoints are usually area under the curve (AUC), with the specific choice of AUC parameter dependent on the biological medicine and informed by clinical pharmacology experts and maximum concentration (Cmax). AUC from time zero to infinity (AUC0-inf) is usually preferred by the regulatory authorities with AUC0-last as a key secondary endpoint. Other PK parameters will usually be determined and reported, but are not subject to formal comparison, with no requirement to show equivalence.
+
+   - **Area Under the Curve (AUC)**: Measures the total exposure of the drug in the body over time. AUC from time zero to infinity (AUC0-inf) is preferred, with AUC from time zero to the last measurable concentration (AUC0-last) serving as a key secondary endpoint.
+   - **Maximum Concentration (Cmax)**: The peak serum concentration that the drug achieves.
+
+
+ **Sample Size and Statistical Power**:
+ 
+   - The calculation of sample size in BE studies is based on the coefficient of variation (CV) of the primary PK parameters, using the larger CV to ensure robust statistical power.
+   - BE studies are designed to confirm that the test product is neither 20% below nor 25% above the reference product in terms of PK parameters, with standard BE acceptance margins set between 0.8 and 1.25.
+   - Statistical analyses often utilize two one-sided tests, each conducted at half the overall significance level used for the confidence interval.
+   - Ensuring the correct alpha level is critical when using statistical software for sample size calculations. For instance, for a 90% confidence interval, an alpha of 0.05 is used.
+   - The potential impact on Type II error (failing to detect a difference when one exists) is minimal when the sample size is adjusted based on the PK endpoint with the highest variability.
+> The sample size calculation for a BE study is based on the coefficient of variation (CV) of the primary PK parameters. The larger of the two values will be used in the calculation along with the standard acceptance margin for BE (0.8 – 1.25). BE will need to be demonstrated for each of the primary PK endpoints. Because winning on all comparisons represents a higher hurdle than winning on just one comparison, there is no issue with regard to inflation in the Type I error (Julious and McIntyre, 2012). There is, however, a potential impact on the Type II error, but this is usually minimal when the sample size is calculated based on the endpoint with the highest variability (Julious and McIntyre, 2012). Illustrative text for the sample size determination for a BE study is given below:
+
+> When the sample size in each group is 106, a three-group design will have 90% power to reject both the null hypothesis that the ratio of the test mean to the reference mean is below 0.8 and the null hypothesis that the ratio of test mean to the reference mean is above 1.25; i.e., that the test and standard are not equivalent, in favor of the alternative hypothesis that the means of the two groups are equivalent, assuming that the expected ratio of means is 1, the CV is 0.522, that data will be analyzed in the log-scale using t-tests for differences in means, and that each t-test is made at the 5% level. Allowing for 10% losses to follow-up (dropout), at least 354 subjects will be enrolled.
+
+
+### Clinical Equivalence Study in Patients
+
+The aim of the comparative Phase 3 clinical equivalence study is not to demonstrate clinical beneﬁt, but to conﬁrm clinical equivalence of the proposed biosimilar to reference product (EMA, 2014; FDA, 2016). The study population should be sufﬁciently sensitive for detecting potential product-related differences while at the same time minimizing the inﬂuence of patient- or disease-related factors.
+
+The most sensitive study population would typically be one in which a robust treatment effect has been shown, as this facilitates the detection of small differences in efﬁcacy. Prior lines of therapy and the effect of concomitant medications are also important considerations. Ideally, the Phase 3 study should be performed with ﬁrst-line or monotherapy, in a homogeneous patient population (e.g., in terms of disease severity) using a short-term clinical efficacy endpoint. From the perspective of feasibility and study conduct it is also important that the condition is relatively common, particularly if there are likely to be a number of competing studies.
+
+The choice of primary endpoint will be driven by the indication under study, the endpoints used in the pre-licensing studies for the reference product, and any indication specific regulatory guidance. When the clinically relevant endpoint would require treatment over a long duration it’s common to use a PD measure as the primary endpoint in the study, for example, for denosumab biosimilars the endpoint of interest is usually bone mineral density (BMD) rather than fracture rates.
+
+To establish clinical equivalence, similarity margins must be defined, usually to ensure the preservation of a proportion of the effect of the biosimilar vs placebo. The similarity margin is usually derived from a meta-analysis of studies performed with the reference product. In some cases, where other biosimilars have already been given approval, the choice of margin will already have been established. 
+
+The FDA and EMA differ in their requirements for the similarity margin. The FDA requires the margin to be chosen based on approximately 50% of the lower bound of the 95% CI. The EMA requires preservation of 50% of the point estimate. Furthermore, FDA accepts demonstration of equivalence based on the 90% CI, whereas the EMA requires the 95% CI (See Section 3.3). Illustrative text for a sample size determination is given below:
+
+> When applying the FDA requirements, a sample size of 325 subjects in each group yields 80.03% power for a Z-test (Pooled) to reject the null hypothesis that the difference in the response rate in the treatment group and the response rate in the reference group is outside the margin of equivalence of -0.11 to 0.11, i.e. that the treatment and reference are not equivalent, in favor of the alternative hypothesis that the response rates of the treatment and reference groups are equivalent, assuming that the actual difference in response rates is 0, the response rate in the reference group is 0.36, and that each of the two one-sided tests is made at the 5% significance level (90% confidence interval). 
+
+> When applying the EMA requirements, a sample size of 325 subjects in each group yields 86.64% power for a Z-test (Pooled) to reject the null hypothesis that the difference in the response rate in the treatment group and the response rate in the reference group is outside the margin of equivalence of -0.13 to 0.13, i.e. that the treatment and reference are not equivalent, in favor of the alternative hypothesis that the response rates of the treatment and reference groups are equivalent, assuming that the actual difference in response rates is 0, the response rate in the reference group is 0.36, and that each of the two one-sided tests is made at the 2.5% significance level (95% confidence interval).
+
+> Allowing for 10% losses to follow-up (dropout), at least 730 subjects will be enrolled.
+
+In some cases it is necessary to include a single change of treatment from the reference to the candidate biosimilar following assessment of the primary endpoint. The aim is to assess the impact on development of neutralizing antibodies (nABs) and any safety concerns following a switch from the reference to the biosimilar, since it is likely that many patients already receiving the reference will have their treatment changed to the biosimilar once approved. This switch is usually handled by randomization in the reference group(s).
+
+### Combined Bioequivalence and Clinical Equivalence Study in Patients
+
+When it’s not possible to assess bioequivalence in healthy volunteers, bioequivalence must be established in patients. For convenience and to reduce the number of patients required, this evaluation is conducted within the comparative clinical equivalence study. In some studies sampling for PK endpoints is conducted in all patients, whereas in others it is limited to only the number of patients required to establish bioequivalence. The decision is informed by the acceptability of the PK sampling scheme to patients, taking into account any challenges to recruitment if only a subset of patients will be subject to the additional PK sampling
+
+
+### Example
+
+Similarity Margin:
+
+The similarity margin is derived from a meta-analysis (Random effects model) of four randomized studies, SOLO 1, SOLO 2, R668-AD-1021 and CHRONOS, which resulted in a difference in the proportions achieving EASI-75 of 0.38, with 95% CI of 0.32 to 0.43. For FDA requirements the margin is based on approximately 50% of the lower bound of the 95% CI (0.32), yielding a margin of 16%. For the EMA requirements, the margin is based on 50% of the point estimate (0.38), which gives a margin of 19%. FDA accepts demonstration of equivalence based on the 90% CI, whereas EMA requires the 95% CI.”
+
+And of analysis text:
+
+“Primary efficacy variable (FDA Analysis)
+The primary endpoint will be the proportion of subjects with EASI-75 (≥75% improvement from baseline) at Week 16. Equivalence will be concluded if the 90% confidence interval of the difference between the 2 proportions is completely contained within the interval [ 16%;+16%].
+
+Primary efficacy variable (EMA Analysis)
+The primary endpoint will be the proportion of subjects with EASI-75 (≥75% improvement from baseline) at Week 16. Equivalence will be concluded if the 95% confidence interval of the difference between the 2 proportions is completely contained within the interval [ 19%;+19%].”
+
+
+## Analysing Data – Key Statistical Considerations
+
+### Immunogenicity  
+Immunogenicity endpoints (ADA, ADA titers, and NAb) will typically be summarized descriptively for the safety analysis set. The number and percentage of subjects testing positive for ADAs, their titers, and the percentage of subjects with NAbs will be tabulated by actual treatment, scheduled visit, and overall when applicable.
+
+### PK
+
+Log-transformed PK primary endpoints (e.g., AUC0-inf, AUC0-last, and Cmax) will usually be analyzed on the PK Analysis Set using an ANOVA model with treatment and stratification factors as fixed effects. For the comparison of primary endpoints, the 90% confidence intervals (CIs) for the GMR will be derived by exponentiating the 90% CI obtained for the difference between the two treatments' LS means resulting from the analysis of the log-transformed PK primary endpoints. If the 90% CIs for the GMR of all PK primary endpoints fall entirely within the 0.8 to 1.25 equivalence margins, PK equivalence between the two treatments will be declared. Other PK endpoints will usually be summarized by treatment.
+
+### Efficacy and/or PD
+
+The analysis approach will depend on the data type for the primary endpoint, i.e., binary, continuous, or time to event. In all cases, the point estimate of the treatment effect, whether a difference or ratio, and the associated 90% CI (for the FDA) and 95% CI (for the EMA) will be calculated. An adjustment for multiplicity in the analyses for the two main regulators is not required, since each regulator is uninterested in the result as presented to the other, i.e., multiple testing is not being conducted. If the calculated CI falls entirely within the defined equivalence or similarity margins, the candidate biosimilar is considered equivalent to the reference biologic. For example, in comparing the biomarker responses of two treatments based on CTX and P1NP, the area under the effect curve (AUEC0-wkxx) for percentage change from baseline of CTX and P1NP was analyzed using an analysis of covariance with log (AUEC0-wkxx) as the dependent variable, with treatment, and stratification factors as fixed effects, and log (baseline serum CTX or P1NP concentration) as a covariate. The 90% CI for the GMR of AUEC for percentage change from baseline of CTX and P1NP was derived by exponentiating the 90% CI obtained for the difference between the two treatments' LS means.
+
+### Estimands
+
+Most clinical pharmacology studies are considered exploratory rather than confirmatory, and as such, do not strictly require the definition of estimands. However, bioequivalence studies are considered confirmatory, and possible intercurrent events (ICEs) and strategies for handling these in the statistical analysis should be considered and detailed (ICH E9 (R1)). For example, potential intercurrent events which lead to subjects being excluded from the PK analysis set might be handled using a principal stratum strategy, and these subjects will not be included in the primary analysis. There is significant discussion about how ICEs in clinical equivalence studies should be handled, given the concerns that an analysis based on the intention-to-treat (ITT) analysis set will be more likely to conclude equivalence, i.e., is not the conservative approach. As with other types of studies, the indication, frequency of administration, and the endpoint all need to be considered when determining the appropriate strategy. In some circumstances, the regulators may require the primary analysis to be based on a per protocol (PP) analysis set, while in others, an analysis based on the ITT or full analysis set (FAS) may be required, with appropriate ICE strategies. Clear justification and early discussions with the regulators are advised.
+
+## Reference
+
+ICH E9 (R1) addendum on estimands and sensitivity analysis in clinical trials to the guideline on statistical principles for clinical trials, 2020
+
+Julious SA, McIntyre NE. Sample sizes for trials involving multiple correlated must-win comparisons. Pharm Stat. 2012 Mar-Apr;11(2):177-85. doi: 10.1002/pst.515. Epub 2012 Mar 1. PMID: 22383136.
+
+Biosimilars Market by Drug Class (Drug Class (Monoclonal Antibodies (adalimumab, Infliximab, rituximab, Trastuzumab), Insulin, erythropoietin, anticoagulants. RGH), Indication, Region – Global Forecast to 2028. Biosimilars Market. Jun2023, Report Code: PH7582
+
+ 

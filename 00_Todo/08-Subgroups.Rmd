@@ -1,0 +1,247 @@
+# Subgroups
+
+```{r, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                    1. load the required packages                       -->
+# <!-- ---------------------------------------------------------------------- --> 
+
+## if(!require(psych)){install.packages("psych")}
+
+
+packages<-c("tidyverse", "kableExtra", 
+            "gtsummary","inTextSummaryTable",
+            "Hmisc","htmltools","clinUtils")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                        2. Basic system settings                        -->
+# <!-- ---------------------------------------------------------------------- -->
+# setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+```
+
+## Introduction
+
+Subgroup analysis in clinical trials is a statistical process where the effects of a treatment are evaluated within specific subsets, or subgroups, of participants. These subgroups can be defined based on characteristics such as age, gender, severity of disease, genetic markers, or any other trait that researchers believe may influence the response to the treatment.
+
+The purpose of subgroup analysis is to identify potential differences in the effectiveness or safety of a treatment across various populations. This is particularly important for understanding whether certain groups of patients may benefit more or less from the treatment, or if there are groups that might experience more adverse effects.
+
+### Key Points Consideration
+
+Generally, the evaluation of drugs is based on the entire study population, but the treatment effect may vary among different characteristic populations, which is known as the heterogeneity of treatment effects. Dividing the study population into different subgroups based on various characteristics and statistically analyzing these subgroups can refine a richer set of information. The following common issues need to be considered from a statistical perspective when conducting subgroup analysis:
+
+1. **Research Objective**
+Firstly, it should be clarified whether the subgroup analysis is confirmatory or exploratory. For confirmatory research, if the subgroup analysis is one of the objectives of the clinical trial, especially as a basis for drug registration application, subgroups need to be defined in advance, and subgroup analysis methods specified. For exploratory research, the objective might be to assess the sensitivity, robustness, and internal consistency of the overall clinical trial conclusion, or to explore factors affecting the drug efficacy; such analysis does not need to be explicitly stated in the trial protocol. Post-hoc analysis is even less likely to be specified in the trial protocol.
+
+2. **Randomness**
+For subgroup analysis, maintaining the randomness of the assignment of participants within subgroups is crucial. The best method is to consider subgroups as a stratification factor for stratified randomization during the design phase to ensure the randomness of subgroups, especially in confirmatory subgroup analysis. From this perspective, there should not be too many subgroups as this poses practical difficulties.
+
+3. **Sample Size Estimation**
+Typically, sample size estimates are based on the entire population of participants, but if subgroup analysis is planned, particularly confirmatory subgroup analysis, it's crucial to ensure sufficient confidence in the subgroup analysis. Therefore, the sample size for subgroups needs to be estimated. This requires accurately estimating the proportion of the subgroup within the entire participant population and adjusting accordingly to arrive at a more reasonable sample size estimate.
+
+4. **Multiplicity Correction**
+In fact, conducting several subgroup analyses will always find a few subgroups with statistical significance, but the probability of false positives is relatively high in such exploratory analyses. In confirmatory subgroup analysis, the issue of multiplicity correction should be considered in advance to control the inflation of Type I error probability.
+
+5. **Determination of Subgroup Stratification Factors**
+* Subgroups are defined based on certain baseline characteristics of participants. If the baseline characteristic is a discrete categorical variable, then grouping is straightforward—using the categories of that variable as subgroups. If the baseline characteristic is a continuous numerical variable, there is the issue of determining the cut-off point for grouping.
+* It is important to note that the division into subgroups must be based on measurements or states at baseline, not after treatment. If subgroups are defined based on post-treatment measurements, the intervention itself confounds the subgroup comparison, and it becomes impossible to interpret the effect of the intervention.
+
+6. **Choice of Subgroup Analysis Indicators and Methods**
+* After defining subgroups based on certain baseline characteristics of participants, compare the baseline characteristics of the subgroup population with those of the entire participant population and other participants outside the subgroup. The uniqueness of the baseline characteristics within the subgroup population may reveal reasons for inconsistent results.
+* For the analysis of a single indicator in a single subgroup, the same analysis method as the entire participant population is typically used. The comparison of the same indicator across multiple subgroups is, in fact, a heterogeneity analysis.
+* When selecting analysis indicators, they should be combined with clinical practice and be correct and reasonable. When baseline indicator values differ significantly, relative rather than absolute measurement indicators should be used to test subgroup effects. For example, in clinical trials using statins to lower blood lipids, there are two subgroups, low-risk and high-risk. The low-risk group has a future 10-year cardiovascular mortality risk ≤ 2%, while the high-risk group ≥ 30%. After 10 years of treatment with statins, based on a meta-analysis of statin treatment effects, the mortality risk for the low-risk group is expected to decrease from 2% to 1.4%, and for the high-risk group from 30% to 21%. If the absolute risk reduction (ARR) is used as an indicator for subgroup analysis, a conclusion that there is a difference in the treatment effect between the high-risk and low-risk subgroups is drawn; if the relative risk reduction (RRR) is used, a conclusion that the treatment effect of statins is similar between the high-risk and low-risk subgroups is drawn. Clearly, the latter is a more reasonable indicator for subgroup analysis.
+
+7. **Heterogeneity Analysis and Interaction**
+Heterogeneity analysis is essentially analyzing the consistency of conclusions among subgroups with different levels of a single characteristic variable (such as different age groups), which can be analyzed using models with interaction terms. For example, to test whether the efficacy of an anti-cancer drug differs between newly diagnosed and recurrent patients, the survival analysis uses the Cox proportional hazards regression model. The model includes group (Trt=1 experimental group, Trt=0 control group), recurrence (Rec=1 recurrent, Rec=0 newly diagnosed), and their interaction (Trt × Rec). The estimated values and confidence intervals of the interaction can determine whether there is a difference in drug efficacy between the two subgroups of newly diagnosed and recurrent.
+
+ 
+8. **Consistency of Subgroup Effects Among Closely Related Outcomes**
+If subgroup effects are real, they might manifest through all closely related outcome events. For example, in Case 15-1, gefitinib and placebo's impact on survival were compared. Preliminary analysis showed that compared to placebo, gefitinib tended to prolong survival (HR=0.89, 95% CI 0.77 to 1.02, P=0.087). A pre-planned subgroup analysis hypothesis test showed that the survival effects were different for non-smokers (HR=0.67, 95% CI 0.49 to 0.92) and smokers (HR=0.92, 95% CI 0.79 to 1.06). Further analysis of treatment failure times showed a similar difference in survival effect for non-smokers (HR=0.55, 95% CI 0.42 to 0.72) and smokers (HR=0.89, 95% CI 0.78 to 1.01). The consistency of subgroup effects among closely related different outcome events increases the credibility of subgroup analysis results.
+
+9. **Presentation of Subgroup Analysis Results**
+If there are many subgroups, listing the estimated values and confidence intervals of the trial effects for different subgroups will facilitate analysis and comparison to identify commonalities and specificities. Expressing these results in a forest plot makes them more comprehensive and intuitive.
+
+### Interpretation of Subgroup Analysis Results
+
+
+ Assessing the consistency of treatment effects among different subgroups is often a primary concern of regulatory agencies and is one of the most common applications of subgroup analysis. Factors that can cause heterogeneity include age, gender, race, region, different subtypes of the disease, genetic mutations, comorbidities, concomitant medications, and other baseline conditions. Paying attention to the efficacy of drugs in different populations helps in a comprehensive understanding of the medication and can guide clinical use.
+
+1. **Pre-Planned Subgroup Analysis Results**
+Pre-planned subgroup analyses can be used for drug application and marketing authorization. The requirements to be met include clearly defining and designing subgroups in advance; considering the sample size of subgroups, the test efficiency of subgroup analyses; performing stratified randomization based on subgroups; considering corrections for Type I error probability due to multiple comparisons as necessary, using common methods like the Bonferroni correction; and devising an appropriate statistical analysis plan.
+
+2. **Post-Hoc Subgroup Analysis Results**
+Post-hoc subgroup analysis may present the following problems:
+   - **Insufficient Sample Size**: Due to a lack of prior consideration for subgroup analysis, the study design's sample size estimate is based on the entire population of participants. Choosing different subgroups for statistical analysis clearly means an insufficient sample size and consequently low power.
+   
+   - **Lack of Randomness in Subgroup Populations**: Non-pre-planned subgroup analyses cannot maintain the randomness of subgroup populations, undermining the theoretical foundation for statistical inference. If subgroup analyses had been planned in advance, stratified randomization would be considered during the grouping process.
+   
+   - **High False-Positive Rate, Unreliable Conclusions**: As exploratory analyses, the definitions and number of subgroups analyzed were not considered beforehand and tend to be arbitrary. There is almost no correction for multiplicity. Therefore, faced with many potential subgroup definitions and analyses, some positive results will always be found, and when reporting, there is often a bias towards reporting only positive results, leading to an increase in reported false positives. Even if Type I error probability is controlled, conclusions drawn from small samples still cannot rule out chance, resulting in unreliable results.
+
+
+## STEPP (Subpopulation Treatment Effect Pattern Plot) Analysis
+
+### Introduction
+
+**STEPP Analysis**, or **Subpopulation Treatment Effect Pattern Plot**, is a statistical technique used to explore and visualize the pattern of treatment effects across various subpopulations in a study. This method is particularly useful in clinical trials and epidemiological studies where understanding how different groups respond differently to a treatment is crucial. STEPP was introduced by Bonetti and Gelber (2000, 2004) as a way to examine how treatment effects vary as a function of patient characteristics or biomarkers without specifying a particular model for this variation.
+
+STEPP is primarily used to:
+
+- **Identify heterogeneity in treatment effects**: It helps in discovering whether the effect of a treatment varies across different levels of a covariate or a set of covariates.
+- **Inform personalized medicine**: By identifying how treatment effectiveness changes across subpopulations, STEPP can aid in tailoring medical treatments to individual characteristics.
+- **Enhance understanding of intervention mechanisms**: Understanding which subgroups benefit more or less from a treatment can provide insights into the biological or social mechanisms underlying these effects.
+
+**Steps in a STEPP Analysis:**
+
+STEPP is a graphical tool designed to help researchers explore the potential heterogeneity of treatment effect, and to facilitate the interpretation of estimates of treatment effect derived from different and possibly overlapping subsets of patients defined by the values of a continuous covariate (which could be a risk index). First, STEPP divides the population into overlapping subpopulations defined with respect to the covariate of interest. Second, it estimates the treatment effect in each subpopulation. Finally, these treatment effects are plotted against the covariate of interest. The method is aimed at determining whether the magnitude of the treatment effect changes for different values of the covariate used to define the subpopulations. STEPP has the advantage of making no a priori assumptions regarding the pattern of interaction and thus has the potential to highlight complex associations. By allowing subpopulations to overlap, the estimated treatment effect utilizes information from a non-trivial number of adjacent observations. Importantly, STEPP uses well-known methods to estimate treatment effects within well-defined groups of patients.
+
+1. **Selection of Covariate**: Identify a continuous or ordinal covariate that is hypothesized to interact with the treatment effect.
+2. **Window Formation**: Define overlapping windows or subgroups along the range of the chosen covariate. These windows can be based on quantiles, fixed widths, or other methods.
+3. **Estimate Effects**: For each subgroup, estimate the treatment effect using standard statistical methods (like mean differences, hazard ratios, etc.).
+4. **Visualization**: Plot the estimated effects against the midpoints of the covariate windows. This plot helps visualize how the treatment effect changes with the covariate.
+
+### Generation of Subpopulations in STEPP Analysis
+
+The generation of subpopulations in STEPP analysis involves selecting specific segments or groups within the data based on covariate values \( z_i \) for each sample unit. The steps involved are detailed as follows:
+
+1. **Selection of Covariate Points:**
+   - A finite collection of points \({(l_j, u_j), j = 1, \ldots, K}\) is selected for the covariate \(Z\). 
+   - These points are chosen such that \(l_j + \eta \leq u_j\) for all \(j\), where \(\eta\) is a positive constant. This ensures there is a minimum gap between the lower and upper bounds of each window to avoid overly narrow subpopulations.
+   - Each pair \((l_j, u_j)\) defines a subset of observations for which \(l_j \leq z_i \leq u_j\). This subset is referred to as subpopulation \(P_j\).
+   - The bounds must satisfy \(Z_{min} \leq l_j < u_j \leq Z_{max}\).
+
+2. **Types of Window Approaches:**
+
+   - **Unit-based Sliding Window:** This approach defines subpopulations based on a fixed number of units within each window, with parameters \(r_1\) and \(r_2\) controlling the extent of overlap and the size of each subpopulation, respectively.
+   - **Event-based Sliding Window:** Introduced to handle sparse data in clinical trials with time-to-event outcomes, this approach focuses on including a specified number of events in each subpopulation, enhancing the reliability of treatment effect estimates in each group.
+   - **Tail-oriented Approach:** Focuses more on the tails of the distribution to capture extreme values or outliers, providing insights into subpopulations that might react differently to treatments.
+
+```{r , echo=FALSE, fig.align="center", out.width = '100%'} 
+knitr::include_graphics("./02_Plots/Sub_STEPP_Polupation.png")
+```
+
+3. **Implementing Unit-based Sliding Windows:**
+   - The first subpopulation \(P_1\) includes units from \(Z_{min}\) to the \(r_2/n \times 100\)th percentile of the covariate.
+   - Subsequent subpopulations \(P_2, P_3, \ldots\) are defined such that each starts just beyond the upper limit of the previous subpopulation, shifted by up to \(r_1\) units.
+   - This pattern is repeated until the entire data set is covered.
+
+4. **Implementing Event-based Sliding Windows:**
+   - Units are ordered by the covariate value from lowest to highest.
+   - Subpopulations are defined such that each includes at least a predefined number of events, ensuring that treatment effect estimates across these subpopulations are statistically robust.
+   
+5. **Implementing Event-based Sliding Windows:**
+   - In the tail-oriented framework, subpopulations are defined with a focus on either the lower or upper tails of the covariate distribution:
+   - **Lower Tail Configuration:** All subpopulations start from the minimum value of the covariate (\(Z_{\text{min}}\)). Here, the lower bounds \(l_j\) are consistently set to \(Z_{\text{min}}\), while the upper bounds \(u_j\) are progressively increased. Specifically, \(u_1 < u_2 < \ldots < u_K = Z_{\text{max}}\). Each subpopulation \(P_j\) thus includes all units for which \(z_i \leq u_j\). This results in a sequence of strictly increasing sets of units, culminating in the last subpopulation which includes the entire sample.
+   - **Upper Tail Configuration:** Conversely, all subpopulations end at the maximum value of the covariate (\(Z_{\text{max}}\)). The upper bounds \(u_j\) are fixed at \(Z_{\text{max}}\), and the lower bounds \(l_j\) are adjusted upwards, such that \(Z_{\text{min}} = l_1 < l_2 < \ldots < l_K\). This configures a series of decreasing index sets where each \(P_j\) includes units where \(z_i \geq l_j\).
+   - The tail-oriented approach is designed to emphasize the influence of covariate values increasing towards \(Z_{\text{max}}\) or decreasing towards \(Z_{\text{min}}\) on the treatment effect. It's recommended that any statistical testing be conducted separately for the left (increasing) and right (decreasing) configurations to maintain clarity and accuracy in the interpretation of results.
+
+6. **Note**
+
+- The distinctive feature of STEPP is the overlap in subpopulations, regardless of the windowing system chosen. This overlapping is critical as it:
+  - Minimizes the influence of arbitrary boundaries on the analysis results.
+  - Provides a smoother transition across subpopulations, enhancing the interpretability and stability of treatment effect estimates.
+
+### Treatment Effect Estimation
+
+
+**1. Time-to-Event (Survival) Outcomes:**
+   - **Fixed Time Point Survival Difference:**
+     - The treatment effect (\(\theta_j\)) for a subgroup is defined as the difference in survival at a specific time point \(t^*\) between two treatment arms (A and B).
+     - The survival functions for each treatment group are estimated using the Kaplan-Meier method.
+     - This method provides a clear, non-parametric estimate of survival probabilities at various time points, making it suitable for comparing the effect of treatments on survival at a particular moment.
+
+**2. Time-to-Event Outcomes with Competing Risks:**
+   - **Log Hazard Ratio Estimation:**
+     - In scenarios with competing risks, the treatment effect (\(\theta_j\)) is quantified by the log hazard ratio.
+     - This is estimated via a first-order approximation of the partial likelihood approach.
+     - The methodology here extends the "O minus E" (Observed minus Expected) method, which traditionally measures differences between the observed number of events and the expected number of events under a null hypothesis (no treatment effect).
+     - This approach is well-suited for handling competing risks by adjusting the risk estimates to account for the possibility that different types of events may interfere with the observation of the event of interest (e.g., death from another cause interfering with cancer survival analysis).
+
+**3. Non Time-to-Event Outcomes:**
+   - **Generalized Linear Models (GLMs):**
+     - For outcomes that fit into the exponential family of distributions (which includes binary, count, and continuous outcomes among others), treatment effects (\(\theta_j\)) are estimated using GLMs.
+     - Treatment effects can be expressed either as absolute differences or relative terms:
+       - **Absolute Treatment Effect:** The difference in expected outcomes between the two treatment groups, represented as \([E(Y | G = A) - E(Y | G = B)]\).
+       - **Relative Treatment Effect:** This might be represented as a ratio or an odds ratio, depending on the outcome distribution:
+         - For Gaussian and Poisson distributions: \(\frac{E(Y | G = A)}{E(Y | G = B)}\)
+         - For binary outcomes: \(\frac{E(Y | G = A)}{1-E(Y | G = A)} / \frac{E(Y | G = B)}{1-E(Y | G = B)}\) (odds ratio).
+
+
+### Analysis in R
+
+   - **Treatment Effects (\(\theta_1, \ldots, \theta_K\)):** This is the core of the STEPP output, where the estimated treatment effects for each subpopulation are plotted. These effects could represent differences in means, proportions, hazard ratios, or any other statistical measure appropriate for the study design and data type.
+   - **Median Covariate Values:** The x-axis typically displays the median value of the covariate used to define the subpopulations. This covariate could be a clinical measure, demographic factor, or any other variable of interest.
+   - **Confidence Regions:** Each point estimate (\(\theta_j\)) is accompanied by a confidence interval or region that provides insight into the statistical uncertainty of the estimate. These regions help in assessing the precision of the estimates and are vital for interpreting the robustness of the findings. 
+   - Along with the treatment effects, the plot often includes information about the sizes of each subpopulation. This information is crucial as it impacts the statistical power and reliability of the treatment effect estimates in each subgroup.
+   - **Overall Treatment Effect (\(\theta_{ALL}\))** represents a global measure across all subpopulations but is generally not a simple linear combination of the subpopulations’ effects. This implies that aggregating subpopulation effects does not necessarily yield the overall effect due to potential interactions and non-linear relationships within the data.
+   -  **Statistical Testing for Heterogeneity:**: The analysis may include tests to statistically determine whether the treatment effect varies significantly across the different subpopulations. This aspect is essential for confirming the presence of heterogeneity, which can have substantial implications for clinical practice and further research.
+
+Example of conducting a Subpopulation Treatment Effect Pattern Plot (STEPP) analysis on simulated data for a survival outcome without competing risks. 
+
+   - A `stwin` object is created using the unit-based sliding window approach with specific parameters (r1 = 200 and r2 = 300). These parameters define the overlap and size of the subpopulations:
+     - `r1 = 200`: About 200 patients are in common between consecutive subpopulations.
+     - `r2 = 300`: Each subpopulation comprises approximately 300 patients.
+   - The `stsubpop` object is then used to generate these overlapping subpopulations based on the `covar` values.
+   - An `stmodelKM` object is created to fit a Kaplan-Meier model using treatment, survival time, and censoring data.
+   - The `estimate()` function is then used to calculate the treatment effects for the generated subpopulations at a specified time point (time 4).
+   - A permutation test is conducted with 500 permutations to assess the significance of treatment-covariate interactions.
+   
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library("stepp")
+# Section 3 - The stepp package
+data("simdataKM", package = "stepp")
+
+swin <- new("stwin", type = "sliding", r1 = 200, r2 = 300)
+subp <- new("stsubpop")
+subp <- generate(subp, win = swin, covariate = simdataKM$covar)
+summary(subp)
+
+res <- new("steppes")
+modelKM <- new("stmodelKM", coltrt = simdataKM$trt,
+  survTime = simdataKM$time, censor = simdataKM$censor,
+  trts = c(1, 2), timePoint = 4)
+res <- estimate(res, subp, modelKM)
+
+set.seed(101)
+nperm <- 500
+res <- test(res, nperm)
+# summary(res)
+print(res, estimate = TRUE, cov = FALSE, test = TRUE)
+
+set.seed(101)
+res <- stepp.test(subp, modelKM, nperm)
+
+# plot(res, subplot = TRUE, ylabel = "Survival",
+#   tlegend = c("Treatment 1", "Treatment 2"),
+#   legend_diff = c(1, 2))
+
+```
+
+
+```{r , echo=FALSE, fig.align="center", out.width = '100%'} 
+knitr::include_graphics("./02_Plots/Sub_STEPP_KM.png")
+```
+
+
+### Limitations
+
+- **Arbitrary subgroup definitions**: The choice of subgroup boundaries and sizes can affect the results, although overlapping helps mitigate this issue.
+- **Confounding**: As with any observational analysis, confounding factors can distort the true effect estimates if not properly controlled for.
+- **Sample size requirements**: Each subgroup must be large enough to provide reliable estimates, which can be a limitation in studies with small sample sizes.
+
+### Reference
+
+
+* Bonetti, M., & Gelber, R. D. (2000). Patterns of treatment effects in subsets of patients in clinical trials. Biostatistics, 1(2), 205-221. https://doi.org/10.1093/biostatistics/1.2.205
+*For the 2004 publication:
+* Bonetti, M., & Gelber, R. D. (2004). A graphical method to assess treatment-covariate interactions using the Cox model on subsets of the data. Statistics in Medicine, 23(16), 2581-2596. https://doi.org/10.1002/sim.1831
+* Yip, W. K., Bonetti, M., Cole, B. F., Barcella, W., Wang, X. V., Lazar, A., & Gelber, R. D. (2016). Subpopulation Treatment Effect Pattern Plot (STEPP) analysis for continuous, binary, and count outcomes. Clinical Trials, 13(4), 382-390.
+* Venturini, S., Bonetti, M., Lazar, A. A., Cole, B. F., Wang, X. V., Gelber, R. D., & Yip, W. K. (2022). Subpopulation Treatment Effect Pattern Plot (Stepp) Method with R and Stata. Available at SSRN 4040768.
