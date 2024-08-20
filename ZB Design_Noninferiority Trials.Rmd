@@ -1,0 +1,170 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Considerations for the Design and Interpretation of Noninferiority Trials
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+packages<-c("tidyverse", "kableExtra")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+```
+
+
+# Introduction
+
+Non-inferiority clinical trials are designed to determine if a new treatment is not significantly worse than an established treatment, in terms of efficacy or other clinically relevant outcomes. These trials are particularly useful when it's considered unethical to use a placebo because an effective standard treatment already exists.
+
+## Design of Non-Inferiority Trials
+
+1. **Establishing the Non-Inferiority Margin ("Delta"):** Before the trial begins, researchers must define a margin of difference that is considered clinically acceptable. This margin, known as the delta, is crucial because it represents the maximum allowable difference in efficacy between the new treatment and the standard treatment where the new treatment would still be considered acceptable.
+
+2. **Statistical Considerations:** Unlike superiority trials where researchers prove one treatment is better than another, non-inferiority trials aim to show that the new treatment is not significantly worse than the control. Statistically, this involves demonstrating that the efficacy of the new treatment falls within the pre-specified delta from the standard treatment.
+
+3. **Confidence Intervals:** The results of non-inferiority trials are often expressed in terms of confidence intervals. A common approach is to use a one-sided 97.5% confidence interval or a two-sided 95% confidence interval for the difference between the treatment effects. If this interval does not include the delta, the new treatment can be considered not inferior to the standard treatment. 
+
+![](./02_Plots/INF_Intro.png)
+*Source: Mauri L, D'Agostino RB Sr. Challenges in the Design and Interpretation of Noninferiority Trials. N Engl J Med. 2017 Oct 5;377(14):1357-1367. doi: 10.1056/NEJMra1510063. PMID: 28976859.*
+
+
+
+## Essential Components
+
+Noninferiority trials are a key type of clinical study when it's unethical to use a placebo due to the availability of effective treatments. Here’s a breakdown of the essential components of noninferiority study designs, as outlined in a Table below:
+
+![](./02_Plots/INF_Features.png)
+*Source: Mauri L, D'Agostino RB Sr. Challenges in the Design and Interpretation of Noninferiority Trials. N Engl J Med. 2017 Oct 5;377(14):1357-1367. doi: 10.1056/NEJMra1510063. PMID: 28976859.*
+
+1. **Foundation on Prior Evidence**: Noninferiority trials are predicated on existing randomized trials that have demonstrated the superiority of the active control over a placebo. This historical evidence sets the baseline efficacy expected from the active treatment.
+
+2. **Endpoint Selection and Expected Performance**: The endpoint for the trial is selected based on the active control's performance in prior studies. This helps establish what outcomes can be anticipated from the active control in the absence of the experimental treatment.
+
+3. **Noninferiority Margin Definition**: During the design phase, a noninferiority margin is defined. This margin, typically a percentage of the effect size observed in placebo-controlled trials, represents the smallest effect size that would be clinically acceptable for the new treatment compared to the active control. The margin ensures that the new treatment preserves a meaningful proportion of the active treatment's effect.
+
+4. **Comparator Considerations and Assay Sensitivity**: The trial must distinguish effectively between effective and ineffective treatments. Assay sensitivity is crucial; the trial design should allow the active control to demonstrate its superiority to a hypothetical placebo. This often poses challenges since placebo groups are ethically precluded in such setups.
+
+5. **Constancy Assumption**: The trial's design should maintain the conditions under which the active control was previously shown to be effective. This includes the use of a consistent metric for evaluating treatment effects, such as relative risk, odds ratio, or absolute risk difference. Changes in these metrics can significantly impact the power and validity of the trial conclusions.
+
+6. **Trial Execution and Outcome Ascertainment**: Rigorous execution and accurate outcome measurement are critical. Inaccuracies such as loss to follow-up, treatment crossover, or subjective outcome measures can make treatments appear more similar than they are, potentially leading to erroneous conclusions.
+
+7. **Analytical Considerations**: Noninferiority trials often require different analytical approaches compared to superiority trials. While superiority trials commonly use intention-to-treat analysis, noninferiority studies might need per-protocol analysis to avoid bias, especially if not all participants adhere to the assigned treatment. Analyzing both datasets and ensuring consistency across them is advisable to avoid false positive results.
+
+
+## Challenges and Complexities 
+
+Noninferiority trial designs present specific challenges that require careful consideration, especially in the absence of a placebo group. Here are some of the special challenges involved:
+
+1. **Implicit Superiority Basis**: Noninferiority trials inherently rely on an implicit comparison of the test treatment's efficacy against a placebo, even though a placebo group is not included. This is based on historical data demonstrating the superiority of the active control over placebo.
+
+2. **Use of Historical Controls**: When ethical or practical concerns prevent the inclusion of a placebo group, historical data must be used to establish the superiority of the active control. This can be problematic when such historical data are lacking or outdated, making it difficult to set a reliable noninferiority margin.
+
+3. **Substitute Comparators**: In situations where no direct placebo data are available, less effective or older treatments are often used as stand-ins. For example, in stroke prevention studies, aspirin has been used as a comparator to set noninferiority margins for newer anticoagulants against warfarin. Similarly, bare-metal stents and medical therapies have served as references in trials for new drug-eluting stents and surgical interventions, respectively.
+
+4. **Sample Size and Noninferiority Margin**: Setting the noninferiority margin based on what can be statistically distinguished with a given sample size (back-calculating) rather than what is clinically meaningful can compromise the validity of the trial conclusions. The sample size should be adequate to ensure that the noninferiority margin reflects true clinical equivalence or acceptability.
+
+5. **Misinterpretation of Superiority Trials as Noninferiority**: It is incorrect to conclude noninferiority from a superiority trial that fails to show a significant difference due to lack of power (small sample size). The adage "absence of evidence is not evidence of absence" is particularly relevant here. Trials that are underpowered may not detect small but clinically significant differences, which could lead to erroneous conclusions if interpreted as evidence of noninferiority.
+
+6. **Challenges with Meta-Analysis**: While meta-analysis can be a useful tool to increase power and aggregate findings from multiple studies, relying on it to overcome the limitations of underpowered individual studies can be misleading. Issues such as heterogeneity among studies and potential statistical biases make meta-analysis a less reliable substitute for well-powered, well-designed randomized trials.
+
+
+![](./02_Plots/INF_Sup and Int.png)
+*Source: Mauri L, D'Agostino RB Sr. Challenges in the Design and Interpretation of Noninferiority Trials. N Engl J Med. 2017 Oct 5;377(14):1357-1367. doi: 10.1056/NEJMra1510063. PMID: 28976859.*
+
+## Evaluation of Aafety
+
+Evaluating safety through noninferiority study designs presents unique challenges, particularly when determining what constitutes an acceptable level of risk for adverse events, as these are not typically quantifiable with the same precision as efficacy outcomes. 
+
+1. **Determining Safety Margins**: In efficacy trials, noninferiority margins can be based on historical data where the effect of the control is well established. For safety, however, such benchmarks are less clear because there may not be historical data that definitively establish a 'safe' level of adverse events. Safety margins often require subjective judgment from clinical advisors on what level of risk is acceptable, taking into consideration the severity and frequency of adverse events, the overall risk to the patient population, and the expected benefits of the treatment.
+
+2. **Example from the PRECISION Trial**: The PRECISION trial, which assessed the safety of celecoxib compared to naproxen and ibuprofen in treating arthritis, illustrates these challenges. A relative margin of 1.33 was chosen based on an expected 2% annualized risk for significant cardiovascular events. This margin was designed to ensure that celecoxib's risk did not exceed that of naproxen by an unacceptable amount, reflecting both the direct comparison with competitors and the absence of a placebo.
+
+3. **Noninferiority and Placebo Control**: The PRECISION trial, like many safety studies, couldn't use a placebo control because withholding effective pain relief would be unethical. Consequently, the trial could not demonstrate that the risk of cardiovascular events with celecoxib, naproxen, or ibuprofen was equivalent to a non-treatment scenario.
+
+4. **Extending Noninferiority to Safety Evaluations**: While the framework for noninferiority efficacy trials can be adapted to safety studies, doing so involves significant challenges. The concept of a prespecified margin, while still useful, requires careful consideration and justification in the context of safety, where the outcomes have direct and significant impacts on patient health.
+
+## New Trial Methods and Their Effect 
+
+The evolving methodologies in clinical trial designs, particularly noninferiority studies, reflect a response to both practical and scientific challenges, aiming to streamline the process while maintaining the integrity and reliability of the findings. 
+
+1. **Simplification of Trial Conduct**: Simplifying the operational aspects of clinical trials, such as reducing the frequency of participant contacts and the number of outcomes assessed, enhances both noninferiority and superiority trials. This approach tends to allow for the collection of more reliable data from a larger sample size and reduces potential biases associated with missing data. By streamlining procedures, trials can become more efficient and less burdensome, potentially improving participant retention and the quality of the data collected.
+
+2. **Pragmatic Trials and Routine Data Collection**: Pragmatic trials, which often utilize routine clinical care settings for data collection, can introduce specific challenges for noninferiority studies. Issues such as imbalances in treatment adherence and inaccuracies in endpoint determination are particularly problematic in noninferiority settings where the objective is to prove that the new intervention is not substantially worse than the existing standard. These factors can skew the results and make it difficult to draw definitive conclusions about noninferiority.
+
+3. **Patient Involvement in Trial Design**: Incorporating patient input into the design of noninferiority trials is increasingly recognized as valuable. Patients' preferences and insights can inform the determination of acceptable safety margins and the overall acceptability of risks versus benefits. This approach aligns with the principles of shared decision-making in clinical practice, enhancing the relevance and patient-centeredness of the study outcomes.
+
+4. **Application in Comparative Effectiveness Research**: Noninferiority studies are particularly useful in comparative effectiveness research and health services research within the framework of value-based healthcare. By evaluating clinical outcomes and costs separately, these studies can ensure that treatment efficiencies do not compromise clinical efficacy. This dual focus helps in assessing whether newer treatments provide similar outcomes at reduced costs or with other practical benefits.
+
+5. **Use of Observational and Meta-Analysis Data**: Beyond traditional randomized trials, observational studies and meta-analyses are increasingly being used to test noninferiority hypotheses. The prespecification of hypotheses and noninferiority margins is crucial in these contexts to enhance the credibility and validity of the results. These methodologies allow for the analysis of larger datasets and can provide additional insights into the effectiveness of interventions in more diverse real-world settings.
+
+6. **Equivalence Studies for Biologics**: Equivalence studies, particularly in the biologics sector, have adopted methodologies that test for both noninferiority and nonsuperiority. This is often part of demonstrating biosimilarity, where a biologic agent is tested against an already approved agent to confirm that it does not significantly differ in terms of safety and efficacy. These studies are critical for regulatory approvals and market entry of biosimilars.
+
+## Improving Noninferiority Trials
+
+Improving noninferiority trials involves refining various aspects of their design, reporting, and analysis to ensure that these studies can reliably demonstrate that new treatments are acceptably similar in efficacy and safety to established treatments. Here are some specific recommendations to enhance the rigor and credibility of noninferiority trials:
+
+1. **Justification of the Noninferiority Margin**:
+   - **Explicit Justification**: The noninferiority margin should be explicitly justified in the study design. This involves defining how much worse the new treatment can be compared to the standard treatment without losing its value. Justification should be based on clinical significance rather than purely statistical reasons.
+   - **Incorporating Decision Analysis**: Utilizing decision analysis techniques can help in determining the noninferiority margin by considering both population-level impacts and policy implications.
+   - **Patient-Centered Approaches**: Engaging patients through questionnaires or interviews about their perceptions of acceptable risk and benefit can ground the noninferiority margin in real-world expectations and enhance the patient relevance of the trial outcomes.
+
+2. **Caution with Composite Endpoints**:
+   - **Assessing Component Relevance**: Composite endpoints, while useful in capturing a broad spectrum of treatment effects, can sometimes include components that do not align well with each other in terms of their benefits and risks. It is essential to carefully select these endpoints to ensure they are clinically coherent and meaningful.
+   - **Disparate Impact Evaluation**: Evaluating the disparate impacts of the components of composite endpoints on the overall study conclusion is crucial. This involves analyzing whether any component disproportionately affects the trial’s outcome, potentially skewing the results.
+
+3. **Handling of Missing Data**:
+   - **Avoidance and Minimization**: Strategies should be employed from the study design phase to minimize missing data, such as ensuring follow-up ease and patient engagement.
+   - **Sensitivity Analyses**: Implementing sensitivity analyses to understand the impact of missing data on the trial's conclusions is crucial. Techniques like multiple imputation can be used to handle missing data, providing a more robust analysis and helping to maintain the integrity of the trial outcomes.
+
+4. **Enhanced Reporting Standards**:
+   - **Following CONSORT Guidelines**: Adhering to the CONSORT guidelines for noninferiority trials ensures that all critical elements of the trial design, conduct, and analysis are transparently reported.
+   - **Regulatory Guidance Compliance**: Complying with the specific standards set forth by regulatory bodies such as the FDA and the European Medicines Agency can enhance the validity and acceptability of the trial results.
+
+5. **Continuous Review and Adaptation**:
+   - **Incorporating New Evidence**: Noninferiority trials should be adaptable to new scientific evidence and changes in clinical practice that might affect the trial's context.
+   - **Feedback Integration**: Ongoing feedback from clinical practitioners, patients, and regulatory reviewers should be integrated into trial protocols to refine approaches and address emerging challenges.
+   
+![](./02_Plots/INF_Recommendation.png)
+*Source: Mauri L, D'Agostino RB Sr. Challenges in the Design and Interpretation of Noninferiority Trials. N Engl J Med. 2017 Oct 5;377(14):1357-1367. doi: 10.1056/NEJMra1510063. PMID: 28976859.*
+
+# Reference
+
+D’Agostino, RB Sr, Massaro, JM, Sullivan, LM. Non-inferiority trials: design concepts and issues — the encounters of academic consultants in statistics. Stat Med 2003;22:169-186
+
+Fleming, TR, Odem-Davis, K, Rothmann, MD, Li Shen, Y. Some essential considerations in the design and conduct of non-inferiority trials. Clin Trials 2011;8:432-439
+
+Center for Drug Evaluation and Research, Center for Biologics Evaluation and Research. Non-inferiority clinical trials to establish effectiveness — guidance for industry. Silver Spring, MD: Food and Drug Administration, November 2016.
+
+Center for Drug Evaluation and Research. Antibacterial drug products: use of noninferiority trials to support approval — guidance for industry. Silver Spring, MD: Food and Drug Administration, November 2010.
+
+Rehal, S, Morris, TP, Fielding, K, Carpenter, JR, Phillips, PP. Non-inferiority trials: are they inferior? A systematic review of reporting in major medical journals. BMJ Open 2016;6:e012594-e012594
+
+Piaggio, G, Elbourne, DR, Pocock, SJ, Evans, SJ, Altman, DG. Reporting of noninferiority and equivalence randomized trials: extension of the CONSORT 2010 statement. JAMA 2012;308:2594-2604
+
+Points to consider on switching between superiority and non-inferiority. London: European Medicines Agency, July 2000.
+
+Mauri L, D'Agostino RB Sr. Challenges in the Design and Interpretation of Noninferiority Trials. N Engl J Med. 2017 Oct 5;377(14):1357-1367. doi: 10.1056/NEJMra1510063. PMID: 28976859.

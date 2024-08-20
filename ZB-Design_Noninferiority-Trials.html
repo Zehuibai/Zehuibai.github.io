@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Considerations for the Design and Interpretation of Noninferiority Trials</title>
+
+<script src="site_libs/header-attrs-2.22/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="ZB-Design_Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="ZB-SSC_Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="ZB-SSC_Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="ZB-SSC_Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="ZB-Plot_Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="cv.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Considerations for the Design and Interpretation of Noninferiority
+Trials</p></h1>
+
+</div>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Non-inferiority clinical trials are designed to determine if a new
+treatment is not significantly worse than an established treatment, in
+terms of efficacy or other clinically relevant outcomes. These trials
+are particularly useful when it’s considered unethical to use a placebo
+because an effective standard treatment already exists.</p>
+<div id="design-of-non-inferiority-trials" class="section level2">
+<h2>Design of Non-Inferiority Trials</h2>
+<ol style="list-style-type: decimal">
+<li><p><strong>Establishing the Non-Inferiority Margin
+(“Delta”):</strong> Before the trial begins, researchers must define a
+margin of difference that is considered clinically acceptable. This
+margin, known as the delta, is crucial because it represents the maximum
+allowable difference in efficacy between the new treatment and the
+standard treatment where the new treatment would still be considered
+acceptable.</p></li>
+<li><p><strong>Statistical Considerations:</strong> Unlike superiority
+trials where researchers prove one treatment is better than another,
+non-inferiority trials aim to show that the new treatment is not
+significantly worse than the control. Statistically, this involves
+demonstrating that the efficacy of the new treatment falls within the
+pre-specified delta from the standard treatment.</p></li>
+<li><p><strong>Confidence Intervals:</strong> The results of
+non-inferiority trials are often expressed in terms of confidence
+intervals. A common approach is to use a one-sided 97.5% confidence
+interval or a two-sided 95% confidence interval for the difference
+between the treatment effects. If this interval does not include the
+delta, the new treatment can be considered not inferior to the standard
+treatment.</p></li>
+</ol>
+<p><img src="02_Plots/INF_Intro.png" /> <em>Source: Mauri L,
+D’Agostino RB Sr. Challenges in the Design and Interpretation of
+Noninferiority Trials. N Engl J Med. 2017 Oct 5;377(14):1357-1367. doi:
+10.1056/NEJMra1510063. PMID: 28976859.</em></p>
+</div>
+<div id="essential-components" class="section level2">
+<h2>Essential Components</h2>
+<p>Noninferiority trials are a key type of clinical study when it’s
+unethical to use a placebo due to the availability of effective
+treatments. Here’s a breakdown of the essential components of
+noninferiority study designs, as outlined in a Table below:</p>
+<p><img src="02_Plots/INF_Features.png" /> <em>Source: Mauri L,
+D’Agostino RB Sr. Challenges in the Design and Interpretation of
+Noninferiority Trials. N Engl J Med. 2017 Oct 5;377(14):1357-1367. doi:
+10.1056/NEJMra1510063. PMID: 28976859.</em></p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Foundation on Prior Evidence</strong>: Noninferiority
+trials are predicated on existing randomized trials that have
+demonstrated the superiority of the active control over a placebo. This
+historical evidence sets the baseline efficacy expected from the active
+treatment.</p></li>
+<li><p><strong>Endpoint Selection and Expected Performance</strong>: The
+endpoint for the trial is selected based on the active control’s
+performance in prior studies. This helps establish what outcomes can be
+anticipated from the active control in the absence of the experimental
+treatment.</p></li>
+<li><p><strong>Noninferiority Margin Definition</strong>: During the
+design phase, a noninferiority margin is defined. This margin, typically
+a percentage of the effect size observed in placebo-controlled trials,
+represents the smallest effect size that would be clinically acceptable
+for the new treatment compared to the active control. The margin ensures
+that the new treatment preserves a meaningful proportion of the active
+treatment’s effect.</p></li>
+<li><p><strong>Comparator Considerations and Assay Sensitivity</strong>:
+The trial must distinguish effectively between effective and ineffective
+treatments. Assay sensitivity is crucial; the trial design should allow
+the active control to demonstrate its superiority to a hypothetical
+placebo. This often poses challenges since placebo groups are ethically
+precluded in such setups.</p></li>
+<li><p><strong>Constancy Assumption</strong>: The trial’s design should
+maintain the conditions under which the active control was previously
+shown to be effective. This includes the use of a consistent metric for
+evaluating treatment effects, such as relative risk, odds ratio, or
+absolute risk difference. Changes in these metrics can significantly
+impact the power and validity of the trial conclusions.</p></li>
+<li><p><strong>Trial Execution and Outcome Ascertainment</strong>:
+Rigorous execution and accurate outcome measurement are critical.
+Inaccuracies such as loss to follow-up, treatment crossover, or
+subjective outcome measures can make treatments appear more similar than
+they are, potentially leading to erroneous conclusions.</p></li>
+<li><p><strong>Analytical Considerations</strong>: Noninferiority trials
+often require different analytical approaches compared to superiority
+trials. While superiority trials commonly use intention-to-treat
+analysis, noninferiority studies might need per-protocol analysis to
+avoid bias, especially if not all participants adhere to the assigned
+treatment. Analyzing both datasets and ensuring consistency across them
+is advisable to avoid false positive results.</p></li>
+</ol>
+</div>
+<div id="challenges-and-complexities" class="section level2">
+<h2>Challenges and Complexities</h2>
+<p>Noninferiority trial designs present specific challenges that require
+careful consideration, especially in the absence of a placebo group.
+Here are some of the special challenges involved:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Implicit Superiority Basis</strong>: Noninferiority
+trials inherently rely on an implicit comparison of the test treatment’s
+efficacy against a placebo, even though a placebo group is not included.
+This is based on historical data demonstrating the superiority of the
+active control over placebo.</p></li>
+<li><p><strong>Use of Historical Controls</strong>: When ethical or
+practical concerns prevent the inclusion of a placebo group, historical
+data must be used to establish the superiority of the active control.
+This can be problematic when such historical data are lacking or
+outdated, making it difficult to set a reliable noninferiority
+margin.</p></li>
+<li><p><strong>Substitute Comparators</strong>: In situations where no
+direct placebo data are available, less effective or older treatments
+are often used as stand-ins. For example, in stroke prevention studies,
+aspirin has been used as a comparator to set noninferiority margins for
+newer anticoagulants against warfarin. Similarly, bare-metal stents and
+medical therapies have served as references in trials for new
+drug-eluting stents and surgical interventions, respectively.</p></li>
+<li><p><strong>Sample Size and Noninferiority Margin</strong>: Setting
+the noninferiority margin based on what can be statistically
+distinguished with a given sample size (back-calculating) rather than
+what is clinically meaningful can compromise the validity of the trial
+conclusions. The sample size should be adequate to ensure that the
+noninferiority margin reflects true clinical equivalence or
+acceptability.</p></li>
+<li><p><strong>Misinterpretation of Superiority Trials as
+Noninferiority</strong>: It is incorrect to conclude noninferiority from
+a superiority trial that fails to show a significant difference due to
+lack of power (small sample size). The adage “absence of evidence is not
+evidence of absence” is particularly relevant here. Trials that are
+underpowered may not detect small but clinically significant
+differences, which could lead to erroneous conclusions if interpreted as
+evidence of noninferiority.</p></li>
+<li><p><strong>Challenges with Meta-Analysis</strong>: While
+meta-analysis can be a useful tool to increase power and aggregate
+findings from multiple studies, relying on it to overcome the
+limitations of underpowered individual studies can be misleading. Issues
+such as heterogeneity among studies and potential statistical biases
+make meta-analysis a less reliable substitute for well-powered,
+well-designed randomized trials.</p></li>
+</ol>
+<p><img src="02_Plots/INF_Sup%20and%20Int.png" /> <em>Source: Mauri L,
+D’Agostino RB Sr. Challenges in the Design and Interpretation of
+Noninferiority Trials. N Engl J Med. 2017 Oct 5;377(14):1357-1367. doi:
+10.1056/NEJMra1510063. PMID: 28976859.</em></p>
+</div>
+<div id="evaluation-of-aafety" class="section level2">
+<h2>Evaluation of Aafety</h2>
+<p>Evaluating safety through noninferiority study designs presents
+unique challenges, particularly when determining what constitutes an
+acceptable level of risk for adverse events, as these are not typically
+quantifiable with the same precision as efficacy outcomes.</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Determining Safety Margins</strong>: In efficacy trials,
+noninferiority margins can be based on historical data where the effect
+of the control is well established. For safety, however, such benchmarks
+are less clear because there may not be historical data that
+definitively establish a ‘safe’ level of adverse events. Safety margins
+often require subjective judgment from clinical advisors on what level
+of risk is acceptable, taking into consideration the severity and
+frequency of adverse events, the overall risk to the patient population,
+and the expected benefits of the treatment.</p></li>
+<li><p><strong>Example from the PRECISION Trial</strong>: The PRECISION
+trial, which assessed the safety of celecoxib compared to naproxen and
+ibuprofen in treating arthritis, illustrates these challenges. A
+relative margin of 1.33 was chosen based on an expected 2% annualized
+risk for significant cardiovascular events. This margin was designed to
+ensure that celecoxib’s risk did not exceed that of naproxen by an
+unacceptable amount, reflecting both the direct comparison with
+competitors and the absence of a placebo.</p></li>
+<li><p><strong>Noninferiority and Placebo Control</strong>: The
+PRECISION trial, like many safety studies, couldn’t use a placebo
+control because withholding effective pain relief would be unethical.
+Consequently, the trial could not demonstrate that the risk of
+cardiovascular events with celecoxib, naproxen, or ibuprofen was
+equivalent to a non-treatment scenario.</p></li>
+<li><p><strong>Extending Noninferiority to Safety Evaluations</strong>:
+While the framework for noninferiority efficacy trials can be adapted to
+safety studies, doing so involves significant challenges. The concept of
+a prespecified margin, while still useful, requires careful
+consideration and justification in the context of safety, where the
+outcomes have direct and significant impacts on patient health.</p></li>
+</ol>
+</div>
+<div id="new-trial-methods-and-their-effect" class="section level2">
+<h2>New Trial Methods and Their Effect</h2>
+<p>The evolving methodologies in clinical trial designs, particularly
+noninferiority studies, reflect a response to both practical and
+scientific challenges, aiming to streamline the process while
+maintaining the integrity and reliability of the findings.</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Simplification of Trial Conduct</strong>: Simplifying the
+operational aspects of clinical trials, such as reducing the frequency
+of participant contacts and the number of outcomes assessed, enhances
+both noninferiority and superiority trials. This approach tends to allow
+for the collection of more reliable data from a larger sample size and
+reduces potential biases associated with missing data. By streamlining
+procedures, trials can become more efficient and less burdensome,
+potentially improving participant retention and the quality of the data
+collected.</p></li>
+<li><p><strong>Pragmatic Trials and Routine Data Collection</strong>:
+Pragmatic trials, which often utilize routine clinical care settings for
+data collection, can introduce specific challenges for noninferiority
+studies. Issues such as imbalances in treatment adherence and
+inaccuracies in endpoint determination are particularly problematic in
+noninferiority settings where the objective is to prove that the new
+intervention is not substantially worse than the existing standard.
+These factors can skew the results and make it difficult to draw
+definitive conclusions about noninferiority.</p></li>
+<li><p><strong>Patient Involvement in Trial Design</strong>:
+Incorporating patient input into the design of noninferiority trials is
+increasingly recognized as valuable. Patients’ preferences and insights
+can inform the determination of acceptable safety margins and the
+overall acceptability of risks versus benefits. This approach aligns
+with the principles of shared decision-making in clinical practice,
+enhancing the relevance and patient-centeredness of the study
+outcomes.</p></li>
+<li><p><strong>Application in Comparative Effectiveness
+Research</strong>: Noninferiority studies are particularly useful in
+comparative effectiveness research and health services research within
+the framework of value-based healthcare. By evaluating clinical outcomes
+and costs separately, these studies can ensure that treatment
+efficiencies do not compromise clinical efficacy. This dual focus helps
+in assessing whether newer treatments provide similar outcomes at
+reduced costs or with other practical benefits.</p></li>
+<li><p><strong>Use of Observational and Meta-Analysis Data</strong>:
+Beyond traditional randomized trials, observational studies and
+meta-analyses are increasingly being used to test noninferiority
+hypotheses. The prespecification of hypotheses and noninferiority
+margins is crucial in these contexts to enhance the credibility and
+validity of the results. These methodologies allow for the analysis of
+larger datasets and can provide additional insights into the
+effectiveness of interventions in more diverse real-world
+settings.</p></li>
+<li><p><strong>Equivalence Studies for Biologics</strong>: Equivalence
+studies, particularly in the biologics sector, have adopted
+methodologies that test for both noninferiority and nonsuperiority. This
+is often part of demonstrating biosimilarity, where a biologic agent is
+tested against an already approved agent to confirm that it does not
+significantly differ in terms of safety and efficacy. These studies are
+critical for regulatory approvals and market entry of
+biosimilars.</p></li>
+</ol>
+</div>
+<div id="improving-noninferiority-trials" class="section level2">
+<h2>Improving Noninferiority Trials</h2>
+<p>Improving noninferiority trials involves refining various aspects of
+their design, reporting, and analysis to ensure that these studies can
+reliably demonstrate that new treatments are acceptably similar in
+efficacy and safety to established treatments. Here are some specific
+recommendations to enhance the rigor and credibility of noninferiority
+trials:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Justification of the Noninferiority Margin</strong>:
+<ul>
+<li><strong>Explicit Justification</strong>: The noninferiority margin
+should be explicitly justified in the study design. This involves
+defining how much worse the new treatment can be compared to the
+standard treatment without losing its value. Justification should be
+based on clinical significance rather than purely statistical
+reasons.</li>
+<li><strong>Incorporating Decision Analysis</strong>: Utilizing decision
+analysis techniques can help in determining the noninferiority margin by
+considering both population-level impacts and policy implications.</li>
+<li><strong>Patient-Centered Approaches</strong>: Engaging patients
+through questionnaires or interviews about their perceptions of
+acceptable risk and benefit can ground the noninferiority margin in
+real-world expectations and enhance the patient relevance of the trial
+outcomes.</li>
+</ul></li>
+<li><strong>Caution with Composite Endpoints</strong>:
+<ul>
+<li><strong>Assessing Component Relevance</strong>: Composite endpoints,
+while useful in capturing a broad spectrum of treatment effects, can
+sometimes include components that do not align well with each other in
+terms of their benefits and risks. It is essential to carefully select
+these endpoints to ensure they are clinically coherent and
+meaningful.</li>
+<li><strong>Disparate Impact Evaluation</strong>: Evaluating the
+disparate impacts of the components of composite endpoints on the
+overall study conclusion is crucial. This involves analyzing whether any
+component disproportionately affects the trial’s outcome, potentially
+skewing the results.</li>
+</ul></li>
+<li><strong>Handling of Missing Data</strong>:
+<ul>
+<li><strong>Avoidance and Minimization</strong>: Strategies should be
+employed from the study design phase to minimize missing data, such as
+ensuring follow-up ease and patient engagement.</li>
+<li><strong>Sensitivity Analyses</strong>: Implementing sensitivity
+analyses to understand the impact of missing data on the trial’s
+conclusions is crucial. Techniques like multiple imputation can be used
+to handle missing data, providing a more robust analysis and helping to
+maintain the integrity of the trial outcomes.</li>
+</ul></li>
+<li><strong>Enhanced Reporting Standards</strong>:
+<ul>
+<li><strong>Following CONSORT Guidelines</strong>: Adhering to the
+CONSORT guidelines for noninferiority trials ensures that all critical
+elements of the trial design, conduct, and analysis are transparently
+reported.</li>
+<li><strong>Regulatory Guidance Compliance</strong>: Complying with the
+specific standards set forth by regulatory bodies such as the FDA and
+the European Medicines Agency can enhance the validity and acceptability
+of the trial results.</li>
+</ul></li>
+<li><strong>Continuous Review and Adaptation</strong>:
+<ul>
+<li><strong>Incorporating New Evidence</strong>: Noninferiority trials
+should be adaptable to new scientific evidence and changes in clinical
+practice that might affect the trial’s context.</li>
+<li><strong>Feedback Integration</strong>: Ongoing feedback from
+clinical practitioners, patients, and regulatory reviewers should be
+integrated into trial protocols to refine approaches and address
+emerging challenges.</li>
+</ul></li>
+</ol>
+<p><img src="02_Plots/INF_Recommendation.png" /> <em>Source: Mauri L,
+D’Agostino RB Sr. Challenges in the Design and Interpretation of
+Noninferiority Trials. N Engl J Med. 2017 Oct 5;377(14):1357-1367. doi:
+10.1056/NEJMra1510063. PMID: 28976859.</em></p>
+</div>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<ul>
+<li>Mauri L, D’Agostino RB Sr. Challenges in the Design and
+Interpretation of Noninferiority Trials. N Engl J Med. 2017 Oct
+5;377(14):1357-1367. doi: 10.1056/NEJMra1510063. PMID: 28976859.</li>
+</ul>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
