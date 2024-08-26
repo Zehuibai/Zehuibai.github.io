@@ -36,9 +36,28 @@ Sys.setlocale("LC_ALL","English")
 ```
 
 
+# Introduction
+
 Phase I clinical trials are crucial early steps in the development of new drugs, primarily focusing on assessing the safety, tolerability, and pharmacokinetics (PK) of a compound. These trials are foundational in determining how a new drug behaves in humans, setting the stage for further clinical development.
 
 
+## Overview of Phase I clinical trials
+
+The identification of the maximum tolerated dose (MTD) has long been a primary focus of early phase clinical trials, which not only determines the safety limits but also ensures efficacy at sub-maximal doses. The determination of the MTD should be approached with caution, and it is crucial that the chosen dose achieves a balance between efficacy and tolerability. The traditional approach involves a stepwise escalation of dosages, allowing for assessment at each level until significant adverse effects become unmanageable, thus establishing the MTD. Generally, this dose range falls between the lowest dose that exhibits potential efficacy and the highest dose that is just below the threshold of unacceptable toxicity.
+
+In recent times, Bayesian methods have been employed for more dynamic dose finding. These methods rely on prior probabilities which are updated with incoming trial data to predict the most appropriate higher dose. Utilizing a Bayesian model can refine the estimates of MTD by incorporating all accumulated data, including those from patients who have experienced toxic responses at lower doses. This statistical approach is valuable because it adjusts the estimation process based on real-time data analysis, thus optimizing the dose escalation process and potentially reducing the duration and cost of the trial.
+
+Furthermore, Bayesian methods facilitate a more personalized approach to dose finding, as they can adapt more flexibly to different patient responses. For instance, if certain subgroups of patients demonstrate a higher tolerance or sensitivity to the drug, the model can adjust the dosage accordingly, leading to more precise and individualized treatment plans.
+
+Bayesian methods, a crucial component in dose-finding trials, enhance the process through iterative updates. These methods use prior data combined with new data to improve decision-making, significantly influencing modern trial designs, especially since the first practical application of the continual reassessment method (CRM) in 1990. This approach has led to the development of multiple variations, such as the Bayesian logistic regression model (BLRM), which further refine dose determination processes.
+
+BLRM, implemented in 2006, uses a logistic regression model to estimate the probability of toxicity based on dose levels, distinguishing itself from traditional CRM by incorporating patient-specific covariates. This allows for more personalized dose adjustments based on individual patient responses, a notable advancement in the field of pharmacometrics.
+
+Moreover, Bayesian methods have been further expanded to handle complex clinical scenarios. For instance, the escalation with overdose control (EWOC) approach adheres to strict safety rules to minimize the risk of overdose, while ensuring the efficient exploration of the therapeutic window. These methodologies not only maintain safety as a priority but also maximize the collection of valuable dose-response data.
+
+In the context of multiple dose-finding studies, Bayesian methods are often favored due to their flexibility and comprehensive data utilization. The mTPI-2 method, an extension of the modified toxicity probability interval method, was introduced to overcome some of the limitations seen in earlier approaches by using a more flexible decision framework.
+
+Bayesian methods have consistently evolved, integrating more sophisticated statistical models and computational techniques to address diverse clinical trial demands. This evolution is reflected in the growing variety of Bayesian-based approaches, like BORN and BOIN designs, which focus on optimizing trial outcomes through improved dose-level recommendations. These developments underscore the dynamic nature of dose-finding research and the ongoing need to adapt statistical methods to meet clinical objectives.
 
 ## Objectives of Phase I Clinical Trials
 
@@ -65,3 +84,167 @@ Phase I clinical trials are crucial early steps in the development of new drugs,
 
 - **Statistical and Ethical Considerations**: The design of Phase I trials often involves a careful ethical consideration, particularly regarding subject safety. The use of placebo controls and randomized designs helps to ensure the objectivity and reliability of the trial outcomes.
 
+
+
+# Study Design Method
+
+## Basic Principle
+
+In traditional dose escalation studies aiming to identify the maximum tolerated dose (MTD), a sequential testing strategy is often used. This process involves incrementally testing dose levels \( d_1, d_2, ..., d_k \) to ascertain the dose that strikes a balance between efficacy and dose-limiting toxicity (DLT). The key is to find a dose \( d \) where the probability \( P_{d_c} \) of causing DLT is closest to a predefined target probability \( P_{T} \), without exceeding it.
+
+The objective is not just to find the MTD but also to ensure that the identified dose does not lead to unacceptable levels of toxicity. This necessitates a meticulous calculation of toxicity probabilities across different dose levels to determine the dose \( d_c \) at which the probability \( P_{d_c} \approx P_T \) under the constraints of maintaining acceptable safety standards.
+
+In practical scenarios, the procedure typically involves starting at the lowest dose and administering it to a small group of patients. If this dose is well-tolerated, the next higher dose is tested, and this stepwise increase continues until a dose is found that approaches but does not exceed the target toxicity level. The duration of this phase can vary, often extending over several months to a few years, depending on the drug's properties and the responses observed in the trial.
+
+## Traditional 3+3 Design
+
+The 3+3 design is a traditional method used in early-phase clinical trials to determine the maximum tolerated dose (MTD). This method is characterized by its simplicity and structured approach, which involves initially treating a small group of patients with a low dose of the drug.
+
+If none of the first three patients experience a dose-limiting toxicity (DLT), the dose is escalated and administered to the next cohort of three patients. If one patient experiences a DLT, the dose is maintained and three more patients are treated at the same level. If two or more of these six patients experience DLTs, the dose escalation is stopped, and the previous lower dose is considered the MTD.
+
+This procedure continues incrementally until reaching a dose level where 2 out of 3 or 2 out of 6 patients experience DLTs, with the dose just below this level being declared as the MTD. If a dose is found tolerable after testing in 6 patients without reaching the DLT threshold, it may also be considered as the MTD. However, the incidence of DLT should not exceed 33%.
+
+The 3+3 design aims to balance the risks of under-dosing and excessive toxicity by carefully escalating the dose based on observed patient responses. Despite its widespread use since the 1980s, this method has been criticized for its potential lack of efficiency and statistical robustness, particularly in terms of optimal dose determination.
+
+Since 2006, alternative models like the Bayesian logistic regression model and others have been developed to improve the precision of dose-finding studies. These methods consider a wider range of data, potentially leading to more accurate and personalized dosing strategies. They aim to address the limitations of the 3+3 design by incorporating more sophisticated statistical tools and providing a clearer understanding of the dose-response relationship.
+
+
+## CRM (Continual Reassessment Method) 
+ 
+The CRM method uses a probability model based on hyperbolic tangent functions to estimate the dose toxicity relationship, enhancing the approach with Bayesian updates as more data become available. This is mathematically represented as:
+
+\[ P = \frac{1}{2} \left(\tanh(d) + 1\right) = \frac{\exp(d)}{\exp(d) + \exp(-d)} \]
+
+Where \( P \) is the probability of experiencing dose-limiting toxicity (DLT) at dose \( d \).
+
+The logistic regression version of this model is expressed as:
+
+\[ P = \frac{\exp(-3 + d)}{1 + \exp(-3 + d)} \]
+
+This formulation allows the probability \( P \) to be adjusted dynamically as patient response data are accumulated, refining the dose estimation process.
+
+Bayesian methods, integrating prior distribution information about \( d \), update this probability as new trial results are analyzed. The goal is to navigate through the dose levels—\( d_1, d_2, ..., d_n \)—sequentially to determine the maximum tolerated dose (MTD). This is based on selecting the dose where the predicted probability of DLT aligns closest to the target threshold, yet remains within acceptable safety limits.
+
+The key update formula in the CRM model is:
+
+\[ \lambda(d) = \frac{1}{\sqrt{2\pi} \sigma} \exp\left(-\frac{(d - \mu)^2}{2\sigma^2}\right) \]
+
+Here, \( \lambda(d) \) represents the likelihood function of the dose, where \( \mu \) is the mean, and \( \sigma \) is the standard deviation of the normal distribution associated with dose responses. This function adjusts the likelihood of each dose being the MTD based on cumulative data, providing a statistical backbone (skeleton) to guide the dose escalation process until the most probable MTD, \( d_{\text{pre}} \), is identified.
+
+
+In a Bayesian framework, the update rule is mathematically expressed by the integral:
+\[ p_j^{(n)} = \int_{D_j} L(D_j \mid \alpha) \frac{\pi(\alpha)}{\alpha} d\alpha \]
+where \( L(D_j \mid \alpha) \) is the likelihood of the data given parameter \( \alpha \), and \( \pi(\alpha) \) is the prior distribution of \( \alpha \). This integral is computed for each dose level \( j \) from \( 1 \) to \( J \).
+
+The goal is to select a dose for which the posterior probability is maximized, thus:
+\[ p^{(n)} = \text{argmax}_j \; p_j^{(n)} \]
+
+This approach allows for the estimation of the most appropriate MTD through iterative data analysis and probability maximization.
+
+CRM’s effectiveness can be further enhanced by using Markov chain Monte Carlo (MCMC) simulations. This advanced statistical technique enables comprehensive exploration of the probability distributions associated with different dose levels, facilitating a more accurate estimation of the MTD. MCMC methods help overcome the computational challenges of integrating high-dimensional data, thereby refining the CRM framework.
+
+Studies by Lee & Cheung and others have demonstrated the robustness of the Bayesian CRM approach when supplemented with MCMC simulations, especially in clinical scenarios with complex data structures. These methods provide a systematic and statistically sound mechanism for MTD determination, significantly improving the precision of dose-finding studies.
+
+In practical applications, various software tools are available to implement these Bayesian techniques. For example, one can access the "doseFinding" package from [https://biostatistics.mdanderson.org/SoftwareDownload/](https://biostatistics.mdanderson.org/SoftwareDownload/). These tools are designed to facilitate the implementation of sophisticated statistical methods in clinical research, providing researchers with the necessary resources to conduct efficient and effective dose-finding studies.
+
+## mTPI Method 
+
+The mTPI method is a modification of the traditional TPI (Toxicity Probability Interval) method, utilizing a Bayesian, interval-based approach to refine the dose-finding process. This modification allows for more flexible adjustments between dose levels based on evolving data, enhancing the precision of MTD (Maximum Tolerated Dose) identification compared to the original CRM method. The mTPI method specifically addresses some of the shortcomings of the CRM, incorporating a real-time review of accumulated patient responses to adjust the dose more effectively.
+
+In mTPI, the decision-making process for dose escalation or de-escalation is driven by the comparison of observed toxicity rates against predefined toxicity probability intervals. These intervals serve as benchmarks for determining whether to increase, decrease, or maintain the current dose level, aiming to more accurately identify the MTD with fewer patients. The method uses a series of dose levels, \( d_1, d_2, ..., d_n \), with associated probability intervals \( P_{\text{lower}}, P_{\text{target}}, P_{\text{upper}} \) for each dose.
+
+The decision rule in mTPI is mathematically formulated as follows:
+\[ \text{If } P_{\text{tox}}(i) \in [P_{\text{lower}}, P_{\text{upper}}], \text{then maintain dose } d_i; \text{else adjust dose}. \]
+Here, \( P_{\text{tox}}(i) \) represents the observed toxicity probability at dose \( d_i \), which is compared against the interval \( [P_{\text{lower}}, P_{\text{upper}}] \).
+
+Furthermore, the likelihood of observing data \( D \) given the parameter \( \beta \) is calculated using the likelihood function \( L(D \mid \beta) \), which is a product of binomial probabilities:
+\[ L(D \mid \beta) = \prod_{j=1}^n \text{Binomial}(y_j \mid n_j, p_j(\beta)), \]
+where \( y_j \) and \( n_j \) are the number of toxicities and the number of trials at dose level \( j \), respectively, and \( p_j(\beta) \) is the probability of toxicity modeled by the parameter \( \beta \).
+
+The prior distribution for \( \beta \) is often chosen to be a beta distribution, \( \text{Beta}(\alpha, \beta) \), where \( \alpha \) and \( \beta \) parameters are estimated based on historical data or expert opinion. This statistical framework ensures that the mTPI method is not only grounded in robust probability theory but also flexible enough to adapt to new data as the trial progresses.
+
+The mTPI method calculates the probabilities \(P(T_{m} < P_{tox} < T_{p})\) where \(T_{m}\) and \(T_{p}\) are the lower and upper bounds of the toxicity probability interval. This calculation is essential for determining if the observed toxicity probability \(P_{tox}\) falls within the acceptable range. When \(P_{tox}\) falls outside this range, the method dictates whether the dose needs to be adjusted.
+
+For dose adjustments, mTPI uses three classifications:
+- **Underdosing (UD)**: if \(P_{tox} < T_{m}\), the dose is increased.
+- **Proper dosing (PD)**: if \(T_{m} \leq P_{tox} \leq T_{p}\), the current dose level is maintained.
+- **Overdosing (OD)**: if \(P_{tox} > T_{p}\), the dose is reduced.
+
+These decisions are supported by calculating the posterior probabilities \(UPM_{m}\), \(UPM_{p}\), and \(UPM_{o}\) for underdosing, proper dosing, and overdosing, respectively, as follows:
+\[ UPM_{m} = \frac{P(T_{p} < P_{tox})}{P(T_{p} < P_{tox}) + P(P_{tox} \leq T_{p})} \]
+\[ UPM_{p} = \frac{P(T_{m} \leq P_{tox} \leq T_{p})}{P(P_{tox} < T_{m}) + P(T_{m} \leq P_{tox} \leq T_{p}) + P(P_{tox} > T_{p})} \]
+\[ UPM_{o} = \frac{P(P_{tox} < T_{m})}{P(P_{tox} < T_{m}) + P(P_{tox} \geq T_{m})} \]
+
+These computations aid in making informed decisions about dose adjustments based on observed toxicities.
+
+The mTPI method improves upon CRM by allowing more flexibility in dose adjustments and reducing potential risks associated with fixed dose increments. By dynamically adjusting doses based on the statistical probability of fitting within predefined intervals, mTPI provides a more nuanced approach to finding the MTD.
+
+For further reference and practical implementation, tools such as the mTPI Excel add-on are available at [www.cgenpemone.org](http://www.cgenpemone.org/). This tool simplifies the calculation of the aforementioned probabilities and aids in applying the mTPI method during clinical trials, providing an accessible platform for researchers.
+
+This method's significance lies in its ability to navigate complex dose-finding scenarios more efficiently than CRM, ensuring that patients receive doses that are both effective and safe.
+
+
+
+## BOIN (Bayesian Optimal Interval Design) 
+
+The BOIN design, developed by Liu and Yuan in 2015, is a Bayesian methodology aimed at enhancing dose-finding processes in clinical trials. The key feature of BOIN is its decision framework, which efficiently guides dose adjustments through simple calculations of the likelihood to escalate, deescalate, or maintain the current dose, based on the observed toxicity data.
+
+The BOIN algorithm assigns each dose level a predefined probability interval. When the observed toxicity probability falls within this interval, the current dose is maintained. If the toxicity exceeds the upper bound, the dose is decreased, and if it falls below the lower bound, the dose is increased.
+
+This method contrasts with the mTPI method, which also utilizes a Bayesian approach but involves calculating posterior probabilities of underdosing, proper dosing, and overdosing to guide dose adjustments. While mTPI offers a high degree of flexibility and detailed analysis, BOIN provides a more streamlined approach, potentially reducing computational complexity and enhancing the ease of decision-making in trial settings.
+ 
+**Operational Decision Points in BOIN**
+
+1. If the observed toxicity probability \( P \) is less than the lower bound \( \lambda_L \), dose escalation is recommended.
+2. If \( P \) exceeds the upper bound \( \lambda_U \), dose de-escalation is advised.
+3. If \( P \) lies between \( \lambda_L \) and \( \lambda_U \), maintaining the current dose level is suggested.
+
+These decision points ensure that the BOIN design is both robust and straightforward, facilitating quicker and more reliable dose optimization in clinical trials compared to other Bayesian methods.
+
+### Implementation in R
+
+**Example of a Dose-Escalation Trial Using the BOIN Design**
+
+The objective of this clinical trial was to find a dose level where the maximum tolerated dose (MTD) has a toxicity probability of 30%. The trial was structured with cohorts of three patients, aiming to enroll a total of 30 patients. The BOIN decision scheme, as shown in the table below, was used to guide the dose adjustments based on the number of observed toxicities within each cohort.
+
+**Table: BOIN Dose Adjustment Scheme (N=30, MTD=30%, Cohorts of 3, 5 Dose Levels)**
+
+| Patients Treated | Toxicities: 0-1 | Toxicities: 2 | Toxicities: 3+ |
+|------------------|-----------------|---------------|-----------------|
+| 3                | 0               | 1             | 2               |
+| 6                | 1               | 2             | 4               |
+| 9                | 2               | 4             | 5               |
+| 12               | 2               | 5             | 7               |
+| 15               | 3               | 6             | 8               |
+| 18               | 4               | 7             | 9               |
+| 21               | 4               | 8             | 10              |
+| 24               | 5               | 9             | 11              |
+| 27               | 6               | 10            | 12              |
+| 30               | 7               | 11            | 14              |
+
+During the trial, if the first cohort of three patients had zero occurrences of dose-limiting toxicities (DLTs), the next cohort would receive a higher dose (increase). If the first cohort had two toxicities, the next dose level would be reduced. If the first cohort experienced three or more toxicities, the dose would be significantly reduced. This pattern was followed throughout the trial to adjust dosing based on the actual patient responses, ensuring a systematic approach to identifying the optimal dose while managing patient safety effectively.
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+library("BOIN")
+design <- get.boundary(target = 0.3, ncohort = 10, cohortsize = 3)
+summary(design)
+plot(design)
+```
+
+# Reference
+
+Wheeler, G. M., Mander, A. P., Bedding, A., Brock, K., Cornelius, V., Grieve, A. P., ... & Bond, S. J. (2019). How to design a dose-finding study using the continual reassessment method. BMC medical research methodology, 19, 1-15.
+
+Biswas S, Liu DD, Lee JJ, et al. Bayesian clinical trials at the University of Texas M. D. Anderson Cancer Center. Clinical Trials. 2009;6(3):205-216.
+
+FDA. Draft FDA Guidance on the Use of Bayesian Statistics for Medical Devices Trials. 2006.
+
+Ji Y, Li Y, Nebiyou BB. Dose-finding in phase 1 clinical trials based on toxicity probability intervals. Clinical Trials. 2007;4(3):233.
+
+Ji Y, Liu P, Li Y, et al. A modified toxicity probability interval method for dose-finding trials. Clinical Trials. 2010;7(6):653.
+
+Yuan Y, Hess KR, Hilsenbeck SG, et al. Bayesian Optimal Interval Design: A Simple and Well-performing Design for Phase 1 Oncology Trials.Clinical Cancer Research. 2016;22:4291-4301.
+
+Garrett-Mayer E. The continual reassessment method for dose-finding studies: a tutorial. Clinical Trials. 2006;3(1):57.
+
+Cheung YK. Dose Finding by the Continual Reassessment Method. Chapman & Hall; Boca Raton, 2011.
