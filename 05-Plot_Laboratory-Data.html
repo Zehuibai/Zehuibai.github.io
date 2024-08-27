@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Analysis of Laboratory Data</title>
+
+<script src="site_libs/header-attrs-2.22/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="01-index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="ZB-Design_Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="ZB-SSC_Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="ZB-SSC_Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="ZB-SSC_Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot_Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot_Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="07-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Analysis of Laboratory Data</p></h1>
+
+</div>
+
+
+<div id="statistical-consideration-of-lbs" class="section level1">
+<h1>Statistical Consideration of LBs</h1>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Laboratory specimens are integral to clinical trials, serving as
+primary indicators of systemic toxicities and providing crucial safety
+information. Their objective nature and direct relation to organ
+function make laboratory data indispensable for early detection of
+adverse effects, often before clinical symptoms become apparent. This
+routine collection and analysis of laboratory data is fundamental in
+clinical trials aimed at evaluating new therapies, where safety
+monitoring is a critical component.</p>
+<p><strong>Key Points:</strong> 1. <strong>Routine Collection</strong>:
+Lab data are routinely collected according to prespecified schedules to
+monitor patient safety throughout clinical trials. 2.
+<strong>Unscheduled Tests</strong>: Investigators might order
+unscheduled tests to follow up on identified toxicities or to
+investigate suspicious clinical observations.</p>
+</div>
+<div id="common-laboratory-tests" class="section level2">
+<h2>Common Laboratory Tests</h2>
+<p>The most common categories for laboratory tests for human clinical
+trials are Hematology, Blood (or Serum) Chemistry, Urinalysis and
+Coagulation. Less common categories are Microbiology, Stool specimens,
+and testing for specific drugs. While the grouping specific tests
+sometimes varies from case report form to case report form, in general
+the Hematology category is of those tests involving the cellular
+components of the blood, while Blood Chemistry focuses on the plasma
+components. The Urinalysis group are those tests involving components of
+the Urine. Coagulation Tests are those that involve blood clotting,
+these are sometimes grouped into the Hematology test category.
+Microbiology tests are those testing for the presence of specific
+bacteria, and fungi.</p>
+<p>The determination of what tests are actually collected during a
+clinical trial in some degree is determined by the drug being studied
+and is generally defined in the protocol. Below is a list of commonly
+collected laboratory tests grouped by category. The groupings are not
+hard and fast and different studies sometimes group the lab tests in
+different groups. For example, combining coagulation and hematology into
+one group, is a common practice.</p>
+<ol style="list-style-type: decimal">
+<li><strong>Hematology</strong>
+<ul>
+<li><strong>Definition</strong>: Hematology tests focus on the cellular
+components of blood.</li>
+<li><strong>Common Tests</strong>:
+<ul>
+<li>RBC (Red Blood Cell Count)</li>
+<li>Hemoglobin</li>
+<li>Hematocrit</li>
+<li>MCV (Mean Corpuscular Volume)</li>
+<li>MCH (Mean Corpuscular Hemoglobin)</li>
+<li>MCHC (Mean Corpuscular Hemoglobin Concentration)</li>
+<li>WBC (White Blood Cell Counts)</li>
+<li>Differentiation of white cells (Neutrophils, Lymphocytes, Monocytes,
+Eosinophils, Basophils)</li>
+</ul></li>
+</ul></li>
+<li><strong>Blood (or Serum) Chemistry</strong>
+<ul>
+<li><strong>Definition</strong>: These tests measure the plasma
+components of blood, often reflecting the function of various
+organs.</li>
+<li><strong>Common Tests</strong>:
+<ul>
+<li>Albumin</li>
+<li>LDH (Lactate Dihydrogenase)</li>
+<li>Alkaline Phosphatase</li>
+<li>Electrolytes (Sodium, Potassium, Chloride, Bicarbonate)</li>
+<li>Kidney Function Markers (BUN - Blood Urea Nitrogen, Creatinine)</li>
+<li>Liver Enzymes (SGPT/ALT, SGOT/AST, GGT)</li>
+<li>Lipid Profile (Cholesterol, Triglycerides)</li>
+<li>Others (Phosphorus, Calcium, Total Bilirubin, Total Protein,
+Glucose, Uric Acid)</li>
+</ul></li>
+</ul></li>
+<li><strong>Coagulation</strong>
+<ul>
+<li><strong>Definition</strong>: Coagulation tests assess the blood’s
+ability to clot, which is crucial for diagnosing bleeding
+disorders.</li>
+<li><strong>Common Tests</strong>:
+<ul>
+<li>Prothrombin Time (PT)</li>
+<li>Partial Thromboplastin Time (PTT)</li>
+<li>International Normalization Ratio (INR)</li>
+</ul></li>
+</ul></li>
+<li><strong>Urinalysis</strong>
+<ul>
+<li><strong>Definition</strong>: Tests involving components of urine,
+used to detect diseases of the urinary system as well as systemic
+conditions.</li>
+<li><strong>Common Tests</strong>:
+<ul>
+<li>Urine pH</li>
+<li>Urine Specific Gravity</li>
+</ul></li>
+</ul></li>
+<li><strong>Microbiology</strong>
+<ul>
+<li><strong>Definition</strong>: These tests identify the presence of
+specific bacteria, viruses, and fungi, useful in diagnosing
+infections.</li>
+<li><strong>Typical Tests</strong>:
+<ul>
+<li>Cultures from various samples (blood, urine, throat swabs,
+etc.)</li>
+<li>Sensitivity tests to determine the effectiveness of antibiotics</li>
+</ul></li>
+</ul></li>
+<li><strong>Functional Tests</strong>
+<ul>
+<li><strong>Definition</strong>: These are grouped analyses of blood
+chemistry tests that provide insights into the function of specific
+organs or biological systems.</li>
+<li><strong>Application</strong>: Commonly used to ensure that a drug is
+not adversely affecting a particular organ system.</li>
+</ul></li>
+</ol>
+<table>
+<colgroup>
+<col width="29%" />
+<col width="70%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>System or Organ</th>
+<th>Lab Tests</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Liver</strong></td>
+<td>ALT, AST, Alkaline Phosphatase, GGT, LDH, Albumin, Bilirubin</td>
+</tr>
+<tr class="even">
+<td><strong>Kidney</strong></td>
+<td>BUN, Creatinine</td>
+</tr>
+<tr class="odd">
+<td><strong>Pancreas</strong></td>
+<td>Amylase</td>
+</tr>
+<tr class="even">
+<td><strong>Electrolytes</strong></td>
+<td>Sodium, Potassium, Chloride</td>
+</tr>
+<tr class="odd">
+<td><strong>Nutritional</strong></td>
+<td>Glucose, Fats</td>
+</tr>
+<tr class="even">
+<td><strong>Lipids</strong></td>
+<td>Triglycerides, Cholesterol (LDL, HDL)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="central-labs-vs.-local-labs" class="section level2">
+<h2>Central Labs vs. Local Labs</h2>
+<p><strong>1. Central Labs</strong> - <strong>Overview</strong>: Central
+Labs, like Covance, CCLS, and Quintiles, manage laboratory data for
+clinical trials on a larger scale, often globally. -
+<strong>Advantages</strong>: - <strong>Standardization</strong>: Tests
+are performed using uniform procedures across all samples, enhancing the
+comparability of data across different patients and sites. -
+<strong>Data Handling</strong>: Results are typically delivered
+electronically and include application of normal ranges and unit
+standardization as per the trial sponsor’s specifications. -
+<strong>Consistency</strong>: Uses a common unit for reporting results,
+which can be essential for multi-center international trials. -
+<strong>Challenges</strong>: - <strong>Delay in Results</strong>:
+Samples must be shipped to the central lab, introducing potential delays
+in data availability to investigators.</p>
+<p><strong>2. Local Labs</strong> - <strong>Overview</strong>: Local
+labs are usually situated within the hospital or medical facility where
+the clinical trial is conducted. - <strong>Advantages</strong>: -
+<strong>Speed</strong>: Ideal for urgent testing where immediate results
+are necessary for patient dosing or trial enrollment decisions. -
+<strong>Accessibility</strong>: Convenient for quick data capture
+directly into case report forms. - <strong>Challenges</strong>: -
+<strong>Lack of Standardization</strong>: Each local lab may use
+different units of measurement and have different normal ranges,
+complicating data consistency and comparability. - <strong>Data
+Integration</strong>: Results from local labs often require additional
+efforts to standardize and integrate into the broader trial data
+set.</p>
+</div>
+<div id="units-of-measurements-in-clinical-trials"
+class="section level2">
+<h2>Units of Measurements in Clinical Trials</h2>
+<p><strong>1. Conventional Units</strong> - <strong>Usage</strong>:
+Predominantly used in the United States. -
+<strong>Characteristics</strong>: These units are familiar to U.S.
+healthcare providers and are often derived from historical laboratory
+practices.</p>
+<p><strong>2. SI Units (Système Internationale)</strong> -
+<strong>Usage</strong>: Commonly used in international settings and
+preferred for global clinical trials. - <strong>Benefits</strong>:
+Facilitates easier comparison and interpretation of clinical trial data
+across different countries.</p>
+<p><strong>Adaptation for Trials</strong>: - <strong>Single Country
+Trials</strong>: It may be simpler to use conventional units if the
+trial is confined to the U.S. to align with local clinical practices. -
+<strong>International Trials</strong>: SI units are generally preferred
+to maintain consistency and ensure clear communication among diverse
+international teams.</p>
+<p><strong>Dual Reporting</strong>: - In some cases, particularly in
+trials spanning multiple countries, results might be reported in both
+conventional and SI units to accommodate the preferences and regulatory
+requirements of different regions.</p>
+</div>
+<div id="interpretation-and-use-of-reference-ranges"
+class="section level2">
+<h2>Interpretation and Use of Reference Ranges</h2>
+<p><strong>1. Purpose of Reference Ranges:</strong> - <strong>Diagnostic
+Guidance:</strong> Reference ranges help clinicians discern normal from
+potentially abnormal results, aiding in diagnosis and treatment
+decisions. - <strong>Safety Monitoring:</strong> In clinical trials,
+these ranges are used to flag abnormalities and help grade laboratory
+toxicities.</p>
+<p><strong>2. Challenges with Reference Ranges:</strong> -
+<strong>Variability in Establishment:</strong> Labs frequently adopt
+reference ranges provided by equipment manufacturers or develop their
+own based on internal criteria, which may not be consistent across
+different settings. - <strong>Analytical Variability:</strong> Different
+labs might optimize assays to varying points within the reference
+population range, affecting the sensitivity and specificity of results.
+- <strong>Clinical Considerations:</strong> The overlap between disease
+and non-disease states in analyte levels can make it challenging to set
+definitive range limits without compromising on either sensitivity or
+specificity.</p>
+<p><strong>3. Determination of Reference Ranges:</strong> -
+<strong>Analytical Decisions:</strong> Assay precision must accommodate
+the clinical decisions at critical points, which are often at the
+extreme ends of the reference range. - <strong>Clinical
+Decisions:</strong> Setting the range involves balancing the probability
+of correctly identifying an abnormal result (sensitivity) against that
+of correctly identifying a normal result (specificity). -
+<strong>Mathematical Decisions:</strong> Traditional methods might
+include using a small sample of presumed healthy individuals to
+establish a 95% reference range. Advanced statistical methods like
+bootstrapping or transformations for skewed data are sometimes applied
+to refine these ranges.</p>
+<p><strong>Implications for Clinical Trials</strong></p>
+<p>In the context of clinical trials, especially those involving
+multiple laboratories, the use of standard reference ranges can be
+problematic: - <strong>Multi-lab Variability:</strong> Different labs
+may produce variable results due to differing assay calibrations and
+reference standards. - <strong>Normalization Needs:</strong> It has been
+suggested that results from different labs should be normalized through
+proficiency surveys, where all participating labs analyze a common set
+of specimens to ensure compatibility of results. - <strong>Central
+Laboratory Use:</strong> Employing a central lab can reduce the need for
+adjustments across sites, but does not fully mitigate the issues
+associated with reference range construction.</p>
+</div>
+</div>
+<div id="tabulation-summaries-for-laboratory-results"
+class="section level1">
+<h1>Tabulation Summaries for Laboratory Results</h1>
+<p>In clinical trials, lab summaries play a crucial role in interpreting
+and communicating the effects of interventions. These summaries are
+tailored based on the objectives of the trial and are designed to
+provide clear and concise data analysis to support study findings.</p>
+<p>Routine analyses of laboratory data include constructing tables that
+show the percentage of patients with each specific type of laboratory
+abnormality, tables that contain the frequencies of subjects’
+experiencing a change from normal to abnormal status or from abnormal to
+normal status for each selected body function, tables that contain the
+frequencies of subjects’ experiencing a change in their pretreatment
+laboratory toxicity grade, and tables that present the summary
+statistics concerning the amount of change. Frequently, graphs depict
+the amount of change in relation to the pretreatment value, or the
+average group change over time. For statistical inference, nonparametric
+tests are frequently appropriate even though p-values from the
+inferential procedures are typically used for descriptive purpose only.
+Recently, some authors have discussed more informative graphic displays.
+In addition, multiple small figures that display laboratory data can
+also be quite informative.</p>
+<div id="typical-summaries" class="section level2">
+<h2>Typical Summaries</h2>
+<div id="descriptive-statistics-table" class="section level3">
+<h3>Descriptive Statistics Table</h3>
+<ul>
+<li><strong>Purpose</strong>: To provide a statistical summary of
+laboratory values at various time points throughout the trial.</li>
+<li><strong>Common Statistics</strong>:
+<ul>
+<li><strong>Mean and Median</strong>: Indicate the central tendency of
+the data.</li>
+<li><strong>Standard Deviation</strong>: Measures the dispersion or
+variability of the lab values from the mean.</li>
+<li><strong>Minimum and Maximum</strong>: Show the range of the
+data.</li>
+</ul></li>
+<li><strong>Usage</strong>: This table is often repeated for each lab
+test conducted during the trial, offering a snapshot of changes or
+percent changes from baseline at predefined visits.</li>
+</ul>
+</div>
+<div id="shift-tables" class="section level3">
+<h3>Shift Tables</h3>
+<ul>
+<li><strong>Purpose</strong>: Used when variations in lab results
+complicate direct comparison, often due to the use of local labs.</li>
+<li><strong>Content</strong>:
+<ul>
+<li><strong>Classification</strong>: Lab values are categorized as
+“Above Normal Range,” “Within Normal Range,” or “Below Normal
+Range.”</li>
+<li><strong>Summary</strong>: These categories are analyzed for shifts
+from baseline to subsequent time points, often focusing on the last
+visit.</li>
+</ul></li>
+<li><strong>Usage</strong>: Particularly useful in studies with high
+variability in data or when comparing results across multiple sites that
+might not use standardized measurement units.</li>
+</ul>
+</div>
+<div id="clinically-significant-categories-table"
+class="section level3">
+<h3>Clinically Significant Categories Table</h3>
+<ul>
+<li><strong>Purpose</strong>: To categorize lab values into clinically
+significant categories based on predefined critical values.</li>
+<li><strong>Content</strong>:
+<ul>
+<li><strong>Categories</strong>: Lab results are segmented into critical
+levels, such as “Below a certain threshold” which might indicate a risk
+or require intervention.</li>
+<li><strong>Patient Count</strong>: Reports the number of patients
+falling into each category.</li>
+</ul></li>
+<li><strong>Usage</strong>: Helps in assessing the clinical relevance of
+lab results, particularly in safety analyses.</li>
+</ul>
+</div>
+<div id="standard-ctc-toxicity-grading-table" class="section level3">
+<h3>Standard CTC Toxicity Grading Table</h3>
+<ul>
+<li><strong>Purpose</strong>: To group lab values based on established
+toxicity grades, often using Common Terminology Criteria for Adverse
+Events (CTC).</li>
+<li><strong>Content</strong>:
+<ul>
+<li><strong>Grading</strong>: Each lab value is assigned a grade (e.g.,
+Grade 1, Grade 2) based on severity according to toxicity criteria.</li>
+<li><strong>Summary</strong>: Number of patients corresponding to each
+toxicity grade at different time points.</li>
+</ul></li>
+<li><strong>Usage</strong>: Crucial for evaluating drug safety and
+managing patient care, particularly in oncology trials where toxicity
+monitoring is integral.</li>
+</ul>
+</div>
+</div>
+<div id="multivariate-analysis" class="section level2">
+<h2>Multivariate Analysis</h2>
+<p>The analysis of laboratory data in clinical trials often extends
+beyond individual test results to include comprehensive evaluations of
+multiple parameters simultaneously. This approach recognizes the
+interrelated nature of various biomarkers and their collective impact on
+a patient’s health. The multivariate analysis of lab data can enhance
+the understanding of a drug’s safety profile and provide a more accurate
+representation of clinical outcomes.</p>
+<p><strong>1. Preference for Multivariate Analysis</strong></p>
+<ul>
+<li><p><strong>Comprehensive Safety Profiles:</strong> Clinicians and
+researchers increasingly prefer to evaluate a patient’s overall safety
+profile using multivariate laboratory data rather than isolating single
+parameters. This holistic view helps in making more informed clinical
+decisions as it incorporates the complex interactions among various
+biomarkers.</p></li>
+<li><p><strong>Limitations of Univariate Analysis:</strong> Analyzing
+lab results one parameter at a time can lead to a fragmented
+understanding of patient health and may overlook the interactions
+between different body functions.</p></li>
+</ul>
+<p><strong>2. Methods and Approaches</strong></p>
+<ul>
+<li><p><strong>Ranking and Pair Analysis:</strong> Brown et
+al. demonstrated a method involving the selection of tolerable limits
+for lab results and ranking abnormalities by the frequency of abnormal
+values detected. They then analyzed related test results concurrently to
+assess the safety of two antibiotics, leveraging the relationship
+between tests that assess similar functions.</p></li>
+<li><p><strong>Score Construction:</strong> Sogliero-Gilbert et al. and
+Gilbert et al. introduced the concept of constructing scores, such as
+the Genie score, which aggregates results from multiple related assays
+into a single score for each patient. This score can then be used to
+compare the effects of different treatments within a clinical trial,
+offering a consolidated view of the impact on patient health.</p></li>
+<li><p><strong>Incorporating Various Data Types:</strong> Chuang-Stein
+et al. suggested a more inclusive approach that combines laboratory
+results with other types of safety data, including clinical signs and
+symptoms. This method provides a more comprehensive safety profile of
+patients by integrating various dimensions of health data.</p></li>
+</ul>
+<p><strong>3. Benefits of Multivariate Analysis</strong></p>
+<ul>
+<li><p><strong>Enhanced Data Interpretation:</strong> By aggregating
+related lab tests, researchers can achieve a more nuanced understanding
+of treatment effects on specific body functions.</p></li>
+<li><p><strong>Efficiency in Comparisons:</strong> Collapsing
+multivariate data into univariate scores simplifies the statistical
+analysis and can lead to more efficient comparisons among different
+treatment groups.</p></li>
+</ul>
+</div>
+<div id="regression-to-the-mean" class="section level2">
+<h2>Regression to the Mean</h2>
+<ul>
+<li><p><strong>Eligibility Criteria Impact:</strong> In many clinical
+trials, subjects are selected based on specific eligibility criteria,
+such as normal ranges for certain laboratory tests like SGOT and SGPT.
+Subjects with values too high or too low are typically
+excluded.</p></li>
+<li><p><strong>Baseline Measurements:</strong> The initial measurement
+(screen value) is used as a baseline to compare subsequent laboratory
+results. If the initial screening selects subjects based on extreme
+values, any natural variation towards the average (mean) can appear as a
+change due to the treatment, rather than simple statistical
+regression.</p></li>
+<li><p><strong>Mean Change Due to Regression:</strong> Chuang-Stein
+discussed how the mean change observed in a clinical trial can be
+influenced significantly by regression to the mean, especially if the
+correlation between the repeated measures is low.</p></li>
+<li><p><strong>Impact of Exclusion Criteria:</strong> The stricter the
+exclusion criteria (e.g., only allowing subjects with values within a
+narrow range), the more pronounced the regression effect can be. This
+can erroneously suggest that treatment has affected parameters like SGOT
+and SGPT when, in fact, it has not.</p></li>
+</ul>
+<p><em>Source: Chuang-Stein C. The regression fallacy. Drug Info J
+1993;27:1213–1220.</em></p>
+<p><strong>Adjustment Procedures</strong></p>
+<ul>
+<li><strong>Proposed Adjustments:</strong> Chuang-Stein proposed
+specific adjustments to account for the regression effect, aiming to
+provide a more accurate assessment of how treatments impact laboratory
+parameters.</li>
+<li><strong>Selection of Baseline Values:</strong> Another approach to
+mitigate this effect is the selection of baseline values. Using values
+from a pretreatment period closer to the start of dosing rather than
+initial screening values can reduce the impact of regression to the
+mean.</li>
+<li><strong>Controlled Study Settings:</strong> In controlled trials
+where subjects are randomized into treatment groups, regression to the
+mean is less likely to skew comparisons among groups if the
+randomization effectively balances baseline characteristics across these
+groups.</li>
+<li><strong>Use of Multiple Baseline Measures:</strong> Comparing
+changes from a baseline established by multiple pre-treatment measures
+can also help mitigate this effect.</li>
+</ul>
+</div>
+<div id="mixture-response-distributions" class="section level2">
+<h2>Mixture Response Distributions</h2>
+<p>In clinical trials, the response of patients to a treatment is not
+always uniform, leading to variations in how different subjects react.
+This variation can often be described using mixture distributions, which
+provide a statistical framework for modeling the differential response
+to treatment across a population.</p>
+<ul>
+<li><strong>Basic Idea</strong>: The response distribution for a
+laboratory parameter in a treatment group might not be homogenous but
+could represent a mixture of different distributions. For instance, part
+of the treatment group might follow the same distribution as the control
+group, while another part might show a significant shift in the response
+due to the treatment.</li>
+<li><strong>Realistic Modeling of Patient Responses</strong>: The
+mixture model approach acknowledges that some patients might not exhibit
+any treatment effects (hence the control-like distribution), while
+others might experience significant changes in lab parameters due to the
+treatment. This dual response can be crucial for understanding the full
+impact of a treatment, especially when considering side effects or
+therapeutic effectiveness.</li>
+<li><strong>Formulation</strong>: Assume <code>G(x)</code> as the
+response distribution for the treatment group and <code>F(x)</code> for
+the control. <code>G(x)</code> can be modeled as a mixture of
+<code>F(x)</code> and a transformed version of <code>F(x)</code> that
+includes a location shift <code>D</code> and a scale change
+<code>l</code>, formulated as: <span class="math display">\[
+G(x) = pF(x) + (1-p)F\left(\frac{x-D}{l}\right)
+\]</span> Here, <code>p</code> represents the proportion of the
+treatment group that responds similarly to the control group.</li>
+</ul>
+<p><strong>Statistical Challenges and Solutions</strong></p>
+<ul>
+<li><strong>Estimation and Hypothesis Testing</strong>: The primary
+statistical task is to estimate the mixture proportion <code>p</code>
+and test the null hypothesis <span class="math inline">\(H_0: p =
+1\)</span> against the alternative <span class="math inline">\(H_1: p
+\neq 1\)</span>. This tests whether the treatment has a different effect
+compared to the control.</li>
+<li><strong>Methodologies Applied</strong>:
+<ul>
+<li><strong>Cherng et al. [16]</strong> discussed testing procedures
+specifically designed for this scenario, applying methods proposed by
+<strong>Conover and Salsburg</strong> and <strong>O’Brien</strong>.
+These methods help in identifying whether a significant portion of the
+treatment group exhibits a response different from the control
+group.</li>
+</ul></li>
+</ul>
+</div>
+<div id="correlating-lb-data-with-pharmacokinetic-parameters"
+class="section level2">
+<h2>Correlating LB Data with Pharmacokinetic Parameters</h2>
+<p>Pharmacokinetic parameters describe how a drug is absorbed,
+distributed, metabolized, and excreted in the body. Laboratory data, on
+the other hand, can indicate how these processes affect the body’s
+normal functions, revealing potential toxicities or adverse effects.</p>
+<p>In the context of drug development and clinical trials, the
+correlation between pharmacokinetic (PK) parameters and laboratory data
+is crucial for understanding how a drug behaves in the body and its
+potential toxic effects. This correlation helps in optimizing drug
+dosing, monitoring therapeutic levels, and enhancing overall treatment
+safety and efficacy.</p>
+<p><strong>Methodological Approaches</strong></p>
+<ul>
+<li><strong>Toxicity and Drug Concentrations</strong>: Observing severe
+toxicities at high plasma drug concentrations provides a direct
+rationale for therapeutic drug monitoring. This approach ensures that
+drug levels remain within a therapeutic range that maximizes efficacy
+while minimizing harm.</li>
+<li><strong>Complexity of Analyses</strong>: The relationships between
+PK parameters and laboratory data are often complex and require
+sophisticated statistical tools to decipher.</li>
+<li><strong>Variability</strong>: High inter-individual variability in
+how patients process drugs can complicate these analyses, making
+universal conclusions difficult.</li>
+<li><strong>Statistical Modeling</strong>: Techniques such as regression
+analysis, mixed-effects models, and machine learning algorithms can be
+used to identify and quantify relationships between PK parameters and
+lab data.</li>
+<li><strong>Biomarker Development</strong>: Identifying biomarkers that
+predict drug response or toxicity can significantly enhance the utility
+of PK data, guiding drug dosing and monitoring strategies.</li>
+</ul>
+<p><strong>Applications of Correlating PK Parameters with Lab
+Data</strong></p>
+<ol style="list-style-type: decimal">
+<li><strong>Therapeutic Drug Monitoring (TDM)</strong>:
+<ul>
+<li><strong>Purpose</strong>: To adjust drug dosages based on individual
+pharmacokinetic profiles and laboratory markers of toxicity or
+efficacy.</li>
+<li><strong>Example</strong>: If high drug plasma levels are correlated
+with laboratory signs of liver toxicity (e.g., elevated liver enzymes),
+dosing adjustments might be necessary.</li>
+</ul></li>
+<li><strong>Effect of Baseline Conditions</strong>:
+<ul>
+<li><strong>Impact on Drug Absorption and Effectiveness</strong>:
+Pre-existing conditions, such as hepatitis B, can influence how a drug
+is metabolized and absorbed. Understanding these effects through PK and
+laboratory data correlation can guide dosage adjustments and treatment
+planning.</li>
+<li><strong>Clinical Decision Making</strong>: Analyzing how baseline
+health conditions affect drug kinetics can help in predicting treatment
+outcomes and personalizing therapies.</li>
+</ul></li>
+<li><strong>Pharmacodynamic Insights</strong>:
+<ul>
+<li><strong>Mechanism of Action</strong>: Correlating lab data with PK
+parameters can elucidate the pharmacodynamic properties of a drug,
+revealing how it exerts its effects at the cellular or systemic
+level.</li>
+<li><strong>Safety and Efficacy</strong>: This correlation aids in
+identifying which pharmacokinetic profiles correspond to optimal
+therapeutic outcomes and acceptable safety profiles.</li>
+</ul></li>
+</ol>
+</div>
+<div id="patients-at-risk-for-laboratory-toxicity"
+class="section level2">
+<h2>Patients at Risk for Laboratory Toxicity</h2>
+<p>Understanding and predicting laboratory toxicities in various patient
+subgroups is crucial for developing safer and more effective treatment
+regimens. Traditional clinical trials often exclude patients with major
+organ impairments, which limits the understanding of how these
+populations might respond to new treatments. However, regulatory bodies
+are increasingly requiring the inclusion of diverse patient subgroups to
+ensure a comprehensive safety profile.</p>
+<p><strong>Challenges in Current Clinical Trials</strong></p>
+<ul>
+<li><strong>Exclusion of Vulnerable Populations</strong>: Initial phases
+of clinical trials commonly exclude patients with significant organ
+impairments (like hepatic or renal dysfunctions), which can lead to a
+lack of data about how these populations react to the treatments.</li>
+<li><strong>Post-Approval Risks</strong>: Once a treatment is approved
+and enters the market, it becomes accessible to a broader population,
+including those previously excluded from trials, potentially leading to
+unforeseen adverse reactions.</li>
+</ul>
+<p><strong>Regulatory Requirements</strong></p>
+<ul>
+<li><strong>Inclusive Study Designs</strong>: Regulators are mandating
+the inclusion of specific subgroups—such as pediatric, geriatric, and
+patients with existing organ dysfunctions—in clinical trials to evaluate
+the safety profiles more comprehensively.</li>
+<li><strong>Exploratory Analyses</strong>: These are conducted to
+identify risk factors associated with the onset, presence, or severity
+of laboratory toxicities.</li>
+</ul>
+<p><strong>Statistical Methods for Safety Analysis</strong></p>
+<ul>
+<li><strong>Logistic Regression</strong>: Useful for identifying
+predictors of binary outcomes, such as the occurrence of a specific
+toxicity. It helps in understanding which factors (e.g., age, baseline
+organ function) increase the likelihood of adverse reactions.</li>
+<li><strong>Survival Analysis</strong>: Applied to examine the time to
+onset of adverse reactions. This method can handle censored data (where
+patients drop out or the study ends before an event occurs) and can
+provide insights into the timing of toxicities.</li>
+</ul>
+</div>
+</div>
+<div id="graphical-summaries-for-laboratory-results"
+class="section level1">
+<h1>Graphical Summaries for Laboratory Results</h1>
+<p>Graphical summaries are invaluable in clinical trials for visually
+representing laboratory data over time, comparing treatment groups, and
+identifying outliers that may require further investigation.</p>
+<div id="typical-summaries-1" class="section level2">
+<h2>Typical Summaries</h2>
+<div id="box-and-whisker-plot" class="section level3">
+<h3>Box and Whisker Plot</h3>
+<ul>
+<li><strong>Description</strong>: This plot is highly effective for
+depicting the distribution of lab data across different visits within a
+treatment group.</li>
+<li><strong>Components</strong>:
+<ul>
+<li><strong>Median</strong>: The line in the middle of the box indicates
+the median value of the dataset.</li>
+<li><strong>Interquartile Range (IQR)</strong>: The box represents the
+25th to 75th percentile.</li>
+<li><strong>Whiskers</strong>: Extend from the box to 1.5 times the IQR,
+indicating the range of most data points.</li>
+<li><strong>Outliers</strong>: Data points that fall outside the
+whiskers are plotted individually, often marked with a specific
+symbol.</li>
+</ul></li>
+<li><strong>Usage</strong>: Ideal for showing the central tendency
+(median) and variability (IQR) of data over time, and for spotting
+outliers at each visit.</li>
+</ul>
+<p><strong>SAS Implementation</strong></p>
+<pre class="sas"><code>axis1 label=(angle=90 &#39;Parameter Name&#39;) &amp;order;
+axis2 label=(&#39;WEEK OF STUDY&#39;) offset=(0.5 in);
+symbol1 interpol=boxt value=x;
+proc gplot data=plotds;
+plot &amp;var*visn / noframe vaxis=axis1 haxis=axis2;</code></pre>
+</div>
+<div id="mean-and-standard-deviation-plot" class="section level3">
+<h3>Mean and Standard Deviation Plot</h3>
+<ul>
+<li><strong>Description</strong>: This type of plot compares the mean
+lab values across treatment groups over time, incorporating error bars
+to represent one standard deviation above and below the mean.</li>
+<li><strong>Steps</strong>:
+<ul>
+<li><strong>Data Preparation</strong>: Calculate the mean and standard
+deviation for each treatment group at each visit.</li>
+<li><strong>Plotting</strong>: Display mean values connected by lines,
+with error bars showing the range of one standard deviation.</li>
+</ul></li>
+<li><strong>Usage</strong>: Useful for directly comparing the mean
+responses of treatment groups over time and visualizing the data
+spread.</li>
+</ul>
+<p><strong>SAS Implementation</strong></p>
+<pre class="sas"><code>proc univariate data=deff_n noprint;
+by parm trtname visit;
+var lbstresn;
+output out=deff_v n=n1 mean=mean1 std=sd1;
+data deff_v; set deff_v; by parm trtname visit;
+val=mean1; output;
+val=mean1+sd1; output;
+val=mean1-sd1; output;
+
+symbol1 l=1 value=diamond width=3 interpol=hiloj line=1;
+symbol2 l=1 value=square width=3 interpol=hiloj line=5;
+legend1 across=1 cborder=black label=none position=(top inside center) across=2 value=(&quot;TRTA(1-4 MG QID)&quot; &quot;&amp;ztrtb&amp;ztrtbb&quot;);
+proc gplot data=ps nocache;
+plot val*window=trtname / vaxis=axis1 haxis=axis2 legend=legend1;</code></pre>
+</div>
+</div>
+<div id="edish" class="section level2">
+<h2>eDISH</h2>
+</div>
+</div>
+<div id="presentation-and-handling-of-clinical-laboratory-data"
+class="section level1">
+<h1>Presentation and Handling of Clinical Laboratory Data</h1>
+<p>The following figure is provided as example to display the mean
+changes in laboratory values over time and is presented in clinically
+relevant groupings based on the template.</p>
+<p><img src="./02_Plots/LB_Mean" /></p>
+<p><em>Jagadish K., <a
+href="https://www.linkedin.com/posts/jagadishkatam_r-rstudio-datascience-activity-7132144850254123008-yylO/?utm_source=share&amp;utm_medium=member_desktop"
+class="uri">https://www.linkedin.com/posts/jagadishkatam_r-rstudio-datascience-activity-7132144850254123008-yylO/?utm_source=share&amp;utm_medium=member_desktop</a></em></p>
+<pre><code>labs &lt;- function(data, params, val){
+  # Filter data based on parameters and visit
+  adlbcx &lt;- data[data$PARAMCD == params &amp; data$AVISIT != &#39;&#39;, ]
+
+  # Summarize data to calculate mean, sd, se, CI lower and upper bounds
+  adlbc1 &lt;- adlbcx %&gt;%
+    group_by(TRTA, AVISIT) %&gt;%
+    summarise(
+      mean = mean(val, na.rm = TRUE),
+      sd = sd(val, na.rm = TRUE),
+      n = n(),
+      se = sd / sqrt(n),
+      CI_lower = mean - 1.96 * se,
+      CI_upper = mean + 1.96 * se,
+      .groups = &#39;drop&#39;
+    )
+
+  # Prepare for joining by renaming and transforming
+  adlbcn &lt;- adlbcx %&gt;%
+    rename_all(tolower) %&gt;%
+    group_by(trta, trtan, avisit, avisitn) %&gt;%
+    summarise(n = n(), .groups = &#39;drop&#39;) %&gt;%
+    left_join(adlbc1, by = c(&quot;trta&quot;, &quot;trtan&quot;, &quot;avisit&quot;, &quot;avisitn&quot;)) %&gt;%
+    mutate(across(contains(&quot;.&quot;), ~round(.x, digits = 1)))
+
+  return(adlbcn)
+}
+
+# Generate a plot using ggplot2
+g1 &lt;- ggplot(data = adlbcn, aes(x = reorder(avisit, avisitn), y = mean, group = trta)) +
+  geom_point(aes(color = trta), size = 1.5, position = position_dodge(width = 0.7)) +
+  geom_line(aes(color = trta, linetype = trta), position = position_dodge(width = 0.7)) +
+  geom_errorbar(aes(ymin = CI_lower, ymax = CI_upper, color = trta), position = position_dodge(width = 0.7)) +
+  theme_classic() +
+  theme(legend.position = &quot;bottom&quot;) +
+  scale_linetype(guide = FALSE) +
+  guides(color = guide_legend(title = &quot;Treatment&quot;)) +
+  labs(x = &quot;Visit&quot;, y = &quot;Mean Change from Baseline (95% CI)&quot;) +
+  geom_hline(yintercept = 0, linetype = &#39;dashed&#39;)
+
+# Plot number of patients
+t2 &lt;- ggplot(data = adlbcn, aes(x = reorder(avisit, avisitn), y = trta, label = as.character(n))) +
+  geom_text(aes(color = &#39;white&#39;), vjust = -0.5, hjust = 0.5) +
+  ggtitle(&quot;Number of Patients&quot;) +
+  theme_bw() +
+  theme(
+    axis.line = element_blank(),
+    panel.grid = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    axis.text.x = element_text(color = &quot;white&quot;),
+    plot.title = element_text(size = 11, hjust = 0)
+  )
+
+# Combine plots
+library(patchwork)
+combined_plot &lt;- g1 + t2 + plot_layout(ncol = 1, nrow = 2, heights = c(2, 1))</code></pre>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<div id="general" class="section level2">
+<h2>General</h2>
+<ul>
+<li>Christy Chuang-Stein; PhD (1998). Laboratory Data in Clinical
+Trials: A Statistician’s Perspective. , 19(2), 167–177. <a
+href="doi:10.1016/s0197-2456(97)00123-2"
+class="uri">doi:10.1016/s0197-2456(97)00123-2</a></li>
+<li>Carlson, Randall K. “Approaches For Using SAS for Conversion of
+Pharmaceutical Safety Laboratory Values to Standard Units”, 19th Annual
+Conference Proceedings of the Northeast SAS® Users Group, September
+2006</li>
+<li>Carlson, R. K., &amp; Freimark, N. (n.d.). Presentation and Handling
+of Clinical Laboratory Data: From Test Tube to Table. Wilmington, DE
+&amp; Lakewood, NJ: Omnicare Clinical Research, Inc. <a
+href="https://www.lexjansen.com/nesug/nesug07/np/np02.pdf"
+class="uri">https://www.lexjansen.com/nesug/nesug07/np/np02.pdf</a></li>
+</ul>
+</div>
+<div id="multivariate-analysis-1" class="section level2">
+<h2>Multivariate Analysis</h2>
+<ul>
+<li>Brown KR, Getson AJ, Gould AL, et al. Safety of cefoxitin: an
+approach to the analysis of laboratory data. Rev Infectious Dis
+1979;1:228–231.</li>
+<li>Sogliero-Gilbert G, Mosher K, Zubkoff L. A procedure for the
+simplification and assessment of lab parameters in clinical trials. Drug
+Info J 1986;20:279–296.</li>
+<li>Gilbert GS, Ting N, Zubkoff L. A statistical comparison of drug
+safety in controlled clinical trials: the Genie score as an objective
+measure of lab abnormalities. Drug Info J 1991;25:81–96.</li>
+<li>Chuang-Stein C, Mohberg NR, Musselman DM. The organization and
+analysis of safety data using a multivariate approach. Stat Med
+1992;11:1075–1089.</li>
+</ul>
+</div>
+<div id="mixture-response-distributions-1" class="section level2">
+<h2>Mixture Response Distributions</h2>
+<ul>
+<li>Conover WJ, Salsburg DS. Locally most powerful tests for detecting
+treatment effects when only a subset of patients can be expected to
+“respond” to treatment. Biometrics 1988;44:189–196.</li>
+<li>O’Brien PC. Comparing two samples: Extensions of the t, rank-sum,
+and log-rank tests. JASA 1988;83:52–61.</li>
+</ul>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

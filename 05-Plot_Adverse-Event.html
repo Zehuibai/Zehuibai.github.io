@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Analysis of Adverse Event</title>
+
+<script src="site_libs/header-attrs-2.22/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="site_libs/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet" />
+<script src="site_libs/bsTable-3.3.7/bootstrapTable.js"></script>
+<script src="site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.10.2/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+<link href="site_libs/font-awesome-6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="01-index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="ZB-Design_Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="ZB-Design_Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="ZB-SSC_Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="ZB-SSC_Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="ZB-SSC_Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="ZB-Plot_Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="07-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Analysis of Adverse Event</p></h1>
+
+</div>
+
+
+<div id="statistical-analysis-of-aes" class="section level1">
+<h1>Statistical Analysis of AEs</h1>
+<p>Efficacy and safety are two crucial aspects of assessing the
+risk-benefit ratio of a drug. When a drug’s efficacy meets the
+regulatory requirements, its safety profile must also be within a
+reasonable range. However, clinical trials sometimes reveal peculiar
+adverse reactions that attract regulatory attention, such as
+immune-related adverse events (irAEs) from PD-1/L1 inhibitors, bone
+damage from BTK inhibitors, and bleeding events from EGFR inhibitors. In
+such cases, sponsors are often required to conduct more in-depth
+analyses to clarify the drug’s safety. Based on past clinical trial
+experiences and literature, here have summarized some analytical methods
+for adverse events that sponsors and regulatory bodies might require for
+your reference.</p>
+<div id="incidence" class="section level2">
+<h2>Incidence</h2>
+<p>Calculating the incidence rate is a fundamental requirement for AE
+analysis. This includes overall incidence rates, incidence by preferred
+terms (PT), standard of care (SOC), and by severity levels, including
+AEs that lead to drug discontinuation, interruption of treatment, or
+death.</p>
+</div>
+<div id="time-to-occurrence-and-duration" class="section level2">
+<h2>Time to Occurrence and Duration</h2>
+<p>The time from drug administration to the occurrence of an AE and the
+duration of the AE are two important dimensions of AE analysis. If an AE
+persists, it indicates that this type of AE tends to last long
+clinically and may require the sponsor to explain how to manage and
+ensure safety, especially for AEs of grade 3 or higher, which are of
+greater concern. The following table displays a common summary
+format:</p>
+<p><img src="02_Plots/AE_Time2Onset.png" /> <em>Source: John Shaik et
+al., PharmaSUG 2016.</em></p>
+<p>The figure below demonstrates the use of Kaplan-Meier (KM) curves to
+analyze the occurrence of AEs.</p>
+<p><img src="02_Plots/AE_KMPlot.png" /> <em>Source: Kriss Harris et
+al., PhUSE 2017</em></p>
+</div>
+<div id="temporal-distribution-of-aes" class="section level2">
+<h2>Temporal Distribution of AEs</h2>
+<p>Analyzing the patterns of AE occurrence over different time periods.
+For example, although an AE may occur rapidly, it might disappear
+quickly or be transient, thus having a minimal impact. If a certain type
+of AE continues throughout the medication period and is of a higher
+CTCAE grade, it is likely drug-related and clinical considerations for
+management are necessary.</p>
+<p>The following figure shows the distribution over time of three types
+of AEs in melanoma patients treated with Nivo+Ipi. It can be observed
+that most skin-related AEs cease to appear after 3 months, and GI and
+liver-related AEs significantly decrease after 6 months.</p>
+<p><img src="02_Plots/AE_Temporal%20Distribution.png" /></p>
+</div>
+<div id="outcome-summary-of-adverse-events-aes" class="section level2">
+<h2>Outcome Summary of Adverse Events (AEs)</h2>
+<p>The outcome of an AE represents whether interventions against the AE
+are effective. If there is no recovery, the duration of the AE will be
+prolonged, indicating that effective intervention for this type of AE is
+challenging.</p>
+</div>
+<div id="analysis-of-factors-influencing-aes" class="section level2">
+<h2>Analysis of Factors Influencing AEs</h2>
+<p>If the AEs in the experimental group are particularly prominent
+(e.g., significantly more bleeding events or a higher mortality rate in
+the experimental group compared to controls), regulatory bodies often
+require an analysis of influencing factors. If clinical influencing
+factors can be identified, measures can be taken to control them, also
+indicating that the AEs are predictable.</p>
+<p>Sometimes, to reduce the bias due to timing in between-group
+comparisons, a landmark analysis strategy might be used, which excludes
+patients who stopped treatment or died prematurely. For example,
+patients who terminated treatment or died within two months may be
+excluded.</p>
+</div>
+<div id="hazard-ratio-hr-of-ae-occurrence" class="section level2">
+<h2>Hazard Ratio (HR) of AE Occurrence</h2>
+<p>This is also a method for analyzing differences in AE characteristics
+between two groups, using survival analysis to study the hazard ratio of
+AE occurrence. The figure below shows the risk of irAEs in the
+Keynote-054 study comparing Drug K with a placebo (HR = 5.0), indicating
+that the risk of irAEs is significantly higher in the experimental
+group.</p>
+<p><img src="02_Plots/AE_HR.png" /></p>
+</div>
+</div>
+<div id="ae-visualization" class="section level1">
+<h1>AE Visualization</h1>
+<div id="relative-riskforest-plot" class="section level2">
+<h2>Relative Risk/Forest Plot</h2>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Pbo"],"name":[1],"type":["int"],"align":["right"]},{"label":["Xan_Hi"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"44","2":"43"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p><img src="05-Plot_Adverse-Event_files/figure-html/unnamed-chunk-1-1.png" width="960" /><img src="05-Plot_Adverse-Event_files/figure-html/unnamed-chunk-1-2.png" width="960" /><img src="05-Plot_Adverse-Event_files/figure-html/unnamed-chunk-1-3.png" width="960" /></p>
+</div>
+<div id="heat-map" class="section level2">
+<h2>Heat Map</h2>
+<p>Using a heatmap to display adverse event (AE) co-occurrence can be an
+effective visual tool in medical research to identify and analyze
+patterns of symptoms or side effects that frequently appear
+together.</p>
+<p>Heat maps are charts with values being represented by colors. The
+intensity of the color is an indication of the number i.e. higher the
+value more intense will be the color.</p>
+<p><strong>HEAT MAP FOR NUMBER OF ADVERSE EVENTS PER TREATMENT PER
+SYSTEM ORGAN CLASS (SOC):</strong></p>
+<p>A heat map can be generated to visualize the number of adverse events
+recorded per SOC per treatment. We will plot the treatments on x-axis
+and the SOCs on y-axis. Each tile of the heat map will be colored as per
+the number of events recorded for that particular combination. The color
+of the tile will vary from yellow to red, with low counts shown in
+yellow and high counts in red. The tiles with white color denote the
+absence of events for a particular combination of SOC and treatment. The
+number of events will be printed in either black or white as per a
+predefined threshold; counts below or equal to the threshold will be
+printed in black, remaining will be in white.</p>
+<p>In this plot, we are able to see the number of events reported for
+every SOC for all 5 arms. As seen in the legend, tiles with count less
+than 100 are yellow with varying intensity as per the actual count for
+that tile. For e.g. if we check the number of adverse events in the
+gastrointestinal system for treatments X and Y, the count is 11 and 26
+respectively. The color of the tile for Y is deeper than the tile for X.
+The color starts changing from yellow to orange and then to red as the
+number of events increases. This is observed in the “Psychiatric” SOC
+counts, with 31 events Y has a yellow tile, 257 events lead to treatment
+A having an orange tile and the treatment Z has a red tile due to the
+311 events reported. Here the threshold for number of events has been
+set to 100. We can quickly identify the SOCs with number of events
+greater than 100 as they are printed in white. We can observe white
+tiles for SOCs with no events for a particular treatment like
+Reproductive system and treatment X.</p>
+<p><img src="02_Plots/AE_Heat%20Map%201.png" /></p>
+<p><img src="05-Plot_Adverse-Event_files/figure-html/unnamed-chunk-2-1.png" width="960" /></p>
+<p><strong>HEAT MAP FOR NUMBER OF SERIOUS AND NON SERIOUS ADVERSE EVENTS
+PER SOC PER TREATMENT</strong></p>
+<p>The adverse events are classified as either ‘Non Serious’ or
+‘Serious’. We can plot the number of serious and non serious events
+occurring per SOC per treatment as shown in the heat map below. In this
+plot, both the counts will be displayed in the same tile and the color
+of the tile will be decided by the maximum of the number of events if
+both events are present.</p>
+<p><img src="02_Plots/AE_Heat%20Map%202.png" /></p>
+<p><strong>HEAT MAP FOR NUMBER OF ADVERSE EVENTS PER TREATMENT PER
+PREFERRED TERM (PT) FOR A SINGLE SOC</strong></p>
+<p>As mentioned earlier, we can analyze the psychiatric disorders
+further by generating a heat map of the events reported under this SOC
+for all treatments. We will generate a heat map of all PTs with number
+of reported events greater than 10.</p>
+<p><img src="02_Plots/AE_Heat%20Map%203.png" /></p>
+<!-- sub <- subset(aeord,aeord$SOC=="PSYCHIATRIC") -->
+<!-- tb4 <-aggregate(USUBJID~TRTA+AEDECOD, data=sub, FUN=function(x) c(ln=length(x))) -->
+<!-- names(tb4)[names(tb4)=="USUBJID"]<- "OBS" -->
+<!-- p3 <- ggplot(tb4[tb4$OBS>10,], (aes(x = TRTA, y = AEDECOD, fill = OBS))) + geom_raster() + -->
+<!-- geom_text(aes(label = paste0("N=",round(OBS, 1)), color = OBS < 40), show.legend = -->
+<!-- F,size=4)+ scale_fill_gradient(low="yellow",high="red",na.value="white")+ -->
+<!-- scale_color_manual(values = c("FALSE" = "white", "TRUE" = "black")) + -->
+<!-- scale_x_discrete("Treatment") + scale_y_discrete(name = "Adverse Event Term") + -->
+<!--  theme_classic()+ -->
+<!-- ggtitle("Heat Map for Number of Adverse Events per Treatment per Preferred Term for -->
+<!-- Psychiatric Disorders") + theme(plot.title = element_text(hjust = 0.5)) + -->
+<!--  labs(fill="Number of Events") -->
+<!-- p3 -->
+<p><img src="05-Plot_Adverse-Event_files/figure-html/unnamed-chunk-3-1.png" width="960" /></p>
+<p><strong>HEAT MAP FOR NUMBER OF ADVERSE EVENTS OF PTS OF A SINGLE SOC
+OF A SINGLE TREATMENT PER SEVERITY</strong></p>
+<p>We can check the severity of all the PTs for a single SOC for a
+single treatment. Let us analyze the Psychiatric Disorder PTs reported
+for treatment Z. We will plot the number of events reported for PTs
+against their severity which will have the value as Mild, Moderate or
+Severe</p>
+<p><img src="02_Plots/AE_Heat%20Map%204.png" /></p>
+<!-- sub1 <- subset(aeord,aeord$SOC=="PSYCHIATRIC" & TRTA=="Z") -->
+<!-- tb5 <- aggregate(USUBJID~AEDECOD+AESEV, data=sub1, FUN=function(x) c(ln=length(x))) -->
+<!-- names(tb5)[names(tb5)=="USUBJID"]<- "OBS" -->
+<!-- p4 <- ggplot(tb5, aes(AESEV, AEDECOD, fill = OBS)) + geom_raster() + -->
+<!-- geom_text(aes(label=paste0("N=",round(OBS,1)),color=OBS<10), show.legend = F,size=3)+ -->
+<!-- scale_fill_gradient(low="yellow",high="red",na.value="white")+ -->
+<!-- scale_color_manual(values = c("FALSE" = "white", "TRUE" = "black")) + -->
+<!-- scale_x_discrete("Severity") + scale_y_discrete(name = "Adverse Event Term") + -->
+<!-- theme_classic()+ ggtitle("Heat Map for Number of Adverse Events of PTs of Psychiatric -->
+<!-- Disorders of Treatment Z per Severity") + theme(plot.title = element_text(hjust = -->
+<!-- 0.5)) + labs(fill="Number of Events") -->
+<!-- p4 -->
+<p><strong>HEAT MAP FOR NUMBER OF RELATED AND NOT RELATED ADVERSE EVENTS
+PER PT PER SEVERITY FOR A SINGLE TREATMENT</strong></p>
+<p>We can check the causality of the events reported in the above plot
+along with their severity. Let us once again consider the psychiatry PTs
+reported for treatment Z. We will plot the number of events reported for
+PTs with their causality which will have values as ‘Related’ or ‘Not
+Related’ against severity</p>
+<p><img src="02_Plots/AE_Heat%20Map%205.png" /></p>
+<!-- tb6 <- aggregate(USUBJID~AEDECOD+AESEV+AEREL, data=sub1, FUN=function(x) c(ln=length(x))) -->
+<!-- names(tb6)[names(tb6)=="USUBJID"]<- "OBS" -->
+<!-- tb6 <-tb6[order(tb6$AEDECOD,tb6$AESEV, tb6$OBS),] -->
+<!-- p5 <- ggplot(tb6, aes(AESEV, AEDECOD, fill = OBS)) + geom_raster() + -->
+<!-- geom_text(data=tb6[tb6$AEREL=="NOT RELATED",],aes(label=paste0("NREL=",round(OBS,1))), -->
+<!-- show.legend = F,size=2.8, vjust=0, hjust=1) + -->
+<!-- geom_text(data=tb6[tb6$AEREL=="RELATED",],aes(label = paste0("REL=",round(OBS, 1))), -->
+<!-- show.legend = F,size=2.8, vjust=1, hjust=0)+ -->
+<!-- scale_fill_gradient(low="yellow",high="red",na.value="white")+ -->
+<!-- scale_x_discrete("Severity") + scale_y_discrete(name = "Adverse Event Term") + -->
+<!-- theme_classic()+ -->
+<!-- ggtitle("Heat Map for Number of Related and Not Related Adverse Events per PT per -->
+<!-- Severity for Psychiatric Disorders of Treatment Z") + theme(plot.title = -->
+<!-- element_text(hjust = 0.5)) + labs(fill="Number of Events") -->
+<!-- p5 -->
+<p><em>Source: <a
+href="https://www.lexjansen.com/phuse/2018/dv/DV11.pdf"
+class="uri">https://www.lexjansen.com/phuse/2018/dv/DV11.pdf</a></em></p>
+</div>
+<div id="volcano-plot" class="section level2">
+<h2>Volcano Plot</h2>
+<p>A volcano plot is a type of scatter-plot that is used to quickly
+identify changes in large data sets composed of replicate data. It plots
+significance versus fold-change on the y and x axes, respectively. It is
+constructed by plotting the negative log of the p value on the y axis
+(usually base 10). This results in data points with low p values (highly
+significant) appearing toward the top of the plot. The x axis is the log
+of the fold change between the two conditions. The log of the fold
+change is used so that changes in both directions appear equidistant
+from the center. In the clinical domain, a volcano plot is used to view
+Risk Difference (RD), Relative Risk or Odds Ratio of AE occurrence
+between the treatment groups by preferred term.</p>
+<p><strong>VOLCANO PLOT OF TREATMENT EMERGENT ADVERSE EVENT AT PT
+LEVEL</strong></p>
+<p>Volcano plots are also generated on the same data which is used for
+heat maps. Here, we have plotted negative log10-transformed p-value
+calculated using Fisher exact test on Y-axis and Log2-transformed
+relative risk on x-axis.</p>
+<p>The dashed red line on y-axis shows where p = 0.05 with points above
+the line having p &lt; 0.05 and points below the line having p &gt;
+0.05. Note that smaller the p-value larger is the number on y-axis. For
+this graph, we have labeled the AE terms with p-values &lt; 0.05 as they
+are significant.</p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+DATA SNIPPET
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+AETERM
+</th>
+<th style="text-align:right;">
+rr
+</th>
+<th style="text-align:right;">
+log2rr
+</th>
+<th style="text-align:right;">
+p
+</th>
+<th style="text-align:right;">
+Total
+</th>
+<th style="text-align:left;">
+term
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+NECK SHOULDER PAIN
+</td>
+<td style="text-align:right;">
+1.7967074
+</td>
+<td style="text-align:right;">
+1.7984807
+</td>
+<td style="text-align:right;">
+0.0544522
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SINUSITIS
+</td>
+<td style="text-align:right;">
+4.7510003
+</td>
+<td style="text-align:right;">
+-0.4996963
+</td>
+<td style="text-align:right;">
+0.0594548
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DECREASED APPETITE
+</td>
+<td style="text-align:right;">
+2.5129638
+</td>
+<td style="text-align:right;">
+2.4353532
+</td>
+<td style="text-align:right;">
+0.0289871
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:left;">
+DECREASED APPETITE
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DRY MOUTH
+</td>
+<td style="text-align:right;">
+5.3098027
+</td>
+<td style="text-align:right;">
+0.6340520
+</td>
+<td style="text-align:right;">
+0.0147967
+</td>
+<td style="text-align:right;">
+43
+</td>
+<td style="text-align:left;">
+DRY MOUTH
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+UPPER RESPIRATORY INFECTION
+</td>
+<td style="text-align:right;">
+5.6487570
+</td>
+<td style="text-align:right;">
+-1.5222139
+</td>
+<td style="text-align:right;">
+0.0963061
+</td>
+<td style="text-align:right;">
+46
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+COLD SYMPTOMS
+</td>
+<td style="text-align:right;">
+0.3687833
+</td>
+<td style="text-align:right;">
+1.0248390
+</td>
+<td style="text-align:right;">
+0.0902397
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DRYNESS IN MOUTH
+</td>
+<td style="text-align:right;">
+3.2158224
+</td>
+<td style="text-align:right;">
+2.5189308
+</td>
+<td style="text-align:right;">
+0.0691015
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WEIGHT GAIN
+</td>
+<td style="text-align:right;">
+5.3652724
+</td>
+<td style="text-align:right;">
+2.4190755
+</td>
+<td style="text-align:right;">
+0.0795672
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+HYPERHIDROSIS
+</td>
+<td style="text-align:right;">
+3.3534666
+</td>
+<td style="text-align:right;">
+2.0661030
+</td>
+<td style="text-align:right;">
+0.0025589
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+INCREASED IRRITABILITY
+</td>
+<td style="text-align:right;">
+2.7940269
+</td>
+<td style="text-align:right;">
+1.9556811
+</td>
+<td style="text-align:right;">
+0.0478318
+</td>
+<td style="text-align:right;">
+24
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+INCREASED THIRST
+</td>
+<td style="text-align:right;">
+5.7453167
+</td>
+<td style="text-align:right;">
+2.5768103
+</td>
+<td style="text-align:right;">
+0.0758701
+</td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LOWER BACK PAIN
+</td>
+<td style="text-align:right;">
+2.7746715
+</td>
+<td style="text-align:right;">
+1.9886535
+</td>
+<td style="text-align:right;">
+0.0217192
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NUMBNESS (BOTH HANDS)
+</td>
+<td style="text-align:right;">
+4.0976667
+</td>
+<td style="text-align:right;">
+2.0977219
+</td>
+<td style="text-align:right;">
+0.0318863
+</td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+</tbody>
+</table>
+<p><img src="05-Plot_Adverse-Event_files/figure-html/unnamed-chunk-4-1.png" width="960" /></p>
+</div>
+<div id="bubble-plot" class="section level2">
+<h2>Bubble Plot</h2>
+<p><strong>BUBBLE PLOT OF -LOG10 (P-VALUE) BY RELATIVE RISK SIZED BY
+COUNTS</strong></p>
+<p>The x-axis represents the log2 relative risk and y-axis represents
+the –log10 p-values computed using the fisher exact test. Each bubble
+represents an adverse event, with bubble size indicative of the total
+number of adverse events that occur for both treatments combined.
+Specifically, the bubble area is proportional to the total number of
+events.</p>
+<p>Log2 (Relative Risk) of 0 represents no difference in risk between
+the 2 treatment groups, while bubbles to the right indicate a higher
+risk for subjects in treatment group Y (i.e. – If Log2 (RR) = 1, that is
+the same as an RR=2), and bubbles to the left indicate a higher risk for
+subjects in treatment group Z. Color, green and blue helps to emphasize
+adverse events that are more common for treatment Y or Z, respectively.
+The size of the bubble represents the total number of occurrences of the
+AE of interest. Names of events with total number of occurrences greater
+than 10 are displayed.</p>
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-dfa5d821dc44474b3e8c" style="width:960px;height:576px;"></div>
+<script type="application/json" data-for="htmlwidget-dfa5d821dc44474b3e8c">{"x":{"visdat":{"4b0c47458c2":["function () ","plotlyVisDat"]},"cur_data":"4b0c47458c2","attrs":{"4b0c47458c2":{"x":{},"y":{},"text":{},"mode":"markers","marker":{"size":{},"opacity":0.90000000000000002},"color":{},"colors":["blue","green"],"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Bubble Plot Treatment Emergent Adverse Event of Significance versus Relative<br />Risk","xaxis":{"domain":[0,1],"automargin":true,"showgrid":false,"title":"Log2 (Relative Risk)"},"yaxis":{"domain":[0,1],"automargin":true,"showgrid":false,"title":"-Log10 (p-value)"},"annotations":[{"text":null,"x":1.7984806959087485,"y":1.2639846019611922,"xref":"x","yref":"y","showarrow":false,"font":{"size":10}},{"text":null,"x":-0.49969634350375841,"y":1.225813166277796,"xref":"x","yref":"y","showarrow":false,"font":{"size":10}},{"text":"DECREASED APPETITE","x":2.4353531824483436,"y":1.5377958641655511,"xref":"x","yref":"y","showarrow":false,"font":{"size":10}},{"text":"DRY MOUTH","x":0.63405198918775807,"y":1.8298365000665657,"xref":"x","yref":"y","showarrow":false,"font":{"size":10}},{"text":null,"x":-1.522213900615502,"y":1.016346109984575,"xref":"x","yref":"y","showarrow":false,"font":{"size":10}},{"text":null,"x":1.0248389586175237,"y":1.0446024793675117,"xref":"x","yref":"y","showarrow":false,"font":{"size":10}},{"text":null,"x":2.5189307633519533,"y":1.160512793480508,"xref":"x","yref":"y","showarrow":false,"font":{"size":10}},{"text":null,"x":2.4190755272227609,"y":1.0992659518018075,"xref":"x","yref":"y","showarrow":false,"font":{"size":10}},{"text":null,"x":2.0661030045451168,"y":2.5919454836768852,"xref":"x","yref":"y","showarrow":false,"font":{"size":10}},{"text":null,"x":1.9556811314634255,"y":1.320283116504829,"xref":"x","yref":"y","showarrow":false,"font":{"size":10}},{"text":null,"x":2.5768103293901206,"y":1.119929298876813,"xref":"x","yref":"y","showarrow":false,"font":{"size":10}},{"text":null,"x":1.9886535023326743,"y":1.6631571195022936,"xref":"x","yref":"y","showarrow":false,"font":{"size":10}},{"text":null,"x":2.0977219480164111,"y":1.4963961083258459,"xref":"x","yref":"y","showarrow":false,"font":{"size":10}}],"hovermode":"closest","showlegend":false,"legend":{"yanchor":"top","y":0.5}},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[1.7984806959087485,-0.49969634350375841,2.4353531824483436,0.63405198918775807,-1.522213900615502,1.0248389586175237,2.5189307633519533,2.4190755272227609,2.0661030045451168,1.9556811314634255,2.5768103293901206,1.9886535023326743,2.0977219480164111],"y":[1.2639846019611922,1.225813166277796,1.5377958641655511,1.8298365000665657,1.016346109984575,1.0446024793675117,1.160512793480508,1.0992659518018075,2.5919454836768852,1.320283116504829,1.119929298876813,1.6631571195022936,1.4963961083258459],"text":["NECK SHOULDER PAIN","SINUSITIS","DECREASED APPETITE","DRY MOUTH","UPPER RESPIRATORY INFECTION","COLD SYMPTOMS","DRYNESS IN MOUTH","WEIGHT GAIN","HYPERHIDROSIS","INCREASED IRRITABILITY","INCREASED THIRST","LOWER BACK PAIN","NUMBNESS (BOTH HANDS)"],"mode":"markers","marker":{"colorbar":{"title":"log2rr","ticklen":2},"cmin":-1.522213900615502,"cmax":2.5768103293901206,"colorscale":[["0","rgba(0,0,255,1)"],["0.0416666666666667","rgba(49,29,248,1)"],["0.0833333333333334","rgba(69,45,241,1)"],["0.125","rgba(83,58,233,1)"],["0.166666666666667","rgba(93,70,226,1)"],["0.208333333333333","rgba(102,81,219,1)"],["0.25","rgba(108,91,211,1)"],["0.291666666666667","rgba(113,101,204,1)"],["0.333333333333333","rgba(118,110,197,1)"],["0.375","rgba(121,120,189,1)"],["0.416666666666667","rgba(123,129,182,1)"],["0.458333333333333","rgba(125,138,174,1)"],["0.5","rgba(125,147,166,1)"],["0.541666666666667","rgba(125,156,158,1)"],["0.583333333333333","rgba(124,165,150,1)"],["0.625","rgba(123,174,141,1)"],["0.666666666666667","rgba(120,183,133,1)"],["0.708333333333333","rgba(116,192,124,1)"],["0.75","rgba(111,201,114,1)"],["0.791666666666667","rgba(105,210,104,1)"],["0.833333333333333","rgba(97,219,92,1)"],["0.875","rgba(87,228,79,1)"],["0.916666666666667","rgba(73,237,64,1)"],["0.958333333333333","rgba(52,246,44,1)"],["1","rgba(0,255,0,1)"]],"showscale":false,"color":[1.7984806959087485,-0.49969634350375841,2.4353531824483436,0.63405198918775807,-1.522213900615502,1.0248389586175237,2.5189307633519533,2.4190755272227609,2.0661030045451168,1.9556811314634255,2.5768103293901206,1.9886535023326743,2.0977219480164111],"size":[13,16,33,43,46,8,10,42,11,24,28,8,28],"opacity":0.90000000000000002,"line":{"colorbar":{"title":"","ticklen":2},"cmin":-1.522213900615502,"cmax":2.5768103293901206,"colorscale":[["0","rgba(0,0,255,1)"],["0.0416666666666667","rgba(49,29,248,1)"],["0.0833333333333334","rgba(69,45,241,1)"],["0.125","rgba(83,58,233,1)"],["0.166666666666667","rgba(93,70,226,1)"],["0.208333333333333","rgba(102,81,219,1)"],["0.25","rgba(108,91,211,1)"],["0.291666666666667","rgba(113,101,204,1)"],["0.333333333333333","rgba(118,110,197,1)"],["0.375","rgba(121,120,189,1)"],["0.416666666666667","rgba(123,129,182,1)"],["0.458333333333333","rgba(125,138,174,1)"],["0.5","rgba(125,147,166,1)"],["0.541666666666667","rgba(125,156,158,1)"],["0.583333333333333","rgba(124,165,150,1)"],["0.625","rgba(123,174,141,1)"],["0.666666666666667","rgba(120,183,133,1)"],["0.708333333333333","rgba(116,192,124,1)"],["0.75","rgba(111,201,114,1)"],["0.791666666666667","rgba(105,210,104,1)"],["0.833333333333333","rgba(97,219,92,1)"],["0.875","rgba(87,228,79,1)"],["0.916666666666667","rgba(73,237,64,1)"],["0.958333333333333","rgba(52,246,44,1)"],["1","rgba(0,255,0,1)"]],"showscale":false,"color":[1.7984806959087485,-0.49969634350375841,2.4353531824483436,0.63405198918775807,-1.522213900615502,1.0248389586175237,2.5189307633519533,2.4190755272227609,2.0661030045451168,1.9556811314634255,2.5768103293901206,1.9886535023326743,2.0977219480164111]}},"type":"scatter","xaxis":"x","yaxis":"y","frame":null},{"x":[-1.522213900615502,2.5768103293901206],"y":[1.016346109984575,2.5919454836768852],"type":"scatter","mode":"markers","opacity":0,"hoverinfo":"none","showlegend":false,"marker":{"colorbar":{"title":"log2rr","ticklen":2,"len":0.5,"lenmode":"fraction","y":1,"yanchor":"top"},"cmin":-1.522213900615502,"cmax":2.5768103293901206,"colorscale":[["0","rgba(0,0,255,1)"],["0.0416666666666667","rgba(49,29,248,1)"],["0.0833333333333334","rgba(69,45,241,1)"],["0.125","rgba(83,58,233,1)"],["0.166666666666667","rgba(93,70,226,1)"],["0.208333333333333","rgba(102,81,219,1)"],["0.25","rgba(108,91,211,1)"],["0.291666666666667","rgba(113,101,204,1)"],["0.333333333333333","rgba(118,110,197,1)"],["0.375","rgba(121,120,189,1)"],["0.416666666666667","rgba(123,129,182,1)"],["0.458333333333333","rgba(125,138,174,1)"],["0.5","rgba(125,147,166,1)"],["0.541666666666667","rgba(125,156,158,1)"],["0.583333333333333","rgba(124,165,150,1)"],["0.625","rgba(123,174,141,1)"],["0.666666666666667","rgba(120,183,133,1)"],["0.708333333333333","rgba(116,192,124,1)"],["0.75","rgba(111,201,114,1)"],["0.791666666666667","rgba(105,210,104,1)"],["0.833333333333333","rgba(97,219,92,1)"],["0.875","rgba(87,228,79,1)"],["0.916666666666667","rgba(73,237,64,1)"],["0.958333333333333","rgba(52,246,44,1)"],["1","rgba(0,255,0,1)"]],"showscale":true,"color":[-1.522213900615502,2.5768103293901206],"line":{"color":"rgba(255,127,14,1)"}},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<ul>
+<li><a
+href="https://www.linkedin.com/pulse/most-frequent-ae-relative-risk-using-r-jagadish-katam/?trackingId=GllB04d3RAe%2BIPwtx1czFg%3D%3D">Most
+Frequent AE by Relative Risk/Forest Plot using</a></li>
+</ul>
+<div id="heat-map-1" class="section level2">
+<h2>Heat Map</h2>
+<ul>
+<li><a href="https://www.lexjansen.com/phuse/2018/dv/DV11.pdf">Adverse
+Event Data – gRaphically</a></li>
+<li></li>
+</ul>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
