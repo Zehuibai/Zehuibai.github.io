@@ -1,0 +1,1735 @@
+---
+title: |
+  ![](logo.jpg){width=1in}  
+  MMRM
+author: "Zehui Bai"
+date: '`r format(Sys.time())`'
+output:
+  html_document:
+    df_print: paged
+    number_sections: yes
+    toc: yes
+    toc_float:
+      collapsed: yes
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+ 
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                    1. load the required packages                       -->
+# <!-- ---------------------------------------------------------------------- --> 
+
+# if(!require(psych)){install.packages("psych")}
+
+packages<-c("tidyverse", "kableExtra", "gtsummary",
+            "Hmisc","htmltools","clinUtils","sjPlot",
+            "lme4","lattice","minqa","nlme","lmerTest")
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                        2. Basic system settings                        -->
+# <!-- ---------------------------------------------------------------------- -->
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+
+# convert backslash to forward slash in R
+# gsub('"', "", gsub("\\\\", "/", readClipboard()))
+
+## get the path
+# rstudioapi::getSourceEditorContext()$path
+# dirname(rstudioapi::getSourceEditorContext()$path)
+
+## set working directory
+# getwd()
+# setwd("c:/Users/zbai/Desktop")
+# Sys.setlocale("LC_ALL","English")
+
+## get the R Version
+# paste(R.Version()[c("major", "minor")], collapse = ".")
+
+## convert backslash to forward slash 
+# scan("clipboard",what="string")
+# gsub('"', "", gsub("\\\\", "/", readClipboard())) 
+
+# Load all r functions
+# The directory where all source code files are saved.
+source_code_dir <- "C:/Users/baiz/Downloads/Data-Analyst-with-R/00 R Function/ZB Function/"  
+file_path_vec <- list.files(source_code_dir, full.names = T)
+for(f_path in file_path_vec){source(f_path)}
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                         3. Import the datasets                         -->
+# <!-- ---------------------------------------------------------------------- -->
+
+# <!-- ---------------------------- -->
+# <!-- --3.1 Import csv data ------ -->
+# <!-- ---------------------------- -->
+
+# pfad <- "~/Desktop/SASUniversityEdition/myfolders/Daten"
+# mydata1 <- read.csv(file.path(pfad, "yourcsv_data.csv"), 
+#                     sep=";", 
+#                     header=TRUE)   
+
+# Import all csv data from folder
+# list_csv_files <- list.files(path = "./csvfolder/")
+# do.call(rbind, lapply(list_csv_files, function(x) read.csv(x, stringsAsFactors = FALSE)))
+
+# <!-- ---------------------------- -->
+# <!-- --3.2 Import xlsx data ----- -->
+# <!-- ---------------------------- -->
+
+# library(readxl)
+# mydata2 <- read_excel("C:/Users/zbai/Documents/GitHub/R-Projects/SAS/Yimeng/results-text.xlsx")
+
+# <!-- ---------------------------- -->
+# <!-- --3.3 Import sas7dbat data - -->
+# <!-- ---------------------------- -->
+
+# library(sas7bdat)
+# mydata3 <- read.sas7bdat("~/Desktop/SASUniversityEdition/myfolders/Daten/uis.sas7bdat")
+
+# Import all sas7dbat data from SASfolder
+# ZB.import.sas.folder("./SASfolder/")
+
+# <!-- ---------------------------- -->
+# <!-- --3.4 Import from copyboard --->
+# <!-- ---------------------------- -->
+# copdat <- read.delim("clipboard")
+# Data_D01 <- copdat
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                           4. Some Tools                                -->
+# <!-- ---------------------------------------------------------------------- -->
+
+# To check out vignettes for one specific package
+# browseVignettes("sjPlot")      # sjPlot for Models Summary
+# browseVignettes("kableExtra")
+# browseVignettes("gtsummary")
+# <!-- ---------------------------------------------------------------------- -->
+```
+
+
+<!-- ----------------------------------------- -->
+<!-- -----------Mind Map of ToC--------------- -->
+<!-- ----------------------------------------- -->
+
+
+
+
+<!-- ----------------------------------------- -->
+<!-- --------------CSS Define----------------- -->
+<!-- ----------------------------------------- -->
+<style>
+.bold-list-257f96 + ol {
+    font-weight: 900;
+    color: #257f96;
+}
+.bold-list-ff9900 + ol {
+    font-weight: 900;
+    color: #ff9900;
+}
+</style>
+<!-- ----------------------------------------- -->
+
+
+
+# Introduction
+
+## Correlated Response Data
+
+1. Repeated Measurements:
+
+    + Defined as data collected from each experimental unit or subject under different experimental conditions at multiple occasions.
+    + Requires a flexible correlation structure to reflect the sequential nature of measurements for each subject, considering possible correlations related to subject-specific random effects.
+    + Special case: Longitudinal data, which are collected at several time points and might exhibit sequential correlations.
+    
+2. Clustered Data:
+
+    + Occurs when observations are naturally grouped into clusters, leading to correlated data within clusters.
+    + Explained typically through random effect models, distinguishing variability within and between clusters.
+    + In some cases, there might be more than one level of clustering, leading to a multi-level random effect structure.
+    + Examples include studies on twins (natural clusters) and ophthalmology studies where each pair of eyes forms a cluster.
+    
+3. Spatially Correlated Data:
+
+    + Occurs when observations include both a response variable and a location vector associated with it.
+    + The proximity of measured responses determines their correlation.
+    + Grid data, linked to discrete areas like towns or counties, are also considered spatially correlated. Examples include census, socio-economic, and health data.
+
+## Hierarchical and Marginal model
+
+**Hierarchical Models (Also Known as Multilevel or Mixed-Effect Models)**
+
+* Hierarchical models explicitly consider the hierarchical structure of data. For example, students nested within classes, which are nested within schools.
+* They include both fixed effects (common to all groups) and random effects (specific to each group or level).
+* Random effects allow for individual differences at each level (like differences among schools or among classes within schools).
+* Hierarchical models can handle unbalanced data and different numbers of observations across groups.
+* They provide insights into **both the individual group level and the overall population**.
+* Marginal models need a correct specification of the correlation structure for consistent estimates, while hierarchical models are more flexible in this aspect.
+
+The general linear mixed model can be written as:
+
+$$
+\begin{array}{c}
+\mathbf{Y}_{i}=X_{i} \beta+Z_{i} \mathbf{b}_{i}+\epsilon_{i} \\
+\mathbf{b}_{i} \sim N(\mathbf{0}, D) \quad \text { und } \quad \epsilon_{i} \sim N\left(0, \Sigma_{i}\right)
+\end{array}
+$$ und
+$\mathbf{b}_{1}, \ldots, \mathbf{b}_{N}, \epsilon_{1}, \ldots, \epsilon_{N}$ are stochastically independent. This can be rewritten as **Hierarchical model**
+$$
+\mathbf{Y}_{i} \mid \mathbf{b}_{i}=N\left(X_{i} \beta+Z_{i} \mathbf{b}_{i}, \Sigma_{i}\right), \quad \mathbf{b}_{i} \sim N(\mathbf{0}, D)
+$$ 
+One often assumes that $\Sigma_{i}$ only depends on the dimension of $i$ i.e. that the unknown parameters in $\Sigma_{i}$ are independent on $i$ (depends only on the dimensionality of $i$, the unknown parameter $\Sigma_{i}$ is independent of $i$)
+
+
+**Marginal Models (Also Known as Population-Averaged Models)**
+
+* Marginal models focus on the average response of the population, rather than the individual group levels.
+* They use generalized estimating equations (GEEs) to estimate the average response.
+* These models explicitly model the correlation structure of the data but do not estimate random effects.
+* They are suitable when the interest is in the average effect across all subjects or units, rather than the specific random effects.
+* Marginal models provide an understanding of the average behavior of the entire population under study.
+* They are robust to certain types of misspecifications of the correlation structure.
+
+The following marginal model follows from the hierarchical model:
+$$\mathbf{Y}_{i} \sim N\left(X_{i} \beta, Z_{i} D Z_{i}^{T}+\Sigma_{i}\right)$$
+The hierarchical model implies the marginal model, the reverse is not
+generally true: $V_{i}=Z_{i} D Z_{i}^{T}+\Sigma_{i}$
+
+## Maximum Likelihood (ML) 
+
+A linear mixed-effects model is of the form
+$$
+y=\underbrace{X \beta}_{\text {fixed }}+\underbrace{Z b}_{\text {random }}+\underbrace{\varepsilon}_{\text {error }},
+$$
+where
+- $y$ is the $n$-by-1 response vector, and $n$ is the number of observations.
+- $X$ is an $n$-by-p fixed-effects design matrix.
+- $\beta$ is a $p$-by- 1 fixed-effects vector.
+- $Z$ is an $n$-by- $q$ random-effects design matrix.
+- $b$ is a $q$-by-1 random-effects vector.
+- $\varepsilon$ is the $n$-by-1 observation error vector.
+
+The random-effects vector, $b$, and the error vector, $\varepsilon$, are assumed to have the following independent prior distributions:
+$$
+\begin{aligned}
+& b \sim N\left(0, \sigma^2 D(\theta)\right), \\
+& \varepsilon \sim N\left(0, \sigma^2 I\right),
+\end{aligned}
+$$
+ 
+The maximum likelihood estimation includes both regression coefficients and the variance components, that is, both fixed-effects and random-effects terms in the likelihood function.
+
+For a linear mixed-effects model defined above, the conditional response of the response variable $y$ given $\beta, b, \theta$, and $\sigma^2$ is
+$$
+y \mid b, \beta, \theta, \sigma^2 \sim N\left(X \beta+Z b, \sigma^2 I_n\right) .
+$$
+
+The likelihood of $y$ given $\beta, \theta$, and $\sigma^2$ is
+$$
+P\left(y \mid \beta, \theta, \sigma^2\right)=\int P\left(y \mid b, \beta, \theta, \sigma^2\right) P\left(b \mid \theta, \sigma^2\right) d b,
+$$
+where
+$$
+\begin{aligned}
+& P\left(b \mid \theta, \sigma^2\right)=\frac{1}{\left(2 \pi \sigma^2\right)^{q / 2}|D(\theta)|^{1 / 2}} \exp \left\{-\frac{1}{2 \sigma^2} b^T D^{-1} b\right\} \text { and } \\
+& P\left(y \mid b, \beta, \theta, \sigma^2\right)=\frac{1}{\left(2 \pi \sigma^2\right)^{n / 2}} \exp \left\{-\frac{1}{2 \sigma^2}(y-X \beta-Z b)^T(y-X \beta-Z b)\right\} .
+\end{aligned}
+$$
+
+Suppose $\Lambda(\theta)$ is the lower triangular Cholesky factor of $D(\theta)$ and $\Delta(\theta)$ is the inverse of $\Lambda(\theta)$. Then,
+$$
+D(\theta)^{-1}=\Delta(\theta)^T \Delta(\theta) .
+$$
+
+Define
+$$
+r^2(\beta, b, \theta)=b^T \Delta(\theta)^T \Delta(\theta) b+(y-X \beta-Z b)^T(y-X \beta-Z b),
+$$
+and suppose $b^*$ is the value of $b$ that satisfies
+$$
+\left.\frac{\partial r^2(\beta, b, \theta)}{\partial b}\right|_{b^*}=0
+$$
+for given $\beta$ and $\theta$. Then, the likelihood function is
+$$
+P\left(y \mid \beta, \theta, \sigma^2\right)=\left(2 \pi \sigma^2\right)^{-n / 2}|D(\theta)|^{-1 / 2} \exp \left\{-\frac{1}{2 \sigma^2} r^2\left(\beta, b^*(\beta), \theta\right)\right\} \frac{1}{\left|\Delta^T \Delta+Z^T Z\right|^{1 / 2}} .
+$$
+
+$\mathrm{P}\left(\mathrm{y} \mid \beta, \theta, \sigma^2\right)$ is first maximized with respect to $\beta$ and $\sigma^2$ for a given $\theta$. Thus the optimized solutions $\widehat{\beta}(\theta)$ and $\widehat{\sigma}^2(\theta)$ are obtained as functions of $\theta$. Substituting these solutions into the likelihood function produces $P\left(y \mid \widehat{\beta}(\theta), \theta, \widehat{\sigma}^2(\theta)\right)$. This expression is called a profiled likelihood where $\beta$ and $\sigma^2$ have been profiled out. $P\left(y \mid \widehat{\beta}(\theta), \theta, \widehat{\sigma}^2(\theta)\right)$ is a function of $\theta$, and the algorithm then optimizes it with respect to $\theta$. Once it finds the optimal estimate of $\theta$, the estimates of $\beta$ and $\sigma^2$ are given by $\widehat{\beta}(\theta)$ and $\widehat{\sigma}^2(\theta)$.
+
+**Summary**
+
+The ML method treats $\beta$ as fixed but unknown quantities when the variance components are estimated, but does not take into account the degrees of freedom lost by estimating the fixed effects. This causes ML estimates to be biased with smaller variances. However, one advantage of ML over REML is that it is possible to compare two models in terms of their fixed- and random-effects terms. On the other hand, if you use REML to estimate the parameters, you can only compare two models, that are nested in their random-effects terms, with the same fixed-effects design.
+
+
+**Problem of MLE**
+
+Maximum likelihood estimation uses an iterative interactive method to estimate fixed effects and variance when estimating fixed effects and random effects (variance components) in a mixed effects model. When estimating variance, you need a reference point, which is the fixed effect, such as the mean. Therefore, MLE first estimates the fixed effects and then estimates the variance components. Use EM or IGLS iteration method to estimate. Fixed effects are estimated first, assuming missing variance or random effects for any observations. Then the variance is estimated based on the fixed effects, and iteratively until the estimated value no longer changes.
+
+Estimating fixed effects, which means treating the fixed effects as known and fixed when estimating the variance, will cause two problems.
+
+1.  Variation in fixed effects is not considered
+2.  Degrees of freedom consumed when estimating fixed effects are not taken into account
+
+When the sample is large, these two problems are not a problem. When the sample is small, these two problems have a relatively large impact on the estimated variance. When calculating the population variance of the mean, use "each X value minus the sum of squares of the population mean" as the numerator, and the denominator uses N; when calculating the sample variance, use "each 1 (because the mean is estimated, a penalty is needed at this time); and ML estimation is similar to the estimation of the population variance, but in practice the sample mean is used, and **N is used as the numerator instead of N-1**. The estimated values are almost the same when the sample is large, but they are very different when the sample is small. This will lead to a smaller estimated variance and a smaller standard error of the fixed effects, leading to an inflated type I error.
+
+## Restricted Maximum Likelihood (REML) 
+
+The idea of Restricted Maximum Likelihood (REML) comes from realization that the variance estimator given by the Maximum Likelihood (ML) is biased. What is an estimator and in which way it is biased? An estimator is simply an approximation / estimate of model parameters. Assuming that statistical observations follow Normal distribution, there are two parameters: $\mu$ (mean) and $\sigma^2$ (variance) to estimate if one wants to summarize the observations. It turns out that the variance estimator given by Maximum Likelihood (ML) is biased, i.e. the value we obtain from the ML model over- or under-estimates the true variance, see the figure below.
+
+```{r, echo=FALSE, fig.align="center", out.width = '75%',fig.cap="Figure: Illustration of biased vs. unbiased estimators"}
+knitr::include_graphics("./02_Plots/MMRM/MMRM_Biased_Variance.png")
+```
+
+REML is similar to the "N-1" version of MLE, with the variance corrected. REML separates the process of estimating fixed effects and variance, and can estimate variance more accurately when using small samples, thus obtaining more accurate standard errors of fixed effects, thereby controlling type one error inflation. 
+
+1. The first step in REML is to ignore the hierarchical structure and first obtain the residuals through ordinary least squares (OLS). The OLS residuals have the same conditional variance (based on the X variable) as the original results. When using OLS residuals to estimate variance, the fixed effects are limited to 0, so there is no need to consider fixed effects when REML estimates variance components. 
+2. The second step is to estimate the fixed effects. GLS is used to estimate fixed effects through matrix multiplication, that is, the variance components estimated by REML are put into Generalized least squares (generalized least squares method) to estimate fixed effects.
+
+**In SAS**, Both PROC MIXED and PROC GLIMMIX provide maximum likelihood estimates (abbreviated MLE) of model effects as well as REML estimates of variance components. REML default variance estimation method. ML variance estimates can be obtained by using METHOD=ML in PROC MIXED or METHOD=MSPL in PROC GLIMMIX. The variance estimate resulting from the ML variance estimate will be smaller than the corresponding REML estimate, the resulting confidence interval will be narrower, and the test statistic will be larger. This reflects the well-known fact that ML estimates of variance components are biased downward.
+
+For example, in the one-sample case, when $y_{1}, y_{2}, \ldots, y_{n}$
+is a random sample from $\mathrm{N}\left(\mu, \sigma^{2}\right)$, the ML
+estimate of the variance is as follows: 
+$$
+\sum_{i}\left(y_{i}-\bar{y}\right)^{2} / n
+$$ 
+
+whereas the sample variance - which is the simplest REML variance estimate-is as follows: 
+$$
+\sum_{i}\left(y_{i}-\bar{y}\right)^{2} /(n-1)
+$$
+The latter is unbiased and is generally considered the preferred variance estimate. It can be easily seen that using ML variance estimation results in increased Type 1 error rates (up to 25% rejection rate for nominal $a=0.05$) and insufficient confidence interval coverage.
+
+```         
+proc mixed data=bond method=reml;
+ class ingot metal;
+ model pres=metal;
+ random ingot;
+run;
+
+proc glimmix data=bond method=rspl;
+ class ingot metal;
+ model pres=metal;
+ random ingot;
+run;
+```
+
+**Summary**
+
+REML accounts for the degrees of freedom lost by estimating the fixed effects, and makes a less biased estimation of random effects variances. The estimates of $\theta$ and $\sigma^2$ are invariant to the value of $\beta$ and less sensitive to outliers in the data compared to ML estimates. However, if you use REML to estimate the parameters, you can only compare two models that have the identical fixed-effects design matrices and are nested in their random-effects terms.
+
+
+## Small Sample Variance Correction
+
+In the case of small samples, the variance component of the fixed effects (which can be understood as the standard error) is not accurately estimated, whether it is MLE or REML. Furthermore, when calculating the p-value of fixed effects, the **fisher information and central limit theorem (asympotics)** that need to be used will fail in small samples, resulting in an underestimation of the variance, thus leading to a type of error inflation. 
+
+* Some scholars pointed out that this problem can be solved using the Bayesian method (the Bayesian method does not rely on asympotics),
+* But Kackar-Harville and later Kendward-roger solved it within the frequentist school by correcting square shame.
+
+### Kackar-Harville correction
+
+Kackar-Harville discovered the following formula, the variance of fixed effects is equal to the REML variance estimate of the fixed effects sample estimate plus the small sample bias.
+
+$$
+\operatorname{Var}(\gamma)=\operatorname{Var}^{R E M L}(\hat{\gamma})+\text { Small Sample Bias }
+$$ 
+
+A series of studies from KH to KR are aimed at how to estimate small sample bias. KH found that the estimation of Small sample bias (SSB) requires the use of the population value of the variance component (rather than the sample estimate); then they used the Taylor series expansion method to asymptotically estimate SSB using the sample estimate of the variance and covariance components. ; Later, Prasad-Rao and Harville-Jeske further expanded and developed this method based on KH. So this correction is sometimes called Prasad-Rao-Jeske-kackar-Harville correction.
+
+### Kendward-Roger correction
+
+KR further found that "REML variance estimate of fixed effect sample estimate" also has problems with small samples, that is, when REML estimates fixed effects, it directly uses the estimated variance into the GLS estimation equation to estimate fixed effects. At this time, there is no Consider the variation of the variance component itself, but directly treat it as known and fixed. 
+
+KR further uses Taylor's formula expansion to estimate "REML variance estimates of fixed effects sample estimates", taking into account the fact that the variance components when estimating fixed effects are estimates and are not known. In the case of small samples, the t test is used instead of the Z test (the multivariate case corresponds to the chi-square test instead of the F test).
+
+* The first step is equivalent to giving an accurate estimate of the residuals in "t=fixed effects/residuals"
+* The second step is to calculate the exact degrees of freedom. In mixed effects models, the calculation formula for the degrees of freedom often does not exist, and it is difficult to estimate the accurate degrees of freedom. KR uses the moment estimation matching procedure (method of moments matching procedure), and the estimation at this time is more accurate, sometimes even with fractional degrees of freedom.
+
+
+## Test of Fixed Effects
+
+Tests of fixed effects are typically done with either Wald or likelihood ratio (LRT) tests. With the **assumptions of asymptotic distributions and independent predictors**, Wald and LRT tests are equivalent. How large the data set needs to be for the asymptotic distribution to be a good approximation depends not only on how many observations you have, but also on the response variable type and the size of subgroups of observations formed by the categorical variables in the model. With a continuous response variable in a linear mixed model, subgroup sizes as small as five may be enough for the Wald and LRT to be similar. When the response is an indicator variable and the proportion of events of interest is small, groups size of one hundred may not be large enough for the Wald and LRT results to be similar.
+
+When a data set size is not large enough to be a good approximation of the asymptotic distribution or there is some correlation amongst the predictors, the Wald and LRT test results can vary considerably.
+
+-   Wald test. Tests of the effect size which is scaled using the estimated standard error.
+-   LRT (Likelihood Ratio Test.) Tests the difference in two nested models using the Chi square distribution.
+
+**Test if coefficients are zero**
+
+* Wald test. Tests of the effect size which is scaled using the estimated standard error.
+	
+* LRT (Likelihood Ratio Test.) Tests the difference in two nested models using the Chi square distribution.
+	
+* KRmodComp. For linear mixed models with little correlation among predictors, a Wald test using the approach of Kenward and Rogers (1997) will be quite similar to LRT test results.
+	The function is only available for linear mixed models (does not support glmer() models.) An F test of nested models with an estimated degrees of freedom. The KRmodcomp() function estimates which F-test distribution is the best distribution from the family of F distributions. This function addresses the degrees of freedom concern.
+	
+* Profiled confidence interval. While not a formal test, an interval which does not contain zero indicates the parameter is significant.
+The profiled confidence interval of a parameter is constructed by holding all other model parameters constant and then examining the likelihood of the the single parameter individually. If the parameter being profiled is correlated with other parameters, the profiled confidence interval assumption of the other parameters being held constant could affect the estimated interval.
+	
+* Parametric bootstrap. Assumes the model which restricts a parameter to zero (null model) is the true distribution and generates an empirical distribution of the difference in the two models. The observed coefficient is tested against the generated empirical distribution.
+
+
+### Wald Test
+
+The Wald test is based only on estimates from the model being evaluated. This results in an implied assumption that a model which holds the parameter being tested to zero will be the same with the exception of the parameter which is being tested. Correlation between the tested predictor and the other model predictors, can cause the estimate made from the model including the parameter to be different from a model which holds the parameter to zero.  A Walt test is done by comparing the coefficient's estimated value with the estimated standard error for the coefficient. 
+
+* $H_{0}: \beta_{j}=d_{j}$
+* $H_{1}: \beta_{j} \neq d_{j}$ 
+
+A more general form of linearity assumption
+
+$$
+H_{0}: \boldsymbol{C} \boldsymbol{\beta}=\boldsymbol{d} \text { vs } H_{1}: \boldsymbol{C} \boldsymbol{\beta} \neq \boldsymbol{d}
+$$
+Where $$W=(\boldsymbol{C} \hat{\boldsymbol{\beta}}-\boldsymbol{d})^{\prime}\left(\boldsymbol{C}^{\prime} \boldsymbol{A}_{11} \boldsymbol{C}\right)^{-1}(\boldsymbol{C} \hat{\boldsymbol{\beta}}-\boldsymbol{d})$$ 
+The approximate covariance matrices are given by
+$$\widehat{\operatorname{Cov}}(\hat{\boldsymbol{\beta}})=\boldsymbol{A}_{11}=\left\{\sum_{i=1}^{m} \boldsymbol{X}_{i}^{\prime} \hat{\boldsymbol{V}}_{i}^{-1} \boldsymbol{X}_{i}\right\}^{-1}$$
+
+
+### Likelihood Ratio Test
+
+The LRT requires the formal estimation of a model which restricts the parameter to zero and therefore accounts for correlation in its test.  The Likelihood Ratio Test (LRT) of fixed effects requires the models be fit with by MLE (use REML=FALSE for linear mixed models.) The LRT of mixed models is only approximately χ2 distributed. 
+
+In SS, the "Null Model Likelihood Ratio Test" is a likelihood ratio test of whether the model with the specified covariance fits better than a model with errors- that is, with $\boldsymbol{\Sigma}=\sigma^2 \mathrm{I}$. The $p$-value $<.0001$ shows that the iid $N\left(0, \sigma^2 \mathbf{I}\right)$ model is clearly inadequate.
+
+
+## Test of Random Parameters
+
+**Test variance parameter is equal to 0**, The test which are in common use for the variance parameter are listed from least efficient to most efficient.
+
+* LRT (Likelihood Ratio Test): The variance parameter of a generalized mixed models does not have a known asymptotic distribution. The LRT for these variance parameters at times can be poor estimates. We recommend treating these p-values with caution. The LRT test of a variance parameter equalling zero will be conservative (larger $p$-value). This is due to the test being on a boundary condition $\left(\sigma^2 \geq 0\right)$. Thus if the $p$-value is small enough to be significant with the LRT test, your finding is likely good. There are some areas were twice the LRT p-value is used as a formal test. We do not recommend this for variance of generalized mixed models since the $p$-value can be a poor estimate at times. As example to test random variable g2 in R
+
+```r
+gmmG2 <- glmer(bin ~ x1 + x2 + (1|g1) + (1|g2), family=binomial, data=pbDat)
+# LRT calculated using the loglik() function
+G2 = -2 * logLik(gmm) + 2 * logLik(gmmG2)
+pchisq(as.numeric(G2), df=1, lower.tail=F)
+```
+* Profiled confidence interval:  While not a formal test, an interval which does not contain zero indicates the parameter is significant.
+
+* Test based on Crainiceanu, C. and Ruppert, D. ( 2004 ) for linear mixed models. There is no equivalent for generalized mixed models. The variance parameters of the model must be uncorrelated. There is no equivalent function for when the random variables are correlated, such as with hierarchical models. In R, the exactRLRT() function is an implementation of Crainiceanu and Ruppert. See [Example](https://www.ssc.wisc.edu/sscc/pubs/MM/MM_TestEffects.html)
+
+* Parametric bootstrap. Assumes the model which restricts a parameter to zero (null model) is the true distribution and generates an empirical distribution of the difference in the two models. The observed coefficient is tested against the generated empirical distribution.
+
+## Covariance/Residual Structure
+
+In the simplest setting of a standard linear regression model, we have constant variance and no covariance.
+
+However, since mixed models have two sources of variability (within and between-subjects) different types of residuals may be defined and the corresponding analysis is more complex.
+
+**Homogeneous Variance**
+
+
+$$
+\Sigma = 
+\left[
+\begin{array}{ccc} 
+\sigma^2 & 0   & 0   \\
+0   & \sigma^2 & 0   \\
+0   & 0   & \sigma^2 \\
+\end{array}\right]
+$$
+
+```{r, echo=FALSE, fig.align="center", out.width = '100%',fig.cap="Figure: Residual Structure in the mixed model"}
+knitr::include_graphics("./02_Plots/MMRM/MMRM_Residual_Structure.png")
+```
+
+Each block represents the covariance matrix associated with within-individual observations. Within subject, there is variance on the diagonal and covariance on the off-diagonal. When considering the entire data, we can see that one subject's observations have no covariance with the other (grey). Furthermore, the within-subjectcovariance is a constant value and the variance is also a constant value.
+ 
+
+**Heterogeneous Variance**
+
+Relax the assumption of equal variances and estimate separately. For example, in the case of this heterogeneous variance, we might see more or less variation over time
+
+$$
+\Sigma = 
+\left[
+\begin{array}{ccc} 
+\sigma_1^2 & 0   & 0   \\
+0   & \sigma_2^2 & 0   \\
+0   & 0   & \sigma_3^2 \\
+\end{array}\right]
+$$
+**Covariance Structure of Compound Symmetry **
+
+More generally, referring to the previous estimated variance sign, we can see that the covariance matrix (for clusters) is as follows. (covariance structure of compound symmetry)
+
+the model with compound
+symmetric (or exchangeable) variance-covariance matrix of the error
+terms. In this matrix, all variances are assumed to be equal to
+$\sigma^{2}$, and all correlations are assumed to be equal to $\rho$.
+That is, the matrix has the form:
+
+$$
+\sigma^{2}\left[\begin{array}{ccccc}
+1 & \rho & \rho & \ldots & \rho \\
+\rho & 1 & \rho & \ldots & \rho \\
+\rho & \rho & 1 & \ldots & \rho \\
+\ldots & \ldots & \ldots & \ldots & \ldots \\
+\rho & \rho & \rho & \ldots & 1
+\end{array}\right]
+$$ 
+
+This variance-covariance structure is more suitable for repeated measures across treatment conditions (rather than longitudinally), since all observations are assumed to be equally correlated
+
+**ARMA (1,1) Structure**
+
+Model has the blocks in the variance-covariance matrix that
+have constant values on each of the descending diagonals, that is, the
+matrix has the form:
+
+$$
+\left[\begin{array}{ccccc}
+\sigma^{2} & \sigma_{1} & \sigma_{2} & \ldots & \sigma_{p-1} \\
+\sigma_{1} & \sigma^{2} & \sigma_{1} & \ldots & \sigma_{p-2} \\
+\sigma_{2} & \sigma_{1} & \sigma^{2} & \ldots & \sigma_{p-3} \\
+\ldots & \ldots & \ldots & \ldots & \ldots \\
+\sigma_{p-1} & \sigma_{p-2} & \sigma_{p-3} & \ldots & \sigma^{2}
+\end{array}\right]
+$$
+
+Using this structure implies that observations that are the same number
+of time points apart are equally correlated. There are a total of $p$
+unknown parameters $\sigma^{2}, \sigma_{1}, \ldots, \sigma_{p-1} .$ This
+model is said to have the Toeplitz covariance structure, which is
+sometimes referred to as an autoregressive-moving average
+$\operatorname{ARMA}(1,1)$ structure.
+
+Another model with useful structure of the variance-covariance matrix
+relies on the fact that typically as time goes on, observations become
+less correlated with the earlier ones. In this model, each block in the
+variance-covariance matrix has
+$\sigma^{2} \rho^{\left|t_{i}-t_{j}\right|}$ in the $i j$ -th cell,
+$i, j=1, \ldots, p$, that is, it looks like this:
+
+$$
+\sigma^{2}\left[\begin{array}{ccccc}
+1 & \rho^{\left|t_{1}-t_{2}\right|} & \rho^{\left|t_{1}-t_{3}\right|} & \ldots & \rho^{\left|t_{1}-t_{p}\right|} \\
+\rho^{\left|t_{1}-t_{2}\right|} & 1 & \rho^{\left|t_{2}-t_{3}\right|} & \ldots & \rho^{\left|t_{2}-t_{p}\right|} \\
+\rho^{\left|t_{1}-t_{3}\right|} & \rho^{\left|t_{2}-t_{3}\right|} & 1 & \ldots & \rho^{\left|t_{3}-t_{p}\right|} \\
+\ldots & \ldots & \ldots & \ldots & \ldots \\
+\rho^{\left|t_{1}-t_{p}\right|} & \rho^{\left|t_{2}-t_{p}\right|} & \rho^{\left|t_{3}-t_{p}\right|} & \ldots & 1
+\end{array}\right]
+$$ 
+
+Here $\sigma^{2}$ and $\rho$ are the unknown constants, $|\rho|<1$.
+Note that in this matrix the entries decrease as the distance between
+times $t_{i}$ and $t_{j}$ increases.  
+
+
+**Autocorrelation Structure**
+
+
+A special case of this model is when the times are equal to $\$ 1,2,3$,
+Vidots, $\mathrm{p} \$$. Then the \$p $\mathrm{p}$ \$ blocks of the
+variance-covariance matrix become:
+
+$$
+\sigma^{2}\left[\begin{array}{ccccc}
+1 & \rho & \rho^{2} & \ldots & \rho^{p-1} \\
+\rho & 1 & \rho & \ldots & \rho^{p-2} \\
+\rho^{2} & \rho & 1 & \ldots & \rho^{p-3} \\
+\ldots & \ldots & \ldots & \ldots & \ldots \\
+\rho^{p-1} & \rho^{p-2} & \rho^{p-3} & \ldots & 1
+\end{array}\right]
+$$ 
+
+This model is said to have an autoregressive variance-covariance
+structure of the error terms, referring to an AR(1) model, an
+autoregressive time series model with lag one that has the same
+covariance structure. Note that the autoregressive matrix is a special
+case of both Toeplitz and spatial power matrices.
+
+**Unstructured Covariance**
+
+The most general is an unstructured one with an $n p \times n p$ block-diagonal matrix with $n$ identical blocks of size $p \times p$ of the form: 
+
+$$
+\left[\begin{array}{ccccc}
+\sigma_{1}^{2} & \sigma_{12} & \sigma_{13} & \ldots & \sigma_{1 p} \\
+\sigma_{12} & \sigma_{2}^{2} & \sigma_{23} & \ldots & \sigma_{2 p} \\
+\sigma_{13} & \sigma_{23} & \sigma_{3}^{2} & \ldots & \sigma_{3 p} \\
+\ldots & \ldots & \ldots & \ldots & \ldots \\
+\sigma_{1 p} & \sigma_{2 p} & \sigma_{3 p} & \ldots & \sigma_{p}^{2}
+\end{array}\right]
+$$
+ 
+
+*  If the size of the dataset allows, a model with an **unstructured variance-covariance** matrix with error terms should be used. The model makes no assumptions about the structure and allows the estimation of each parameter to take its own value.
+* If the size of the dataset is too small to fit in a general unstructured variance-covariance matrix, there are several **sparse** but meaningful structures to try.
+
+**Selecting an Appropriate Covariance Model**
+
+It needs an appropriate covariance model in order to draw accurate conclusions from repeated  measures data. If you ignore important correlation by using a model that is too simple, you risk  increasing the Type I error rate and underestimating standard errors. If the model is too  complex, you sacrifice power and efficiency. Guerin and Stroup (2000) documented the effects  of various covariance modeling decisions using PROC MIXED for repeated measures data.  Their work supports the idea that repeated measures analysis is robust as long as the covariance  model used is approximately correct. Inference is  severely compromised by a blatantly poor choice of the covariance model. 
+
+There are two types of tools to help you select a covariance model. 
+
+1. First are **graphical tools** to help visualize patterns of correlation between observations at  different times. 
+2. Second are **information criteria** that measure the relative fit of competing covariance models. As noted at the end of the last section, these methods work best when you  first rule out covariance structures that are obviously inconsistent with the characteristics of the  data you are analyzing. 
+
+## Converge Problems
+
+The model cannot converge. At this time, the model needs to be simplified to make it converge: For the problem that the model cannot converge, first of all, the model we finally select must meet two standards: 
+
+1. It can converge; 
+2. It cannot be overfitted.
+
+**Deal with Converge**
+ 
+* Increase the number of iterations of the model: Regardless of whether the entire model can converge after increasing the number of iterations, check its random effects
+ 
+**Overfitting**
+
+Regardless of whether the entire model can converge after increasing the number of iterations, check its random effects
+
+1. Delete the highest-order interaction first, because as long as there is the highest-order interaction, deleting other interactions has no effect on the model (Barr D. J., 2013);
+2. After deleting the interaction, if convergence still cannot be achieved, please continue deleting. At this time, if the Corr of the two main effects is greater than 0.9, please delete the one with the larger Corr first;
+3. If convergence still cannot occur after deleting the larger main effect, retain the main effect with larger Corr and delete the main effect with smaller Corr (if the Corr of both main effects is greater than 0.9, they cannot be deleted directly because the random slopes interact with each other. If one is deleted, the other Corr will change accordingly), and so on, until a model that meets the above two criteria is explored.
+ 
+## Basic Concepts of BLUE & BLUP
+
+The basic form of a linear mixed model is
+$$
+Y_j=\sum_i \beta_i X_{j i}+\sum_k u_k Z_{j k}+e_j
+$$
+where
+* $Y_j$ is the $j^{\text {th }}$ observation
+* $\beta_i$ are fixed effect parameters
+* $X_{j i}$ are constants associated with the fixed effects
+* $u_k$ are random effects
+* $Z_{j k}$ are constants associated with the random effects
+* $e_j$ is the $j^{\text {th }}$ residual error
+
+Alternatively,  can be written as the mixed model in matrix form as $\mathbf{Y}=\mathbf{X} \boldsymbol{\beta}+\mathbf{Z u}+\mathbf{e}$.
+
+The expected value of an observation is
+$$
+\mathrm{E}[\mathbf{Y}]=\mathrm{E}[\mathbf{X} \boldsymbol{\beta}+\mathbf{Z u}+\mathbf{e}]=\mathbf{X} \boldsymbol{\beta}
+$$
+since the expected values of the random effect vector $\mathbf{u}$ and the error vector $\mathbf{e}$ are 0 . This is called the **unconditional expectation**, or the mean of $\mathbf{Y}$ averaged over all possible $\mathbf{u}$. The subtlety of this quantity is important: in practical terms, the observed levels of the random effects are a random sample of a larger population. The unconditional expectation is the mean of $\mathbf{Y}$ over the entire population.
+
+The conditional expectation of $\mathbf{Y}$ given $\mathbf{u}$, denoted $\mathrm{E}[\mathbf{Y} \mid \mathbf{u}]$, is
+$$
+\mathbf{E}[\mathbf{Y} \mid \mathbf{u}]=\mathbf{X} \boldsymbol{\beta}+\mathbf{Z u}
+$$
+
+In practical terms, this is the mean of Y for the specific set of levels of the random effect actually observed.
+
+**The unconditional mean is thus a population-wide average, whereas the conditional mean is an  average specific to an observed set of random effects.** Because the set of observed levels of the  random factors is not an exact duplicate of the entire population, the conditional and  unconditional means are not equal, in general. 
+
+Linear combinations of fixed effects, denoted $\Sigma_i \mathbf{K}_i \boldsymbol{\beta}_i$, are called estimable functions if they can be constructed from a linear combination of unconditional means of the observations. That is, if $\mathbf{K}^{\prime} \boldsymbol{\beta}=\mathbf{T}^{\prime} E[\mathbf{Y}]=\mathbf{T}^{\prime} \mathbf{X} \boldsymbol{\beta}$ for some $\mathbf{T}$, then it is estimable. Quantities such as regression coefficients, treatment means, treatment differences, contrasts, and simple effects in factorial experiments are all common examples of estimable functions.
+
+Estimable functions do not depend on the random effects. A generalization of the estimable function is required for such cases. Linear combinations of the fixed and random effects, $\mathbf{K}^{\prime} \boldsymbol{\beta}+\mathbf{M}^{\prime} \mathbf{u}$, can be formed from linear combinations of the conditional means. Such linear combinations are called predictable functions. A function $\mathbf{K}^{\prime} \boldsymbol{\beta}+\mathbf{M}^{\prime} \mathbf{u}$ is predictable if its $\mathbf{K}^{\prime} \boldsymbol{\beta}$ component is estimable.
+
+Using the mixed model equation solution for $\boldsymbol{\beta}$ in an estimable function results in the **best linear unbiased estimate (BLUE)** of $\mathbf{K}^{\prime} \boldsymbol{\beta}$. For predictable functions, the solutions for $\boldsymbol{\beta}$ and $\mathbf{u}$ provide the **best linear unbiased predictor (BLUP)** of $\mathbf{K}^{\prime} \boldsymbol{\beta}+\mathbf{M}^{\prime} \mathbf{u}$.
+
+To summarize, linear combinations of fixed effects only are called estimable functions. The solution of the mixed model equations results in estimates, or BLUEs, of $\mathbf{K}^{\prime} \boldsymbol{\beta}$. Linear combinations of fixed and random effects are called predictable functions. Solving the mixed model equations yields predictors, or BLUPs, of $\mathbf{K}^{\prime} \boldsymbol{\beta}+\mathbf{M}^{\prime} \mathbf{u}$.
+
+
+
+# Missing Data in MMRM
+
+MMRM is an advanced extension of the analysis of covariance (ANCOVA) tailored for repeated assessments in clinical trials. It specifically addresses the scenario where data may be missing from subjects who drop out before the study concludes.
+
+- **Treatment Group Differences:** MMRM estimates differences between treatment groups at the primary endpoint, typically the final visit of the treatment phase, while utilizing all available data, including that from subjects who dropped out early.
+- **Assumption of Data:** The model operates under the assumption that data is missing at random (MAR), which simplifies the handling of incomplete data sets.
+- **Model Configuration:** MMRM is a specific form of the mixed linear model, often implemented without random effects. It treats the timing of post-baseline visits as categorical variables and imposes a structure on the variance-covariance pattern across these visits.
+- **Variance-Covariance Structure:** An unstructured variance-covariance pattern is preferred due to its minimal assumptions, enhancing the model's flexibility in estimating outcomes at each visit. However, this choice may sometimes lead to issues with model convergence.
+- **Planning and Backup:** The variance-covariance pattern must be specified in the analysis plan, with an alternative pattern pre-specified in case the primary model fails to converge.
+- **Preliminary Data Analysis:** Before starting the analysis, it's crucial to assess the amount and pattern of missing data through appropriate descriptive displays.
+- **Extension to Binary Data:** For repeated binary outcomes, an extension of MMRM can be implemented using a Generalized Linear Mixed Model (GLMM), which typically assumes that data are missing completely at random (MCAR). Despite this assumption, the estimates from GLMM can remain robust even with mild deviations from MCAR.
+- **Sensitivity Analysis:** Sensitivity analysis should be pre-planned to test the robustness of the study findings against the assumptions of MAR
+
+
+## Introduction
+
+Mixed linear models represent a comprehensive family of likelihood-based models that estimate linear functions of correlated data. These models uniquely blend fixed and random effects to evaluate repeated measurements, making them particularly useful in contexts where the data points are interrelated within subjects over time. Such models are invaluable in handling incomplete data sets, common in scenarios where patients might discontinue a study. The concept of "mixed model for repeated measures" (MMRM), as introduced by Mallinckrodt et al., is a specialized adaptation within this family designed to compare treatment groups at the final time point of a clinical trial with minimal assumptions about the trends in the outcome measure (Mallinckrodt et al., 2003; 2008).
+
+Traditional approaches to modeling repeated measurements often involve fitting linear or quadratic regression slopes to time-series data. This method, however, presupposes the accuracy of the modeled slope as the true trajectory of symptom progression, a significant assumption that can be problematic in clinical trials seeking regulatory approval. Unlike these approaches, MMRM categorizes time as a classification variable, avoiding assumptions about the progression pattern over time. The model leverages the intrinsic mixed model functionality to account for correlations between repeated visits, using these estimated correlations to infer outcomes at the primary endpoint, even in the presence of missing data from patient dropouts.
+
+Historically, the analysis of covariance with last observation carried forward (LOCF) imputation was the standard for analyzing primary continuous outcomes in FDA new drug applications. However, the LOCF method often assumes no subsequent change post-discontinuation, which can inadvertently bias results in favor of the experimental arm. MMRM, by assuming that missing data are missing at random (MAR), generally provides less biased estimates at crucial endpoints compared to LOCF (Mallinckrodt et al., 2001a; 2001b; 2004; Siddiqui et al., 2009).
+
+MMRM shares structural similarities with ANCOVA, making it straightforward to describe, present, and interpret results. This similarity has been emphasized in the FDA-endorsed National Research Council report on the prevention and treatment of missing data, which highlights the importance of choosing interpretable methods for handling missing data (National Research Council, 2010).
+
+In addition to handling continuous outcomes, MMRM can be adapted for binary data, such as responder or relapse status, by employing a generalized linear mixed model (GLMM) approach. This adaptation allows for the computation of odds ratios (ORs) comparing treatment effects at the final study visit.
+
+
+## Mixed Model and MMRM 
+
+Consider a clinical trial dataset where each participant \( i \) is subject to multiple post-baseline assessments. While all participants follow a standardized visit schedule, instances of missing measurements arise due to "skipped" visits or premature trial discontinuation.
+
+For a continuous outcome variable \( y \) for subject \( i \) at visit \( j \) under treatment \( t \), the model is formulated as:
+\[ y_{ij} = \beta_{0jt} + \sum_{s} x_{ijs} \beta_s + e_{ij} \]
+where:
+- \( \beta_{0jt} \) represents the interaction term between visit and treatment,
+- \( \beta_1 \) to \( \beta_s \) are coefficients for explanatory variables \( x_1 \) to \( x_s \),
+- \( e_{ij} \) denotes the residuals.
+
+Explanatory variables can either be consistent across all visits for a subject or vary between visits. Using matrix notation for clarity, the model for all observations across subjects is expressed as:
+\[ Y = X\beta + e \]
+where:
+- \( Y \) is the vector of outcomes for each visit,
+- \( X \) is the matrix of explanatory variables (including visit, treatment, and interactions),
+- \( \beta \) represents fixed regression coefficients,
+- \( e \) is the vector of residuals.
+
+In a standard linear model, observations are considered independent, leading to a simplified variance-covariance matrix:
+\[ V = \sigma^2 I_{NJ} \]
+However, because repeated measures within a subject are correlated, a mixed effects model is more appropriate:
+\[ Y = X\beta + Z\gamma + e \]
+Here:
+- \( \gamma \) is a vector of random parameters,
+- \( Z \) is the design matrix for random effects,
+- \( G \) and \( R \) are the variance-covariance matrices for \( \gamma \) and \( e \), respectively.
+
+The overall variance-covariance matrix of outcomes \( Y \) is:
+\[ V = ZGZ^T + R \]
+
+MMRM focuses on the correlation of errors within a subject without incorporating random effects, making it distinct within mixed models:
+\[ \Omega_i = R_i \ \text{(for all i)} \]
+where \( R_i \) defines the covariance structure of residuals for subject \( i \).
+
+Each \( R_i \) forms a block in the overall diagonal matrix \( R \), aligning with the data's structure per subject. The matrix \( R \) is customized per the data's needs (discussed in Section 5.2.2), and parameters are estimated using Restricted Maximum Likelihood (REML).
+
+
+## Covariance Structures
+
+Covariance Structures
+When choosing a covariance matrix R, there are several options available. It might seem tempting to delay selecting a covariance structure until the end of a study to find the best fit for the data. However, this approach might be considered data dredging, as it seeks to favorably adjust the results for the test treatment. To avoid this bias, it is crucial to specify the covariance structure beforehand in the study's protocol or analysis plan. In regulatory contexts, pre-defining the covariance structure is mandatory.
+
+Key Considerations for Covariance Structures
+Two main considerations are crucial when selecting a covariance structure:
+1. The ability to accurately represent correlations between measurements while minimizing assumptions.
+2. Ensuring that the chosen covariance structure allows for convergence in the MMRM (Mixed Models for Repeated Measures) model.
+
+Common Covariance Structures
+Several covariance structures are commonly used:
+
+- **Unstructured**: This structure assumes each visit has a unique variance, and each pair of visits has a distinct correlation, making it a highly flexible option that is preferred if convergence is not an issue. However, it involves estimating a large number of parameters, which can be problematic with small sample sizes or many visits.
+   - This is the most flexible covariance structure where each pair of visits can have a unique covariance, and each visit can have a unique variance. The matrix for this pattern, when there are four visits, might look like this:
+     \[
+     \begin{pmatrix}
+     \sigma^2_1 & \sigma_{12} & \sigma_{13} & \sigma_{14} \\
+     \sigma_{12} & \sigma^2_2 & \sigma_{23} & \sigma_{24} \\
+     \sigma_{13} & \sigma_{23} & \sigma^2_3 & \sigma_{34} \\
+     \sigma_{14} & \sigma_{24} & \sigma_{34} & \sigma^2_4
+     \end{pmatrix}
+     \]
+   - Each off-diagonal element \(\sigma_{ij}\) represents the covariance between the \(i\)th and \(j\)th visits, and each diagonal element \(\sigma^2_i\) is the variance at the \(i\)th visit.
+   
+   
+- **Toeplitz and Heterogeneous Toeplitz**: These structures are useful as backup options if the unstructured pattern fails to converge. The Toeplitz pattern assumes equal variance across visits and consistent correlations for visits equally spaced apart, which can help in convergence due to fewer parameters required. The heterogeneous Toeplitz variant allows for different variances across visits, adding flexibility.
+   - **Toeplitz (TOEP)**:
+     - Assumes a constant variance across all visits and a constant covariance for visits equally spaced apart. A Toeplitz matrix for four visits might look like this:
+       \[
+       \begin{pmatrix}
+       \sigma^2 & \rho_1 & \rho_2 & \rho_3 \\
+       \rho_1 & \sigma^2 & \rho_1 & \rho_2 \\
+       \rho_2 & \rho_1 & \sigma^2 & \rho_1 \\
+       \rho_3 & \rho_2 & \rho_1 & \sigma^2
+       \end{pmatrix}
+       \]
+     - Here, \(\sigma^2\) is the common variance, and \(\rho_k\) is the covariance between visits \(k\) steps apart.
+   - **Heterogeneous Toeplitz (TOEPH)**:
+     - Allows for different variances at each visit while maintaining the Toeplitz structure for covariances:
+       \[
+       \begin{pmatrix}
+       \sigma^2_1 & \rho_1 & \rho_2 & \rho_3 \\
+       \rho_1 & \sigma^2_2 & \rho_1 & \rho_2 \\
+       \rho_2 & \rho_1 & \sigma^2_3 & \rho_1 \\
+       \rho_3 & \rho_2 & \rho_1 & \sigma^2_4
+       \end{pmatrix}
+       \]
+
+
+- **Spatial Power and AR(1)**: These patterns are suitable when visits are not equally spaced, as they consider the time intervals between visits to model correlations. They generally require fewer parameters than the unstructured pattern, making them potentially more robust in studies with many visits.
+   - **Spatial Power**:
+     - The covariances decrease with the increase in time between visits. For four visits, if \(\rho(d_{ij})\) denotes the correlation based on the distance \(d_{ij}\) between visits \(i\) and \(j\), the matrix might look like:
+       \[
+       \begin{pmatrix}
+       \sigma^2 & \rho(d_{12}) & \rho(d_{13}) & \rho(d_{14}) \\
+       \rho(d_{12}) & \sigma^2 & \rho(d_{23}) & \rho(d_{24}) \\
+       \rho(d_{13}) & \rho(d_{23}) & \sigma^2 & \rho(d_{34}) \\
+       \rho(d_{14}) & \rho(d_{24}) & \rho(d_{34}) & \sigma^2
+       \end{pmatrix}
+       \]
+   - **AR(1)**:
+     - Assumes that correlations between visits decrease exponentially with the number of visits separating them. For four visits, the matrix could look like:
+       \[
+       \begin{pmatrix}
+       \sigma^2 & \rho & \rho^2 & \rho^3 \\
+       \rho & \sigma^2 & \rho & \rho^2 \\
+       \rho^2 & \rho & \sigma^2 & \rho \\
+       \rho^3 & \rho^2 & \rho & \sigma^2
+       \end{pmatrix}
+       \]
+     - Here, \(\rho\) is the correlation between consecutive visits, and \(\rho^k\) is the correlation between visits \(k\) intervals apart.
+
+
+Specifics of Some Covariance Patterns
+- **Unstructured Pattern**: Best for scenarios with no convergence concerns; allows data-driven estimates with minimal assumptions. Suitable for clinical trials with fixed visit schedules.
+- **Toeplitz and Heterogeneous Toeplitz Patterns**: Good secondary choices if the unstructured pattern does not converge, with Toeplitz being simpler but less flexible compared to the heterogeneous variant.
+- **Spatial Patterns**: Ideal for trials with uneven visit intervals, focusing on the time between visits to determine correlations, potentially offering a more realistic representation of the data.
+
+**Note**:
+
+The Toeplitz and Heterogeneous Toeplitz covariance structures are indeed sensitive to the ordering of data, particularly the sequence in which visits or measurements occur. This sensitivity arises from the core assumptions these patterns make about the data:
+
+1. **Toeplitz Covariance Structure:**
+   - **Assumption of Stationarity**: The Toeplitz structure assumes that the covariance between any two measurements depends only on the time interval or lag between them, not on the specific time points at which the measurements are taken. This implies that the data must be ordered in such a way that this assumption holds true across all intervals. For instance, the correlation between the first and third time points is assumed to be the same as the correlation between the second and fourth time points, as long as the interval between these points is the same.
+   - **Sensitivity to Ordering**: If the data are not ordered chronologically or if the intervals between successive measurements vary in a way that does not align with the assumptions of the Toeplitz structure, the resulting covariance estimates may not accurately reflect the underlying patterns of correlation in the data.
+
+2. **Heterogeneous Toeplitz Covariance Structure:**
+   - **Extension of Toeplitz Assumptions**: While the Heterogeneous Toeplitz structure allows for different variances at each time point, it still assumes that the covariance between measurements is based solely on their intervals. Thus, like the standard Toeplitz structure, it assumes that all pairs of measurements separated by the same number of time intervals have the same covariance, regardless of their absolute positioning in the timeline.
+   - **Sensitivity to Ordering and Variance Considerations**: This structure’s allowance for heterogeneous variances adds flexibility but does not alleviate the requirement that data must be properly ordered according to the intervals between measurements. Misordering can lead to incorrect estimates not only of the covariances but also of the variances at each time point, given that each variance parameter is tied to a specific position in the sequence.
+
+**Implications for Data Analysis:**
+
+- **Careful Data Preparation**: When using either Toeplitz or Heterogeneous Toeplitz structures, it is crucial to ensure that data are ordered correctly and consistently, particularly in studies where measurements are taken at irregular intervals or where missing data may disrupt the sequence of intervals.
+- **Model Suitability Evaluation**: Before applying these structures, researchers should evaluate whether the assumption of equidistant (or at least pattern-consistent) intervals holds for their data. If measurements are not equidistant but are assumed to be in the analysis, the covariance structure may misrepresent the actual correlations.
+
+## MMRM versus GEE
+
+For achieving accurate estimates in Mixed Models for Repeated Measures (MMRM), selecting the appropriate variance-covariance matrix is critical. An unstructured pattern, while imposing minimal assumptions about the correlation structure, may not always be feasible due to its requirement for large parameter estimates, especially in studies with numerous time points or small sample sizes. In such cases, choosing a less flexible covariance structure could lead to bias if it doesn't properly represent the underlying correlations among the repeated measures.
+
+**Empirical Sandwich Estimator:**
+To mitigate the risk of bias from misspecified covariance structures, regulatory bodies like the FDA sometimes recommend supplementing primary MMRM analyses with an empirical sandwich estimator. This estimator provides asymptotically consistent estimates of the variance-covariance matrix for the fixed effects, making the fixed effect estimates asymptotically unbiased and robust against correlation pattern misspecification. However, the sandwich estimator comes with its own requirements and limitations:
+- **Assumption of Missing Completely at Random (MCAR)**: The data must be MCAR, which is a stronger condition than Missing at Random (MAR), typically required for model-based estimators. When data are MAR but not MCAR, using the sandwich estimator can result in biased analyses.
+- **Use in Sensitivity Analysis**: Given its reliance on the MCAR assumption, it's prudent to use the sandwich estimator as a secondary analysis in MMRM studies to assess the robustness of the results obtained from the primary analysis that uses a structured correlation pattern.
+
+**Generalized Estimating Equations (GEE):**
+- **Comparison to MMRM**: GEE is another method used for dealing with repeated measures, particularly with binary outcomes but also applicable to normally distributed data. Like MMRM utilizing a sandwich estimator, GEE provides asymptotically unbiased estimates of the fixed effects under the condition of MCAR.
+- **Working Correlation Matrix**: In GEE, the correlation among repeated measures is captured by a "working" correlation matrix, estimated using the method of moments. This is analogous to specifying a covariance structure in MMRM but is termed as a working matrix because it does not necessarily need to correctly specify the true correlations to achieve consistency.
+- **Efficiency and Sample Size**: GEE typically requires a larger sample size to satisfy its asymptotic properties compared to MMRM under MAR. If the working correlation matrix is misspecified, GEE can lose efficiency, leading to wider confidence intervals and less precise estimates.
+
+**Sensitivity Analyses**:
+- Given the complexities and assumptions involved with both the sandwich estimator and GEE, additional sensitivity analyses are often discussed in clinical trial reports to ensure the robustness and validity of the findings. These analyses help identify the impact of different assumptions on the study's conclusions.
+
+## MMRM vs LOCF
+
+When considering the analysis of longitudinal data in clinical trials, Mixed Models for Repeated Measures (MMRM) and Last Observation Carried Forward (LOCF) represent two common approaches. Each has its own assumptions, strengths, and weaknesses.  
+
+- **MMRM** is generally preferred for its flexibility and ability to handle more complex data structures and missing data patterns. It is better suited for more rigorous scientific inquiries where assumptions about data continuity post-dropout are less realistic.
+- **LOCF** might still be used for its simplicity and historical precedence in certain regulatory contexts, but it is typically considered less robust and less reliable for drawing conclusions about treatment effects, especially in conditions that evolve over time.
+- Despite its limitations, **LOCF** has been historically significant and is still requested by regulatory authorities like the FDA in some situations. Therefore, including LOCF analyses as a supplementary descriptive analysis might still be relevant, especially for conditions that are stable over time.
+
+**Assumptions and Biases**
+
+1. **Residual Error Normality**:
+   - Both MMRM and ANCOVA of LOCF data assume that the residual errors are normally distributed. This is a common assumption in many statistical tests to ensure the validity of inference.
+
+2. **Handling of Missing Data**:
+   - **MMRM**: Assumes that the missing data are Missing at Random (MAR). This means that the likelihood of missing data depends on the observed data but not on the unobserved data.
+   - **LOCF**: Assumes that the data after a subject drops out remain constant over time. This is a strong and often unrealistic assumption, especially in studies where the condition of subjects is expected to change over time.
+
+3. **Bias with MNAR Data**:
+   - Both methods are biased if the data are Missing Not at Random (MNAR); however, simulations suggest that MMRM tends to be less biased compared to LOCF. This is primarily because MMRM leverages more of the available data and patterns within it, whereas LOCF ignores any changes after the point of dropout.
+
+**Variance and Error Estimates**
+
+- **MMRM** generally produces larger variance estimates than LOCF. This is because LOCF tends to underestimate standard errors due to its simplistic assumption about data post-dropout, potentially leading to misleading confidence intervals and p-values.
+- In some cases, however, LOCF might show a higher variance than MMRM, particularly when the last observed values are significantly different from subsequent values (which are ignored in LOCF but modeled in MMRM).
+
+**Treatment Effect Estimates**
+
+- **LOCF** can lead to treatment effect estimates that deviate significantly from those derived under MAR or MCAR assumptions. The direction of this deviation (whether conservative or anti-conservative) depends on the nature of the data and the progression of the condition being studied.
+- **MMRM**, while also requiring correct specification of the covariance structure for unbiased estimates, tends to maintain a better control over Type I error rates compared to LOCF, even if the covariance pattern is misspecified.
+
+## Applying MMRM
+
+For an effective analysis, it's crucial to articulate a clear and complete description in the statistical analysis plan (SAP) prior to unblinding the trial. Here's how MMRM can be framed for a Parkinson’s disease trial, focusing on changes from baseline in the Unified Parkinson’s Disease Rating Scale (UPDRS) Total Score at Week 28:
+
+* Model Description: Utilize a mixed effects ANCOVA model for repeated measures. The dependent variable is the observed change from baseline score at each scheduled post-baseline visit (Visits 1 to 8).
+* Fixed Effects: Include the baseline UPDRS total score as a covariate, along with categorical factors for geographic region, treatment group, and visit, plus interactions between baseline × visit and treatment × visit.
+* Covariance Structure: Use an unstructured covariance pattern to estimate the variance–covariance of the within-subject repeated measures. If this fails to converge, switch to a heterogeneous Toeplitz covariance pattern.
+* Parameter Estimation: Employ REML with the Newton–Raphson algorithm, and use the Kenward–Roger method for calculating denominator degrees of freedom.
+* The primary objective is to assess treatment differences at Week 28 using least squares (LS) means derived from the model, testing the hypothesis that response profiles over time are parallel across treatment groups.
+
+```
+Treatment groups will be compared for the change from baseline in the Unified
+Parkinson’s Disease Rating Scale (UPDRS) Total Score at Week 28 using a mixed
+effects ANCOVA model for repeated measures (MMRM). The observed change
+from baseline score at each scheduled post-baseline visit (Visits 1 to 8) is the
+dependent variable. The model will include the baseline UPDRS total score as a
+fixed effect covariate, with fixed effect categorical factors for geographic region
+(North America, South America, Western Europe, Eastern Europe and Asia),
+treatment group (Active and Placebo), visit and baseline × visit and treatment ×
+visit interactions. The interactions will remain in the model regardless of significance. Treatment group comparisons at each visit will be estimated by differences
+between least squares (LS) means from the treatment × visit interaction, with
+accompanying p-values and 95% CIs. An unstructured covariance pattern will be
+used to estimate the variance–covariance of the within-subject repeated measures.
+Parameters will be estimated using REML with the Newton–Raphson algorithm
+and using the Kenward–Roger method for calculating the denominator degrees of freedom.
+In case this model does not converge, a heterogeneous Toeplitz covariance
+pattern will be used in place of unstructured. In this case, to assess the robustness
+of the results, a supportive model using a sandwich estimator for the standard
+error of the fixed effects parameters will also be produced.
+```
+
+```
+PROC MIXED DATA=updrs_v;
+  CLASS subjid region trt visit ;
+  MODEL change = base_upd region trt visit trt*visit
+  base_upd*visit / DDFM=KR ;
+  REPEATED visit / TYPE=UN SUBJECT=subjid R RCORR;
+  LSMEANS trt*visit / PDIFF CL;
+  ESTIMATE “TRT 1 vs 2 at visit 8” TRT 1 -1
+  TRT*VISIT 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 -1 /CL ;
+RUN;
+```
+
+### Strategies to Improve Convergence {-}
+
+1. **Site Pooling**: In clinical trials, especially multinational Phase III trials, adjusting for investigator sites is beneficial but challenging due to potentially small sample sizes per site. Pre-planned pooling of small sites can aid model convergence. Sites might be grouped by geographic location, type, or subject numbers. The pooling strategy should aim to balance the size of pooled sites to prevent any single site from dominating the analysis.
+
+2. **Baseline × Visit Interaction**: Including this interaction helps account for potential differences in how baseline conditions influence changes over time. However, if the trial has many visits and a small sample size, it might be necessary to simplify the model by excluding this term, although it's generally advisable to retain it when feasible.
+
+
+**Generalized Estimating Equations (GEE) Compariso**
+
+Though less commonly used for normally distributed outcomes, GEE provides a robust alternative that is less sensitive to the covariance structure:
+
+```
+proc genmod data=updrs_v;
+   class subjid region trt visit;
+   model change = baseline region trt visit trt*visit baseline*visit / dist=normal link=identity;
+   repeated subject=subjid / type=cs corrw;
+   lsmeans trt*visit / pdiff cl;
+   estimate 'TRT 1 vs 2 at visit 8' trt 1 -1 trt*visit 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 -1;
+run;
+```
+
+In SAS, GENMOD has fewer options for fitting the working correlation structure than MIXED, as less emphasis is placed on fitting the structure in GEE since GEE estimates are asymptotically unbiased regardless of the covariance matrix selected, under the MCAR assumption. Due to the relatively large sample size required for GEE estimation, and the small number of subjects in our example, the GEE algorithm would not converge with an unstructured pattern. Compound symmetry, also called exchangeable, was selected instead. The compound symmetry structure estimates one covariance term, and assumes homogeneous variances and covariances across all visits. Results are similar to the MMRM using the spatial power with random subject effect and sandwich estimator
+
+
+### Treatment by Subgroup and Site Interactions {-}
+
+
+1. **Treatment by Subgroup and Site Interactions**:
+   - **Importance**: It's essential for phase III clinical trials to evaluate interactions between treatment and trial site as specified in the analysis plan. Similarly, treatment by subgroup interactions must be assessed before submitting a new drug application.
+   - **Specific Example**: For a Parkinson’s disease study, the interaction between treatment and gender is analyzed, particularly focusing on Week 28 (Visit 8). Although a one-degree freedom interaction (treatment × gender) across all visits is considered, the primary focus is on Visit 8. To do this, a more complex three-way interaction (treatment × gender × visit) involving seven degrees of freedom is assessed specifically at Visit 8 using contrast statements in SAS.
+   - **SAS Implementation**: The SAS code provided illustrates how to test these interactions at Visit 8. It includes sorting the data and ensuring consistency in the order of items in the class, model, and contrast statements.
+
+2. **Testing Interaction with Regions**:
+   - **Complexity in Regions**: Testing the interaction between treatment and region at Visit 8 involves a four degrees of freedom test due to the presence of five regions, which is handled through a complex contrast statement. The approach involves comparing differences between regions and adjusting the coefficients accordingly.
+
+3. **Effect Size Calculation**:
+   - **Utility**: Calculating the effect size is crucial for quantifying the treatment difference in standardized terms, which helps in assessing the treatment's effectiveness and planning sample sizes for future trials.
+       - The effect size, often referred to as Cohen's d, is calculated using the formula:
+\[ \text{Effect size (Cohen's d)} = \frac{\text{LSMean difference}}{\sqrt{\text{Variance}}} \] Where:
+       - **LSMean difference** is the least squares mean difference between treatment groups.
+       - **Variance** is the estimated variance of the change from baseline at a specific visit.
+       1. **Estimate the LSMean Difference**: involves calculating the difference in the least squares means between two treatment groups at a specific time point or visit. In clinical trials, this typically represents the difference in the primary outcome between groups (e.g., the difference in symptom severity between a treatment group and a placebo group).
+       2. **Determine the Variance**: The variance used in the denominator is the variance of the change from baseline for a specific visit. This variance can be estimated from a mixed model, such as the mixed models for repeated measures (MMRM). In SAS, this would typically be extracted from the variance-covariance matrix (R matrix) that is outputted by the PROC MIXED procedure. The specific variance estimate would be from the diagonal cells of the R matrix associated with the visit of interest.
+       3. **Compute Cohen's d**: Divide the LSMean difference by the square root of the variance estimate to get Cohen's d. This provides a standardized measure of effect size, facilitating comparisons across studies or different measurement scales.
+       4. **Interpreting Cohen's d**: **Values of Cohen’s d**: Typically, a Cohen's d value of 0.2 is considered a small effect, 0.5 a medium effect, and 0.8 or higher a large effect. These thresholds help determine the clinical significance of the treatment effect. Even a small effect size (like 0.2) might be considered significant in clinical terms, depending on the context and the condition being treated.
+
+### Constrained Longitudinal Data Analysis (cLDA) {-}
+
+**Alternative Modeling Strategy - cLDA**:
+   - **cLDA vs. MMRM**: The constrained longitudinal data analysis (cLDA) method treats the baseline score as another repeated measurement, differing from the more traditional ANCOVA method used in MMRM. This approach might provide benefits, especially in estimating the treatment group differences in the presence of missing data.
+   - **Implementation and Comparison**: The cLDA model tends to estimate fewer covariance parameters and is presented as potentially more challenging to program and interpret.
+
+```
+PROC MIXED DATA=updrs_v;
+  CLASS subjid region trt visit ;
+  MODEL updrs = region vis1 vis2 vis3 vis4 vis5 vis6 vis7 vis8
+  trt*vis1 trt*vis2 trt*vis3 trt*vis4 trt*vis5
+  trt*vis6 trt*vis7 trt*vis8 / DDFM=KR ;
+  REPEATED visit / TYPE=UN SUBJECT=subjid R RCORR;
+  ESTIMATE ’BL lsmean’ INTERCEPT 1 region 0.2 0.2 0.2 0.2 0.2 ;
+  ESTIMATE ’vis 8 chg from BL trt 1’ vis8 1 trt*vis8 1 0 / cl;
+  ESTIMATE ’vis 8 chg from BL trt 2’ vis8 1 trt*vis8 0 1 / cl;
+  ESTIMATE ’active - placebo at v8’ trt*vis8 -1 1 / cl ;
+RUN;
+```
+
+The cLDA model is designed to analyze data where repeated measurements are taken over time on the same subjects, which is typical in clinical trials. Unlike traditional models that treat baseline values as a covariate, the cLDA incorporates the baseline as another repeated measurement within the model. This approach can be beneficial, especially when considering the full trajectory of response over time and handling missing data effectively.
+
+**Key Features of cLDA**
+
+1. **Treatment of Baseline Measurements**:
+   - In cLDA, the baseline score is included as a repeated measure rather than being used as a covariate. This means that the baseline becomes part of the sequence of observations that are modeled together.
+   - By treating baseline as a repeated measure, cLDA can directly incorporate the baseline variability into the model's estimation process, potentially leading to a more accurate understanding of how subjects' responses change over time relative to their starting points.
+
+2. **Modeling Structure**:
+   - The cLDA model constrains the mean of the baseline scores to be the same across different treatment groups. This assumption is reasonable under randomization in clinical trials, where baseline characteristics should be balanced across groups.
+   - The model also allows for the estimation of the overall treatment effect by comparing the trajectories of response over time between different treatment groups.
+
+3. **Handling of Covariance**:
+   - With cLDA, there is an opportunity to model the covariance structure more comprehensively by using all available repeated measurements, including baseline. This can provide a richer estimation of the correlation structure across time points.
+   - More covariance parameters may be estimated compared to traditional methods, which can lead to more robust handling of missing data. This is because the correlation structure helps inform the imputation of missing observations based on observed data patterns.
+
+**Advantages of cLDA**
+
+- **Enhanced Handling of Missing Data**: By using all repeated measures, cLDA can utilize the inherent correlations in the data to better predict missing values, which is particularly useful in longitudinal studies where dropout rates can be significant.
+- **Improved Estimation of Treatment Effects**: The inclusion of baseline as a repeated measure allows the model to account for individual variations at the start of the study, potentially leading to more precise estimates of treatment effects.
+
+**Disadvantages of cLDA**
+
+- **Complexity in Estimation**: The inclusion of more covariance parameters to estimate can increase the complexity of the model, potentially leading to issues with convergence in the fitting process.
+- **Statistical Power**: The increased number of parameters might also impact the statistical power of the test for treatment group differences, particularly in studies with smaller sample sizes.
+
+
+## Generalized Linear Mixed Model (GLMM)
+
+- **Basic Concept**: GLMM extends the linear mixed model (which assumes a normally distributed outcome) to accommodate various distributions of the response variable. This is crucial when the response variable does not follow a normal distribution, such as binary outcomes in logistic regression.
+- **Components of GLMM**:
+  - **Linear Predictors (Xβ)**: This component models the fixed effects, similar to traditional regression models but suited for mixed effects with repeated measures.
+  - **Link Function**: This is a monotonic mapping function that relates the mean of the dependent variable to the linear predictors. In the context of binary data and logistic regression, the logit (log-odds) function is used.
+  - **Error Distribution**: The model error follows a distribution within the exponential family. For binary outcomes, this is typically the binomial distribution. 
+  
+
+### Logistic Regression as a GLMM {-}
+
+- **Application in Repeated Measures**: When modeling binary repeated measures data, the logistic regression model can be adapted into a GLMM framework. This approach allows for the modeling of correlations among repeated measurements on the same subject, which is essential for data integrity and accuracy in estimates.
+- **Logit Transformation**: The logit, defined as \( \log\left(\frac{p}{1-p}\right) \), where \( p \) is the probability of an event, is used as the link function.
+- **Model Estimation**:
+  - The response probability for a subject visit \( y_{ij} \) is transformed using the logit function and modeled as a linear combination of predictors: \( \logit(\mathbb{E}[y_{ij}]) = x_{ij}\beta \).
+  - This model estimates the odds ratio as \( e^{x_{ij}\beta} \), and the predicted probability is \( \frac{e^{x_{ij}\beta}}{1 + e^{x_{ij}\beta}} \).
+
+**Estimation Techniques**
+
+- **Restricted Pseudolikelihood**: Unlike linear mixed models, GLMMs are typically estimated using iterative methods like restricted pseudolikelihood due to the complexity of the error structure and the link function.
+- **Handling of Variance-Covariance**: The variance-covariance matrix, crucial for understanding relationships among repeated measures, is modeled using a specified structure. The matrix \( A \) contains variances that depend on the model's error distribution, particularly for binomial outcomes in logistic regression.
+
+**Considerations**
+
+- **Random Effects**: In the logistic regression version of MMRM, random effects are limited to those arising from correlations among repeated measurements. This simplifies the model to \( P = X\beta + e \), excluding random slopes or other complex random structures.
+- **Optimization and Convergence**: Various optimization techniques, like Newton–Raphson with ridging, may be employed. These methods address the challenges in convergence due to the complexity of the model’s structure.
+- **Data Assumptions**: The logistic regression GLMM assumes that data are missing completely at random (MCAR). If data is missing at random (MAR) but the correlation structure is correctly specified, GLMM tends to provide more reliable estimates compared to other methods like Generalized Estimating Equations (GEE), which also assume MCAR.
+
+### Applying MMRM
+
+```
+Treatment groups will be compared for odds of response at Day 28 using a logistic
+GLMM for repeated measures. Response or non-response at each scheduled postbaseline visit (Visits 1 to 5) is the dependent variable. Subjects who discontinued
+very early without providing a post-baseline YMRS score will be considered
+non-responders at Visit 1 (Day 4). The logistic GLMM is fit using the logit link
+and the binomial distribution. The model will include the baseline YMRS total
+score as a fixed effect covariate, with fixed effect categorical factors for pooled
+investigator site (defined elsewhere in the SAP), treatment group (Experimental
+and Control), visit and baseline × visit and treatment × visit interactions. The
+interactions will remain in the model regardless of significance. Treatment group
+comparisons at each visit will be estimated by differences between LS means
+from the treatment × visit interaction, and will be presented as odds ratios with
+accompanying p-values and 95% CIs. The predicted probability of response at
+each visit will also be presented. An unstructured covariance pattern will be used
+to estimate the variance–covariance of the within-subject repeated measures i.e.,
+as R-side random effects. Parameters will be estimated using restricted pseudolikelihood with Newton–Raphson ridging optimization and the Kenward–Roger
+method for calculating the denominator degrees of freedom.
+In case this model does not converge, a heterogeneous Toeplitz covariance
+pattern will be used in place of unstructured. In this case, to assess the robustness
+of the results, a supportive model will also be produced using the bias-corrected
+sandwich estimator HC3 (MacKinnon and White, 1985) for the standard error of
+the fixed effects parameters.
+```
+Pooling investigator sites in logistic regression models for clinical trials with binary responses is a strategy designed to improve model convergence and enhance statistical power. This approach is particularly relevant when dealing with low event rates at individual sites, which can hamper the ability of logistic models to converge successfully. Here's a detailed breakdown of the site pooling strategy for logistic regression, its rationale, and its implementation in SAS:
+
+**Rationale for Site Pooling in Logistic Regression**
+
+1. **Convergence Issues**: Logistic regression models can struggle to converge when individual sites have low event rates. This is because the model relies on sufficient variation and number of events (outcomes) to estimate the parameters accurately.
+
+2. **Variance Reduction**: Adjusting for site differences can significantly reduce variance in the model estimates, leading to more reliable results and increased power to detect true effects.
+
+3. **Event Rates**: For logistic regression, the number of subjects with events (rather than the total number of subjects) at each site is crucial. Low event rates can lead to instability in model estimates.
+
+**Guidelines for Site Pooling**
+
+1. **Conservative Pooling**: Given the dependency on event rates, site pooling for logistic regression often needs to be more conservative compared to pooling for linear models. This means pooling more sites together to ensure adequate events per site.
+
+2. **Event Thresholds**: A common guideline suggests having at least 5-10 events per category of a categorical predictor to maintain adequate model stability and convergence. Below 5 events per category can significantly jeopardize model convergence.
+
+3. **Analysis Plan**: The method and specifics of site pooling should be predetermined and documented in the analysis plan before unblinding the study. This is crucial for maintaining the integrity of the analysis and avoiding bias.
+
+The SAS code provided uses PROC GLIMMIX, which is suited for generalized linear mixed models, including logistic regression with random effects:
+
+```sas
+PROC GLIMMIX DATA=mania_v;
+NLOPTIONS TECHNIQUE=NRRIDG;
+CLASS subjid poolinv trt visit;
+MODEL RESPONSE = base_ymrs poolinv trt visit trt*visit base_ymrs*visit /
+                DIST=BIN LINK=LOGIT DDFM=KR;
+RANDOM visit / TYPE=UN SUBJECT=subjid RSIDE;
+LSMEANS trt*visit / ILINK CL; /* Estimates event rates */
+LSMEANS trt*visit / ODDSRATIO DIFF CL; /* Estimates Odds Ratios */
+ESTIMATE "Experimental vs Control at visit 5"
+         TRT -1 1 TRT*VISIT 0 0 0 0 -1 0 0 0 0 1 / EXP CL;
+RUN;
+```
+
+- **Optimization Technique**: `NRRIDG` (Newton-Raphson with ridging) is specified to aid in convergence, particularly useful in complex models or when dealing with boundary issues that logistic regression might face.
+- **Model Specifications**: The model adjusts for pooled investigator sites (`poolinv`), treatment groups (`trt`), visits (`visit`), and their interactions. It uses the logit link function appropriate for binary outcomes.
+- **Random Effects**: The `RANDOM` statement specifies that the visit effects are random, accommodating intra-subject correlation over time.
+- **Estimation and Comparison**: LSMEANS are used to estimate event rates and odds ratios, essential for interpreting treatment effects over time.
+
+### Alternate Models {-}
+
+In the context of clinical trials analyzing binary outcomes, the planned analysis may often be followed by several alternate models to provide a deeper, more robust evaluation of the data. This approach helps in understanding the influence of various modeling strategies and adjustments on the outcomes, especially in complex settings like logistic regression where model convergence can be challenging.
+
+1. **Excluding Baseline × Visit Interaction**:
+   - Removing this interaction did not significantly change the results, suggesting that this interaction may not be critical for the model in this specific study context.
+
+2. **Heterogeneous Toeplitz Covariance Structure**:
+   - This structure, which estimated fewer covariance parameters (9 instead of 15), yielded results that were similar to the more complex model but with a slightly lower odds ratio (OR) of 1.49. This suggests a potential reduction in model complexity without substantial loss of information.
+
+3. **Generalized Estimating Equations (GEE)**:
+   - A GEE model with an unstructured working covariance matrix produced an OR of 1.54, indicating similar findings to the GLMM model. This highlights that both GEE and GLMM can be suitable for handling binary repeated measures data with large sample sizes.
+ 
+The SAS code provided for the GEE model is as follows:
+
+```sas
+PROC GENMOD DATA=mania_v DESCENDING;
+CLASS subjid poolinv trt visit;
+MODEL RESPONSE = base_ymrs poolinv trt visit trt*visit base_ymrs*visit /
+DIST=BIN LINK=LOGIT TYPE3;
+REPEATED SUBJECT=subjid / TYPE=UN CORRW;
+LSMEANS trt*visit / DIFF CL;
+ESTIMATE “Experimental vs Control at visit 5”
+TRT -1 1 TRT*VISIT 0 0 0 0 -1 0 0 0 0 1 /EXP;
+RUN;
+```
+
+**Methodological Considerations**
+
+- **Model Convergence Issues**: Logistic regression models adjusted for pooled sites encountered issues at some sites with quasi-complete separation, where some sites had zero non-responders. This can lead to estimation problems and should be carefully managed, possibly by modifying pooling strategies or analytic approaches.
+- **Interpretation and Sensitivity Analyses**: Results should be interpreted with caution, especially when quasi-complete separation affects the logistic regression estimates. Sensitivity analyses, like defining all dropouts as non-responders, help assess the robustness of the findings.
+
+
+
+
+# Implementation lme4 in R
+
+The lme4 package (Bates, Maechler, Bolker, and Walker 2014a) for R (R Core Team 2015) provides functions to fit and analyze linear mixed models, generalized linear mixed models and nonlinear mixed models.
+
+At present, the main alternative to lme4 for mixed modeling in R is the nlme package (Pinheiro, Bates, DebRoy, Sarkar, and R Core Team 2014). The main features distinguishing lme4 from nlme are   
+
+		(1) more efficient linear algebra tools, giving improved performance on large problems; 
+		(2) simpler syntax and more efficient implementation for fitting models with crossed random effects; 
+		(3) the implementation of profile likelihood confidence intervals on random-effects parameters; and 
+		(4) the ability to fit generalized linear mixed models (although in this paper we restrict ourselves to linear mixed models). 
+
+The main advantage of nlme relative to lme4 is a user interface for fitting models with structure in the residuals (various forms of heteroscedasticity and autocorrelation) and in the random-effects covariance matrices (e.g., compound symmetric models).
+
+## Preface vs Linear Model
+
+```{r shrimp,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+shrimp <- read.csv("./01_Datasets/shrimp.csv",sep=",", header=TRUE)   
+# AnimalID-individual number
+# SireID-sire number
+# DamID-parent number
+# FamilyID-family number
+# SexID - sex
+# TankID-test pool number
+# M1BW-weight before entering the pool
+# M2BW - Harvest Weight and M2Age
+# The age at harvest is a numeric variable
+ 
+ggplot(data=shrimp,aes(x=SexID,y=M2BW,color=SexID))+
+  geom_boxplot()+
+  geom_dotplot(binaxis = "y",
+               stackdir = "center",
+               position = "dodge",
+               binwidth = 0.25)
+ 
+
+# Choose the model 模型中一个效应到底是作为固定效应，还是随机效应
+# "SAS for Mixed models (Second edition)": An effect is called fixed if the levels in the study represent all possible levels of the factor, or at least all levels about which inference is to be made
+# Factor effects are random if they are used in the study to represent only a sample (ideally, a random sample) of a larger set of potential levels”
+# 固定效应，该效应的所有水平在实验群体中都已经出现
+# 随机效应, 试验群体出现的该效应的水平只是一个很大水平数中的随机抽样
+# 如果我们分析一个效应的目的是为了研究它所在的一个具有概率分布的大群体的情况，那么这个效应应该作为随机效应。随机效应有两个特点，a) 它是大群体中的一个样本，b) 它具有概率分布。
+
+shrimp.lm <- lm(M2BW~SexID,shrimp)
+summary(shrimp.lm) 
+ 
+
+shrimp %>% 
+  group_by(SexID) %>% 
+  transmute(sex.mean=mean(M2BW)) %>% unique()
+ 
+ggplot(data=shrimp,aes(x=SexID,y=M2BW,color=SexID))+
+  geom_dotplot(binaxis = "y",stackdir = "center",position = "dodge",binwidth = 0.25)+
+  geom_vline(xintercept = 1)+
+  geom_vline(xintercept = 2)+
+  geom_hline(yintercept = 34.37646)+
+  geom_hline(yintercept = 28.16273)+
+  geom_abline(intercept = 34.3765+6.2137, slope=-6.2137)+
+  geom_text(x=2.4,y=31.5,label="-6.6155")+
+  annotate("segment",x=2.5,xend=2.5,y=28.16273,yend = 34.37646)
+
+# 考虑家系结构，Pop:Family为随机效应，Pop、Sex和Tank为固定效应，Sex:M1BW为协变量
+shrimp.lm.9 <- lmer(M2BW ~ 1 + PopID + SexID + TankID + SexID:M1BW 
+                    + (1|PopID:FamilyID),shrimp)
+summary(shrimp.lm.9)
+anova(shrimp.lm.9)
+
+# Compare with linear model
+shrimp.lm.8 <- lm(M2BW ~ 1 + PopID + SexID + TankID + SexID:M1BW,shrimp)
+# Mixed model Residual  Variance 12.527     
+# 考虑家系结构后，残差方差明显变小，从残差中分离出了大部分的家系方差。
+# 如果不考虑家系结构，残差方差明显被高估,估计值
+mean(resid(shrimp.lm.8)^2) 
+```
+
+ 
+## Random Slope and Intercept Model
+
+**This structure assumes that the errors are independent, and thus is termed an independent structure.**
+
+$$
+\Sigma = 
+\left[
+\begin{array}{ccc} 
+\sigma_1^2 & 0   & 0   \\
+0   & \sigma_2^2 & 0   \\
+0   & 0   & \sigma_3^2 \\
+\end{array}\right]
+$$
+
+
+### Model with One Random Intercept Effekct
+
+```{r one-random-intercept,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+## library("lmerTest") 
+load("./01_Datasets/gpa.RData")
+
+# Standard regression
+gpa_lm = lm(gpa ~ occasion, data = gpa)  
+summary(gpa_lm)
+
+# Run a mixed model, taking into account the specific effects of the students
+# (1 | student) means that the intercept allowed to be expressed by 1 varies from student to student
+gpa_mixed = lmer(gpa ~ occasion + (1 | student), data = gpa)
+summary(gpa_mixed)
+
+# Another way to interpret the variance output is to record the student variance as a percentage of the total variance, which is 0.064 / 0.122 = 52%.
+# This is also called intra-class correlation because it is also an estimate of intra-cluster correlation
+
+# Profile confidence intervals      
+confint(gpa_mixed)
+# Random effect and random interception (i.e. intercept + random effect)
+ranef(gpa_mixed)$student %>% head(5)
+
+# Occasion changes are not allowed, it is a fixed effect for all students
+coef(gpa_mixed)$student %>% head(5)
+
+# check the influence (uncertainty)
+library(merTools)
+predictInterval(gpa_mixed)   # For various model predictions, possibly with new data
+REsim(gpa_mixed)             # 随机效应估计的均值，中位数和标准差
+plotREsim(REsim(gpa_mixed))  # Plotting interval estimates
+
+# predict don't use random effects re.form = NA
+predict(gpa_mixed, re.form=NA) %>% head()
+
+# R outputs AIC and BIC values automatically. The AICC value has to be computed as
+# AICC <- -2*logLik(gpa_mixed)+2*p*n/(n-p-1)
+```
+
+### Model with random intercept and slpoe effects
+
+```{r random-intercept-slpoe,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+gpa_mixed =  lmer(gpa ~ occasion + (1 + occasion | student), data = gpa)
+summary(gpa_mixed)
+```
+
+
+## Covariance Structure using nlme
+
+A structure can be specified by adding `correlation=` to the syntax
+within thelme()function. The choices are:
+
+```         
+corSymm() (unstructured),
+corARMA(form=∼ 1|id.name, p=1, q=1) (Toeplitz),
+corCAR1(form=∼1|id.name) (spatial power),
+corAR1(form=∼1|id.name) (autoregressive),
+corCompSymm(form=∼1|id.name) (compound symmetric).
+```
+lme4 fails to model the residual covariance structure in a simple way. To estimate heterogeneous variance, It is needed to use additional weight parameters. The following will give each occasion point a unique estimate.
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+load("./01_Datasets/gpa.RData")
+## Heterogeneous variance 
+heterovar_res = lme(
+  gpa ~ occasion,
+  data = gpa,
+  random = ~ 1 | student,
+  weights = varIdent(form = ~ 1 | occasion)
+)
+summary(heterovar_res)
+
+
+## Autocorrelation
+corr_res = lme(
+  gpa ~ occasion,
+  data = gpa,
+  random = ~ 1 | student,
+  correlation = corAR1(form = ~ occasion)
+)
+
+##  new parameter in the nlme output called Phi which represents autocorrelation Phi
+summary(corr_res)
+```
+  
+
+## Advance of lme4
+
+### Output module
+
+$$
+\begin{array}{ll}
+\hline \text { Generic } & \text { Brief description of return value } \\
+\hline \text { anova } & \text { Decomposition of fixed-effects contributions } \\
+\text { as.function } & \text { Function returning profiled deviance or REML criterion. } \\
+\text { coef } & \text { Sum of the random and fixed effects for each level. } \\
+\text { confint } & \text { Confidence intervals on linear mixed-model parameters. } \\
+\text { deviance} & \text { Minus twice maximum log-likelihood. } \\
+& \text { (Use REMLcrit for the REML criterion.) } \\
+\text { df.residual } & \text { Residual degrees of freedom. } \\
+\text { drop1 } & \text { Drop allowable single terms from the model. } \\
+\text { extractAIC } & \text { Generalized Akaike information criterion } \\
+\text { fitted } & \text { Fitted values given conditional modes (Equation 13). } \\
+\text { fixef} & \text { Estimates of the fixed-effects coefficients, } \widehat{\boldsymbol{\beta}} \\
+\text { formula } & \text { Mixed-model formula of fitted model. } \\
+\text { logLik } & \text { Maximum log-likelihood. } \\
+\text { model.frame } & \text { Data required to fit the model. } \\
+\text { model.matrix } & \text { Fixed-effects model matrix, } \boldsymbol{X} . \\
+\text { ngrps } & \text { Number of levels in each grouping factor. } \\
+\text { nobs } & \text { Number of observations. } \\
+\text { plot } & \text { Diagnostic plots for mixed-model fits. } \\
+\text { predict} & \text { Various types of predicted values. } \\
+\text { print } & \text { Basic printout of mixed-model objects. } \\
+\text { profile} & \text { Profiled likelihood over various model parameters. } \\
+\text { ranef} & \text { Conditional modes of the random effects. } \\
+\text { refit} & \text { A model (re)fitted to a new set of observations of the response variable. } \\
+\text { refitML } & \text { A model (re)fitted by maximum likelihood. } \\
+\text { residuals} & \text { Various types of residual values. } \\
+\text { sigma } & \text { Residual standard deviation. } \\
+\text { simulate  } & \text { Simulated data from a fitted mixed model. } \\
+\text { termary  } & \text { Summary of a mixed model. } \\
+\text { update } & \text { Terms representation of a mixed model. } \\
+\text { VarCorr  } & \text { Estimated random-effects variances, standard deviations, and correlations. } \\
+\text { vcov } & \text { Covariance matrix of the fixed-effect estimates. } \\
+\text { weights } & \text { Prior weights used in model fitting. } \\
+\hline
+\end{array}
+$$
+
+
+
+### Fit model using High level modular structure
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+str(sleepstudy)
+
+xyplot(Reaction ~ Days | Subject, sleepstudy, aspect = "xy",
+       layout = c(9, 2), type = c("g", "p", "r"),
+       index.cond = function(x, y) coef(lm(y ~ x))[2],
+       xlab = "Days of sleep deprivation",
+       ylab = "Average reaction time (ms)",
+       as.table = TRUE)
+
+fm1 <- lmer(Reaction ~ Days + (Days | Subject), sleepstudy)
+fm2 <- lmer(Reaction ~ Days + (Days || Subject), sleepstudy)
+
+
+## Uisng High level modular structure
+parsedFormula <- lFormula(formula = Reaction ~ Days + (Days | Subject),
+                          data = sleepstudy)
+devianceFunction <- do.call(mkLmerDevfun, parsedFormula)
+optimizerOutput <- optimizeLmer(devianceFunction)
+mkMerMod(rho = environment(devianceFunction),
+         opt = optimizerOutput,
+         reTrms = parsedFormula$reTrms,
+         fr = parsedFormula$fr)
+```
+
+### Updating fitted mixed models
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+fm3 <- update(fm1, . ~ . - (Days | Subject) + (1 | Subject))
+formula(fm1)
+formula(fm3)
+```
+
+### Model Summary and Associated Accessors
+
+#### Reproduces the Model Formula and the Scaled Pearson Residuals
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+ss <- summary(fm1)
+cc <- capture.output(print(ss))
+reRow <- grep("^Random effects", cc)
+cat(cc[1:(reRow - 2)], sep = "\n")
+
+## ----summary-reproduced-------------------------------------
+formula(fm1)
+REMLcrit(fm1)
+quantile(residuals(fm1, "pearson", scaled = TRUE))
+```
+
+#### Information Regarding the Random-Effects & Residual Variation
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+feRow <- grep("^Fixed effects", cc)
+cat(cc[reRow:(feRow - 2)], sep = "\n")
+
+## ----summary-reproduced------------------
+print(vc <- VarCorr(fm1), comp = c("Variance", "Std.Dev."))
+c(nobs(fm1), ngrps(fm1), sigma(fm1))
+```
+
+#### Fixed-Effect Estimates
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+corRow <- grep("^Correlation", cc)
+cat(cc[feRow:(corRow - 2)], sep = "\n")
+```
+
+#### Correlations Between the Fixed-Effect Estimates
+
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+cat(cc[corRow:length(cc)], sep = "\n")
+```
+
+### Diagnostic Plots
+
+lme4 provides tools for generating most of the standard graphical diagnostic plots (with the
+exception of those incorporating influence measures, e.g., Cook’s distance and leverage plots),
+in a way modeled on the diagnostic graphics of nlme (Pinheiro and Bates 2000). In particular,
+the familiar plot method in base R for linear models (objects of class ‘lm’) can be used to
+create the standard fitted vs. residual plots,
+
+**Standard fitted vs. residual plots**
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+plot(fm1, type = c("p", "smooth"))
+```
+
+**Scale-location plots**
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+plot(fm1, sqrt(abs(resid(.))) ~ fitted(.),
+type = c("p", "smooth"))
+```
+
+**Quantile-quantile plots (from lattice)**
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+ qqmath(fm1, id = 0.05)
+```
+
+**Sequential decomposition and model comparison**
+
+Objects of class ‘merMod’ have an anova method which returns F statistics corresponding to
+the sequential decomposition of the contributions of fixed-effects terms.
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+##  fit a model with orthogonal linear and quadratic Days terms
+fm4 <- lmer(Reaction ~ polyDays[ , 1] + polyDays[ , 2] +
+              (polyDays[ , 1] + polyDays[ , 2] | Subject),
+            within(sleepstudy, polyDays <- poly(Days, 2)))
+anova(fm4)
+
+## For multiple arguments, the anova method returns model comparison statistics.
+anova(fm1, fm2, fm3)
+```
+
+## Reference
+
+* `citation("lme4")`
+
+
+
+# Implementation mmrm in R
+
+## Package introduction
+
+* fit a mmrm model with us (unstructured) covariance structure specified, as well as the defaults of reml = TRUE and control = mmrm_control().
+* The method and vcov arguments specify the degrees of freedom and coefficients covariance matrix adjustment methods, respectively. mmrm_control: method = c("Satterthwaite", "Kenward-Roger", "Residual", "Between-Within"),
+* The summary() method then provides the coefficients table with Satterthwaite degrees of freedom as well as the covariance matrix estimate
+* Residuals
+    + `residuals(fit, type = "response")`, Response or raw residuals - the difference between the observed and fitted or predicted value.
+    + `residuals(fit, type = "pearson")`, Pearson residuals - the raw residuals scaled by the estimated standard deviation of the response.
+    + `residuals(fit, type = "normalized")`, Normalized or scaled residuals - the raw residuals are ‘de-correlated’ based on the Cholesky decomposition of the variance-covariance matrix.
+    
+### Fit Models
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+## Release and development
+# install.packages(
+#   "mmrm",
+#   repos = c("https://openpharma.r-universe.dev", "https://cloud.r-project.org")
+# )
+library(mmrm)
+## https://cran.r-project.org/web/packages/mmrm/index.html
+## citation("mmrm")
+
+head(fev_data) %>%
+  kable(caption = "Check the head of fev_data", format = "html") %>% 
+  kable_styling(bootstrap_options = "striped", 
+                full_width = F, 
+                position = "center",
+                fixed_thead = T) 
+
+## by default this uses restricted maximum likelihood (REML)
+fit <- mmrm(
+  formula = FEV1 ~ SEX + ARMCD * AVISIT + us(AVISIT | USUBJID),
+  data = fev_data,
+  control = mmrm_control(method = "Between-Within")
+)
+summary(fit)
+
+## Other components
+component(fit, name = c("convergence", "evaluations", "conv_message"))
+component(fit, name = "call")
+## look at the design matrix
+## head(model.matrix(fit), 1)
+```
+
+
+### Neat Output
+
+1. tab_model for HTML output
+2. tidy method to return a summary table of coefficient estimates
+3. glance method to return a summary table of goodness of fit statistics
+4. augment method to return a merged tibble of the data, fitted values and residuals
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+## tab_model for HTML output
+tab_model(fit)
+
+## tidy method to return a summary table of coefficient estimates
+fit %>%
+  tidy(conf.int = TRUE, conf.level = 0.9)
+
+## glance method to return a summary table of goodness of fit statistics
+fit %>%
+  glance()
+
+## augment method to return a merged tibble of the data, fitted values and residuals
+fit %>%
+  augment(interval = "confidence", type.residuals = "normalized") %>%
+  head()
+```
+
+### Residuals
+
+1. Response or raw residuals - the difference between the observed and fitted or predicted value. MMRMs can allow for heteroscedasticity, so these residuals should be interpreted with caution.
+2. Pearson residuals - the raw residuals scaled by the estimated standard deviation of the response. This residual type is better suited to identifying outlying observations and the appropriateness of the covariance structure, compared to the raw residuals.
+3. Normalized or scaled residuals - the raw residuals are ‘de-correlated’ based on the Cholesky decomposition of the variance-covariance matrix. These residuals should approximately follow the standard normal distribution, and therefore can be used to check for normality (@galecki2013linear).
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+residuals_resp <- residuals(fit, type = "response")
+residuals_pearson <- residuals(fit, type = "pearson")
+residuals_norm <- residuals(fit, type = "normalized")
+
+```
+
+
+### Predictions
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+predict(fit, new_data = fev_data) 
+
+# predict(
+#   fit,
+#   new_data = fev_data,
+#   type = "raw",
+#   opts = list(se.fit = TRUE, interval = "prediction", nsim = 10L)
+# ) 
+
+# augment(fit, new_data = fev_data) %>%
+#   select(USUBJID, AVISIT, .resid, .fitted)
+```
+
+## Common Customizations
+
+* mmrm_control() is provided. This function allows the user to choose the adjustment method for the degrees of freedom and the coefficients covariance matrix, specify optimization routines, number of cores to be used on Unix systems for trying several optimizers in parallel, provide a vector of starting parameter values, decide the action to be taken when the defined design matrix is singular, not drop unobserved visit levels.
+
+```
+mmrm_control(
+  method = "Kenward-Roger",
+  optimizer = c("L-BFGS-B", "BFGS"),
+  n_cores = 2,
+  start = c(0, 1, 1, 0, 1, 0),
+  accept_singular = FALSE,
+  drop_visit_levels = FALSE
+)
+```
+* REML or ML
+
+```
+fit_ml <- mmrm(
+  formula = FEV1 ~ RACE + ARMCD * AVISIT + us(AVISIT | USUBJID),
+  data = fev_data,
+  reml = FALSE
+)
+```
+
+* Adjustment Method
+    + In additional to the residual and Between-Within degrees of freedom, both Satterthwaite and Kenward-Roger adjustment methods are available. `method = "Kenward-Roger"`
+    + “Kenward-Roger”
+    + “Satterthwaite”
+    + “Residual”
+    + “Between-Within”
+    
+* Variance-covariance for Coefficients
+    + [Coefficients Covariance Matrix Adjustment](https://cran.r-project.org/web/packages/mmrm/vignettes/coef_vcov.html)
+    + There are multiple variance-covariance estimator available for the coefficients, including:
+    + “Asymptotic”
+    + “Empirical” (Cluster Robust Sandwich)
+    + “Empirical-Jackknife”
+    + “Empirical-Bias-Reduced”
+    + “Kenward-Roger”
+    + “Kenward-Roger-Linear”
+
+* Optimizer to converge
+    + General-purpose optimization based on Nelder–Mead, quasi-Newton and conjugate-gradient algorithms. It includes an option for box-constrained optimization and simulated annealing.
+    + The default method is an implementation of that of Nelder and Mead (1965), that uses only function values and is robust but relatively slow. It will work reasonably well for non-differentiable functions.
+    + Method "BFGS" is a quasi-Newton method (also known as a variable metric algorithm), specifically that published simultaneously in 1970 by Broyden, Fletcher, Goldfarb and Shanno. This uses function values and gradients to build up a picture of the surface to be optimized.
+    + Method "CG" is a conjugate gradients method based on that by Fletcher and Reeves (1964) (but with the option of Polak–Ribiere or Beale–Sorenson updates). Conjugate gradient methods will generally be more fragile than the BFGS method, but as they do not store a matrix they may be successful in much larger optimization problems.
+    + Method "L-BFGS-B" is that of Byrd et. al. (1995) which allows box constraints, that is each variable can be given a lower and/or upper bound. The initial value must satisfy the constraints. This uses a limited-memory modification of the BFGS quasi-Newton method. If non-trivial bounds are supplied, this method will be selected, with a warning.
+    
+```
+?stats::optim()
+fit_opt <- mmrm(
+  formula = FEV1 ~ RACE + ARMCD * AVISIT + us(AVISIT | USUBJID),
+  data = fev_data,
+  optimizer = "BFGS"
+)
+```
+
+* Covariance Structure
+    + [covariance vignette](https://cran.r-project.org/web/packages/mmrm/vignettes/covariance.html)
+    + Grouped Covariance Structure:  the estimates are allowed to vary across groups `formula = FEV1 ~ RACE + ARMCD * AVISIT + cs(AVISIT | ARMCD / USUBJID)`
+ 
+```{r, echo=FALSE, fig.align="center", out.width = '75%',fig.cap="Figure: Common Covariance Structures"}
+knitr::include_graphics("./02_Plots/MMRM/MMRM_var.png")
+```
+ 
+
+* Weighting: perform weighted MMRM by specifying a numeric vector weights with positive values.
+
+```
+fit_wt <- mmrm(
+  formula = FEV1 ~ RACE + ARMCD * AVISIT + us(AVISIT | USUBJID),
+  data = fev_data,
+  weights = fev_data$WEIGHT
+)
+```
+
+## Keeping Unobserved Visits
+
+Sometimes not all possible time points are observed in a given data set. When using a structured covariance matrix, e.g. with auto-regressive structure, then it can be relevant to keep the correct distance between the observed time points.
+
+Consider the following example where we have deliberately removed the VIS3 observations from our initial example data set fev_data to obtain sparse_data. We first fit the model where we do not drop the visit level explicitly, using the drop_visit_levels = FALSE choice. Second we fit the model by default without this option.
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+sparse_data <- fev_data[fev_data$AVISIT != "VIS3", ]
+sparse_result <- mmrm(
+  FEV1 ~ RACE + ar1(AVISIT | USUBJID),
+  data = sparse_data,
+  drop_visit_levels = FALSE
+)
+
+dropped_result <- mmrm(
+  FEV1 ~ RACE + ar1(AVISIT | USUBJID),
+  data = sparse_data
+)
+
+tab_model(sparse_result,dropped_result)
+
+## Keep VIS3 in covariance matrix
+cov2cor(VarCorr(sparse_result))
+
+## By default, drop the VIS3 from the covariance matrix. As a consequence, we model the correlation between VIS2 and VIS4 the same as the correlation between VIS1 and VIS2. Hence we get a smaller correlation estimate here compared to the first result, which includes VIS3 explicitly.
+cov2cor(VarCorr(dropped_result))
+```
+
+## Hypothesis Testing
+
+This package supports estimation of one- and multi-dimensional contrasts (t-test and F-test calculation) with the df_1d() and df_md() functions. 
+
+### One-Dimensional Contrasts
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+fit <- mmrm(
+  formula = FEV1 ~ RACE + SEX + ARMCD * AVISIT + us(AVISIT | USUBJID),
+  data = fev_data
+)
+
+contrast <- numeric(length(component(fit, "beta_est")))
+contrast[3] <- 1
+contrast
+
+df_1d(fit, contrast)
+```
+
+### Multi-Dimensional Contrasts
+ 
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+contrast <- matrix(data = 0, nrow = 2, ncol = length(component(fit, "beta_est")))
+contrast[1, 2] <- contrast[2, 3] <- 1
+contrast
+df_md(fit, contrast)
+```
+
+
+## Least-Square Means
+
+This package includes methods that allow mmrm objects to be used with the emmeans package. emmeans computes estimated marginal means (also called least-square means) for the coefficients of the MMRM. For example, in order to see the least-square means by visit and by treatment arm:
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library(emmeans)
+#> mmrm() registered as emmeans extension
+lsmeans_by_visit <- emmeans(fit, ~ ARMCD | AVISIT)
+lsmeans_by_visit
+```
+
+Furthermore, we can also obtain the differences between the treatment arms for each visit by applying pairs() on the object returned by emmeans() earlier:
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+pairs(lsmeans_by_visit, reverse = TRUE)
+```
+
+
+
+
+
+## Reference
+
+* `citation("mmrm")`
+* [mmrm: Model Fitting Algorithm](https://cran.r-project.org/web/packages/mmrm/vignettes/algorithm.html)
+* [mmrm: Between-Within](https://cran.r-project.org/web/packages/mmrm/vignettes/between_within.html)
+* [mmrm: Coefficients Covariance Matrix Adjustment](https://cran.r-project.org/web/packages/mmrm/vignettes/coef_vcov.html)
+* [mmrm: Covariance Structures](https://cran.r-project.org/web/packages/mmrm/vignettes/covariance.html)
+* [mmrm: Weighted Least Square Empirical Covariance](https://cran.r-project.org/web/packages/mmrm/vignettes/empirical_wls.html)
+* [mmrm: Kenward-Roger](https://cran.r-project.org/web/packages/mmrm/vignettes/kenward.html)
+* [mmrm: Mixed Models for Repeated Measures](https://cran.r-project.org/web/packages/mmrm/vignettes/methodological_introduction.html)
+* [mmrm: Comparison with SAS](https://cran.r-project.org/web/packages/mmrm/vignettes/mmrm_review_methods.html)
+* [mmrm: Package Introduction](https://cran.r-project.org/web/packages/mmrm/vignettes/introduction.html)
