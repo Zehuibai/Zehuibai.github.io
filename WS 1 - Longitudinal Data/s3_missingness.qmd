@@ -1,0 +1,348 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+# Missing Data
+
+```{r}
+## get the wd path
+# setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+# getwd()
+source("setup.R")
+```
+
+So far, we conducted all our analyses on the basis of complete data. This is a blissful, yet highly unusual setting.
+
+We use the following definition for missing data, borrowed from [@little19]:
+
+"*Missing data are unobserved values that would be meaningful for analysis if observed; in other words, a missing value hides a meaningful value.*"
+
+We distinguish the following patterns of missingness:
+
+-   **Monotonic missingness/ dropout**: All values by a subject after a certain time are missing. More specifically, if responses are missing at visit $n \in \mathbb{N}$, then responses are also missing for every subsequent visit $n + m$, for all $m \in \mathbb{N}$. *Example:* Subject drop-out from the clinical study.
+-   **Intermittend missingness**: Subjects miss one or several visits, but return for later visits. *Example:* A subject with data collected at baseline and Time 1 (Week 2), a missing value at Time 2 (Week 4) and a non-missing value at Time 3 (Week 8).
+
+Note that, following the nomenclature introduced by [@little19], we use the term missing data *pattern*, to describe which data are missing in the data matrix of subject responses, and the term missing data *mechanism*, which describes the relationship between missing and observed values in the subject responses.
+
+Our dataset contains a second variable `chgdrop`, which is subject to missingness. Let's rerun our initial MMRM with `chgdrop` as dependent variable, baseline value, visit, baseline by visit interaction and treatment by visit interaction as fixed effects and an unstructured covariance matrix for visits within each subject.
+
+This formulation is very similar to the one at the beginning of the former chapter. How do the results differ in terms of LS Means of change from baseline by treatment arm over time?
+
+```{r}
+fit_cat_time <- mmrm::mmrm(
+  formula = chgdrop ~ basval*avisit + trt*avisit + us(avisit | subject),
+  data = all2,
+  control = mmrm_control(method = "Kenward-Roger")
+)
+
+# summary(fit_cat_time)
+
+model_lsmeans <- emmeans::emmeans(fit_cat_time, ~trt*avisit, weights = "proportional")
+model_lsmeans
+
+emmeans::emmeans(fit_cat_time, ~trt*avisit, weights = "proportional") %>% 
+  contrast(
+    list(
+      "Difference in LS Means at Week 8" = c(0, 0, 0, 0, -1, 1),
+      "Difference in longitudinal LS Means to Week 8" = c(-1, 1, -1, 1, -1, 1)/3
+    )
+  )
+```
+
+To understand the nature of the differences between the model using `change` as a response variable and the one with `chgdrop`, we need to look closer into the extent of missing data and understand its nature.
+
+## Missing Data Mechanisms
+
+To understand the nature of missing data in our clinical trial, we consider the following taxonomy, introduced by [@little19]. We differentiate between the following three types of missing data:
+
+-   **Missing Completely at Random (MCAR)**: Conditional on all covariates in our analysis, the probability of missingness does not depend on either observed or unobserved values of the response variable.
+
+-   **Missing at Random (MAR)**: Conditional on all covariates and observed response values in our analysis, the probability of missingness does not depend on the unobserved values of the response variable.
+
+-   **Missing not at Random (MNAR)**: Conditional on all covariates and observed response values in our analysis, the probability of missingness does depend on the unobserved values of the response variable.
+
+[@mallinckrodt2016] give the following interpretation around the three types of missingness:
+
+"*With MCAR, the outcome variable is not related to the probability of dropout (after taking into account covariates). In MAR, the observed values of the outcome variable are related to the probability of dropout, but the unobserved outcomes are not (after taking into account covariates and observed outcomes). In MNAR the unobserved outcomes are related to the probability of dropout even after the observed outcomes and covariates have been taken into account.*"
+
+The following two sections outline handling strategies for missing data. However, the best approach to handle missing data is to minimise its extent. While the occurence of missing data can rarely be avoided at all (think about the collection of questionnaire data in oncology studies and the missing data after subjects die), it is important to pursue an "as complete as can be" data collection.
+
+Baseline and screening data are of utmost importance in a pursuit of data completeness. If a screening value is missing, but was meant to be used as a covariate, this subjects' whole data will be dropped from the analysis even if all responses were observed. If the baseline response variable was missing we are unable to compute a change from baseline, which also leads to the loss of this subjects' data in the model (although LDA models are still able to provide an estimate) even if all post-baseline values were observed.
+
+## Missing Data Handling I (descriptive stats + visualisations)
+
+To gain an understanding of the impact of missingness on the average response trajectories, we can plot the mean changes from baseline by visit for each drop-out group. The three drop-out groups (variable `dropout_grp`) are:
+
+-   Drop-outs at Week 2: Subjects who completed baseline and Week 2, but discontinued from the study prior to Week 4.
+
+-   Drop-outs at Week 4: Subjects who completed baseline, Week 2 and Week 4, but discontinued from the study prior to Week 8.
+
+-   Completers: Subjects who completed all visits in the study.
+
+```{r}
+#| echo: false
+library(ggplot2)
+
+all2_miss <- all2
+
+levels(all2_miss$aval) <- c("Baseline", levels(all2_miss$aval))
+
+all2_miss %>% 
+  filter(!is.na(chgdrop)) %>% 
+  dplyr::group_by(avisit, week, trt, dropout_grp) %>% 
+  dplyr::summarise(
+    mn = mean(chgdrop),
+    .groups = "drop"
+  ) %>% 
+  dplyr::bind_rows(
+    .,
+    tidyr::expand_grid("dropout_grp" = c("Week 2 Dropout", "Week 4 Dropout", "Completer"), "trt" = c("1", "2"), avisit = "Baseline", week = 0, "mn" = 0)
+  ) %>% 
+  ggplot(aes(x = week, y = mn, color = interaction(trt, dropout_grp))) +
+  geom_line() +
+  geom_point(aes(shape = dropout_grp), size = 4, show.legend = FALSE) +
+  scale_shape_manual(
+    name = "Dropout", 
+    labels = c("Trt 1 Week 2 Dropout", "Trt 1 Week 4 Dropout", "Trt 1 Completer",
+               "Trt 2 Week 2 Dropout", "Trt 2 Week 4 Dropout", "Trt 2 Completer"),
+    values = c("C", "2", "4", "C", "2", "4")
+  ) +
+  scale_color_manual(
+    name = "Dropout",
+    labels = c("Trt 1 Week 2 Dropout", "Trt 1 Week 4 Dropout", "Trt 1 Completer",
+               "Trt 2 Week 2 Dropout", "Trt 2 Week 4 Dropout", "Trt 2 Completer"),
+    values = c("red", "blue", "red", "blue", "red", "blue")
+  ) +
+  scale_y_continuous(
+    n.breaks = 15,
+    name = "Mean Change from Baseline"
+  ) +
+  theme(
+    legend.position = "bottom"
+  )
+```
+
+**Exercise:** Try to interpret the plot above and discuss the following topics around missingness:
+
+### Check Missing Patter
+
+- Q1> Look into the data. Which missing data pattern is present in this dataset?
+
+From the plot, we can infer that there is a **monotone missing data pattern**. This is characterized by participants dropping out of the study at specific points (Weeks 2 and 4), and then no further data is collected for them. The plot shows how participants who drop out at different weeks (Week 2 and Week 4) exhibit a decline in their measured outcome prior to dropping out. We can observe distinct trajectories for those who complete the study versus those who drop out.
+ 
+```{r}
+all2 %>%
+  # group_by(Month) %>%
+  miss_var_summary() %>%
+  kable(caption = "Missing data among variables", format = "html") %>%
+  kable_styling(latex_options = "striped")
+
+## Exploring missing data
+vis_miss(all2)
+
+
+gg_miss_var(all2 %>% filter(group=="Arm 1"), 
+            facet = avisit, 
+            show_pct = TRUE)
+
+gg_miss_var(all2 %>% filter(group=="Arm 2"), 
+            facet = avisit, 
+            show_pct = TRUE)
+```
+
+
+- Q2> What can be seen in the plot? How does the drop-out time affect the observed mean response trajectories?
+
+**Dropout Trajectories**
+
+- Participants who drop out at Week 2 or Week 4 show a different mean change from baseline compared to completers. For example, those dropping out earlier seem to have a more abrupt or flatter decline, indicating that their treatment response may be different from completers.
+
+**Completer Trajectories** 
+
+- The completers in both treatment groups exhibit a smoother and more sustained decline, suggesting better outcomes than the dropouts.
+
+**Effect of Dropout Time**
+
+   - The earlier the dropout, the less steep the observed decline from baseline. This could be due to several factors, such as treatment inefficacy for those participants or increased adverse effects, leading to their dropout.
+   - Dropouts at Week 4 have trajectories closer to the completers but are still distinct, indicating some level of divergence in treatment response.
+   
+-   Q3> What other aspects, apart from response, could influence a subjects' likelihood to drop-out from the study?
+
+**Other Factors Influencing Dropout Likelihood**
+   Apart from the measured response (mean change from baseline), several other factors could influence a subject’s likelihood of dropping out from the study:
+   
+   - **Adverse effects**: Participants experiencing more severe side effects may drop out earlier.
+   - **Personal circumstances**: Life events unrelated to the study (e.g., work, family issues) may cause participants to discontinue participation.
+   - **Lack of perceived treatment efficacy**: Participants who feel the treatment is not working may lose motivation to continue.
+   
+-   Q4> Which other summaries/ visualizations can be useful to characterize and monitor the degree of missingness in clinical study data?
+
+ **Other Summaries/Visualizations to Characterize Missingness**
+   To better characterize and monitor missingness in clinical study data, the following summaries and visualizations could be useful:
+   
+   - **Missing Data Patterns Table**: A summary table showing the number of subjects missing data at each time point.
+   - **Kaplan-Meier Plot for Time-to-Dropout**: This would allow us to examine the dropout pattern over time, showing how many participants remain in the study at each time point.
+   - **Proportional Missingness Plot**: A bar chart showing the proportion of missing data for each variable at each time point.
+   - **Correlation Heatmap**: Showing correlations between missingness patterns and other variables (e.g., baseline characteristics, adverse events).
+   - **Trajectory Plots for Subgroups**: Similar to the plot provided, but stratified by potential confounders (e.g., age, gender) to see if missingness varies across subgroups.
+
+
+
+### Solution
+
+A look into the data shows that all missing values stem from a monotinic missingness pattern.
+
+The figure above shows a notable difference between mean response trajectories per drop-out group. The completers in both treatment arms show a steady decrease of HAMD17 scores over time, which is equivalent to an increase in depression symptoms. 
+
+Week 4 drop-outs under treatment 2 only showed a moderate change from baseline, while the treatment 1 subjects experienced an increase in HAMD17 scores. A possible explanation could be that changes under treatment 2 were not regarded meaningful by patients, while the increase in scores under treatment 1 made subjects drop out of the study.
+
+Week 2 drop-outs under treatment 2 showed notable improvements of HAMD17 scores compared to treatment 1, yet the drop-out could potentially be linked to the occurrence of adverse events.
+
+Although the extent of missing data should be reduced to the bare minimum, it can never be avoided completely, especially with Patient-Reported Outcomes (PRO) data. In the reporting of PRO clinical trial data, it is therefore important to transparently summarize the extent of missingness. This is usually done via so-called *compliance tables*.
+
+Compliance tables summarize three key components to characterize missingness in our data:
+
+-   The number of subjects initially randomized in the trial. 
+
+-   The number of subjects for whom data is expected. This is the number of patients who are still ongoing in the study (alive and not discontinued) and for whom an assessment is scheduled following the schedule of assessments in the clinical trial protocol. 
+
+-   The number of subjects by whom the assessment has been completed. 
+
+From these numbers, we can derive the *available data rate* and the *compliance* for visit $i$ as follows:
+
+$$
+\begin{aligned}
+\text{Available Data Rate}_{\,i} &:= 100\,\frac{\#\{\text{Subj. with assessment i completed}\}}{\#\{\text{Subj. randomized}\}}\,,\\
+\text{Compliance Rate}_{\,i} &:= 100\,\frac{\#\{\text{Subj. with assessment i completed}\}}{\#\{\text{Subj. assessment i expected}\}}\,.
+\end{aligned}
+$$
+
+## Missing data handling II (naive analytic approaches)
+
+This section provides an overview of simple and most of the times overly naive methods to deal with missing data. Although we will introduce more suitable methods in the next chapter, the approaches introduced in this section have gained questionable popularity in the past, which is why we introduce them here. The following methods to compute or completely ignore missing data exist:
+
+-   Complete Case Analysis: Discard all subjects with missing observations and only conduct the analysis on subjects with complete follow-up data.
+
+-   Last observation carried forward (LOCF): Handling of monotonic missing data. The missing visits are imputed with the last non-missing value. This approach assumes a constant trend of observations after drop-out from the study, i.e. the response level remains the same as the last response under the study drug.
+
+-   Baseline observation carried forward (BOCF): Handling of monotonic missing data. The missing visits are imputed with the baseline value. This approach assumes that subjects' symptom severity or functioning (whichever was measured in the study) *bounce back* to the baseline state, prior to the intiation of the study drug.
+
+
+### Complete Case Analyses
+
+Let us run a complete case analysis on the `all2` dataset.
+
+**Exercise:** Fit an MMRM with response variable `chgdrop`, with baseline severity, treatment and visit as fixed effects, as well as baseline-by-visit and treatment-by-visit interaction, using an unstructured variance-covariance matrix on the `all2` completers.
+
+-   How do the results differ from the results obtained in the former chapter (response variable `change`, no missing data)?
+
+-   How do the results differ from the results obtained at the beginning of this chapter (response variable `chgdrop` with missing data)?
+
+-   Discuss the limitations of the complete case analysis. Which sources of bias can you identify?
+
+    + Significant Impact in Multivariate Analysis: In complex multivariate analyses, list-wise deletion can lead to substantial loss of statistical information due to a reduction in the effective sample size.
+    + The varying sample size due to list-wise deletion makes it difficult to maintain a consistent set of inputs across analyses.
+    + Potential for Bias in Estimations: CCA assumes that the data are Missing Completely at Random (MCAR)—i.e., the probability of missingness is independent of both observed and unobserved data. However, in most real-world scenarios, data are more likely Missing at Random (MAR) or Missing Not at Random (MNAR).
+    + Selection Bias
+
+**Solution:**
+
+We firstly select our completers dataset. As this is a filtering exercise based on post-baseline characteristics, we first look into the distribution of subjects per treatment arm (note that we lost our randomization effect):
+
+```{r}
+all2_comp <- dplyr::filter(all2, dropout_grp == "Completer")
+
+all2_comp %>% 
+  dplyr::group_by(group) %>% 
+  dplyr::summarise(
+    N = dplyr::n_distinct(subject),
+    .groups = "drop"
+  )
+
+### Work with code chunks to find the solution to the exercises
+all2_cca <- all2 %>%
+  group_by(subject) %>%                    
+  filter(all(!is.na(chgdrop))) %>%          
+  ungroup()    
+```
+
+In this case, we are left with 18 and 19 subjects per arm, which reduced our sample size notably, but at least left us with close to equal sizes of our treatment groups. This is not normal. Usually the stratification of data based on post-baseline assessments can lead to imbalances (it might still have, as we only checked the distribution of the treatment arms).
+
+
+```{r}
+### Complete Case Analysis
+fit_cat_time_compl <- mmrm::mmrm(
+  formula = chgdrop ~ basval*avisit + trt*avisit + us(avisit | subject),
+  data = all2_comp,
+  control = mmrm_control(method = "Kenward-Roger")
+)
+
+summary(fit_cat_time_compl)
+
+model_lsmeans <- emmeans::emmeans(fit_cat_time_compl, ~trt*avisit, weights = "proportional")
+model_lsmeans
+
+emmeans::emmeans(fit_cat_time_compl, ~trt*avisit, weights = "proportional") %>% 
+  contrast(
+    list(
+      "Difference in LS Means at Week 8" = c(0, 0, 0, 0, -1, 1),
+      "Difference in longitudinal LS Means to Week 8" = c(-1, 1, -1, 1, -1, 1)/3
+    )
+  )
+```
+
+
+A comparison to the results using the full response trajectories for all randomized subjects (response variable `change`) yields:
+
+```{r}
+### complete response trajectory on all randomized subjects
+
+fit_cat_time <- mmrm::mmrm(
+  formula = change ~ basval*avisit + trt*avisit + us(avisit | subject),
+  data = all2,
+  control = mmrm_control(method = "Kenward-Roger")
+)
+
+model_lsmeans <- emmeans::emmeans(fit_cat_time, ~trt*avisit, weights = "proportional")
+model_lsmeans
+
+emmeans::emmeans(fit_cat_time, ~trt*avisit, weights = "proportional") %>% 
+  contrast(
+    list(
+      "Difference in LS Means at Week 8" = c(0, 0, 0, 0, -1, 1),
+      "Difference in longitudinal LS Means to Week 8" = c(-1, 1, -1, 1, -1, 1)/3
+    )
+  )
+```
+We can see that the mean change from baseline to Week 8 using the complete response trajectory is actually lower (i.e. better) under Treatment 2 than the ones from the complete case analysis. For Treatment 1 the mean change from baseline to Week 8 is a little higher (i.e. worse) for the complete response trajectory on all randomized subjects as compared to the complete case analysis. A possible explanation could be that the favorable treatment effect of Treatment 2 came at the cost of adverse events, which made subjects drop out from the study, while the lack of early efficacy under Treatment 1 made subjects drop out, which lead them to not experience the favorable effects in the longer term.
+
+A comparison to the analysis results based on the incomplete response trajectory (data as is), yields:
+
+```{r}
+### Response data as is (including missings)
+
+fit_cat_time <- mmrm::mmrm(
+  formula = chgdrop ~ basval*avisit + trt*avisit + us(avisit | subject),
+  data = all2,
+  control = mmrm_control(method = "Kenward-Roger")
+)
+
+emmeans::emmeans(fit_cat_time, ~trt*avisit, weights = "proportional")
+
+emmeans::emmeans(fit_cat_time, ~trt*avisit, weights = "proportional") %>% 
+  contrast(
+    list(
+      "Difference in LS Means at Week 8" = c(0, 0, 0, 0, -1, 1),
+      "Difference in longitudinal LS Means to Week 8" = c(-1, 1, -1, 1, -1, 1)/3
+    )
+  )
+```
+
+We can see that mean changes from baseline to Week 8 are higher (i.e. worse) under both treatment arms using the data as is, as compared to the complete case analysis. In this case, the complete case analysis overestimates the treatment effect in both arms. This effect is often observed with complete case analyses, due to the inherent selection bias that arises from the inclusion of completers only.
+
+### Discussion
+
+Complete Case Analysis is subject to selection bias, as the analysis is only conducted on subjects who complete the study and therefore did not drop out due to the experience of adverse events of the lack of efficacy. Selection of subjects based on post-baseline events can lead to notable imbalances between our treatment arms and the distribution of covariates. Results from the Complete Case Analysis can therefore be hard to interpret (due to the loss of randomization), and are frequently overestimating the true treatment effect.
+
+In principle, this method should be avoided.

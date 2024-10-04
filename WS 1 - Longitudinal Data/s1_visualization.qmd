@@ -1,0 +1,378 @@
+---
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3   
+editor_options: 
+  chunk_output_type: console
+---
+
+# Longitudinal Data Exploration and Visualization
+
+```{r}
+#| include: false
+source("setup.R")
+```
+
+## Introduction
+
+-   Data on individuals followed over time with information collected at several time points.
+-   Clusters are the individuals who are followed over time.
+-   Repeated observations may or may not be taken at regular times (balanced, fixed occasions, do not differ between subjects).
+-   Our interest is in the change from baseline.
+
+Datasets used in this course:
+
+-   Example data is taken from [@mallinckrodt2016]. The authors generated data sets based on two nearly identically designed antidepressant clinical trials by randomly selecting subjects from the original data.
+-   Contain data on the continuous variable HAMD17 (Hamilton 17-item rating scale for depression).
+-   Two treatement arms are included: placebo (arm 1) vs. drug (arm 2).
+-   Assessments were taken at baseline and weeks 1, 2, 4, 6, and 8.
+
+There are 3 data sets created from the original data:
+
+- Data *all2* = Subsample of the large dataset with n=50, visits: weeks 2, 4, 8.
+- Data *high2* = Large dataset with n=100, high dropout = 70% (drug), 60% (placebo).
+- Data *low2* = Large dataset with n=100, low dropout = 18%.
+
+We are mainly working with the *all2* data set in the following. There is one application on the *high2* data set. We are not considering the *low2* data set.
+
+## Data set all2
+
+-   Small data set with n=50 subjects.
+-   1st version: complete data where all subjects adhered to the originally assigend study medication, variable *change*
+-   2nd version = missing data: identical to the first except some data were missing (drop-out), variable *chgdrop*
+
+Looking at the variables in the data set
+
+```{r}
+head(all2)
+```
+
+### Task 1 - Exploration of data set all2 - 15 minutes working time
+
+Only consider the complete data, variable *change*
+
+-   Are the data balanced and equally spaced?
+-   Number of observations by week? - Summary statistics for HAMD17 (change from baseline) by week.
+-   Plot trajectories for each individual, different colors for each treatment group (or panels).
+-   Add mean to your plot or generate new plot with mean change from baseline by treatment group.
+-   Plot mean change from baseline for each treatment group stratified by sex. Comment on the plot.
+
+
+#### Check the Data Overview
+
+```{r}
+describe(all2)
+```
+
+ 
+
+#### Check Line Plot
+
+
+```{r}
+# Plot individual lines for each patient
+ggplot(data = all2, aes(x = factor(week), y = change, group = subject)) +  
+  geom_line(aes(colour = factor(group)), alpha = 0.5) +  # Individual lines for each patient
+  facet_wrap(~group) +
+  ylab("Change from baseline HAMD17") +
+  scale_x_continuous(name = "Visit [week]", breaks = c(2, 4, 8)) +
+  scale_x_discrete(name = "Visit [week]") +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+
+#### Check Number of observations by week
+
+```{r}
+all2 %>%
+  select(aval, group, avisit) %>%
+  tbl_strata(strata=group, 
+             ~.x %>% 
+               tbl_summary(by = avisit,
+                           statistic = list(
+      all_continuous() ~ "{mean} ({sd})"), 
+      digits = all_continuous() ~ 2 ) %>%
+      modify_header(label = "**Variable**")
+)
+
+
+all2 %>%
+  select(change, group, avisit) %>%
+  tbl_strata(strata=group, 
+             ~.x %>% 
+               tbl_summary(by = avisit,
+                           statistic = list(
+      all_continuous() ~ "{mean} ({sd})"), 
+      digits = all_continuous() ~ 2 ) %>%
+      modify_header(label = "**Variable**")
+)
+
+
+ggplot(data = all2, aes(x = factor(week), y = change)) +  
+  geom_boxplot(aes(colour = factor(group))) + 
+  ylab("Change from baseline HAMD17") +
+  scale_x_continuous(name="Visit [week]", breaks=c(2, 4, 8)) +
+  scale_x_discrete(name = "Visit [week]") +
+  theme_minimal()
+
+
+
+# Calculate mean and standard deviation by group and week
+summary_stats <- all2 %>%
+  group_by(week, group) %>%
+  summarise(mean = mean(change, na.rm = TRUE),
+            sd = sd(change, na.rm = TRUE))
+
+# Plot with boxplot and labels for mean and SD by group
+ggplot(data = all2, aes(x = factor(week), y = change, colour = factor(group))) +  
+  geom_boxplot() + 
+  ylab("Change from baseline HAMD17") +
+  scale_x_continuous(name="Visit [week]", breaks=c(2, 4, 8)) +
+  scale_x_discrete(name = "Visit [week]") +
+  theme_minimal() +
+  # Add text labels for mean and SD by group and week
+  geom_text(data = summary_stats, aes(x = factor(week), y = mean + sd, 
+                                      label = paste0("Mean: ", round(mean, 2), 
+                                                     "\nSD: ", round(sd, 2)), 
+                                      colour = factor(group)), 
+            vjust = -0.5, size = 3, position = position_dodge(width = 0.75))
+```
+
+#### Check by Gender
+
+```{r}
+ggplot(data = all2, aes(x = week, y = change)) +  
+  geom_point(aes(colour=factor(group))) + ylab("Change from baseline HAMD17") +
+  facet_wrap(~gender) +
+  scale_x_continuous(name="Visit [week]", breaks=c(2,4,8)) +
+  stat_summary(aes(group = group, colour=factor(group)), geom = "line", fun.y = mean,
+               size = 1) +
+  stat_summary(aes(group = group, colour=factor(group)), geom = "point", fun.y = mean,
+               shape=17,size = 2)
+
+all2 %>% dplyr::select(gender, group) %>% 
+  tbl_summary(by=group,
+              type = all_continuous() ~ "continuous2", 
+              label = list(Sex = "Gender", missing = "no")) %>%
+  modify_header(label ~ "Variable") %>%
+  modify_spanning_header(c("stat_1", "stat_2") ~ "Subgroup") %>%
+  bold_labels() %>%
+  add_overall() 
+
+ggplot(data = all2, aes(x = factor(week), y = change)) +  
+  geom_boxplot(aes(colour = factor(group))) + 
+  facet_wrap(~gender) +
+  ylab("Change from baseline HAMD17") +
+  scale_x_continuous(name="Visit [week]", breaks=c(2, 4, 8)) +
+  scale_x_discrete(name = "Visit [week]") +
+  theme_minimal()
+```
+
+
+#### Data set all2 with drop-out
+
+-   2nd version = missing data: identical to the first except some data were missing (drop-out), variable *chgdrop*
+-   This version is later relevant when considering missing data. Thus, have a short look at the data.
+
+Table: Summary statistics for HAMD17 by treatment and week in the all2 data set with drop-outs
+
+```{r}
+#| message: false
+all2 %>%
+  select(chgdrop, group, avisit) %>%
+  tbl_strata(strata=group, 
+             ~.x %>% 
+               tbl_summary(by = avisit,
+                           statistic = list(
+      all_continuous() ~ "{mean} ({sd})"), 
+      digits = all_continuous() ~ 2 ) %>%
+      modify_header(label = "**Variable**")
+)
+```
+
+Figure: Mean change from baseline for each treatment group in the all2 data set with drop-outs
+
+```{r}
+#| label: fig-mean2
+#| fig-cap: "Mean HAMD17 change from baseline by treatment group"
+#| warning: false
+ggplot(data = all2, aes(x = week, y = chgdrop)) +  
+  geom_point(aes(colour=factor(group))) + ylab("Change from baseline HAMD17") +
+  scale_x_continuous(name="Visit [week]", breaks=c(2,4,8)) +
+  stat_summary(aes(group = group, colour=factor(group)), geom = "line", fun.y = mean,
+               size = 1) +
+  stat_summary(aes(group = group, colour=factor(group)), geom = "point", fun.y = mean,
+               shape=17,size = 2)
+```
+
+## Data set high2
+
+-   Large data set with n=100 subjects.
+-   Note that we have no intermittent missing values but drop-outs.
+
+Looking at the variables in the data set.
+
+```{r}
+head(high2)
+```
+
+### Task 2 - Exploration of data set high2 - 15 minutes working time
+
+-   Explore the drop-outs e.g. number of observations by week.
+-   Summary statistics for HAMD17 change.
+-   Generate and interpret the group-wise boxplots of the change from baseline.
+-   Mean change from baseline for different drop-out groups (by treatment). Comment on the plot.
+
+
+
+
+# Correlation structure, covariance matrices
+
+-   Longitudinal data allows to exploit the correlation between outcomes within subjects regardless of whether or not focus is on a single landmark time point.
+-   Model within-subject error correlation
+-   Different residual covariance structures can be implemented
+
+## Overview - different covariance matrices
+
+-   Variance components (VC) independence structure
+-   Compound symmetry (CS) also known as exchangeable
+-   Toeplitz (TOEP)
+-   First order auto regressive (AR(1))
+-   Unstructured (UN)
+
+Selected covariance structures for data with three assessment times (t=3) are shown below. Note that with three assessment times, the number of parameters estimated for the various structures did not differ as much as would be the case with more assessment times. Thus, results from different covariance structures are more similar than would be the case with more assessment times.
+
+### Independence structure (VC)
+
+Constant variance. It is assumed to be no correlation between assessments (residuals are independent across time). $$ R = \begin{bmatrix}
+   \sigma^2   & 0  & 0  \\
+   0  & \sigma^2   & 0 \\
+   0  & 0  & \sigma^2
+   \end{bmatrix}$$
+
+### Compound symmetry (CS)
+
+Constant variance and constant covariance across all assessments. Also known as exchangeable. It requires two parameter estimates. Most simplest repeated measures (i.e., correlated errors) structure.
+
+$$ R = \begin{bmatrix}
+   \sigma^2 + \sigma_1 & \sigma_1  & \sigma_1  \\
+   \sigma_1  & \sigma^2 + \sigma_1  & \sigma_1  \\
+   \sigma_1  & \sigma_1  & \sigma^2 + \sigma_1
+   \end{bmatrix}$$
+
+### Unstructured (UN)
+
+This is the most general (saturated) model. It has t + \[t(t-1)/2\] parameters to be estimated. Here it is 3 + 3 = 6 parameters.
+
+$$ R = \begin{bmatrix}
+   \sigma_1^2 & \sigma_{21}  & \sigma_{31}  \\
+   \sigma_{21}  & \sigma_2^2   & \sigma_{32}  \\
+   \sigma_{31}  & \sigma_{32}  & \sigma_3^2
+   \end{bmatrix}$$
+
+### Toeplitz structure (TOEP)
+
+Homogenous variances and heterogenous correlations. Same correlation value is used whenever the degree of adjacency is the same e.g. correlation between times 1 and 2 = correlation between times 2 and 3. Repeated measurements are assumed to be equally spaced. TOEP requries t parameter estimates so here we have t=3 parameter.
+
+$$ R = \begin{bmatrix}
+   \sigma^2  & \sigma_1^2 & \sigma_2^2 \  \\
+   \sigma_1^2 & \sigma^2  & \sigma_1^2  \\
+   \sigma_2^2  & \sigma_1^2 & \sigma^2 
+   \end{bmatrix}$$
+
+### Autoregressive structure (AR(1))
+
+Correlation decreases as time between observations increases. Assumtpion of equal spacing between each repeated measurement must be reasonably applicable. This structure requires the estimation of two parameters.
+
+$$ R = \begin{bmatrix}
+   \sigma^2  & \sigma^2 \rho  & \sigma^2 \rho^2  \\
+   \sigma^2 \rho & \sigma^2   & \sigma^2 \rho  \\
+  \sigma^2 \rho^2  & \sigma^2 \rho  & \sigma^2 
+   \end{bmatrix}$$
+
+### Spatial Power (SP)
+
+Spatial covariance structures does not require equal spacing between measurements. Instead, as long as the distance between visits can be quantified in terms of time and/or other coordinates, the spatial covariance structure can be applied. Covariances are mathematical functions of Euclidean distances between observed measurements. Again, two parameters need to be estimated.
+
+For spatial exponential, the covariance structure is defined as follows:
+
+$$ R = \begin{bmatrix}
+   \sigma^2  & \sigma^2 \rho_{12}  & \sigma^2 \rho_{13}  \\
+   \sigma^2 \rho_{21} & \sigma^2   & \sigma^2 \rho_{23}  \\
+  \sigma^2 \rho_{31}  & \sigma^2 \rho_{32}  & \sigma^2 
+   \end{bmatrix}$$
+
+with $$ \rho_{ij}=\rho^{d_{ij}} $$ where $$d_{ij} $$ is the distance between time point i and time point j e.g. distance in weeks.
+
+## Selecting the covariance structure
+
+There are a variety of considerations when selecting the covariance structure:
+
+-   number of parameters
+-   interpretation of the structure
+-   model fit
+
+UN is the most flexible (complex) structure and can fail to run especially if one has many repeated measures. Choose a reasonable covaraiance structure which is the best compromise between model fit and complexity. E.g. use AIC as it penalises more complex models.
+
+## Task 3 - Exploration of correlation in the data
+
+-   Compute the empirical correlations between measurement timepoints in the all2 data set (e.g. correlation between baseline and post-baseline changes, variable *change*).
+-   Looking at these correlations + using your knowledge of the experiment (e.g., spacing of measurements), comment on the suitability of the correlation structures VC, CS, UN, AR(1).
+
+### Compute the correlation matrix
+
+```{r}
+# Reshape data from long to wide format
+wide_base <- all2 %>%
+  select(subject, week, basval) %>%
+  pivot_wider(names_from = week, values_from = basval, names_prefix = "Base_") %>%
+  select(Base_2)
+
+
+wide_data <- all2 %>%
+  select(subject, week, change) %>%
+  pivot_wider(names_from = week, values_from = change, names_prefix = "week_")
+
+wide_new <- cbind(wide_data,wide_base) 
+wide_new <- wide_new %>%
+  select(subject,Base_2,week_2,week_4,week_8)
+ 
+
+# Compute the correlation matrix for the wide data (excluding the 'subject' column)
+cor_matrix <- cor(wide_new[ , -1], use = "complete.obs")
+# Print the correlation matrix
+print(cor_matrix)
+
+
+library("ggcorrplot")
+# Plot the correlation matrix
+ggcorrplot(cor_matrix, 
+           type = "full",       
+           lab = TRUE,          # Add correlation coefficient labels
+           lab_size = 3,        # Size of the labels
+           colors = c("red", "white", "blue"),  
+           title = "Correlation Matrix",
+           ggtheme = theme_minimal())  
+
+
+cov(wide_new[ , -1], use = "complete.obs")
+```
+
+
+## Taking a step back: Consequences of Ignoring Correlation among Longitudinal Data
+
+This technical detour is motivated by [@fitzmaurice2011]. Let us assume we are only interested in the first two responses in a clinical study, say Visit 1 (Baseline) and Visit 2. Our interest lies in an assessment of mean changes over time (for the sake of simplicity in a single treatment group only), i.e. we wish to estimate
+
+$$
+\hat\delta := \hat\mu_2 - \hat\mu_1 = \frac{1}{N} \sum_{i=1}^N (Y_{i2} - Y_{i1})\,,
+$$
+
+where $Y_{i1}$ and $Y_{i2}$ are observations from subject $i$ at Visit 1 and Visit 2, respectively. To obtain the standard error (SE) and get a notion of variability, we compute the variance of $\hat\delta$ and see that
+
+$$
+\text{Var}(\hat\delta) = \text{Var}\left(\frac{1}{N} \sum_{i=1}^N (Y_{i2} - Y_{i1})\right) = \frac{1}{N} (\sigma_1^2 + \sigma_2^2 - 2\sigma_{12})\,.
+$$
+
+The inclusion of the term $- 2\sigma_{12}$ accounts for the correlation between responses at Visit 1 and Visit 2. As data from adjacent visits is usually positively correlated, the omission of the correlation term leads to an overestimation of the variance and thus the SE associated with the treatment effect.

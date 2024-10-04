@@ -1,0 +1,397 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Power for Complex Hypotheses
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+packages<-c("tidyverse", "kableExtra")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+```
+
+
+**Summary**
+
+Choosing an effect size for sample size determination depends on factors such as scientific & clinical considerations, uncertainty about the effect size & practical trial resources available.
+
+While traditionally estimated effect sizes have been used, there is increasing guidance favoring the use of MCID for more scientifically relevant SSD (see DELTA guidance).
+
+Sensitivity analysis and assurance help evaluate the effect of effect size uncertainty on power and sample size and can quantify the robustness of the study design to effect size deviations
+
+Promising zone designs offer adaptive approach that can bridges conventional and MCID perspectives by allowing to power initially on expected effect size but increase sample size at interim analyses for lower but still promising results
+
+
+## Overview of Complex Hypotheses
+
+### Introduction {-}
+
+1. **Objective of Clinical Trials**: The main goal is to evaluate the efficacy and safety of a new treatment.
+
+2. **Definition of Efficacy**: The term "efficacy" can have different meanings depending on the clinical and regulatory context. For instance, it could be the basis for:
+   - **New Treatment Approval**: Determining if a new treatment is effective enough for approval.
+   - **Generic Treatment Approval**: Assessing if a generic treatment is as effective as the brand-name version.
+
+3. **Changing Hypotheses**: Depending on the regulatory scenario, the hypothesis regarding the efficacy of a treatment may vary from proving superiority (a new treatment is better than existing options) to proving other aspects like equivalence or non-inferiority.
+
+4. **Types of Hypotheses in Clinical Trials**:
+   - **Equality/Inequality/Superiority**: This involves testing whether the new treatment is equal, not equal, or superior to the control or existing treatment.
+     - Objective: To show that the new treatment's efficacy is statistically similar to the control, within predefined upper and lower margins.
+     - Directionality: This involves an indirect effect without a "good" or "bad" direction, focusing solely on similarity.
+   
+   - **Superiority by a Margin (Super-superiority)**: This tests whether the new treatment is not just superior, but superior by a specific, predefined margin.
+     - Objective: To prove that the new treatment is better than the control by at least a specified margin.
+     - Directionality: This is effectively the inverse of non-inferiority testing and aims for a clearly better result than the control.
+   
+   - **Non-inferiority**: This tests whether the new treatment is not worse than the standard treatment by more than a predefined margin.
+      - Objective: To demonstrate that the new treatment is not worse than the control treatment by more than a specified margin.
+      - Directionality: It involves a direct effect with a "good" direction—meaning that the new treatment aims to be no worse than the control.
+   
+   - **(Bio)Equivalence**: This tests whether the new treatment has a similar efficacy and safety profile compared to an existing standard.
+
+5. **Statistical Definitions**:
+   - **Inequality Test (δ = 0)**: Known as statistical superiority, where the goal is to prove the new treatment has a statistically significant effect compared to the control.
+   - **Superiority by a Margin Test (δ > 0)**: Known as clinical superiority, which aims to demonstrate that the new treatment's effect is greater than the control by at least the margin δ.
+   
+   
+
+![Confidence interval approach to analysis of equivalence and non-inferiority trials](./02_Plots/SSC/SSC_CI_Margin.png)
+
+*Pater C. Equivalence and noninferiority trials - are they viable alternatives for registration of new drugs? (III). Curr Control Trials Cardiovasc Med. 2004 Aug 17;5(1):8. doi: 10.1186/1468-6708-5-8. PMID: 15312236; PMCID: PMC514891.*
+
+### Non-Inferiority Testing {-}
+
+1. **Purpose and Context**:
+   - **Non-Inferiority Testing**: Aimed to show that a new treatment's effectiveness is not substantially worse than that of an existing treatment by more than a pre-specified margin (Δ₀).
+   - Hypotheses:
+     - Null Hypothesis (H₀): Δ ≥ Δ₀, where Δ₀ is the non-inferiority margin.
+     - Alternative Hypothesis (H₁): Δ < Δ₀.
+   - **Common Use**: Particularly relevant for treatments that may be less invasive, cheaper, or provide alternative benefits compared to existing standards.
+
+2. **Statistical Framework**:
+   - **One-Sided Test**: Non-inferiority is usually tested using a one-sided confidence interval. For instance, at a 5% alpha level, this would imply a 90% two-sided confidence interval.
+   - **Confidence Interval (CI)**: The CI for the treatment difference should not include the non-inferiority margin Δ₀ on the negative side, indicating that the new treatment is not substantially worse.
+
+3. **Margin Selection**:
+   - NI testing is particularly valuable for treatments that might be less invasive, cheaper, or offer other practical benefits compared to the standard treatment.
+   - This approach is suitable when a lower effect size is acceptable due to other advantages like cost, safety, or ease of administration.
+   - **Regulatory Guidelines**: The International Council for Harmonisation (ICH) guidelines and FDA recommendations suggest using a conservative margin, typically a fraction (M2) of the active control effect (M1), which is the estimated effect size of the standard treatment compared to a placebo.
+   - **Factors Influencing Margin Selection**: These include the safety profile, ease of administration, secondary endpoints, and overall treatment benefits. The chosen margin should reflect a balance between clinical judgment and statistical rationale.
+    
+4. **Assay Sensitivity**:
+   - **Two-Arm Trials**: Commonly involve a new treatment versus a standard treatment, assuming the effect size of the standard treatment is consistent with its historical data.
+   - In some cases, a three-arm trial including a placebo might be used to ensure assay sensitivity (the ability to distinguish effective treatments from less effective or ineffective treatments).
+   - This setup allows direct measurement of the treatment effect against both a placebo and the standard treatment, providing a robust framework for evaluating the non-inferiority margin.
+   - **Three-Arm Trials**: These include a placebo group to directly assess the standard treatment's effect versus placebo, enhancing the reliability of the non-inferiority assessment.
+
+5. **Regulatory and Ethical Considerations**:
+    - **Ethical Justification**: The inclusion of a placebo group is justified only if it is ethical, considering the severity of the condition being treated and the existing treatment landscape.
+    - **Dialogue with Regulators**: Discussions with regulatory authorities are crucial to justify the non-inferiority margin and other trial parameters, ensuring that the new treatment can be adequately assessed for its intended use without compromising safety or ethical standards.
+    - Non-inferiority trials are especially vital when newer treatments offer significant non-efficacy related benefits such as reduced cost, improved safety, or better patient compliance. These trials allow for the introduction of new treatments that may not outperform established therapies in terms of efficacy but are still valuable alternatives due to other advantages.
+    
+    
+
+### Superiority by Margin Testing {-}
+
+1. **Purpose and Context**:
+   - **Superiority Testing**: This test aims to show that a new treatment is superior to an existing treatment by a pre-specified margin.
+   - **Clinical Implications**: Often required when the new treatment is more expensive or complex to administer, thereby necessitating a demonstrable improvement in efficacy to justify these drawbacks.
+   
+ 
+
+2. **Statistical Framework**:
+   - **One-Sided Test**: Similar to non-inferiority tests, superiority by margin tests often use a one-sided confidence interval, which should lie entirely above the superiority margin to confirm the treatment’s enhanced efficacy.
+   - **Null Hypothesis** (H₀): Δ ≤ Δ₀ (where Δ₀ is the margin, and if it's positive, it represents a superiority test).
+
+3. **Regulatory and Clinical Considerations**:
+   - **Margin Selection**: Determining the margin of superiority is based on clinical expertise, historical data, and rigorous discussion with regulatory bodies. It must be clinically meaningful, considering the disease's severity and the new treatment's potential side effects.
+   - **FDA Requirements**: In some high-stakes scenarios, such as vaccine development for widespread diseases (e.g., COVID-19), the FDA may require substantial efficacy improvement over existing treatments.
+
+4. **Ethical and Practical Considerations**:
+   - **Patient Benefit**: The primary concern is the net benefit to patients, weighing potential increases in efficacy against increased toxicity or other drawbacks.
+   - **Assay Sensitivity**: The test must be sensitive enough to detect true differences between the new and standard treatments, necessitating well-designed trial parameters.
+
+
+### Similarities and Differences with Non-Inferiority Testing {-}
+
+- **Similarities**:
+  - Both tests involve defining a specific margin to measure treatment effects against.
+  - Statistical methods and sample size considerations can be similar, depending on the outcome measures (like proportions or survival times).
+
+- **Differences**:
+  - Non-inferiority tests aim to demonstrate that the new treatment is not significantly worse than the standard, while superiority tests must show it is significantly better.
+  - Variance considerations may differ, especially for non-normal endpoints where the variance can depend on the measure itself, affecting the type of statistical test used and its power.
+
+- **Statistical Considerations for Sample Size and Power:**
+  - **Sample Size Determination**: Before calculations, the null hypothesis and margin must be explicitly specified. This is critical as it influences the entire study design, including power and type I error considerations.
+  - **Power Analysis**: In superiority by margin testing, the analysis is straightforward if the endpoints are normally distributed, as the test is akin to a shifted one-sided test. However, for non-normal endpoints like proportions, variance and location dependence must be carefully considered, complicating the power calculations and potentially impacting type I error rates.
+
+### Equivalence Testing {-}
+
+Equivalence testing in clinical trials aims to establish that the efficacy and safety of a new treatment are equivalent to those of an existing treatment within pre-defined margins. This is critical in generic drug development and biosimilar approval processes, where demonstrating similarity to an established product is necessary for regulatory approval.
+
+Equivalence testing plays a crucial role in ensuring that new or alternative treatments provide therapeutic results consistent with existing options, without significant deviations that could affect efficacy or safety. This testing framework supports regulatory and clinical decisions, helping to maintain high standards in drug development and approval processes, and ensuring that patients receive effective and safe therapeutic alternatives.
+
+**Overview of Equivalence Testing**
+
+- **Objective**: To demonstrate that a new treatment's effect is neither significantly worse nor significantly better than an existing treatment's effect, within pre-specified upper (\(\Delta_U\)) and lower (\(\Delta_L\)) equivalence margins.
+- **Methodology**: The testing approach involves Two One-Sided Tests (TOST) for equivalence:
+  - The null hypothesis (\(H_0\)) tests if the treatment difference is either greater than \(\Delta_U\) or less than \(\Delta_L\).
+  - The alternative hypothesis (\(H_1\)) asserts that the true treatment difference lies between these two margins (\(\Delta_L < \Delta < \Delta_U\)).
+- **Procedure**: Equivalence testing often utilizes the TOST procedure, which involves conducting two one-sided tests:
+  - One test to determine if the new treatment's effect is significantly less than the lower equivalence margin.
+  - Another test to determine if it's significantly more than the upper equivalence margin.
+- **Acceptance Criterion**: Equivalence is established if both tests confirm that the difference in treatment effects falls within the specified equivalence margins.
+- **Statistical Significance**: Each test is conducted at a one-sided significance level, and typically, no adjustment for multiple comparisons is needed since the overall type I error rate for the procedure is maintained at the nominal level.
+  
+**Common Applications**
+
+- **Bioequivalence Trials**: These trials, often mandatory for the approval of generic drugs, typically use equivalence testing to show that the generic drug's pharmacokinetic parameters (like AUC, \(C_{max}\), and \(T_{max}\)) fall within acceptable limits around those of the brand-name counterpart.
+- **Biosimilar Trials**: Involving biological medicines, these trials require more robust evidence due to the inherent variability in biological production processes. They might use parallel trial designs rather than crossover due to the complexities involved.
+
+**Setting Equivalence Margins**
+
+- **Equivalence Margins**: Set by regulatory authorities, commonly within a range that ensures the therapeutic effects of the biosimilar or generic are not significantly different from those of the reference product.
+  - For example, the FDA often requires that the geometric mean ratios (GMRs) for parameters like AUC and \(C_{max}\) be between 0.80 and 1.25.
+- **High Variability Drugs**: For drugs with a coefficient of variation (CV) greater than 30%, the equivalence margins might be adjusted or "scaled" to account for increased variability, ensuring that the trials are both feasible and not overly punitive.
+
+**Defining Equivalence**
+
+- **Measurement Focus**: Choices about what constitutes equivalence can vary, focusing on average effects, individual responses, or population-wide outcomes depending on the drug's intended use and clinical impact.
+- **Endpoints**: Selection of appropriate endpoints such as AUC, \(C_{max}\), and \(T_{max}\) is crucial as these metrics effectively capture the drug’s absorption and concentration profiles, which are pivotal for establishing pharmacokinetic equivalence.
+
+## Sample Size for non-inferiority (NI) and superiority by margin (SM) testing 
+
+![XXX](./02_Plots/SSC/SSC_Test_NI SM.png)
+
+
+### 1. Endpoint: Means {-}
+
+- **Common Tests**: t-test, Z-test, Mann-Whitney U.
+- **Sample Size Methods**: Schuirmann (1987), Phillips (1990).
+- **Example Formula**:
+  \[
+  n = \frac{(Z_{\alpha} + Z_{\beta})^2 \sigma^2}{(\epsilon - \delta)^2}
+  \]
+  Where:
+  - \(n\) = sample size
+  - \(Z_{\alpha}\) and \(Z_{\beta}\) = standard normal deviates corresponding to type I error rate (\(\alpha\)) and power (\(1-\beta\))
+  - \(\sigma\) = standard deviation of the measurements
+  - \(\epsilon\) = effect size of interest
+  - \(\delta\) = non-inferiority or superiority margin
+
+### 2. Endpoint: Proportions {-}
+
+- **Common Tests**: Likelihood ratio tests (e.g., Farrington-Manning), Chi-squared test, Exact tests.
+- **Sample Size Methods**: Miettinen & Nurminen (1985), Farrington & Manning (1990), Gart & Nam (1990).
+- **Example Formula**:
+  \[
+  n = \frac{(Z_{\alpha} + Z_{\beta})^2 p(1 - p)}{(\epsilon - \delta)^2}
+  \]
+  Where:
+  - \(p\) = proportion in the control group
+
+### 3. Endpoint: Survival/Time-to-Event {-}
+
+- **Common Tests**: Log-rank test, Cox regression, Linear Rank tests (e.g., Fleming-Harrington), MaxCombo, RMST.
+- **Sample Size Methods**: Schoenfeld (1983), Chow (2008), Tang (2021).
+- **Example Formula**:
+  \[
+  n = \frac{(Z_{\alpha} + Z_{\beta})^2}{(b - \delta)^2 p_1 p_2 d}
+  \]
+  Where:
+  - \(b\) = logarithm of the hazard ratio
+  - \(p_1\) and \(p_2\) = probabilities of events in the two groups
+  - \(d\) = integrated hazard over time
+
+### 4. Endpoint: Counts/Incidence Rates {-}
+
+- **Common Tests**: Poisson/Quasi-Poisson, Negative Binomial, Andersen-Gill.
+- **Sample Size Methods**: Zhu (2017), Tang (2017), Fitzpatrick (2019).
+- **Example Formula**:
+  \[
+  n = \frac{(Z_{\alpha} \sqrt{V_0} + Z_{\beta} \sqrt{V_1})^2}{(\epsilon - \delta)^2}
+  \]
+  Where:
+  - \(V\) = variance depending on the rates \( \lambda_1 \) and \( \lambda_2 \)
+   
+
+## Sample Size for equivalence testing 
+
+
+![XXX](./02_Plots/SSC/SSC_Test_Equivalence.png)
+
+1. **Endpoints and Common Tests**
+
+- **Means**: Often analyzed using t-tests, Z-tests, or non-parametric tests like the Mann-Whitney U.
+- **Proportions**: Analyzed using likelihood ratio tests, Chi-squared tests, or exact tests.
+- **Survival/Time-to-Event**: Commonly assessed using log-rank tests, Cox regression, or other survival analysis methods.
+- **Counts/Incidence Rates**: Typically analyzed using Poisson or Negative Binomial models, among others.
+
+2. **Sample Size Determination Methods**
+
+These methods are tailored to the type of data and the statistical test used:
+- **Means**: Schuirmann’s dual criterion method is popular for continuous outcomes, ensuring that the sample size is adequate to detect or reject equivalence within specified margins.
+- **Proportions**: Methods by Miettinen & Nurminen and Farrington & Manning focus on calculating the required sample size to detect a significant difference in proportions, ensuring that the observed proportion falls within the predefined equivalence margins.
+- **Survival/Time-to-Event**: Schoenfeld and others provide formulas based on survival analysis metrics to ensure enough events occur during the study to confidently assess equivalence.
+- **Counts/Incidence Rates**: Zhu, Tang, and others have developed methods suitable for count data, often seen in epidemiological studies.
+
+3. **Example Formulas**
+
+The example formulas provided in the slide use standard parameters for hypothesis testing:
+- **For Means**:
+  \[
+  n = \frac{(Z_\alpha + Z_\beta/2)^2 \sigma^2}{(\delta - |e|)^2}
+  \]
+  Here, \(Z_\alpha\) and \(Z_\beta\) are the critical values for type I and type II errors, \(\sigma^2\) is the variance, \(\delta\) is the equivalence margin, and \(|e|\) is the expected difference.
+  
+- **For Proportions**:
+  \[
+  n = \frac{(Z_\alpha + Z_\beta/2)^2 p(1-p)}{(\delta - |e|)^2}
+  \]
+  Where \(p\) represents the proportion in the reference group.
+
+- **For Survival/Time-to-Event**:
+  \[
+  n = \frac{(Z_\alpha + Z_\beta/2)^2}{(\delta - |b|)^2 p_1 p_2 d}
+  \]
+  \(b\) is derived from the log hazard ratios, \(p_1\) and \(p_2\) are the probabilities of event occurrence, and \(d\) integrates the variance over time.
+
+- **For Counts/Incidence Rates**:
+  \[
+  n = \frac{(Z_\alpha V_0 + Z_\beta V_1)^2}{\delta^2}
+  \]
+  Where \(V_0\) and \(V_1\) represent the variances based on different rates in the treatment and control groups.
+  
+## Case Study
+
+### Non-inferiority t-test for two Sample
+
+A case study on non-inferiority testing for comparing two types of stents—sirolimus-eluting and paclitaxel-eluting—in diabetic patients concerning in-segment late luminal loss, which is a measure used to assess the efficacy of stents in preventing re-narrowing of the artery after implantation.
+
+1. **Objective**: To determine if paclitaxel-eluting stents are not inferior to sirolimus-eluting stents by a specified margin regarding in-segment late luminal loss.
+
+2. **Non-Inferiority Margin**: 
+   - The non-inferiority margin set is -0.16 mm, meaning the late luminal loss with the paclitaxel stent should not be more than 0.16 mm worse than that observed with the sirolimus stent.
+   - This margin (-0.16 mm) represents 35% of the assumed mean late luminal loss of 0.46 mm observed with sirolimus stents.
+
+3. **Statistical Design**:
+   - **Significance Level (α)**: 0.05, one-sided, indicating the probability of Type I error is 5%.
+   - **Power (1 - β)**: 80%, which means there is an 80% probability that the study will correctly reject the non-inferiority hypothesis if paclitaxel stents are indeed not inferior.
+   - **Expected Difference**: 0, as the study aims to prove non-inferiority rather than a difference.
+
+4. **Standard Deviation (SD)**: 
+   - The SD of late luminal loss is 0.45 mm, used to calculate the sample size and variability of the outcome measure.
+
+5. **Sample Size**: 
+   - Calculated to be 99 patients per group to achieve the desired power and account for the variability and non-inferiority margin set.
+
+**Interpretation:**
+
+- The choice of the non-inferiority margin is critical as it directly influences the clinical relevance of the study findings. In this case, -0.16 mm is deemed clinically acceptable, implying that any additional loss up to this amount does not significantly impact the efficacy of the paclitaxel stent compared to the sirolimus stent.
+- The sample size of 99 patients per group is calculated to ensure sufficient power to detect a non-inferiority effect size as small as the margin set, within the bounds of statistical and clinical significance.
+
+
+### Non-inferiority for difference of two proportions
+
+The clinical trial aims to compare the efficacy of ketamine to electroconvulsive therapy (ECT) for the treatment of nonpsychotic treatment-resistant major depression. The primary endpoint of interest is the proportion of patients who respond to treatment.
+
+**Key Parameters**
+  - **Non-Inferiority Margin (Δ₀)**: -10 percentage points. This margin is chosen to define the maximum allowable inferiority of ketamine compared to ECT. In essence, ketamine's response rate should not be more than 10 percentage points lower than that of ECT to consider ketamine non-inferior.
+  - **Expected Difference (Δ)**: 5 percentage points. This is the hypothesized actual difference in the response rate between ketamine and ECT, favoring ECT.
+  - **Standard Proportion (π₂)**: 50%. This is the expected response rate for ECT based on previous studies or expert opinion.
+  - **Significance Level (α)**: 2.5% one-sided. This lower alpha level reflects the stringent criteria for declaring non-inferiority, thus reducing the risk of type I error.
+  - **Sample Size**: 346 participants in total. This size is calculated to achieve the desired statistical power while accounting for the expected difference and non-inferiority margin.
+
+**Methodology**
+
+The Farrington-Manning method for power calculation was used. This approach is specifically tailored for non-inferiority and equivalence trials involving two proportions. It adjusts for the fact that the non-inferiority margin and expected difference could alter the traditional power calculation dynamics.
+
+**Statistical Considerations**
+
+  - **Power (1-β)**: 80%. This is the probability that the study will correctly detect non-inferiority if it truly exists, indicating a robust study design capable of substantiating the non-inferiority claim.
+  - **Test Type**: One-sided. The test is designed to only explore whether ketamine is not inferior by more than 10 percentage points, rather than checking for superiority or equivalence.
+
+**Clinical Implications**
+
+This study design allows clinicians and researchers to evaluate whether ketamine, which might be less invasive or have different side effects profiles compared to ECT, can be a viable treatment option without significantly compromising on efficacy. The choice of a -10 percentage point margin as non-inferiority criteria balances clinical judgment and statistical rigor, ensuring that any clinically meaningful deterioration in efficacy (from the perspective of patient outcomes) is detected.
+
+### Superiority for difference of two Means
+
+A clinical trial designed to test the superiority of adjustable intragastric balloons (aIGB) for obesity treatment over a control, using non-adjustable intragastric balloons (IGBs). This type of trial, targeting a measure called total body loss (TBL), is structured to determine whether the difference in TBL between the two groups is significant and clinically meaningful.  
+
+**Study Design**
+
+- **Objective**: To demonstrate the superiority of aIGBs over standard IGBs in promoting weight loss, measured as total body loss (TBL).
+- **Population Mean TBL**:
+  - **Control group (IGB)**: Expected to be 3.3% based on past trials.
+  - **Treatment group (aIGB)**: Expected to be 10.34% based on predictions.
+
+
+**Statistical Parameters**
+
+  - **Significance Level (α)**: One-sided significance of 2.5%, which enhances the stringency of the test to minimize type I errors.
+  - **Expected Difference (Δ)**: The anticipated true difference in TBL between the aIGB group and the control is 7.04%, calculated as \(10.34\% - 3.3\%\).
+  - **Non-Inferiority Margin**: Not directly applicable here since the trial is for superiority, but sometimes used to determine the minimal clinically important difference. Here it is 4.5%, indicating the trial aims to demonstrate a superiority of aIGB over the control by more than this margin.
+  - **Common Standard Deviation (σ)**: 6.6%, derived from previous data. This is used in calculating the sample size needed to detect the expected difference with adequate power.
+  - **Power (1 - β)**: 80%, meaning there is an 80% chance of detecting a true superiority of the specified margin if it exists.
+
+**Sample Size Calculation**
+
+  - **Total Sample Size**: 240 subjects, with a 2:1 randomization ratio (160 in aIGB group and 80 in the control group). This size is sufficient to detect the expected difference with the desired power and at the given significance level.
+  - The sample size calculation and study design considerations ensure that the trial is adequately powered to detect a meaningful difference in TBL, thus potentially confirming the superior efficacy of aIGB for obesity treatment compared to standard IGB.
+  - The use of a 2:1 randomization reflects a preference to gather more data on the aIGB, possibly due to its novel nature and the need to assess its safety and effectiveness thoroughly.
+  - The defined superiority margin and expected difference reflect both statistical calculations and clinical judgment about what constitutes a meaningful improvement in TBL for obese patients.
+
+
+### Equivalence Testing {-}
+
+
+A study design of a Phase 3 equivalence trial comparing the efficacy of a new drug (MW032) with an innovator drug (Denosumab) in treating solid tumor-related bone metastases. The case study focuses on a specific pharmacokinetic marker: the change in the logarithm of the urine N-telopeptide to creatinine ratio (log uNTx/uCr) from baseline to week 13. Let's break down the key components and the setup of this clinical trial:
+
+**Trial Objectives and Design**
+  - **Objective**: To demonstrate that the new drug, MW032, is equivalent to Denosumab in terms of their effect on uNTx/uCr, a marker of bone resorption.
+  - **Primary Endpoint**: The mean difference in log uNTx/uCr values at week 13 from baseline between the two treatments.
+
+**Statistical Setup**
+  - **Equivalence Margins**: These are set at -0.135 and 0.135. These margins define the limits within which the two treatments' effects must fall to be considered equivalent. The choice of these margins is based on half of the upper limit of the 50% confidence interval of the difference observed in a pivotal study, indicating a precise and scientifically justified range.
+  - **Expected Mean Difference**: Set at 0, indicating that under the null hypothesis, there is no difference between the new drug and the innovator drug.
+  - **Significance Level**: 5% (two-sided), which is standard for clinical trials, providing a balance between type I error control and statistical power.
+  - **Standard Deviation**: 0.58, reflecting variability in the measurement of the log uNTx/uCr across participants.
+  - **Sample Size**: 317 patients per group are required to achieve 80% power, ensuring a high probability of detecting equivalence if it truly exists.
+  - **Power**: 80%, typical for clinical trials, indicating a strong likelihood of correctly rejecting the null hypothesis if the new drug is indeed equivalent to the standard treatment.
+
+**Interpretation of Results**
+  - **95% Confidence Interval of Difference**: The reported interval from the pivotal study is [-0.444, -0.188], suggesting a significant difference favoring Denosumab over MW032 in the earlier study. However, for the purpose of this trial, the upper limit of this interval is used to establish a conservative equivalence margin.
+  - **Sample Size Justification**: The required sample size of 317 per group is calculated based on the standard deviation and the desired power to detect differences within the specified equivalence margins, ensuring the trial is adequately powered to confirm or refute equivalence.
+  - **Equivalence Testing**: This is crucial in the context of biosimilars or second-generation formulations where therapeutic equivalence to an established treatment must be demonstrated without significant reductions in efficacy or safety.
+  - **Regulatory Approval**: Successfully demonstrating equivalence within the defined margins can lead to regulatory approval for the new drug, offering a similar therapeutic option to patients and potentially affecting market dynamics with a new competitor to Denosumab.
+
+
+## Reference
+

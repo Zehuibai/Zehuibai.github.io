@@ -1,0 +1,550 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+# Sensitivity Analyses
+
+```{r}
+#| include: false
+## get the wd path
+# setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+# getwd()
+source("setup.R")
+```
+
+Purpose: talk about sensitivity analyses with respect to missing data
+
+-   MMRM is an appropriate choice for the primary analysis in many longitudinal clinical trials under the missing at random (MAR) assumption.
+-   MMRM can handle missing values. BUT: need of baseline and at least one post-baseline value.
+-   No imputation for individual missing values but missing data is implicitly imputed.
+-   Exploit the correlation between outcomes within subjects.
+-   MAR: future outcomes for subjects who discontinued are assumed be similar to the future outcomes of subjects who continued if they had the same values of past (observed) outcomes, covariates,...
+
+## Purpose of sensitivity analyses
+
+-   Consider sensivitiy analyses to check model assumptions e.g. assumption of MAR.
+-   Comparing results from sensitivity analyses: how much inference rely on the assumptions.
+-   Here, inference with regard to the treatment effect. Thus, investigate how treatment effects vary depending on assumptions (about missing data).
+-   Uncertainty from incompleteness cannot be objectively evaluated from observed data so there is a need for missing data sensitivity analyses.
+
+## MMRM vs. MI
+
+-   Flexibility in modeling treatment effects over time and the within-patient error correlation structure makes MMRM a widely useful analysis.
+-   MMRM, MI: two major approaches to missing data with good statistical properties. Both rely on MAR assumption (for MI: standard implementation).
+-   MMRM: missing values implicitly imputed, MI: missing values explicitly imputed.
+-   MMRM vs. MI: approximately equivalent provided the variables used in the imputation model are the same as those included in the analysis model (level of equivalence will depend on the number of imputations)
+-   MI: imputation model with at least those variables from the primary model, additional auxiliary variables can be used in the imputation model to improve the accuracy of the missing data prediction.
+-   Handling missing not at random (MNAR) possible for MI (e.g. reference-based imputation) but not within MMRM.
+-   MMRM does not work if missing baseline values are present. Missing baseline values can be imputed first. Additionally, at least one post-baseline value has to be observed. Alternative: LDA where baseline is part of the response vector.
+
+Note that, when implemented in similar manners, MI and MMRM have similar assumptions and yield similar results. Thus, MI implemented similarly to MMRM is not a sensitivity analysis!
+
+## Missing covariates (baseline data) only
+
+-   Missing baseline value of the outcome (and other covariates) is a common situation
+-   MMRM not efficient or potential biased estimates as subjects with missing covariates are excluded from the analysis
+-   [@kayembe2022] compared different methods e.g. unadjusted analysis, complete case, mean imputation, MI: mean imputation seems to be appropriate as long as the covariates are measured before randomization (produces unbiased treatment effect estimates with good coverage, easy to implement)
+
+Now, we consider the situation as in our data sets: baseline observed, no intermittent missing values, drop-outs = monotone missing pattern
+
+## Sensitivity analyses - Simple approaches
+
+In general, these simple approaches are not recommended for use. Methods are of historic interest and provide a useful starting point.
+Here, we consider two simple approaches. We will apply these two methods in the practical part to compare results.
+
+### Last observation carried forward (LOCF)
+For each subject, LOCF imputes missing values using the last observed value for that subject. Typically, under LOCF the repeated masures nature of the data is ignored and a single outcome for each subject is analyzed.
+
+LOCF was used in the past, justified as it was thought that it provides conservative estimates. However, conditions under which LOCF yield conservative estimates and maintain control of Type I error rates are not straightforward and cannot be assured at the beginning of the trial. For example, LOCF is likely to overestimate treatment benefit if dop-out in the control gorup is more frequent.
+
+### Complete case (CC) 
+Other names: observed case/ completers analysis 
+
+Reduce the data set selecting only those subjects with observed outcome value(s). 
+
+Completers analysis may create selection bias, may cause overestimation of within group effects particularly at the last scheduled visit.
+
+## Sensitivity analyses - Handling nonignorable missingness (MNAR)
+
+-   Assumption of MAR is often reasonable, but possibility of data missing not at random (MNAR) is difficult to rule out.
+-   Thus, analysis under MNAR needed.
+-   Analysis under MNAR: these methods are heavily assumption driven and the assumptions are not testable as we do not have the missing data.
+-   Consider a sensitivity analysis framework allowing assessment of robustness of results to the various assumptions.
+-   MNAR methods: different possibilities e.g. class of pattern-mixture models. The pattern-mixture model allows missing outcomes to be imputed under a chosen scenario and in this way can be used to complete the data set and apply the primary analysis to this completed data set.
+-   MI can be used to explore departures from MAR (for analysis under a MNAR assumption). This is referred to as controlled MI and includes delta-based MI and reference-based MI (belong to the class of pattern mixture models). Data is imputed under an alternative MNAR distribution that reflects a relevant scenario for the unobserved data. The imputed data sets are then analysed as with standard MI.
+
+
+### Reference-based multiple imputation
+
+-   Has received increasing attention in clinical trials as it provides an attractive approach for a sensitivity analysis because missing data assumptions are framed in an intuitive way. The departure from MAR is captured in a qualitative way, making the formulation of the problem intuitive.
+-   For example, a plausible MNAR mechanism in a placebo???controlled trial is to assume that subjects in the experimental arm who dropped out stop taking their treatment and have similar outcomes to those in the placebo arm.
+-   Remember: MI under MAR assumes that the outcome distribution of patients with missing data is the same as the outcome distribution of patients with complete data, conditional on relevant covariates. However, if most patients withdraw from the study after treatment discontinuation, then this is not plausible, as patients who withdraw from the study treatment are expected to have a worse otucome than patients who stay on study treatment. Thus, **addressing missing data under a MAR assumption estimates a hypothetical estimand and not a treatment policy estimand.**
+-   Different options to handle missing outcome data for reference-based imputation were described [@carpenter2013]: e.g. jump to reference (J2R), copy reference (CR), copy increments in reference (CIR)
+
+**Jump to reference** J2R assumes that after treatment discontinuation, the patient???s mean outcome distribution is that of a reference group, usually the control group. This is a very extreme assumption, as this implies that any efficacy of the drug vanishes immediately after discontinuation - may be plausible for symptomatic treatments.
+
+**Copy reference** CR assumes that the patient???s outcome distribution both before and after treatment discontinuation is the same as the distribution of the reference group. This has a milder effect than J2R: If a treatment-group patient has an outcome that is better than the reference group mean before treatment discontinuation, their imputed values after treatment discontinuation will also be better than the reference group mean.
+
+**Copy increments in reference** CIR assumes that after treatment discontinuation, the increments are the same as those from the reference group. This is much milder than J2R and CR and implies that benefit gained from the treatment before discontinuation is not lost.
+
+The conventional approach to analyse data using these reference based approaches is MI, following the same steps as MI under MAR.
+
+Software, R: e.g. the rbmi package supports reference-based strategies [@gowerpage2022]
+
+### Delta-based multiple imputation
+
+-   Impute data assuming all unobserved subjects having a poorer or better response than those observed, by adding or subtracting a delta parameter $\delta$ to the expected value of the e.g. MAR imputed values.
+-   Delta can be implemented in all treatment groups, or in only one group, or may vary by treatment group or an alternative specified factor.
+-   Choice of values for the sensitivity parameter $\delta$: e.g. selection by content experts.
+-   Steps: 1. missing values are imputed using standard MI procedure e.g. under MAR (but can also be under MNAR e.g. combinded with copy reference approach), 2. imputed values are shifted by adding some fixed value $\delta$ to reflect the MNAR mechanism, 3. analysis with standard statistical methods including Rubin's rule to combine results
+
+## Practical part
+
+-   Take the (*all2*) *high2* data set
+-   Look at the MMRM and at the complete case (CC) analysis (refer to section Missing Data for the *all2* data set).
+-   Apply additionally LOCF and compare results.
+-   Try MNAR method reference-based MI with J2R and CIR by using the rbmi package. Compare with the other results.
+
+### Set-up to use rbmi
+Have a short look at the `rbmi()` package first.
+
+```{r}
+library(rbmi)
+# ?rbmi
+vignette(topic = "quickstart", package = "rbmi")
+```
+
+The workflow is based on 4 core functions:
+
+-   draws() - fits the imputation models, different methods possible, we will use method_bayes() for MI based on Bayesian posterior parameter draws from MCMC sampling
+-   impute() - creates multiple imputed data sets
+-   analyse() - analyses each of the multiple imputed data sets, default = ancova, other options possible
+-   pool() - combines the results across imputed data sets, for method_bayes (see above) pooling and inference is based on Rubin's rule
+
+Implemented imputation strategies in rbmi:
+
+-   Missing at Random (MAR)
+-   Jump to Reference (JR)
+-   Copy Reference (CR)
+-   Copy Increments in Reference (CIR)
+
+I will show how it looks like for the *all2* data set and you will then explore the methods using the *high2* data set.
+
+### Plenum - Solution for all2 data set
+
+#### 1. Complete case
+
+```{r}
+#| echo: false
+all2.cc <- all2 %>% dplyr::filter(dropout_grp=="Completer")
+
+fit_cc <- mmrm::mmrm(
+  formula = chgdrop ~ basval*avisit + trt*avisit + us(avisit | subject),
+  data = all2.cc,
+  control = mmrm_control(method = "Kenward-Roger")
+)
+
+#summary(fit_cc)
+
+model_lsmeans_cc <- emmeans::emmeans(fit_cc, ~trt*avisit, weights = "proportional")
+```
+
+Table: Adjusted means for the complete case data set (all2 data with drop-out, select completer)
+
+```{r}
+model_lsmeans_cc
+```
+
+#### 2. MMRM, unstructured covariance
+
+```{r}
+#| echo: false
+fit_mmrm <- mmrm::mmrm(
+  formula = chgdrop ~ basval*avisit + trt*avisit + us(avisit | subject),
+  data = all2,
+  control = mmrm_control(method = "Kenward-Roger")
+)
+
+#summary(fit_drop)
+
+model_lsmeans_mmrm <- emmeans::emmeans(fit_mmrm, ~trt*avisit, weights = "proportional")
+```
+
+Table: Adjusted means for the all2 data set with drop-out analysed with MMRM
+
+```{r}
+model_lsmeans_mmrm
+```
+
+#### 3. LOCF
+
+```{r}
+all2.locf <- all2 %>% filter(!is.na(chgdrop)) %>%
+  dplyr::group_by(subject) %>% 
+  dplyr::mutate( drop=max(week) )
+
+all2.locf<-all2.locf %>% dplyr::filter(week==drop)
+
+ancova <- aov(change ~ basval + trt, data = all2.locf)
+summary(ancova)
+ancova$coefficients
+```
+
+Table: Mean values for change from baseline of LOCF analysis
+
+```{r}
+#| message: false
+#| echo: false
+all2.locf %>% ungroup() %>%
+  select(change, group) %>%
+               tbl_summary(by = group,
+                           statistic = list(
+                             all_continuous() ~ "{mean} ({sd})"), 
+                           digits = all_continuous() ~ 2 ) 
+
+```
+
+#### 4. J2R imputation
+
+```{r}
+#| output: false
+
+# Define the names of key variables in the data set
+set_mi<-set_vars(
+  subjid = "subject",
+  visit = "avisit",
+  outcome = "chgdrop",
+  group = "group",
+  covariates = c("basval * avisit", "group * avisit")
+)
+
+vars_an<-set_mi
+vars_an$covariates <- "basval"
+
+# Define the imputation strategy for each subject with at least one missing observation
+dat_ice <- all2 %>% 
+  arrange(subject, avisit) %>% 
+  filter(is.na(chgdrop)) %>% 
+  group_by(subject) %>% 
+  slice(1) %>%
+  ungroup() %>% 
+  select(subject, avisit) %>% 
+  mutate(strategy = "JR")
+
+# Define the imputation method
+method <- method_bayes(
+  burn_in = 200,
+  burn_between = 5,
+  n_samples = 100,
+  seed = 072407
+)
+
+draw_all2<-draws(data=all2, data_ice = dat_ice, vars=set_mi, method=method, ncores = 1, quiet = FALSE)
+
+imputeObj <- rbmi::impute(
+  draw_all2,
+  references = c("Arm 1" = "Arm 1", "Arm 2" = "Arm 1")
+)
+
+imputed_all2 <- extract_imputed_dfs(imputeObj)
+
+
+anaObj <- analyse(
+  imputeObj,
+  vars = vars_an
+)
+```
+
+Table: Estimates from jump to reference J2R imputation
+
+```{r}
+poolObj <- pool(anaObj)
+as.data.frame(poolObj)
+```
+
+#### 5. Change from J2R to CIR
+
+Use the additional argument update_strategies in the impute function.
+
+```{r}
+#| output: false
+dat_ice_CIR <- dat_ice %>% 
+  mutate(strategy = ifelse(strategy == "JR", "CIR", strategy))
+
+imputeObj_CIR <- rbmi::impute(
+  draw_all2,
+  references = c("Arm 1" = "Arm 1", "Arm 2" = "Arm 1"),
+  update_strategy = dat_ice_CIR
+)
+
+anaObj_CIR <- analyse(
+  imputeObj_CIR,
+  vars = vars_an
+)
+```
+
+Table: Estimates from copy increments in reference CIR imputation
+
+```{r}
+poolObj_CIR <- pool(anaObj_CIR)
+as.data.frame(poolObj_CIR)
+```
+
+#### Summary of results *all2* data set
+
+Take the figure from the missingness part to better understand what we have found here.
+
+Table: Estimates for all methods
+
+|                  | Mean   | Diff  |
+|------------------|:------:|:-----:|
+|Completers, Arm 1 | -10.17 |       |
+|Completers, Arm 2 | -13.10 | -2.93 |
+|MMRM, Arm 1       | -9.73  |       |
+|MMRM, Arm 2       | -12.62 | -2.89 |
+|LOCF, Arm 1       | -8.20  |       |
+|LOCF, Arm 2       | -11.24 | -3.03 |
+|J2R , Arm 1       | -9.66  |       |
+|J2R , Arm 2       | -11.87 | -2.21 |
+|CIR , Arm 1       | -9.65  |       |
+|CIR , Arm 2       | -12.26 | -2.61 |
+
+
+### Test: From *all2* to *high2* data set
+
+Now, you can first of all repeat the analysis on the *all2* data set to see if you can manage it. Or you go directly to the next step and apply methods to the *high2* data set.
+
+One starting point for the *high2* data set as the structure is a little bit different:
+
+First, fill in missing visits. This was not necessary in the *all2* data set. This can be done with the expand_locf function of the rbmi package.
+Note, *change* is the outcome variable and not *chgdrop* as in *all2*
+
+
+```{r}
+high2 <- high2 %>% ungroup()
+
+high2_expand <- expand_locf(
+  high2,
+  subject = levels(high2$subject),  
+  avisit = levels(high2$avisit),
+  vars = c("basval","trt","group"),
+  group = c("subject"),
+  order = c("subject", "avisit")
+)
+
+## Exploring missing data
+vis_miss(high2_expand)
+
+gg_miss_var(high2_expand %>% filter(group=="Arm 1"), 
+            facet = avisit, 
+            show_pct = TRUE)
+
+gg_miss_var(high2_expand %>% filter(group=="Arm 2"), 
+            facet = avisit, 
+            show_pct = TRUE)
+```
+
+
+#### 1. Complete case
+ 
+
+```{r}
+#| echo: false
+high2_expand.cc <- high2_expand %>% dplyr::filter(dropout_grp=="Completer")
+
+fit_cc <- mmrm::mmrm(
+  formula = change ~ basval*avisit + trt*avisit + us(avisit | subject),
+  data = high2_expand.cc,
+  control = mmrm_control(method = "Kenward-Roger")
+)
+
+#summary(fit_cc)
+
+model_lsmeans_cc <- emmeans::emmeans(fit_cc, ~trt*avisit, weights = "proportional")
+
+model_lsmeans_cc
+```
+
+
+#### 2. MMRM, unstructured covariance
+
+```{r}
+#| echo: false
+fit_mmrm <- mmrm::mmrm(
+  formula = change ~ basval*avisit + trt*avisit + us(avisit | subject),
+  data = high2_expand,
+  control = mmrm_control(method = "Kenward-Roger")
+)
+
+#summary(fit_drop)
+
+model_lsmeans_mmrm <- emmeans::emmeans(fit_mmrm, ~trt*avisit, weights = "proportional")
+
+model_lsmeans_mmrm
+```
+
+#### 3. LOCF
+
+```{r}
+high2_expand.locf <- high2_expand %>% filter(!is.na(change)) %>%
+  dplyr::group_by(subject) %>% 
+  dplyr::mutate( drop=max(week) )
+
+high2_expand.locf<-high2_expand.locf %>% dplyr::filter(week==drop)
+
+ancova <- aov(change ~ basval + trt, data = high2_expand.locf)
+summary(ancova)
+ancova$coefficients
+```
+
+Table: Mean values for change from baseline of LOCF analysis
+
+```{r}
+#| message: false
+#| echo: false
+high2_expand.locf %>% ungroup() %>%
+  select(change, group) %>%
+  tbl_summary(by = group,
+              statistic = list(
+                all_continuous() ~ "{mean} ({sd})"), 
+              digits = all_continuous() ~ 2 ) 
+
+```
+
+
+#### 4. J2R imputation
+
+```{r}
+#| output: false
+# Define the names of key variables in the data set
+set_mi<-set_vars(
+  subjid = "subject",
+  visit = "avisit",
+  outcome = "change",
+  group = "group",
+  covariates = c("basval * avisit", "group * avisit")
+)
+
+vars_an<-set_mi
+vars_an$covariates <- "basval"
+
+# Define the imputation strategy for each subject with at least one missing observation
+dat_ice <- high2_expand %>% 
+  arrange(subject, avisit) %>% 
+  filter(is.na(change)) %>% 
+  group_by(subject) %>% 
+  slice(1) %>%
+  ungroup() %>% 
+  select(subject, avisit) %>% 
+  mutate(strategy = "JR")
+
+# Define the imputation method
+method <- method_bayes(
+  burn_in = 200,
+  burn_between = 5,
+  n_samples = 100,
+  seed = 072407
+)
+
+draw_high2_expand<-draws(data=high2_expand, data_ice = dat_ice, vars=set_mi, method=method, ncores = 1, quiet = FALSE)
+
+imputeObj <- rbmi::impute(
+  draw_high2_expand,
+  references = c("Arm 1" = "Arm 1", "Arm 2" = "Arm 1")
+)
+
+imputed_high2_expand <- extract_imputed_dfs(imputeObj)
+
+
+anaObj <- analyse(
+  imputeObj,
+  vars = vars_an
+)
+```
+
+Table: Estimates from jump to reference J2R imputation
+
+```{r}
+poolObj <- pool(anaObj)
+as.data.frame(poolObj)
+```
+
+#### 5. CR imputation
+
+
+```{r}
+#| output: false
+dat_ice_CR <- dat_ice %>% 
+  mutate(strategy = ifelse(strategy == "JR", "CR", strategy))
+
+imputeObj_CR <- rbmi::impute(
+  draw_high2_expand,
+  references = c("Arm 1" = "Arm 1", "Arm 2" = "Arm 1"),
+  update_strategy = dat_ice_CR
+)
+
+anaObj_CR <- analyse(
+  imputeObj_CR,
+  vars = vars_an
+)
+```
+
+
+Table: Estimates from copy increments in reference CR imputation
+
+```{r}
+poolObj_CR <- pool(anaObj_CR)
+as.data.frame(poolObj_CR)
+```
+
+#### 6. CIR imputation
+
+Use the additional argument update_strategies in the impute function.
+
+```{r}
+#| output: false
+dat_ice_CIR <- dat_ice %>% 
+  mutate(strategy = ifelse(strategy == "JR", "CIR", strategy))
+
+imputeObj_CIR <- rbmi::impute(
+  draw_high2_expand,
+  references = c("Arm 1" = "Arm 1", "Arm 2" = "Arm 1"),
+  update_strategy = dat_ice_CIR
+)
+
+anaObj_CIR <- analyse(
+  imputeObj_CIR,
+  vars = vars_an
+)
+```
+
+Table: Estimates from copy increments in reference CIR imputation
+
+```{r}
+poolObj_CIR <- pool(anaObj_CIR)
+as.data.frame(poolObj_CIR)
+```
+
+#### Summary of results *high2_expand* data set
+
+Take the figure from the missingness part to better understand what we have found here.
+
+Table: Estimates for all methods
+
+| Group              | Mean  | Diff  |
+|--------------------|:-----:|:-----:|
+| Completers, Arm 1  | -6.96 |       |
+| Completers, Arm 2  | -8.67 | -1.71 |
+| MMRM, Arm 1        | -5.24 |       |
+| MMRM, Arm 2        | -7.76 | -2.52 |
+| LOCF, Arm 1        | -4.22 |       |
+| LOCF, Arm 2        | -6.72 | -2.50 |
+| J2R, Arm 1         | -5.31 |       |
+| J2R, Arm 2         | -7.03 | -1.72 |
+| CR, Arm 1          | -5.34 |       |
+| CR, Arm 2          | -7.24 | -1.90 |
+| CIR, Arm 1         | -5.31 |       |
+| CIR, Arm 2         | -7.37 | -2.06 |
+
+  

@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Longitudinal Data Modeling – s3_missingness</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+<link href="site_libs/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet">
+<script src="site_libs/bsTable-3.3.7/bootstrapTable.js"></script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Longitudinal Data Modeling</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html" rel="" target="">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./s1_visualization.html" rel="" target="">
+ <span class="menu-text">Visualization</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./s2_inference_continuous.html" rel="" target="">
+ <span class="menu-text">Inference from Continuous Data</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./s3_missingness.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Missing Data Handling</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./s4_sensitivity_analyses.html" rel="" target="">
+ <span class="menu-text">Sensitivity Analyses</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./s5_inferences_binary.html" rel="" target="">
+ <span class="menu-text">Inference from Binary Data</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://alex-lauer.github.io/GMDS-Summer-School/" rel="" target="">
+ <span class="menu-text">Link to Solutions</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools ms-auto">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="s3_missingness.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+
+<section id="missing-data" class="level1">
+<h1>Missing Data</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## get the wd path</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># setwd(dirname(rstudioapi::getSourceEditorContext()$path))</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># getwd()</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"setup.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.2     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.4     ✔ tibble    3.2.1
+✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+mmrm() registered as emmeans extension</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'rbmi' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'rbmi'
+
+The following object is masked from 'package:tidyr':
+
+    expand
+
+
+Attaching package: 'Hmisc'
+
+The following object is masked from 'package:gt':
+
+    html
+
+The following object is masked from 'package:rbmi':
+
+    impute
+
+The following objects are masked from 'package:dplyr':
+
+    src, summarize
+
+The following objects are masked from 'package:base':
+
+    format.pval, units
+
+
+Attaching package: 'kableExtra'
+
+The following object is masked from 'package:dplyr':
+
+    group_rows</code></pre>
+</div>
+</div>
+<p>So far, we conducted all our analyses on the basis of complete data. This is a blissful, yet highly unusual setting.</p>
+<p>We use the following definition for missing data, borrowed from <span class="citation" data-cites="little19">(<a href="#ref-little19" role="doc-biblioref">Roderick JA Little 2019</a>)</span>:</p>
+<p>“<em>Missing data are unobserved values that would be meaningful for analysis if observed; in other words, a missing value hides a meaningful value.</em>”</p>
+<p>We distinguish the following patterns of missingness:</p>
+<ul>
+<li><strong>Monotonic missingness/ dropout</strong>: All values by a subject after a certain time are missing. More specifically, if responses are missing at visit <span class="math inline">\(n \in \mathbb{N}\)</span>, then responses are also missing for every subsequent visit <span class="math inline">\(n + m\)</span>, for all <span class="math inline">\(m \in \mathbb{N}\)</span>. <em>Example:</em> Subject drop-out from the clinical study.</li>
+<li><strong>Intermittend missingness</strong>: Subjects miss one or several visits, but return for later visits. <em>Example:</em> A subject with data collected at baseline and Time 1 (Week 2), a missing value at Time 2 (Week 4) and a non-missing value at Time 3 (Week 8).</li>
+</ul>
+<p>Note that, following the nomenclature introduced by <span class="citation" data-cites="little19">(<a href="#ref-little19" role="doc-biblioref">Roderick JA Little 2019</a>)</span>, we use the term missing data <em>pattern</em>, to describe which data are missing in the data matrix of subject responses, and the term missing data <em>mechanism</em>, which describes the relationship between missing and observed values in the subject responses.</p>
+<p>Our dataset contains a second variable <code>chgdrop</code>, which is subject to missingness. Let’s rerun our initial MMRM with <code>chgdrop</code> as dependent variable, baseline value, visit, baseline by visit interaction and treatment by visit interaction as fixed effects and an unstructured covariance matrix for visits within each subject.</p>
+<p>This formulation is very similar to the one at the beginning of the former chapter. How do the results differ in terms of LS Means of change from baseline by treatment arm over time?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fit_cat_time <span class="ot">&lt;-</span> mmrm<span class="sc">::</span><span class="fu">mmrm</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> chgdrop <span class="sc">~</span> basval<span class="sc">*</span>avisit <span class="sc">+</span> trt<span class="sc">*</span>avisit <span class="sc">+</span> <span class="fu">us</span>(avisit <span class="sc">|</span> subject),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> all2,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">mmrm_control</span>(<span class="at">method =</span> <span class="st">"Kenward-Roger"</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># summary(fit_cat_time)</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>model_lsmeans <span class="ot">&lt;-</span> emmeans<span class="sc">::</span><span class="fu">emmeans</span>(fit_cat_time, <span class="sc">~</span>trt<span class="sc">*</span>avisit, <span class="at">weights =</span> <span class="st">"proportional"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>model_lsmeans</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> trt avisit emmean    SE   df lower.CL upper.CL
+ 1   Week 2  -4.10 0.900 47.0    -5.91    -2.29
+ 2   Week 2  -5.29 0.899 47.0    -7.10    -3.48
+ 1   Week 4  -6.42 0.974 46.5    -8.38    -4.46
+ 2   Week 4  -8.52 0.951 44.8   -10.43    -6.60
+ 1   Week 8  -9.73 1.142 40.4   -12.03    -7.42
+ 2   Week 8 -12.62 1.114 40.1   -14.88   -10.37
+
+Confidence level used: 0.95 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>emmeans<span class="sc">::</span><span class="fu">emmeans</span>(fit_cat_time, <span class="sc">~</span>trt<span class="sc">*</span>avisit, <span class="at">weights =</span> <span class="st">"proportional"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Difference in LS Means at Week 8"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Difference in longitudinal LS Means to Week 8"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)<span class="sc">/</span><span class="dv">3</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> contrast                                      estimate   SE   df t.ratio
+ Difference in LS Means at Week 8                 -2.90 1.60 40.3  -1.814
+ Difference in longitudinal LS Means to Week 8    -2.06 1.23 46.8  -1.671
+ p.value
+  0.0771
+  0.1014</code></pre>
+</div>
+</div>
+<p>To understand the nature of the differences between the model using <code>change</code> as a response variable and the one with <code>chgdrop</code>, we need to look closer into the extent of missing data and understand its nature.</p>
+<section id="missing-data-mechanisms" class="level2">
+<h2 class="anchored" data-anchor-id="missing-data-mechanisms">Missing Data Mechanisms</h2>
+<p>To understand the nature of missing data in our clinical trial, we consider the following taxonomy, introduced by <span class="citation" data-cites="little19">(<a href="#ref-little19" role="doc-biblioref">Roderick JA Little 2019</a>)</span>. We differentiate between the following three types of missing data:</p>
+<ul>
+<li><p><strong>Missing Completely at Random (MCAR)</strong>: Conditional on all covariates in our analysis, the probability of missingness does not depend on either observed or unobserved values of the response variable.</p></li>
+<li><p><strong>Missing at Random (MAR)</strong>: Conditional on all covariates and observed response values in our analysis, the probability of missingness does not depend on the unobserved values of the response variable.</p></li>
+<li><p><strong>Missing not at Random (MNAR)</strong>: Conditional on all covariates and observed response values in our analysis, the probability of missingness does depend on the unobserved values of the response variable.</p></li>
+</ul>
+<p><span class="citation" data-cites="mallinckrodt2016">(<a href="#ref-mallinckrodt2016" role="doc-biblioref">Mallinckrodt and Lipkovich 2016</a>)</span> give the following interpretation around the three types of missingness:</p>
+<p>“<em>With MCAR, the outcome variable is not related to the probability of dropout (after taking into account covariates). In MAR, the observed values of the outcome variable are related to the probability of dropout, but the unobserved outcomes are not (after taking into account covariates and observed outcomes). In MNAR the unobserved outcomes are related to the probability of dropout even after the observed outcomes and covariates have been taken into account.</em>”</p>
+<p>The following two sections outline handling strategies for missing data. However, the best approach to handle missing data is to minimise its extent. While the occurence of missing data can rarely be avoided at all (think about the collection of questionnaire data in oncology studies and the missing data after subjects die), it is important to pursue an “as complete as can be” data collection.</p>
+<p>Baseline and screening data are of utmost importance in a pursuit of data completeness. If a screening value is missing, but was meant to be used as a covariate, this subjects’ whole data will be dropped from the analysis even if all responses were observed. If the baseline response variable was missing we are unable to compute a change from baseline, which also leads to the loss of this subjects’ data in the model (although LDA models are still able to provide an estimate) even if all post-baseline values were observed.</p>
+</section>
+<section id="missing-data-handling-i-descriptive-stats-visualisations" class="level2">
+<h2 class="anchored" data-anchor-id="missing-data-handling-i-descriptive-stats-visualisations">Missing Data Handling I (descriptive stats + visualisations)</h2>
+<p>To gain an understanding of the impact of missingness on the average response trajectories, we can plot the mean changes from baseline by visit for each drop-out group. The three drop-out groups (variable <code>dropout_grp</code>) are:</p>
+<ul>
+<li><p>Drop-outs at Week 2: Subjects who completed baseline and Week 2, but discontinued from the study prior to Week 4.</p></li>
+<li><p>Drop-outs at Week 4: Subjects who completed baseline, Week 2 and Week 4, but discontinued from the study prior to Week 8.</p></li>
+<li><p>Completers: Subjects who completed all visits in the study.</p></li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="s3_missingness_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Exercise:</strong> Try to interpret the plot above and discuss the following topics around missingness:</p>
+<section id="check-missing-patter" class="level3">
+<h3 class="anchored" data-anchor-id="check-missing-patter">Check Missing Patter</h3>
+<ul>
+<li>Q1&gt; Look into the data. Which missing data pattern is present in this dataset?</li>
+</ul>
+<p>From the plot, we can infer that there is a <strong>monotone missing data pattern</strong>. This is characterized by participants dropping out of the study at specific points (Weeks 2 and 4), and then no further data is collected for them. The plot shows how participants who drop out at different weeks (Week 2 and Week 4) exhibit a decline in their measured outcome prior to dropping out. We can observe distinct trajectories for those who complete the study versus those who drop out.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>all2 <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># group_by(Month) %&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">miss_var_summary</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Missing data among variables"</span>, <span class="at">format =</span> <span class="st">"html"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">latex_options =</span> <span class="st">"striped"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Missing data among variables</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">variable</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">n_miss</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">pct_miss</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">chgdrop</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">14.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">pgiimp</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.6666667</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">subject</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">time</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">trt</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">basval</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">change</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">gender</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">chgrescue</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">dropout_grp</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">aval</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">avisit</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">week</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">group</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Exploring missing data</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">vis_miss</span>(all2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="s3_missingness_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gg_miss_var</span>(all2 <span class="sc">%&gt;%</span> <span class="fu">filter</span>(group<span class="sc">==</span><span class="st">"Arm 1"</span>), </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">facet =</span> avisit, </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">show_pct =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="s3_missingness_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gg_miss_var</span>(all2 <span class="sc">%&gt;%</span> <span class="fu">filter</span>(group<span class="sc">==</span><span class="st">"Arm 2"</span>), </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">facet =</span> avisit, </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">show_pct =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="s3_missingness_files/figure-html/unnamed-chunk-4-3.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ul>
+<li>Q2&gt; What can be seen in the plot? How does the drop-out time affect the observed mean response trajectories?</li>
+</ul>
+<p><strong>Dropout Trajectories</strong></p>
+<ul>
+<li>Participants who drop out at Week 2 or Week 4 show a different mean change from baseline compared to completers. For example, those dropping out earlier seem to have a more abrupt or flatter decline, indicating that their treatment response may be different from completers.</li>
+</ul>
+<p><strong>Completer Trajectories</strong></p>
+<ul>
+<li>The completers in both treatment groups exhibit a smoother and more sustained decline, suggesting better outcomes than the dropouts.</li>
+</ul>
+<p><strong>Effect of Dropout Time</strong></p>
+<ul>
+<li><p>The earlier the dropout, the less steep the observed decline from baseline. This could be due to several factors, such as treatment inefficacy for those participants or increased adverse effects, leading to their dropout.</p></li>
+<li><p>Dropouts at Week 4 have trajectories closer to the completers but are still distinct, indicating some level of divergence in treatment response.</p></li>
+<li><p>Q3&gt; What other aspects, apart from response, could influence a subjects’ likelihood to drop-out from the study?</p></li>
+</ul>
+<p><strong>Other Factors Influencing Dropout Likelihood</strong> Apart from the measured response (mean change from baseline), several other factors could influence a subject’s likelihood of dropping out from the study:</p>
+<ul>
+<li><p><strong>Adverse effects</strong>: Participants experiencing more severe side effects may drop out earlier.</p></li>
+<li><p><strong>Personal circumstances</strong>: Life events unrelated to the study (e.g., work, family issues) may cause participants to discontinue participation.</p></li>
+<li><p><strong>Lack of perceived treatment efficacy</strong>: Participants who feel the treatment is not working may lose motivation to continue.</p></li>
+<li><p>Q4&gt; Which other summaries/ visualizations can be useful to characterize and monitor the degree of missingness in clinical study data?</p></li>
+</ul>
+<p><strong>Other Summaries/Visualizations to Characterize Missingness</strong> To better characterize and monitor missingness in clinical study data, the following summaries and visualizations could be useful:</p>
+<ul>
+<li><strong>Missing Data Patterns Table</strong>: A summary table showing the number of subjects missing data at each time point.</li>
+<li><strong>Kaplan-Meier Plot for Time-to-Dropout</strong>: This would allow us to examine the dropout pattern over time, showing how many participants remain in the study at each time point.</li>
+<li><strong>Proportional Missingness Plot</strong>: A bar chart showing the proportion of missing data for each variable at each time point.</li>
+<li><strong>Correlation Heatmap</strong>: Showing correlations between missingness patterns and other variables (e.g., baseline characteristics, adverse events).</li>
+<li><strong>Trajectory Plots for Subgroups</strong>: Similar to the plot provided, but stratified by potential confounders (e.g., age, gender) to see if missingness varies across subgroups.</li>
+</ul>
+</section>
+<section id="solution" class="level3">
+<h3 class="anchored" data-anchor-id="solution">Solution</h3>
+<p>A look into the data shows that all missing values stem from a monotinic missingness pattern.</p>
+<p>The figure above shows a notable difference between mean response trajectories per drop-out group. The completers in both treatment arms show a steady decrease of HAMD17 scores over time, which is equivalent to an increase in depression symptoms.</p>
+<p>Week 4 drop-outs under treatment 2 only showed a moderate change from baseline, while the treatment 1 subjects experienced an increase in HAMD17 scores. A possible explanation could be that changes under treatment 2 were not regarded meaningful by patients, while the increase in scores under treatment 1 made subjects drop out of the study.</p>
+<p>Week 2 drop-outs under treatment 2 showed notable improvements of HAMD17 scores compared to treatment 1, yet the drop-out could potentially be linked to the occurrence of adverse events.</p>
+<p>Although the extent of missing data should be reduced to the bare minimum, it can never be avoided completely, especially with Patient-Reported Outcomes (PRO) data. In the reporting of PRO clinical trial data, it is therefore important to transparently summarize the extent of missingness. This is usually done via so-called <em>compliance tables</em>.</p>
+<p>Compliance tables summarize three key components to characterize missingness in our data:</p>
+<ul>
+<li><p>The number of subjects initially randomized in the trial.</p></li>
+<li><p>The number of subjects for whom data is expected. This is the number of patients who are still ongoing in the study (alive and not discontinued) and for whom an assessment is scheduled following the schedule of assessments in the clinical trial protocol.</p></li>
+<li><p>The number of subjects by whom the assessment has been completed.</p></li>
+</ul>
+<p>From these numbers, we can derive the <em>available data rate</em> and the <em>compliance</em> for visit <span class="math inline">\(i\)</span> as follows:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\text{Available Data Rate}_{\,i} &amp;:= 100\,\frac{\#\{\text{Subj. with assessment i completed}\}}{\#\{\text{Subj. randomized}\}}\,,\\
+\text{Compliance Rate}_{\,i} &amp;:= 100\,\frac{\#\{\text{Subj. with assessment i completed}\}}{\#\{\text{Subj. assessment i expected}\}}\,.
+\end{aligned}
+\]</span></p>
+</section>
+</section>
+<section id="missing-data-handling-ii-naive-analytic-approaches" class="level2">
+<h2 class="anchored" data-anchor-id="missing-data-handling-ii-naive-analytic-approaches">Missing data handling II (naive analytic approaches)</h2>
+<p>This section provides an overview of simple and most of the times overly naive methods to deal with missing data. Although we will introduce more suitable methods in the next chapter, the approaches introduced in this section have gained questionable popularity in the past, which is why we introduce them here. The following methods to compute or completely ignore missing data exist:</p>
+<ul>
+<li><p>Complete Case Analysis: Discard all subjects with missing observations and only conduct the analysis on subjects with complete follow-up data.</p></li>
+<li><p>Last observation carried forward (LOCF): Handling of monotonic missing data. The missing visits are imputed with the last non-missing value. This approach assumes a constant trend of observations after drop-out from the study, i.e.&nbsp;the response level remains the same as the last response under the study drug.</p></li>
+<li><p>Baseline observation carried forward (BOCF): Handling of monotonic missing data. The missing visits are imputed with the baseline value. This approach assumes that subjects’ symptom severity or functioning (whichever was measured in the study) <em>bounce back</em> to the baseline state, prior to the intiation of the study drug.</p></li>
+</ul>
+<section id="complete-case-analyses" class="level3">
+<h3 class="anchored" data-anchor-id="complete-case-analyses">Complete Case Analyses</h3>
+<p>Let us run a complete case analysis on the <code>all2</code> dataset.</p>
+<p><strong>Exercise:</strong> Fit an MMRM with response variable <code>chgdrop</code>, with baseline severity, treatment and visit as fixed effects, as well as baseline-by-visit and treatment-by-visit interaction, using an unstructured variance-covariance matrix on the <code>all2</code> completers.</p>
+<ul>
+<li><p>How do the results differ from the results obtained in the former chapter (response variable <code>change</code>, no missing data)?</p></li>
+<li><p>How do the results differ from the results obtained at the beginning of this chapter (response variable <code>chgdrop</code> with missing data)?</p></li>
+<li><p>Discuss the limitations of the complete case analysis. Which sources of bias can you identify?</p>
+<ul>
+<li>Significant Impact in Multivariate Analysis: In complex multivariate analyses, list-wise deletion can lead to substantial loss of statistical information due to a reduction in the effective sample size.</li>
+<li>The varying sample size due to list-wise deletion makes it difficult to maintain a consistent set of inputs across analyses.</li>
+<li>Potential for Bias in Estimations: CCA assumes that the data are Missing Completely at Random (MCAR)—i.e., the probability of missingness is independent of both observed and unobserved data. However, in most real-world scenarios, data are more likely Missing at Random (MAR) or Missing Not at Random (MNAR).</li>
+<li>Selection Bias</li>
+</ul></li>
+</ul>
+<p><strong>Solution:</strong></p>
+<p>We firstly select our completers dataset. As this is a filtering exercise based on post-baseline characteristics, we first look into the distribution of subjects per treatment arm (note that we lost our randomization effect):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>all2_comp <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(all2, dropout_grp <span class="sc">==</span> <span class="st">"Completer"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>all2_comp <span class="sc">%&gt;%</span> </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(group) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">N =</span> dplyr<span class="sc">::</span><span class="fu">n_distinct</span>(subject),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  group     N
+  &lt;fct&gt; &lt;int&gt;
+1 Arm 1    18
+2 Arm 2    19</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Work with code chunks to find the solution to the exercises</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>all2_cca <span class="ot">&lt;-</span> all2 <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(subject) <span class="sc">%&gt;%</span>                    </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">all</span>(<span class="sc">!</span><span class="fu">is.na</span>(chgdrop))) <span class="sc">%&gt;%</span>          </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In this case, we are left with 18 and 19 subjects per arm, which reduced our sample size notably, but at least left us with close to equal sizes of our treatment groups. This is not normal. Usually the stratification of data based on post-baseline assessments can lead to imbalances (it might still have, as we only checked the distribution of the treatment arms).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Complete Case Analysis</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>fit_cat_time_compl <span class="ot">&lt;-</span> mmrm<span class="sc">::</span><span class="fu">mmrm</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> chgdrop <span class="sc">~</span> basval<span class="sc">*</span>avisit <span class="sc">+</span> trt<span class="sc">*</span>avisit <span class="sc">+</span> <span class="fu">us</span>(avisit <span class="sc">|</span> subject),</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> all2_comp,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">mmrm_control</span>(<span class="at">method =</span> <span class="st">"Kenward-Roger"</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_cat_time_compl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>mmrm fit
+
+Formula:     chgdrop ~ basval * avisit + trt * avisit + us(avisit | subject)
+Data:        all2_comp (used 111 observations from 37 subjects with maximum 3 
+timepoints)
+Covariance:  unstructured (6 variance parameters)
+Method:      Kenward-Roger
+Vcov Method: Kenward-Roger
+Inference:   REML
+
+Model selection criteria:
+     AIC      BIC   logLik deviance 
+   608.8    618.5   -298.4    596.8 
+
+Coefficients: 
+                     Estimate Std. Error        df t value Pr(&gt;|t|)    
+(Intercept)           1.89223    3.60558  33.99000   0.525 0.603124    
+basval               -0.31950    0.17281  33.99000  -1.849 0.073201 .  
+avisitWeek 4         -1.63943    2.46046  34.00000  -0.666 0.509708    
+avisitWeek 8        -12.36928    3.39084  34.00000  -3.648 0.000877 ***
+trt2                 -1.13978    1.56623  33.99000  -0.728 0.471768    
+basval:avisitWeek 4  -0.05179    0.11793  34.00000  -0.439 0.663301    
+basval:avisitWeek 8   0.33515    0.16252  34.00000   2.062 0.046899 *  
+avisitWeek 4:trt2    -0.99990    1.06880  34.00000  -0.936 0.356113    
+avisitWeek 8:trt2    -1.78825    1.47295  34.00000  -1.214 0.233089    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Covariance estimate:
+        Week 2  Week 4  Week 8
+Week 2 23.2319 16.8721 14.6422
+Week 4 16.8721 21.7589 17.9166
+Week 8 14.6422 17.9166 27.5347</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>model_lsmeans <span class="ot">&lt;-</span> emmeans<span class="sc">::</span><span class="fu">emmeans</span>(fit_cat_time_compl, <span class="sc">~</span>trt<span class="sc">*</span>avisit, <span class="at">weights =</span> <span class="st">"proportional"</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>model_lsmeans</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> trt avisit emmean   SE df lower.CL upper.CL
+ 1   Week 2  -4.33 1.12 34    -6.61    -2.06
+ 2   Week 2  -5.47 1.09 34    -7.69    -3.26
+ 1   Week 4  -6.98 1.09 34    -9.19    -4.77
+ 2   Week 4  -9.12 1.06 34   -11.27    -6.97
+ 1   Week 8 -10.17 1.21 34   -12.63    -7.71
+ 2   Week 8 -13.10 1.18 34   -15.49   -10.71
+
+Confidence level used: 0.95 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>emmeans<span class="sc">::</span><span class="fu">emmeans</span>(fit_cat_time_compl, <span class="sc">~</span>trt<span class="sc">*</span>avisit, <span class="at">weights =</span> <span class="st">"proportional"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Difference in LS Means at Week 8"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Difference in longitudinal LS Means to Week 8"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)<span class="sc">/</span><span class="dv">3</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> contrast                                      estimate   SE df t.ratio p.value
+ Difference in LS Means at Week 8                 -2.93 1.69 34  -1.733  0.0922
+ Difference in longitudinal LS Means to Week 8    -2.07 1.42 34  -1.455  0.1548</code></pre>
+</div>
+</div>
+<p>A comparison to the results using the full response trajectories for all randomized subjects (response variable <code>change</code>) yields:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="do">### complete response trajectory on all randomized subjects</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>fit_cat_time <span class="ot">&lt;-</span> mmrm<span class="sc">::</span><span class="fu">mmrm</span>(</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> change <span class="sc">~</span> basval<span class="sc">*</span>avisit <span class="sc">+</span> trt<span class="sc">*</span>avisit <span class="sc">+</span> <span class="fu">us</span>(avisit <span class="sc">|</span> subject),</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> all2,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">mmrm_control</span>(<span class="at">method =</span> <span class="st">"Kenward-Roger"</span>)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>model_lsmeans <span class="ot">&lt;-</span> emmeans<span class="sc">::</span><span class="fu">emmeans</span>(fit_cat_time, <span class="sc">~</span>trt<span class="sc">*</span>avisit, <span class="at">weights =</span> <span class="st">"proportional"</span>)</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>model_lsmeans</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> trt avisit emmean    SE df lower.CL upper.CL
+ 1   Week 2  -4.13 0.899 47    -5.93    -2.32
+ 2   Week 2  -5.31 0.899 47    -7.12    -3.51
+ 1   Week 4  -6.70 0.916 47    -8.55    -4.86
+ 2   Week 4  -8.70 0.916 47   -10.54    -6.85
+ 1   Week 8  -9.86 1.033 47   -11.94    -7.79
+ 2   Week 8 -13.26 1.033 47   -15.33   -11.18
+
+Confidence level used: 0.95 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>emmeans<span class="sc">::</span><span class="fu">emmeans</span>(fit_cat_time, <span class="sc">~</span>trt<span class="sc">*</span>avisit, <span class="at">weights =</span> <span class="st">"proportional"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Difference in LS Means at Week 8"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Difference in longitudinal LS Means to Week 8"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)<span class="sc">/</span><span class="dv">3</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> contrast                                      estimate   SE df t.ratio p.value
+ Difference in LS Means at Week 8                 -3.39 1.46 47  -2.319  0.0248
+ Difference in longitudinal LS Means to Week 8    -2.19 1.18 47  -1.850  0.0705</code></pre>
+</div>
+</div>
+<p>We can see that the mean change from baseline to Week 8 using the complete response trajectory is actually lower (i.e.&nbsp;better) under Treatment 2 than the ones from the complete case analysis. For Treatment 1 the mean change from baseline to Week 8 is a little higher (i.e.&nbsp;worse) for the complete response trajectory on all randomized subjects as compared to the complete case analysis. A possible explanation could be that the favorable treatment effect of Treatment 2 came at the cost of adverse events, which made subjects drop out from the study, while the lack of early efficacy under Treatment 1 made subjects drop out, which lead them to not experience the favorable effects in the longer term.</p>
+<p>A comparison to the analysis results based on the incomplete response trajectory (data as is), yields:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Response data as is (including missings)</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>fit_cat_time <span class="ot">&lt;-</span> mmrm<span class="sc">::</span><span class="fu">mmrm</span>(</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> chgdrop <span class="sc">~</span> basval<span class="sc">*</span>avisit <span class="sc">+</span> trt<span class="sc">*</span>avisit <span class="sc">+</span> <span class="fu">us</span>(avisit <span class="sc">|</span> subject),</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> all2,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">mmrm_control</span>(<span class="at">method =</span> <span class="st">"Kenward-Roger"</span>)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>emmeans<span class="sc">::</span><span class="fu">emmeans</span>(fit_cat_time, <span class="sc">~</span>trt<span class="sc">*</span>avisit, <span class="at">weights =</span> <span class="st">"proportional"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> trt avisit emmean    SE   df lower.CL upper.CL
+ 1   Week 2  -4.10 0.900 47.0    -5.91    -2.29
+ 2   Week 2  -5.29 0.899 47.0    -7.10    -3.48
+ 1   Week 4  -6.42 0.974 46.5    -8.38    -4.46
+ 2   Week 4  -8.52 0.951 44.8   -10.43    -6.60
+ 1   Week 8  -9.73 1.142 40.4   -12.03    -7.42
+ 2   Week 8 -12.62 1.114 40.1   -14.88   -10.37
+
+Confidence level used: 0.95 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>emmeans<span class="sc">::</span><span class="fu">emmeans</span>(fit_cat_time, <span class="sc">~</span>trt<span class="sc">*</span>avisit, <span class="at">weights =</span> <span class="st">"proportional"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Difference in LS Means at Week 8"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Difference in longitudinal LS Means to Week 8"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)<span class="sc">/</span><span class="dv">3</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> contrast                                      estimate   SE   df t.ratio
+ Difference in LS Means at Week 8                 -2.90 1.60 40.3  -1.814
+ Difference in longitudinal LS Means to Week 8    -2.06 1.23 46.8  -1.671
+ p.value
+  0.0772
+  0.1014</code></pre>
+</div>
+</div>
+<p>We can see that mean changes from baseline to Week 8 are higher (i.e.&nbsp;worse) under both treatment arms using the data as is, as compared to the complete case analysis. In this case, the complete case analysis overestimates the treatment effect in both arms. This effect is often observed with complete case analyses, due to the inherent selection bias that arises from the inclusion of completers only.</p>
+</section>
+<section id="discussion" class="level3">
+<h3 class="anchored" data-anchor-id="discussion">Discussion</h3>
+<p>Complete Case Analysis is subject to selection bias, as the analysis is only conducted on subjects who complete the study and therefore did not drop out due to the experience of adverse events of the lack of efficacy. Selection of subjects based on post-baseline events can lead to notable imbalances between our treatment arms and the distribution of covariates. Results from the Complete Case Analysis can therefore be hard to interpret (due to the loss of randomization), and are frequently overestimating the true treatment effect.</p>
+<p>In principle, this method should be avoided.</p>
+
+
+
+</section>
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-mallinckrodt2016" class="csl-entry" role="listitem">
+Mallinckrodt, Craig, and Ilya Lipkovich. 2016. <em>Analyzing Longitudinal Clinical Trial Data</em>. Chapman; Hall/CRC. <a href="https://doi.org/10.1201/9781315186634">https://doi.org/10.1201/9781315186634</a>.
+</div>
+<div id="ref-little19" class="csl-entry" role="listitem">
+Roderick JA Little, Donald B. Rubin. 2019. <em>Statistical Analysis with Missing Data</em>. Vol. 3. USA: New York, Wiley. <a href="https://doi.org/10.1002/9781119482260">https://doi.org/10.1002/9781119482260</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
