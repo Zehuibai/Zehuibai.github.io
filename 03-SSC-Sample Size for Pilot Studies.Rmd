@@ -1,0 +1,184 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Sample Size for Pilot Studies
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+packages<-c("tidyverse", "kableExtra")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+```
+
+
+**Summary**
+ 
+
+## Overview of Pilot Studies
+
+### Introduction {-}
+
+
+**Purpose of Pilot Studies**
+
+Pilot studies are smaller-scale studies conducted before the main research project. The primary purpose of these studies is:
+- **Estimate Operational Characteristics**: To understand and predict how the main study might operate under real-world conditions.
+- **Evaluate and Predict Trial Considerations**: To assess various aspects of the planned main study, including its feasibility, potential logistical issues, and the adequacy of the resources available.
+- **Sample Size Planning**: To help determine the appropriate number of participants needed to achieve statistically significant results without over- or underestimating the required sample size.
+
+**Importance**
+
+Pilot studies are essential for:
+- **Testing Procedures**: To ensure that the methodology is sound and practical before applying it on a larger scale.
+- **Identifying Problems**: To detect and address potential issues in the study's design or implementation, which could affect the outcomes if not corrected.
+- **Resource Allocation**: To evaluate if the study’s resource demands are manageable and sustainable over the duration of the main study.
+
+**Challenges in Pilot Studies**
+
+- **Lack of Standardization**: There is a notable absence of standardized procedures for designing and conducting pilot studies. This can lead to variability in how these studies are executed, affecting their reliability and the applicability of their results to the main study.
+- **Priority Misalignment**: Practical considerations often overshadow design and statistical concerns, which can compromise the quality and integrity of the pilot study, leading to flawed conclusions about the feasibility of the main study.
+
+**Recommendations for Better Design**
+
+CONSORT (2016) extension as a guide for designing better pilot trials. CONSORT stands for Consolidated Standards of Reporting Trials, and its extension for pilot trials aims to:
+- **Improve Design and Reporting**: Provide a standardized framework for planning, executing, and reporting pilot studies, enhancing their quality and transparency.
+- **Facilitate Better Decision Making**: By improving the design of pilot studies, researchers can make more informed decisions about whether and how to proceed with the main studies, potentially saving time, effort, and resources from being misallocated.
+
+
+### Consideration {-}
+
+The image provides an organized breakdown of various considerations that need to be addressed when designing and conducting a pilot study. These considerations are grouped into four main categories: Study Objectives, Study Constraints, Study Design, and Statistical Issues. Here’s a detailed explanation of each category:
+
+**Study Objectives**
+- **Feasibility**: Evaluates whether the estimated effect size is reasonable and accounts for practical issues such as dropout rates and participant accrual.
+- **Parameter Estimates**: Focuses on defining the bounds of uncertainty for the parameters of interest to ensure that they are well-defined.
+- **Experimentation**: Involves assessing the study design and statistical tools to identify any potential issues or challenges that might affect the study’s integrity.
+
+**Study Constraints**
+- **Resources**: Looks at the budget allocated for the pilot study and whether there's a need or ability to share resources with the full study.
+- **Time**: Considers the maximum feasible length of the study, endpoint follow-up times, and the time required for recruitment.
+- **Comparability**: Questions whether the pilot study design will be the same as the future main study, focusing on the portability and accuracy of estimates.
+
+**Study Design**
+- **Endpoint Selection**: Determines whether the endpoints for the pilot study will also be endpoints in the future study and considers whether to use surrogate endpoints.
+- **Number of Arms**: Decides whether the study will have a single arm, which is most common in pilot studies, or multiple arms, and whether randomization is necessary.
+- **Subject Selection**: Discusses the inclusion of only the target population and whether the same inclusion/exclusion criteria will apply as in the full study.
+
+**Statistical Issues**
+- **Parameter Choice**: Identifies which parameters to estimate and considers which scale or transformations might be necessary.
+- **Statistical Method**: Decides on the interval or statistical tests to use, such as determining the upper confidence interval (CI) that defines "success."
+- **Sample Size Determination**: Addresses how to determine the sample size, whether by a rule of thumb, a specific formula, or an algorithm.
+
+
+![Pilot Study Considerations](./02_Plots/SSC/SSC_PilotConsideration.png)
+
+### Sample Size Overview {-}
+
+Considerations for determining the sample size in pilot studies, highlighting different "rules of thumb" and the rationale behind each guideline. 
+ 
+**Key Considerations:**
+- **Primary Objectives**: The sample size should reflect the primary objectives of the pilot study, such as assessing feasibility, safety, or trial estimates.
+- **Common Practices**: Sample sizes are often determined based on practical constraints rather than strict statistical methods. These rules of thumb vary but are generally chosen to balance feasibility with the need for informative results.
+- **Explicit Rationale**: It is important to be clear if the sample size is chosen based on practical issues (like available resources) rather than statistical reasons.
+
+
+**Rules of Thumb for Sample Size (Based on t-test Variance)**
+
+This part of the image lists several commonly referenced rules of thumb for determining sample sizes in pilot studies, each with a specific context or justification:
+
+- **Birkett & Day (1994) - 20**: Suggested for internal pilot studies as a general guideline.
+- **Browne (1995) - 30**: Described as a "commonplace" selection, implying a frequently used standard that might not be rigorously justified.
+- **Kieser & Wassmer (1996) - 20-40**: Recommended when the upper confidence limit (UCL) for the main trial size is between 80-250, providing a range that allows for a flexible but statistically reasoned approach.
+- **Julious (2005) - 24**: Proposed for scenarios needing feasibility, precision, and regulatory compliance.
+- **Sim & Lewis (2011) - >55**: Advocated for when using small to medium Cohen's effect sizes (ES) to minimize the total sample size across the pilot and main study, thus conserving resources.
+- **Teare et al (2014) - >70**: Based on simulation studies, suitable for trials with a binary endpoint aiming for robust data.
+- **Whitehead et al (2016) - 20-150**: Varies greatly to accommodate studies aiming for standardized effect sizes between 0.1-0.7 at 80%/90% power, providing a wide range to cover various study designs and objectives.
+
+![Pilot Study Sample Size Overview](./02_Plots/SSC/SSC_PilotSSC.png)
+
+The "Rules of Thumb" for determining pilot study sample sizes listed in the image are derived from various sources and papers over the years, each suggesting different sample sizes based on various statistical principles and practical considerations. Here’s a detailed breakdown of each rule and its context:
+
+**1. Birkett & Day (1994) - 20**
+- **Rule**: Suggests a sample size of 20 for internal pilot studies.
+- **Context**: This rule is generally used for internal pilot studies, which are pilot studies embedded within a main trial, primarily to refine and optimize the study procedures and parameters before the full trial is rolled out. The number 20 is often chosen to ensure enough data to assess the feasibility and initial variability without demanding excessive resources.
+
+**2. Browne (1995) - 30**
+- **Rule**: Recommends a sample size of 30.
+- **Context**: This number is often cited as a "commonplace" selection, meaning it's frequently used in practice. The sample size of 30 is typically considered the minimum number required to achieve a sufficiently normal distribution of the means under the Central Limit Theorem, making it a standard choice for small pilot studies where more complex statistical analyses are not the primary focus.
+
+**3. Kieser & Wassmer (1996) - 20-40**
+- **Rule**: Suggests a range of 20 to 40 participants.
+- **Context**: This range is recommended based on achieving an 80% upper confidence limit (UCL) if the main trial size is anticipated to be between 80 and 250 participants. This rule helps in determining the variability and the potential upper bounds of an estimate, ensuring that the pilot study is adequately powered to inform the design of the main trial without being overly large.
+
+**4. Julious (2005) - 24**
+- **Rule**: Proposes a sample size of 24.
+- **Context**: This sample size is chosen for feasibility, precision, and to meet regulatory reasons. A sample size of 24 allows for preliminary assessment of the study's operational aspects and initial statistical estimations, which can be critical in regulatory settings where preliminary evidence of feasibility and safety must be demonstrated.
+
+**5. Sim & Lewis (2011) - >55**
+- **Rule**: Recommends more than 55 participants.
+- **Context**: This recommendation is for studies aiming to use small to medium Cohen’s effect sizes to minimize the total sample size necessary across both the pilot and the main studies. This approach is focused on efficiency, optimizing the total resources expended while ensuring enough power to detect meaningful effects in the preliminary data.
+
+**6. Teare et al (2014) - >70**
+- **Rule**: Advises a sample size greater than 70.
+- **Context**: Based on simulation studies for trials with binary endpoints, this larger sample size is recommended to ensure robust estimations that can inform the design and feasibility of larger, more definitive trials. It is particularly useful when the pilot study's outcomes are critical in deciding the go/no-go decision for the main trial.
+
+**7. Whitehead et al (2016) - 20-150**
+- **Rule**: Offers a wide range of 20 to 150 participants.
+- **Context**: This range is based on aiming for standardized effect sizes of 0.1 to 0.7 at 80% to 90% power. The broad range allows the pilot study to be adaptable to various study objectives, from very conservative estimates requiring more precision to more exploratory studies that might accommodate a broader range of outcomes.
+ 
+
+### Sample Size Determination {-}
+
+There are two primary methods for formal Sample Size Determination (SSD) in pilot studies: the Upper Confidence Limit (UCL) Method and the Non-Central t-distribution (NCT) Method. These methods are designed to ensure the pilot study is appropriately sized to provide reliable and statistically significant results. 
+
+![](./02_Plots/SSC/SSC_PilotSSD.png)
+
+- Both methods aim to determine a statistically sound sample size for the main study based on pilot study data.
+- The choice between the UCL and NCT methods depends on the specific needs of the research, such as the desired confidence level, the nature of the data, and the acceptable risk of type I and type II errors.
+- Researchers may choose the NCT method for its generally lower sample size requirements, especially in cases where budget or logistical constraints are a concern. Conversely, the UCL method might be preferred when the upper confidence bounds are critical for decision-making or regulatory approval.
+
+#### Upper Confidence Limit (UCL) Method {-}
+
+- **Objective**: This method calculates a confidence interval and uses the upper limit estimate to adjust for uncertainty in parameter estimates.
+- **Formula**:
+  - \(s^2_{UCL} = \left(\frac{k}{\chi^2_{1-\alpha, k}}\right)^2 s^2\)
+    - Where \(s^2\) is the variance estimate from the sample, \(k\) is the degrees of freedom, and \(\chi^2_{1-\alpha, k}\) is the chi-squared distribution value for \(1-\alpha\) confidence level and \(k\) degrees of freedom.
+  - \(n_M = \frac{(r+1)(z_{1-\beta}+z_{1-\alpha/2})^2 s^2_{UCL}}{rd^2}\)
+    - Where \(r\) is the ratio of the sample size of the main study to the pilot study, \(d\) is the effect size, \(z\) values are the standard normal deviates for the respective confidence levels.
+- **Use Case**: Suitable for a variety of parameter types and when one wishes to have high confidence in the upper limit of the parameter estimate.
+
+#### Non-Central t-distribution (NCT) Method {-}
+
+- **Objective**: Adjusts the sample size upwards by incorporating sample variance imprecision via a non-central t-distribution.
+- **Formula**:
+  - \(n_M \geq \frac{(r+1)t^2_{1-(1-\beta),k,t^2}}{(1-\alpha/2,n_M(r+1)-2,0)} s^2_{g}\)
+    - Where \(t\) values represent the non-central t-distribution critical values, \(\beta\) is the power, and \(s^2_{g}\) is the estimated variance based on the pilot study data.
+- **Use Case**: Primarily used when considering variance uncertainty for a two-group t-test, and it generally requires lower sample sizes than the UCL method, making it more resource-efficient.
+
+
+
