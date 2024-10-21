@@ -1,0 +1,2542 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Zehui Bai" />
+
+
+<title> Survival Analysis - Competing Risk</title>
+
+<script src="site_libs/header-attrs-2.22/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-Estimands.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot_Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot_Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="07-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:2in" /><br />
+Survival Analysis - Competing Risk</p></h1>
+<h4 class="author">Zehui Bai</h4>
+<h4 class="date">2024-10-21 20:46:49</h4>
+
+</div>
+
+
+<div id="competing-risk" class="section level1">
+<h1>Competing Risk</h1>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Competing risk are said to be present when a patient is at risk of
+more than one mutually exclusive event, such as death from different
+cause which will prevent any other from happening. Competing risk models
+provide real world probabilities of death when competing events are
+present as opposed to standard survival models by allowing us to
+separate the probability of event into different causes.</p>
+<p>Examples:</p>
+<ul>
+<li>recurrence</li>
+<li>death from disease</li>
+<li>death from other causes</li>
+<li>treatment response</li>
+</ul>
+<p>In presence of competing events, the standard product-limit method of
+estimating survivor function for the event of interest <strong>yields
+biased results</strong> as the probability of occurrence is modified by
+an antecedent competing event.</p>
+<p>The biggest drawback of competing risks analysis is the requirement
+that times for different event types be <strong>independent</strong> or
+<strong>at least that each event be noninformative</strong> for the
+others.</p>
+<p>The fundamental problem that may lead to the need for specialized
+statistical methods is unobserved dependence among the various event
+times. For example, one can imagine that patients who recur are more
+likely to die, and therefore times to recurrence and times to death
+would not be independent events.</p>
+<p>There are two approaches to analysis in the presence of multiple
+potential outcomes:</p>
+<ul>
+<li>Cause-specific hazard of a given event: this represents the rate per
+unit of time of the event among those not having failed from other
+events</li>
+<li>Subdistribution hazard of a given event: this represents the rate
+per unit of time of the event as well as the influence of competing
+events</li>
+</ul>
+<p>Each of these approaches may only illuminate one important aspect of
+the data while possibly obscuring others, and the chosen approach should
+depend on the question of interest.</p>
+<p>When the events are independent (almost never true), cause-specific
+hazards is unbiased. When the events are dependent, a variety of results
+can be obtained depending on the setting.</p>
+<p>Cumulative incidence using 1 minus the Kaplan-Meier estimate is
+always &gt;= cumulative incidence using competing risks methods, so can
+only lead to an overestimate of the cumulative incidence, though the
+amount of overestimation depends on event rates and dependence among
+events.</p>
+<p>To establish that a covariate is indeed acting on the event of
+interest, cause-specific hazards may be preferred for treatment or
+prognostic marker effect testing. To establish overall benefit,
+subdistribution hazards may be preferred for building prognostic
+nomograms or considering health economic effects to get a better sense
+of the influence of treatment and other covariates on an absolute
+scale.</p>
+</div>
+<div id="type-specific-hazards" class="section level2">
+<h2>Type-specific hazards</h2>
+<p>As before, let <span class="math inline">\(T_{i}\)</span> be a random
+variable denoting the time of death for person <span
+class="math inline">\(i\)</span>. Now let <span
+class="math inline">\(J_{i}\)</span> be a random variable denoting the
+type of death that occurred to person <span
+class="math inline">\(i\)</span>. Thus, <span
+class="math inline">\(J_{5}=2\)</span> means that person 5 died of
+cancer. We now define <span class="math inline">\(h_{i j}(t)\)</span>,
+the hazard for death type <span class="math inline">\(j\)</span> at time
+<span class="math inline">\(t\)</span> for person <span
+class="math inline">\(i\)</span>, as follows:</p>
+<p><span class="math display">\[h_{i j}(t)=\lim _{\Delta t \rightarrow
+0} \frac{\operatorname{Pr}\left(t&lt;T_{i}&lt;t+\Delta t, J_{i}=j \mid
+T_{i} \geq t\right)}{\Delta t}, \quad j=1, \ldots, 5\]</span></p>
+<p>The overall hazard of death is just the sum of all the typespecific
+hazards: <span class="math display">\[h_{i}(t)=\sum_{j} h_{i
+j}(t)\]</span> Based on the type-specific hazards, we can also define
+type-specific survival functions: <span
+class="math display">\[S_{j}(t)=\exp \left\{-\int_{0}^{t} h_{j}(u) d
+u\right\}\]</span></p>
+<p>we can define the hypothetical variable <span
+class="math inline">\(T_{i j}\)</span> as the time at which the <span
+class="math inline">\(j_{t h}\)</span> event type either occurred to the
+ith person or would have occurred if other event types had not preceded
+it. In other words, we suppose that a person who dies of cancer at time
+<span class="math inline">\(T_{2}\)</span> would have later died of
+heart disease at time <span class="math inline">\(T_{1}\)</span> if the
+cancer death had not occurred. For a given set of <span
+class="math inline">\(T_{i j} \mathrm{~s}\)</span>, we only observe the
+one that is smallest. If we further assume that the <span
+class="math inline">\(T_{i j} \mathrm{~s}\)</span> are independent
+across event types, we can say that <span class="math display">\[
+S_{i j}(t)=\operatorname{Pr}\left(T_{i j}&gt;t\right)
+\]</span> That is, the type-specific survival function gives the
+probability that an event of type j occurs later than time t.</p>
+<p><strong>Non-informative</strong></p>
+<p>If the estimate is to be unbiased, the censor must be uninformative.
+For competitive risks, we must make exactly the same assumptions. In
+other words, we must assume that, on the condition of covariates, those
+who are at a particularly high (or low) risk of one type of event will
+not (or less) experience other types of events. Therefore, if we know
+that someone died of heart disease at the age of 50, that would not give
+us any information (except the information we derive from the
+covariates), and there is no information about his risk of dying from
+cancer at that age.</p>
+</div>
+<div id="covariate-effects-via-cox-model" class="section level2">
+<h2>Covariate effects via COX model</h2>
+<ul>
+<li>The first model treats all event types the same.</li>
+<li>The second model focuses on type 3 by treating types 1 and 2 as
+censoring.</li>
+<li>That’s followed by a model for type 2, treating types 1 and 3 as
+censoring</li>
+</ul>
+<p>These tests are only valid when using the Breslow method for handling
+ties or when there are no tied event times. With tied event times:
+TIES=EFRON</p>
+<pre><code>PROC PHREG DATA=leaders;
+ MODEL years*lost(0)=manner start military age conflict
+ loginc growth pop land literacy;
+ STRATA region;
+ 
+PROC PHREG DATA=leaders;
+ MODEL years*lost(0,1,2)=manner start military age conflict
+ loginc growth pop land literacy;
+ STRATA region;
+ 
+PROC PHREG DATA=leaders;
+ MODEL years*lost(0,1,3)=manner start military age conflict
+ loginc growth pop land literacy;
+ STRATA region;
+RUN;</code></pre>
+</div>
+</div>
+<div id="competing-risk-analysis-in-sas" class="section level1">
+<h1>Competing Risk Analysis in SAS</h1>
+<div id="cumulative-incidence-function-cif" class="section level2">
+<h2>Cumulative incidence function (CIF)</h2>
+<div id="introduction-1" class="section level3">
+<h3>Introduction</h3>
+<p>Based on type-specific survival functions: <span
+class="math display">\[S_{j}(t)=\exp \left\{-\int_{0}^{t} h_{j}(u) d
+u\right\}\]</span></p>
+<p>It can be interpreted as the probability that a person arrives at
+time <span class="math inline">\(t\)</span> without an event of type
+<span class="math inline">\(j\)</span> under the assumption that no
+other type of event may occur. <span
+class="math display">\[F_{j}(t)=1-S_{j}(t)\]</span> This is not
+considered a useful feature. Because the sum of the probabilities of
+various events that occurred before time t may usually exceed 1. <span
+class="math display">\[\sum_{j} F_{j}(t) \ge 1\]</span> Instead, many
+people prefer to estimate the cumulative incidence function, This
+equation estimates the probability that an event of type j happens to
+individual i before time t, in the presence of competing event types.
+which is defined as <span
+class="math display">\[I_{j}(t)=\operatorname{Pr}\left(T_{i}&lt;t,
+J_{i}=j\right)\]</span> The consistent estimate of the cumulative
+incidence function is given by <span
+class="math display">\[\hat{I}_{j}(t)=\sum_{k \mid t_{k} \leq t}
+\hat{S}\left(t_{k}\right) \frac{d_{j k}}{n_{k}}\]</span></p>
+<ul>
+<li>where <span class="math inline">\(\hat{S}(t)\)</span> is the
+Kaplan-Meier estimate of the overall survivor function,</li>
+<li><span class="math inline">\(d_{j k}\)</span> is the number of events
+of type <span class="math inline">\(j\)</span> that occurred at time
+<span class="math inline">\(t_{k}\)</span>,</li>
+<li><span class="math inline">\(n_{k}\)</span> is the number at risk at
+time <span class="math inline">\(t_{k}\)</span>.</li>
+<li>The ratio of <span class="math inline">\(d_{j k}\)</span> to <span
+class="math inline">\(n_{k}\)</span> is an estimate of the hazard of
+event type <span class="math inline">\(j\)</span> at time <span
+class="math inline">\(t_{k}\)</span></li>
+</ul>
+<p>An attractive feature of this estimator is <span
+class="math display">\[
+\hat{S}(t)+\sum_{j} \hat{I}_{j}(t)=1
+\]</span></p>
+<p>This says that at any time t, the probabilities for all the event
+types plus the probability of no event add up to 1. Another attraction
+is that the method does not depend on the assumption that each event
+type is noninformative for other event types.</p>
+</div>
+<div id="proc-lifetest" class="section level3">
+<h3>Proc Lifetest</h3>
+<p>For competitive risk data, PROC LIFETEST estimates the cumulative
+incidence function (CIF). If you have multiple data samples, it will
+estimate the CIF for each sample and compare the CIF between the samples
+by using the Gray test (Gray 1988). The estimated CIF is a step
+function, with a jump at each different time when the event of interest
+occurs. If there are a large number of such events, the estimated CIF
+table may be very long. If you are interested in the cumulative
+incidence of specific time points, you can use the TIMELIST = option in
+the PROC LIFETEST statement to specify these time points, and PROC
+LIFETEST only prints the estimated CIF values at these time points.</p>
+<p><a
+href="https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.3/statug/statug_lifetest_examples04.htm">source</a></p>
+<ul>
+<li>Censoring <span class="math inline">\(c_{i}=0\)</span></li>
+<li>Without censoring (had a event) <span
+class="math inline">\(c_{i}=1\)</span></li>
+<li>Competing events <span class="math inline">\(c_{i}=2\)</span></li>
+</ul>
+<!-- -->
+<pre><code>proc format;
+    value RG 1=&#39;MelaGenix® Low Risk&#39; 0=&#39;MelaGenix® High Risk&#39;;
+run;
+*** IF censoring then Status = 0;
+*** IF Melanoma-specific death then Status = 1;
+*** IF other death then Status = 2;
+data MSS_Dummy;
+    input Days Status Group Site $ @@;
+    format Group RG.;
+    datalines;
+   1179 1 1 A 
+    378 0 1 B
+    956 1 1 C 
+    355 1 1 A
+   1432 0 1 B
+    262 1 1 B 
+    819 2 1 C
+    256 1 1 A 
+   2256 2 1 B
+    255 1 1 C 
+   1171 1 1 A
+    224 0 1 B 
+   1325 1 1 C
+    225 1 0 A 
+   1325 2 1 B
+   1256 1 1 A 
+    256 2 0 B
+    255 0 1 C 
+   1171 2 1 A
+    224 0 1 B 
+    325 1 0 C
+   1225 0 1 A 
+    725 1 1 B
+    287 2 1 C 
+    217 0 0 A
+    319 1 1 B 
+   1255 2 1 A
+    264 0 1 C 
+    256 1 1 B
+    237 0 0 C 
+    291 1 1 A
+   1156 0 0 B 
+    323 0 0 C
+    270 1 0 A 
+    253 1 1 B
+   1257 2 0 C 
+    206 1 0 A
+    242 0 1 B 
+   1206 1 0 A
+    157 1 0 C 
+    237 1 1 B
+   1249 0 0 B 
+    211 1 0 C
+    180 0 0 B 
+    229 1 1 C
+    226 1 0 A 
+   1234 2 1 A
+    268 0 0 B 
+    209 1 0 C
+;
+
+
+*** Log Rank Test;
+ods graphics on;
+ods trace on;
+ods output  CensoredSummary =_censorsum
+            HomTests = _Hom; 
+proc lifetest data=MSS_Dummy NOTABLE 
+              outsurv = MSS_Dummy_Output 
+              alpha = 0.0074 
+              plots=(survival(atrisk)); 
+    time Days*Status(0);
+    strata Group / group = site;
+run;
+ods output close;
+ods trace off; 
+ods graphics off;
+
+
+*** Cumulative incidence function (CIF);
+ods graphics on;
+proc lifetest data=MSS_Dummy 
+              alpha = 0.0222
+              plots=CIF(test) 
+              timelist=0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0;
+   time Days*Status(0)/eventcode=1;
+   strata Group / order=internal;
+run;
+ods graphics off;</code></pre>
+<p><strong>Stratified Gray’s Test</strong></p>
+<p>Specify the GROUP= option in the STRATA statement, PROC LIFETEST
+enables you to perform a stratified test to evaluate the homogeneity of
+the CIFs between groups.</p>
+<pre><code>ods graphics on;
+proc lifetest data=MSS_Dummy 
+              alpha = 0.0222
+              plots=CIF(test) 
+              timelist=0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0;
+   time Days*Status(0)/eventcode=1;
+   strata site  /group=Group order=internal;
+run;
+ods graphics off;</code></pre>
+</div>
+</div>
+<div id="subdistribution-hazard-function" class="section level2">
+<h2>Subdistribution hazard function</h2>
+<div id="introduction-2" class="section level3">
+<h3>Introduction</h3>
+<p>Hazard function, <span class="math inline">\(h(t)]\)</span> The
+instantaneous strength of the probability that the observed individual
+surviving at this moment dies at <span class="math inline">\(t\)</span>,
+the formula is <span class="math display">\[
+h(t)=\lim _{\Delta t \rightarrow 0} \frac{P(t \leqslant T&lt;t+\Delta t
+\mid T \geqslant t)}{\Delta t}
+\]</span> If there is no competitive risk, the Cox proportional hazard
+model is <span class="math display">\[
+\log [\lambda(t)]=\log \left[\lambda_{0}(t)\right]+X \beta
+\]</span> Among them, <span class="math inline">\(\lambda(t)\)</span> is
+the net risk rate, and <span
+class="math inline">\(\lambda_{0}(t)\)</span> is the baseline risk
+function, that is, the risk function when the covariate vector is 0,
+which can be written as <span
+class="math display">\[\lambda(t)=\lambda_{0}(t) \exp (\mathrm{X}
+\beta)\]</span></p>
+<p>If there is a risk of competition, the <strong>condition of
+“censoring independence”</strong> is not met at this time, and there are
+two models:</p>
+<ul>
+<li><p>Subdistribution hazard function (CIF regression model, Fine-Gray
+model)</p>
+<ul>
+<li>Represents the instantaneous probability intensity of the occurrence
+of the <span class="math inline">\(k\)</span> event of the observed
+individual without the <span class="math inline">\(k\)</span> event at
+the time <span class="math inline">\(t\)</span></li>
+</ul></li>
+<li><p>Cause-specific hazard</p>
+<ul>
+<li>Represents the instantaneous probability intensity of the occurrence
+of the <span class="math inline">\(k\)</span> event of the observed
+individual without any event at the time <span
+class="math inline">\(t\)</span></li>
+</ul></li>
+</ul>
+</div>
+<div id="modeling-using-proc-phreg" class="section level3">
+<h3>Modeling using proc phreg</h3>
+<p><span class="math display">\[\lambda_{K}^{S D}(t)=\lim _{\Delta t
+\rightarrow 0} \frac{P[t \leqslant T&lt;t+\Delta t, D=k \mid T&gt;t
+\cup(T&lt;t \cap K \neq k)]}{\Delta t}\]</span></p>
+<pre><code>*** Mainly concerned about the outcome A corrected CIF, SD model;
+proc phreg data＝cohort plots(overlay＝stratum)＝cif；
+    model time*y(0)＝cov1~covn /eventcode ＝ 1 rl；
+run；
+
+*** Competitive risk event B corrected CIF, SD model;
+proc phreg data＝cohort plots(overlay＝stratum)＝cif； 
+    model time*y(0)＝cov1~covn /eventcode＝2 rl；
+run；</code></pre>
+</div>
+</div>
+<div id="cause-specific-hazard-function" class="section level2">
+<h2>Cause-specific hazard function</h2>
+<div id="modeling-using-proc-phreg-1" class="section level3">
+<h3>Modeling using proc phreg</h3>
+<p>CS represents the instantaneous probability intensity of the
+occurrence of the <span class="math inline">\(k\)</span> event of the
+observed individual without any event at the time <span
+class="math inline">\(t\)</span>. In words, It is a conditional
+probability that a subject with covariates <span
+class="math inline">\(x\)</span> dies in the interval <span
+class="math inline">\([t, t+d t]\)</span> and the event of interest is
+jth cause, given that the subject was alive just before time t.</p>
+<p><span class="math display">\[\lambda_{K}^{C s}(t)=\lim _{\Delta i
+\rightarrow 0} \frac{P(t \leqslant T&lt;t+\Delta t, D=k \mid T \geqslant
+t)}{\Delta t}\]</span></p>
+<p>The principal estimable quantity in competing risks is the
+causespecific hazard function <span
+class="math inline">\(\lambda_{\mathrm{k}}(\mathrm{t})\)</span>, which
+can heuristically be thought of as a probability of failure specifically
+resulting from cause <span class="math inline">\(\mathrm{k}\)</span> in
+a small interval of time, given that no failure of any kind has occurred
+thus far. The overall hazard <span
+class="math inline">\(\lambda(\mathrm{t})\)</span> for any type of
+failure at time <span class="math inline">\(\mathrm{t}\)</span> is the
+sum of the cause-specific hazards <span
+class="math inline">\(\lambda_{\mathrm{k}}(\mathrm{t})\)</span>. The
+cumulative causespecific hazard function <span
+class="math inline">\(\Lambda{\mathrm{k}}(\mathrm{t})\)</span> or
+cumulative hazard function <span
+class="math inline">\(\Lambda(\mathrm{t})\)</span> equals the value of
+its corresponding hazard function summed up to time <span
+class="math inline">\(t\)</span>. Note that the cumulative hazard
+function is uniquely related to the familiar survival function
+(probability of survival past time <span
+class="math inline">\(t\)</span> ) via <span
+class="math inline">\(S(t)=\exp (-\Lambda(t)).\)</span> However, <span
+class="math inline">\(\exp
+\left(-\Lambda_{\mathrm{k}}(\mathrm{t})\right)\)</span> is in general
+not interpretable as the survival function for cause <span
+class="math inline">\(\mathrm{k}\)</span> alone unless additional
+assumptions are made that cannot be verified in competing risks
+data.</p>
+<pre><code>*** competing events censored;
+proc phreg data＝cohort zph；
+    * class cov1(order=internal ref=&#39;3&#39;);
+    model time*Status(0，2)＝cov1~covn /ties＝efron rl；
+    assess ph/resample seed＝1234；
+run；
+
+*** Effect of competing events;
+proc phreg data＝cohort zph； 
+    model time*Status(0，1)＝cov1~covn /ties＝efron rl；
+    assess ph/resample seed＝1234；
+run；</code></pre>
+</div>
+<div id="cause_specific_sel" class="section level3">
+<h3>%Cause_Specific_SEL</h3>
+<p>To conduct multivariate backward selection Cause-Specific Hazard
+model on competing risk survival data. For a particular cause of
+interest, we treat all the competing events as censored observations in
+the analysis. The risk set at each time includes only those subjects who
+have not failed from competing events or are truly censored.</p>
+</div>
+</div>
+</div>
+<div id="competing-risk-analysis-in-r" class="section level1">
+<h1>Competing Risk Analysis in R</h1>
+<p>We will use the Melanoma data from the {MASS} package to illustrate
+these concepts. It contains variables:</p>
+<ul>
+<li>time survival time in days, possibly censored.</li>
+<li>status 1 died from melanoma, 2 alive, 3 dead from other causes.</li>
+<li>sex 1 = male, 0 = female.</li>
+<li>age age in years.</li>
+<li>year of operation.</li>
+<li>thickness tumor thickness in mm.</li>
+<li>ulcer 1 = presence, 0 = absence.</li>
+</ul>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["time"],"name":[1],"type":["int"],"align":["right"]},{"label":["status"],"name":[2],"type":["fct"],"align":["left"]},{"label":["sex"],"name":[3],"type":["int"],"align":["right"]},{"label":["age"],"name":[4],"type":["int"],"align":["right"]},{"label":["year"],"name":[5],"type":["int"],"align":["right"]},{"label":["thickness"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["ulcer"],"name":[7],"type":["int"],"align":["right"]}],"data":[{"1":"10","2":"2","3":"1","4":"76","5":"1972","6":"6.76","7":"1","_rn_":"1"},{"1":"30","2":"2","3":"1","4":"56","5":"1968","6":"0.65","7":"0","_rn_":"2"},{"1":"35","2":"0","3":"1","4":"41","5":"1977","6":"1.34","7":"0","_rn_":"3"},{"1":"99","2":"2","3":"0","4":"71","5":"1968","6":"2.90","7":"0","_rn_":"4"},{"1":"185","2":"1","3":"1","4":"52","5":"1965","6":"12.08","7":"1","_rn_":"5"},{"1":"204","2":"1","3":"1","4":"28","5":"1971","6":"4.84","7":"1","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<div id="cumulative-incidence" class="section level2">
+<h2>Cumulative Incidence</h2>
+<p>A non-parametric estimate of the cumulative incidence of the event of
+interest. At any point in time, the sum of the cumulative incidence of
+each event is equal to the total cumulative incidence of any event (not
+true in the cause-specific setting). Gray’s test is a modified
+Chi-squared test used to compare 2 or more groups.</p>
+<p>Estimate the cumulative incidence in the context of competing risks
+using the cuminc function from the {<strong>tidycmprsk</strong>}
+package. By default this requires the status to be a factor variable
+with censored patients coded as 0.</p>
+<pre><code>## 
+## time    n.risk   estimate   std.error   95% CI          
+## 1,000   171      0.127      0.023       0.086, 0.177    
+## 2,000   103      0.230      0.030       0.174, 0.291    
+## 3,000   54       0.310      0.037       0.239, 0.383    
+## 4,000   13       0.339      0.041       0.260, 0.419    
+## 5,000   1        0.339      0.041       0.260, 0.419    
+## 
+## time    n.risk   estimate   std.error   95% CI          
+## 1,000   171      0.034      0.013       0.015, 0.066    
+## 2,000   103      0.050      0.016       0.026, 0.087    
+## 3,000   54       0.058      0.017       0.030, 0.099    
+## 4,000   13       0.106      0.032       0.053, 0.179    
+## 5,000   1        0.106      0.032       0.053, 0.179</code></pre>
+<p>Now let’s say we wanted to examine death from melanoma or other
+causes in the Melanoma data, according to ulcer, the presence or absence
+of ulceration. We can estimate the cumulative incidence at various times
+by group and display that in a table using the tbl_cuminc() function
+from the {tidycmprsk} package, and add Gray’s test to test for a
+difference between groups over the entire follow-up period using the
+add_p() function.</p>
+<div id="hmcfobunad" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#hmcfobunad table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#hmcfobunad thead, #hmcfobunad tbody, #hmcfobunad tfoot, #hmcfobunad tr, #hmcfobunad td, #hmcfobunad th {
+  border-style: none;
+}
+
+#hmcfobunad p {
+  margin: 0;
+  padding: 0;
+}
+
+#hmcfobunad .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#hmcfobunad .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#hmcfobunad .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#hmcfobunad .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#hmcfobunad .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#hmcfobunad .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hmcfobunad .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#hmcfobunad .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#hmcfobunad .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#hmcfobunad .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#hmcfobunad .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#hmcfobunad .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#hmcfobunad .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#hmcfobunad .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#hmcfobunad .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#hmcfobunad .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#hmcfobunad .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#hmcfobunad .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#hmcfobunad .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hmcfobunad .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#hmcfobunad .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#hmcfobunad .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#hmcfobunad .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hmcfobunad .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#hmcfobunad .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#hmcfobunad .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hmcfobunad .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hmcfobunad .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#hmcfobunad .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hmcfobunad .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#hmcfobunad .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hmcfobunad .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#hmcfobunad .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hmcfobunad .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#hmcfobunad .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hmcfobunad .gt_left {
+  text-align: left;
+}
+
+#hmcfobunad .gt_center {
+  text-align: center;
+}
+
+#hmcfobunad .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#hmcfobunad .gt_font_normal {
+  font-weight: normal;
+}
+
+#hmcfobunad .gt_font_bold {
+  font-weight: bold;
+}
+
+#hmcfobunad .gt_font_italic {
+  font-style: italic;
+}
+
+#hmcfobunad .gt_super {
+  font-size: 65%;
+}
+
+#hmcfobunad .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#hmcfobunad .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#hmcfobunad .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#hmcfobunad .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#hmcfobunad .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#hmcfobunad .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#hmcfobunad .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Characteristic&lt;/strong&gt;"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;5-year cuminc&lt;/strong&gt;"><strong>5-year cuminc</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;p-value&lt;/strong&gt;&lt;span class=&quot;gt_footnote_marks&quot; style=&quot;white-space:nowrap;font-style:italic;font-weight:normal;&quot;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/span&gt;"><strong>p-value</strong><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="label" class="gt_row gt_left">ulcer</td>
+<td headers="stat_1" class="gt_row gt_center"></td>
+<td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    0</td>
+<td headers="stat_1" class="gt_row gt_center">9.1% (4.6%, 15%)</td>
+<td headers="p.value" class="gt_row gt_center"></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    1</td>
+<td headers="stat_1" class="gt_row gt_center">39% (29%, 49%)</td>
+<td headers="p.value" class="gt_row gt_center"></td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="3"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> Gray’s Test</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+<div id="cif-plot" class="section level2">
+<h2>CIF Plot</h2>
+<p>We can use the ggcuminc() function from the {ggsurvfit} package to
+plot the cumulative incidence. By default it plots the first event type
+only. So the following plot shows the cumulative incidence of death from
+melanoma:</p>
+<p><img src="06-Analysis-Survival-Competing-Risk_files/figure-html/unnamed-chunk-4-1.png" width="672" /><img src="06-Analysis-Survival-Competing-Risk_files/figure-html/unnamed-chunk-4-2.png" width="672" /><img src="06-Analysis-Survival-Competing-Risk_files/figure-html/unnamed-chunk-4-3.png" width="672" /></p>
+</div>
+<div id="competing-risks-regression" class="section level2">
+<h2>Competing risks regression</h2>
+<p>There are two approaches to competing risks regression:</p>
+<ol style="list-style-type: decimal">
+<li>Cause-specific hazards
+<ul>
+<li>instantaneous rate of occurrence of the given type of event in
+subjects who are currently event‐free</li>
+<li>estimated using Cox regression (coxph function)</li>
+</ul></li>
+<li>Subdistribution hazards
+<ul>
+<li>instantaneous rate of occurrence of the given type of event in
+subjects who have not yet experienced an event of that type</li>
+<li>estimated using Fine-Gray regression (crr function)</li>
+</ul></li>
+</ol>
+<div id="subdistribution-hazards" class="section level3">
+<h3>Subdistribution hazards</h3>
+<p>The crr() function from the {tidycmprsk} package will estimate the
+subdistribution hazards.</p>
+<pre><code>## 
+## Variable   Coef    SE      HR     95% CI       p-value    
+## sex        0.588   0.272   1.80   1.06, 3.07   0.030      
+## age        0.013   0.009   1.01   0.99, 1.03   0.18</code></pre>
+<div id="pbvifykxvz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#pbvifykxvz table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#pbvifykxvz thead, #pbvifykxvz tbody, #pbvifykxvz tfoot, #pbvifykxvz tr, #pbvifykxvz td, #pbvifykxvz th {
+  border-style: none;
+}
+
+#pbvifykxvz p {
+  margin: 0;
+  padding: 0;
+}
+
+#pbvifykxvz .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#pbvifykxvz .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#pbvifykxvz .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#pbvifykxvz .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#pbvifykxvz .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#pbvifykxvz .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#pbvifykxvz .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#pbvifykxvz .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#pbvifykxvz .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#pbvifykxvz .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#pbvifykxvz .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#pbvifykxvz .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#pbvifykxvz .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#pbvifykxvz .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#pbvifykxvz .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#pbvifykxvz .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#pbvifykxvz .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#pbvifykxvz .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#pbvifykxvz .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pbvifykxvz .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#pbvifykxvz .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#pbvifykxvz .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#pbvifykxvz .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pbvifykxvz .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#pbvifykxvz .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#pbvifykxvz .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#pbvifykxvz .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pbvifykxvz .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#pbvifykxvz .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#pbvifykxvz .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#pbvifykxvz .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#pbvifykxvz .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#pbvifykxvz .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pbvifykxvz .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#pbvifykxvz .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pbvifykxvz .gt_left {
+  text-align: left;
+}
+
+#pbvifykxvz .gt_center {
+  text-align: center;
+}
+
+#pbvifykxvz .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#pbvifykxvz .gt_font_normal {
+  font-weight: normal;
+}
+
+#pbvifykxvz .gt_font_bold {
+  font-weight: bold;
+}
+
+#pbvifykxvz .gt_font_italic {
+  font-style: italic;
+}
+
+#pbvifykxvz .gt_super {
+  font-size: 65%;
+}
+
+#pbvifykxvz .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#pbvifykxvz .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#pbvifykxvz .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#pbvifykxvz .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#pbvifykxvz .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#pbvifykxvz .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#pbvifykxvz .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Characteristic&lt;/strong&gt;"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;HR&lt;/strong&gt;&lt;span class=&quot;gt_footnote_marks&quot; style=&quot;white-space:nowrap;font-style:italic;font-weight:normal;&quot;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/span&gt;"><strong>HR</strong><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;95% CI&lt;/strong&gt;&lt;span class=&quot;gt_footnote_marks&quot; style=&quot;white-space:nowrap;font-style:italic;font-weight:normal;&quot;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/span&gt;"><strong>95% CI</strong><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;p-value&lt;/strong&gt;"><strong>p-value</strong></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="label" class="gt_row gt_left">sex</td>
+<td headers="estimate" class="gt_row gt_center">1.80</td>
+<td headers="ci" class="gt_row gt_center">1.06, 3.07</td>
+<td headers="p.value" class="gt_row gt_center">0.030</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">age</td>
+<td headers="estimate" class="gt_row gt_center">1.01</td>
+<td headers="ci" class="gt_row gt_center">0.99, 1.03</td>
+<td headers="p.value" class="gt_row gt_center">0.2</td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="4"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> HR = Hazard Ratio, CI = Confidence Interval</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+<div id="cause-specific-hazards" class="section level3">
+<h3>Cause-specific hazards</h3>
+<p>Alternatively, if we wanted to use the cause-specific hazards
+regression approach, we first need to censor all subjects who didn’t
+have the event of interest, in this case death from melanoma, and then
+use coxph as before. So patients who died from other causes are now
+censored for the cause-specific hazard approach to competing risks.
+Again we generate a table of formatted results using the
+tbl_regression() function from the {gtsummary} package:</p>
+<div id="hyspgnczio" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#hyspgnczio table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#hyspgnczio thead, #hyspgnczio tbody, #hyspgnczio tfoot, #hyspgnczio tr, #hyspgnczio td, #hyspgnczio th {
+  border-style: none;
+}
+
+#hyspgnczio p {
+  margin: 0;
+  padding: 0;
+}
+
+#hyspgnczio .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#hyspgnczio .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#hyspgnczio .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#hyspgnczio .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#hyspgnczio .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#hyspgnczio .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hyspgnczio .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#hyspgnczio .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#hyspgnczio .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#hyspgnczio .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#hyspgnczio .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#hyspgnczio .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#hyspgnczio .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#hyspgnczio .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#hyspgnczio .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#hyspgnczio .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#hyspgnczio .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#hyspgnczio .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#hyspgnczio .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hyspgnczio .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#hyspgnczio .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#hyspgnczio .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#hyspgnczio .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hyspgnczio .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#hyspgnczio .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#hyspgnczio .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hyspgnczio .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hyspgnczio .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#hyspgnczio .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hyspgnczio .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#hyspgnczio .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hyspgnczio .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#hyspgnczio .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hyspgnczio .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#hyspgnczio .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hyspgnczio .gt_left {
+  text-align: left;
+}
+
+#hyspgnczio .gt_center {
+  text-align: center;
+}
+
+#hyspgnczio .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#hyspgnczio .gt_font_normal {
+  font-weight: normal;
+}
+
+#hyspgnczio .gt_font_bold {
+  font-weight: bold;
+}
+
+#hyspgnczio .gt_font_italic {
+  font-style: italic;
+}
+
+#hyspgnczio .gt_super {
+  font-size: 65%;
+}
+
+#hyspgnczio .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#hyspgnczio .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#hyspgnczio .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#hyspgnczio .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#hyspgnczio .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#hyspgnczio .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#hyspgnczio .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Characteristic&lt;/strong&gt;"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;HR&lt;/strong&gt;&lt;span class=&quot;gt_footnote_marks&quot; style=&quot;white-space:nowrap;font-style:italic;font-weight:normal;&quot;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/span&gt;"><strong>HR</strong><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;95% CI&lt;/strong&gt;&lt;span class=&quot;gt_footnote_marks&quot; style=&quot;white-space:nowrap;font-style:italic;font-weight:normal;&quot;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/span&gt;"><strong>95% CI</strong><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;p-value&lt;/strong&gt;"><strong>p-value</strong></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="label" class="gt_row gt_left">sex</td>
+<td headers="estimate" class="gt_row gt_center">1.82</td>
+<td headers="ci" class="gt_row gt_center">1.08, 3.07</td>
+<td headers="p.value" class="gt_row gt_center">0.025</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">age</td>
+<td headers="estimate" class="gt_row gt_center">1.02</td>
+<td headers="ci" class="gt_row gt_center">1.00, 1.03</td>
+<td headers="p.value" class="gt_row gt_center">0.056</td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="4"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> HR = Hazard Ratio, CI = Confidence Interval</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<ul>
+<li><a
+href="https://www.emilyzabor.com/tutorials/survival_analysis_in_r_tutorial.html#Part_3:_Competing_Risks">Survival
+Analysis in R</a></li>
+<li>Dignam JJ, Zhang Q, Kocherginsky M. The use and interpretation of
+competing risks regression models. Clin Cancer Res.
+2012;18(8):2301-8.</li>
+<li>Kim HT. Cumulative incidence in competing risks data and competing
+risks regression analysis. Clin Cancer Res. 2007 Jan 15;13(2 Pt
+1):559-65.</li>
+<li>Satagopan JM, Ben-Porat L, Berwick M, Robson M, Kutler D, Auerbach
+AD. A note on competing risks in survival data analysis. Br J Cancer.
+2004;91(7):1229-35.</li>
+<li>Austin, P., &amp; Fine, J. (2017). Practical recommendations for
+reporting Fine‐Gray model analyses for competing risk data. Statistics
+in Medicine, 36(27), 4391-4400.</li>
+</ul>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

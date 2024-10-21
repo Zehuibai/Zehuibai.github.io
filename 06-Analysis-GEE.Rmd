@@ -1,0 +1,537 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Generalized Estimating Equation
+author: "Zehui Bai"
+date: '`r format(Sys.time())`'
+output:
+  html_document:
+    df_print: paged
+    number_sections: yes
+    toc: yes
+    toc_float:
+      collapsed: yes
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+ 
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                    1. load the required packages                       -->
+# <!-- ---------------------------------------------------------------------- --> 
+
+# if(!require(psych)){install.packages("psych")}
+
+packages<-c("tidyverse", "kableExtra", "gtsummary",
+            "Hmisc","htmltools","clinUtils","sjPlot",
+            "geepack")
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                        2. Basic system settings                        -->
+# <!-- ---------------------------------------------------------------------- -->
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+
+# convert backslash to forward slash in R
+# gsub('"', "", gsub("\\\\", "/", readClipboard()))
+
+## get the path
+# rstudioapi::getSourceEditorContext()$path
+# dirname(rstudioapi::getSourceEditorContext()$path)
+
+## set working directory
+# getwd()
+# setwd("c:/Users/zbai/Desktop")
+# Sys.setlocale("LC_ALL","English")
+
+## get the R Version
+# paste(R.Version()[c("major", "minor")], collapse = ".")
+
+## convert backslash to forward slash 
+# scan("clipboard",what="string")
+# gsub('"', "", gsub("\\\\", "/", readClipboard())) 
+
+# Load all r functions
+# The directory where all source code files are saved.
+source_code_dir <- "C:/Users/baiz/Downloads/Data-Analyst-with-R/00 R Function/ZB Function/"  
+file_path_vec <- list.files(source_code_dir, full.names = T)
+for(f_path in file_path_vec){source(f_path)}
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                         3. Import the datasets                         -->
+# <!-- ---------------------------------------------------------------------- -->
+
+# <!-- ---------------------------- -->
+# <!-- --3.1 Import csv data ------ -->
+# <!-- ---------------------------- -->
+
+# pfad <- "~/Desktop/SASUniversityEdition/myfolders/Daten"
+# mydata1 <- read.csv(file.path(pfad, "yourcsv_data.csv"), 
+#                     sep=";", 
+#                     header=TRUE)   
+
+# Import all csv data from folder
+# list_csv_files <- list.files(path = "./csvfolder/")
+# do.call(rbind, lapply(list_csv_files, function(x) read.csv(x, stringsAsFactors = FALSE)))
+
+# <!-- ---------------------------- -->
+# <!-- --3.2 Import xlsx data ----- -->
+# <!-- ---------------------------- -->
+
+# library(readxl)
+# mydata2 <- read_excel("C:/Users/zbai/Documents/GitHub/R-Projects/SAS/Yimeng/results-text.xlsx")
+
+# <!-- ---------------------------- -->
+# <!-- --3.3 Import sas7dbat data - -->
+# <!-- ---------------------------- -->
+
+# library(sas7bdat)
+# mydata3 <- read.sas7bdat("~/Desktop/SASUniversityEdition/myfolders/Daten/uis.sas7bdat")
+
+# Import all sas7dbat data from SASfolder
+# ZB.import.sas.folder("./SASfolder/")
+
+# <!-- ---------------------------- -->
+# <!-- --3.4 Import from copyboard --->
+# <!-- ---------------------------- -->
+# copdat <- read.delim("clipboard")
+# Data_D01 <- copdat
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                           4. Some Tools                                -->
+# <!-- ---------------------------------------------------------------------- -->
+
+# To check out vignettes for one specific package
+# browseVignettes("sjPlot")      # sjPlot for Models Summary
+# browseVignettes("kableExtra")
+# browseVignettes("gtsummary")
+# <!-- ---------------------------------------------------------------------- -->
+```
+
+
+ 
+
+# Introduction
+
+
+## Overview of Generalized Linear Models (GLMs)
+
+Generalized linear models (GLMs) extend traditional linear models to accommodate more diverse data types and relationships. Developed by Nelder and Wedderburn in 1972, GLMs allow the mean of the distribution to be linked to the predictors through a non-linear link function and enable the response variable to follow any distribution from the exponential family. This flexibility allows GLMs to handle non-normal distributions and various types of data, including binary, multinomial, and count data.
+
+**Components of a Generalized Linear Model**
+
+1. **Linear Predictor**: Similar to traditional linear models, GLMs include a linear predictor \(\eta_i = x_i^\top \beta\), where \(x_i\) is a vector of covariates for the ith observation, and \(\beta\) is a vector of coefficients.
+   
+2. **Link Function**: A monotonic differentiable function \(g\) relates the expected value of the response variable \(\mu_i\) to the linear predictor. This function defines how the mean of the response is modeled and can vary depending on the type of data being analyzed (e.g., logit link for binary data).
+   
+3. **Probability Distribution**: The response variable in GLMs follows a distribution from the exponential family, which is characterized by a variance function \(V(\mu)\). This specification allows the variance to depend on the mean, accommodating phenomena like heteroscedasticity—where variance changes with the level of an explanatory variable.
+
+4. **Dispersion Parameter**: This parameter (\(\phi\)), which might need to be estimated, scales the variance function. Its value is fixed for some distributions like the binomial but must be estimated for others.
+
+**Advantages of GLMs**
+
+- **Flexibility in Data Types**: GLMs are suitable for various data types that traditional linear models might not handle well, such as counts or binary outcomes.
+- **Modeling Data Constraints**: GLMs can naturally incorporate constraints on the data, such as proportions that must lie between 0 and 1, which traditional linear models cannot handle adequately.
+- **Variance Structure**: By allowing the variance to depend on the mean, GLMs can more accurately model data where the variance changes with the level of measurement, providing a more reliable analysis.
+
+## Generalized Estimating Equation (GEE)
+
+Generalized linear models (GLMs) and Generalized Estimating Equations (GEEs) serve as crucial tools in epidemiological research, particularly when dealing with non-normally distributed data and correlated outcomes. GLMs enhance traditional linear models by using link functions to connect the mean of a population to a linear predictor. This flexibility allows them to effectively handle dichotomous outcomes and other non-continuous data types prevalent in health outcomes research, where diseases often do not follow a normal distribution.
+
+Introduced by Liang and Zeger in 1986, GEEs extend the principles of GLMs to scenarios involving correlated or repeated measures data, which is common in longitudinal studies and clinical trials. The methodology behind GEEs involves a quasi-likelihood, non-likelihood-based approach. This includes the specification of a working correlation matrix to account for within-subject correlations, allowing the model to iteratively solve a system of equations based on these assumptions. Researchers can choose from various model forms for GEEs by specifying appropriate link functions, such as logistic for binary outcomes, log-linear for count data, and linear for continuous variables.
+
+While traditional GLMs rely on likelihood equations influenced only by the assumed distribution's mean and variance, GEEs expand this framework to manage multivariate responses with inherent correlation structures. This adaptation not only maintains the regression coefficients typical of GLMs but also adjusts the standard errors to better reflect the within-cluster correlation, enhancing the robustness against potential mis-specifications of the correlation structure.
+
+GEEs are particularly beneficial when the research focus is on population-averaged effects rather than specific effects at the individual level. Unlike Linear Mixed Effects Models (LMMs) that include random effects to address individual variability, GEEs provide robust estimates that generalize across a population, making them ideal for studies aimed at understanding broader trends rather than individual differences. This makes GEEs a preferred statistical approach in fields where generalized conclusions about population health are required, underscoring their significance in advancing epidemiological and clinical research.
+
+
+## Key Characteristics
+
+1. **Model Formulation**: 
+   - GEE sets up the relationship between predictors and a multivariate response variable using a link function, similar to GLMs. The key difference lies in the specification of the variance-covariance structure of the response variable itself, not merely the error terms.
+   - The mean response for individual \(i\) at time \(t_j\) is modeled as \( \mu_{ij} = \mathbb{E}(y_{ij}) \) with the link function \( g(\mu_{ij}) = \beta_0 + \beta_1 x_{1ij} + \cdots + \beta_k x_{kij} + \beta_{k+1} t_j \).
+
+2. **Variance and Correlation**:
+   - The variance of the response \( y_{ij} \) is expressed as a function \( V(\mu_{ij}) \), which depends on the mean.
+   - The correlation structure is crucial in GEE. Observations within the same cluster (e.g., the same individual in a longitudinal study) are modeled to be correlated, whereas observations between clusters are assumed independent. A working correlation matrix \( \mathbf{R}_i(\boldsymbol{\alpha}) \) captures these correlations, parameterized by a vector \( \boldsymbol{\alpha} \), applying across all clusters.
+
+3. **Estimation**:
+   - GEE uses quasi-likelihood estimation methods to estimate the parameters. The process involves iteratively fitting the model, estimating the regression coefficients \( \beta \), and updating the correlation parameters \( \boldsymbol{\alpha} \).
+   - The working covariance matrix \( \mathbf{V}_i(\boldsymbol{\alpha}) \) for the responses of the \(i\)-th individual is constructed from the variance matrix \( \mathbf{A}_i \) and the correlation matrix \( \mathbf{R}_i \), ensuring that the model accurately reflects the underlying correlation structure among the repeated measures.
+
+-   unstructured
+    $\mathbf{R}_{i}(\boldsymbol{\alpha})=\left[\begin{array}{ccccc}1 & \alpha_{12} & \alpha_{13} & \ldots & \alpha_{1 p} \\ \alpha_{12} & 1 & \alpha_{23} & \ldots & \alpha_{2 p} \\ \alpha_{13} & \alpha_{23} & 1 & \ldots & \alpha_{3 p} \\ \ldots & \ldots & \ldots & \ldots & \ldots \\ \alpha_{1 p} & \alpha_{2 p} & \alpha_{3 p} & \ldots & 1\end{array}\right]$
+
+-   Toeplitz
+    $\mathbf{R}_{i}(\boldsymbol{\alpha})=\left[\begin{array}{ccccc}1 & \alpha_{1} & \alpha_{2} & \ldots & \alpha_{p-1} \\ \alpha_{1} & 1 & \alpha_{1} & \ldots & \alpha_{p-2} \\ \alpha_{2} & \alpha_{1} & 1 & \ldots & \alpha_{p-3} \\ \ldots & \ldots & \ldots & \ldots & \ldots \\ \alpha_{p-1} & \alpha_{p-2} & \alpha_{p-3} & \ldots & 1\end{array}\right]$
+
+-   autoregressive
+    $\mathbf{R}_{i}(\boldsymbol{\alpha})=\left[\begin{array}{ccccc}1 & \alpha & \alpha^{2} & \ldots & \alpha^{p-1} \\ \alpha & 1 & \alpha & \ldots & \alpha^{p-2} \\ \alpha^{2} & \alpha & 1 & \ldots & \alpha^{p-3} \\ \ldots & \ldots & \ldots & \ldots & \ldots \\ \alpha^{p-1} & \alpha^{p-2} & \alpha^{p-3} & \ldots & 1\end{array}\right]$
+
+-   compound symmetric or exchangeable
+    $\mathbf{R}_{i}(\boldsymbol{\alpha})=\left[\begin{array}{ccccc}1 & \alpha & \alpha & \ldots & \alpha \\ \alpha & 1 & \alpha & \ldots & \alpha \\ \alpha & \alpha & 1 & \ldots & \alpha \\ \ldots & \ldots & \ldots & \ldots & \ldots \\ \alpha & \alpha & \alpha & \alpha & 1\end{array}\right]$
+
+-   independent
+    $\mathbf{R}_{i}(\boldsymbol{\alpha})=\left[\begin{array}{ccccc}1 & 0 & 0 & \ldots & 0 \\0 & 1 & 0 & \ldots & 0 \\0 & 0 & 1 & \ldots & 0 \\\ldots & \ldots & \ldots & \ldots & \ldots \\0 & 0 & 0 & \ldots & 1\end{array}\right]$
+
+The GEE estimate of
+$\boldsymbol{\beta}=\left(\beta_{0}, \beta_{1}, \ldots, \beta_{k+1}\right)^{\prime}$
+is the solution of the generalized estimating equations:
+
+$$
+\sum_{i=1}^{n}\left(\frac{\partial \boldsymbol{\mu}_{i}}{\partial \boldsymbol{\beta}}\right)_{(k+2) \times p}\left[\mathbf{V}_{i}(\hat{\boldsymbol{\alpha}})\right]_{p \times p}^{-1}\left(\mathbf{y}_{i}-\boldsymbol{\mu}_{i}\right)_{p \times 1}=\mathbf{0}_{(k+2) \times 1}
+$$ where
+$\boldsymbol{\mu}_{i}=\left(\mu_{i 1}, \ldots, \mu_{i p}\right)^{\prime}$
+is the vector of mean responses, and the estimator
+$\hat{\boldsymbol{\alpha}}$ is the method of moments estimator of the
+vector of parameters.
+
+## Model Types in GEE Framework
+
+- **Marginal Model**: Focuses on the average effect of covariates across the population, ignoring within-subject correlation beyond its influence on the mean structure. This model is useful when the goal is to understand population-level relationships rather than individual trajectories.
+- **Transitional Model**: Suitable for data with time dependencies, this model incorporates past outcomes as predictors for current observations, acknowledging and utilizing the time-sequential nature of the data.
+- **Random Effects Model**: Also known as mixed-effects models, these incorporate both fixed and random effects, allowing for individual variability in regression coefficients, which is essential when outcomes vary not just by measured factors but also by latent personal characteristics.
+
+
+## Assumption for GEE Validity
+
+The paper by Margaret Sullivan Pepe and Garnet L. Anderson discusses the application and assumptions of using Generalized Estimating Equations (GEE) for marginal regression models with longitudinal data and general correlated response data. 
+
+The fundamental assumption in GEE that requires careful attention is related to the specification of the working covariance matrix. The working covariance matrix is a pivotal component in GEE because it models the correlation structure among the repeated measures within subjects. This matrix doesn't need to correctly specify the true underlying correlation perfectly for the GEE to provide consistent estimates of the regression parameters; however, an appropriate specification can significantly improve efficiency and the robustness of standard error estimates.
+
+### Key Assumption {-}
+
+- **Correct Specification of the Working Covariance Matrix**: When applying GEE, researchers often assume a particular form for this matrix—typically simpler forms like the independence model (diagonal matrix) or exchangeable model (correlation among all pairs of observations within a cluster is the same). The critical assumption is that the chosen structure must suitably approximate the true underlying correlation among the responses. If this assumption does not hold—i.e., if the working covariance matrix is poorly specified—the efficiency of the estimates may decrease, and the standard errors may become unreliable, leading to incorrect inferences.
+
+**Common Correlation Structures:**
+
+1. **Independence**: This structure assumes that all observations within a cluster are uncorrelated. It is the simplest form and is often used as a baseline or reference model. It is not realistic for most longitudinal data but can serve as a robust option if there is uncertainty about the correct form of the correlation.
+
+2. **Exchangeable (or Compound Symmetry)**: Assumes that every pair of observations within a cluster has the same correlation. This model is appropriate when the correlation between any two observations does not depend on the time between them.
+
+3. **Autoregressive (AR1)**: Assumes that correlations between observations decay exponentially with the time lag between them. This is suitable for data where the influence of one observation on another decreases as the time interval between them increases.
+
+4. **Unstructured**: This structure does not impose any specific pattern on the correlations within a cluster. Each correlation is estimated separately from the data, making it the most flexible but also the most parameter-intensive model. It is suitable when the sample size is large enough to estimate these parameters reliably.
+
+### Implications - Consistency Condition {-}
+
+There is a crucial implicit assumption necessary for the consistency of estimates derived using Generalized Estimating Equations (GEE) when applied to marginal or cross-sectional models.  
+
+Generalized Estimating Equations are utilized to estimate parameters from models that account for correlations within clustered or longitudinal data. The estimation process involves solving the equation \( S(\beta) = 0 \), where \( S(\beta) \) is derived from the model's structure, and includes terms that depend on the covariates and a working covariance matrix, \( R_i \).
+ 
+The GEE can be expressed as:
+\[ S(\beta) = \sum_i S_i(\beta) \]
+where each \( S_i(\beta) \) incorporates the relationship among observed outcomes, covariates, and the regression coefficients. The crucial aspect for the GEE approach to yield consistent estimates (\( \beta \)) is that the expected value of \( S_i(\beta) \), \( E[S_i(\beta)] \), must equal zero.
+ 
+The key assumption for the consistency of \( \beta \), the solution to \( S(\beta) = 0 \), is that the marginal expectation \( E[Y_{it} \mid X_{it}] \) modeled in the marginal model should equal the partly-conditional expectation. In simpler terms, for the expectation of the estimating equation to zero out, the model must correctly capture how the covariates relate to the outcome, not just at each individual time point but across all conditions where covariates could vary.
+ 
+When covariates are constant over time, this condition is trivially satisfied because the relationship modeled does not change across time points or conditions. However, in many practical applications, particularly in longitudinal data, covariates may vary with time or across different conditions, making this assumption challenging to satisfy.
+
+**Example:** If a longitudinal study tracks Vitamin A levels and their effect on respiratory health annually, changes in Vitamin A levels over the years must be accurately modeled in relation to health outcomes. If the model only captures the initial level without adjusting for its change, the estimating equation might not hold, leading to biased or inconsistent estimates.
+
+### Working Covariance Matrix {-}
+
+To address potential issues arising from time-varying covariates, two approaches can be considered:
+
+1. **Using a Diagonal Working Covariance Matrix**: This simplifies the correlation structure assumed within clusters, treating different time points as if they are uncorrelated. While this may lead to loss of efficiency, it can help avoid the bias from incorrect assumptions about the covariance structure.
+2. **Validating the Consistency Condition**: If a more complex covariance structure is used, it becomes essential to validate that the conditional expectations used in the model accurately reflect the data. This often involves more complex statistical analysis and data verification.
+
+### Marginal Expectation {-}
+
+The focus of analysis in GEE for marginal models is on estimating the marginal expectation \( E(Y_{it} \mid X_{it}) \) rather than precisely modeling the underlying process generating the data. This approach is beneficial for practical applications like screening studies where a simplified model that accurately captures the average effects across the population is more useful than a complex model describing individual variations.
+ 
+
+Three different stochastic processes are considered to demonstrate that different underlying data-generating mechanisms can result in the same marginal mean. These processes include:
+
+1. **Autoregressive Process (Model 7)**: Here, the output variables are generated in a way where each is independent from the others and has a mean of zero. The marginal mean remains \( \beta X_{it} \).
+
+2. **Shifted Mean Process (Model 8)**: This process introduces a mean shift, where \( Y_{it} \) now has a mean of 1, but the marginal mean calculated remains \( \beta X_{it} \).
+
+3. **Random Variable Addition (Model 9)**: In this scenario, a random variable \( q_i \) with a mean of zero is added, but the marginal mean \( q_{it} \) is still \( \beta X_{it} \).
+ 
+
+The choice of a diagonal working covariance matrix is emphasized as a prudent strategy when the true correlation structure is complex or unknown. This matrix simplifies the GEE by treating observations within each cluster as uncorrelated, which is especially useful in avoiding mis-specifications that could arise from more complicated correlation structures.
+
+While a diagonal matrix simplifies calculations and reduces the risk of bias, using an appropriately structured non-diagonal covariance matrix can yield efficiency gains if it accurately reflects the true correlation structure among the data points. This approach requires verifying that the correlation structure assumed by the model aligns well with the actual data.
+
+
+
+# SAS Implementation
+
+## GENMOD Procedure
+
+The GENMOD procedure in SAS is a powerful tool designed to fit generalized linear models (GLMs) using maximum likelihood estimation, which is essential for analyzing data that exhibit non-normal distributions or relationships not well-modeled by traditional linear regression
+
+
+### Maximum Likelihood Estimation (MLE) {-}
+
+- **Iterative Estimation**: There is generally no closed-form solution for the maximum likelihood estimates of the parameters in GLMs, so GENMOD uses an iterative numerical process to estimate them.
+- **Estimation of Dispersion Parameter**: The dispersion parameter, critical for scaling the variance function in GLMs, can be estimated by maximum likelihood, or optionally, using residual deviance or Pearson's chi-square divided by the degrees of freedom.
+
+### Link Functions and Distributions {-}
+
+- **Link Functions**: GENMOD supports a variety of link functions including identity, logit, probit, power, log, and complementary log-log. These functions connect the linear predictor to the mean of the distribution, allowing flexibility depending on the nature of the data.
+- **Probability Distributions**: The procedure accommodates several probability distributions such as normal, binomial, Poisson, gamma, and inverse Gaussian, each with its specific variance function. This variety supports modeling diverse data types, from counts to continuous measurements.
+
+### Model Building and Variable Selection {-}
+
+- **Goodness-of-Fit**: Changes in goodness-of-fit statistics (like deviance) are utilized to assess the contribution of variables to the model. Deviance is particularly useful as it measures the fit of the model compared to a saturated model.
+- **Variable Selection**: GENMOD facilitates the sequential fitting of models, starting from a simple model and progressively adding variables. This method allows for the assessment of the importance of each variable through changes in deviance or log likelihoods. Statistical significance of additional variables can be evaluated using likelihood ratio tests.
+
+### Statistical Tests and Analyses {-}
+- **Type 1 and Type 3 Analyses**: 
+  - **Type 1 Analysis**: Sequential analysis where the order of terms affects the outcome. It's similar to Type I sums of squares in linear models, where each term's contribution is evaluated in the order they are entered into the model.
+  - **Type 3 Analysis**: This does not depend on the order of terms. It involves computing likelihood ratio statistics for each term independently of the order they were entered, akin to Type III sums of squares in traditional linear models. This analysis is useful for testing the significance of each term in the presence of others, especially interactions.
+
+
+
+## Analytic Approach
+
+**Descriptive Statistics and Preliminary Analysis**
+
+Before delving into complex model-building, it's crucial to perform descriptive statistics to screen for significant explanatory variables. This step includes:
+- **PROC FREQ**: Used for categorical variables to summarize data and highlight significant predictors.
+- **PROC UNIVARIATE**: Employed for continuous variables to describe central tendencies, dispersion, and distribution shape, which helps in identifying potential outliers or anomalies and significant predictors.
+
+**Checking for Multicollinearity**
+
+- **PROC REG**: This procedure provides diagnostic capabilities to check for multicollinearity among potential explanatory variables. It's essential to ensure that no burdensome correlations exist between variables, as these can distort the results and lead to unreliable conclusions.
+- **Variable Selection**: Variables that are not independently associated with the outcome are investigated for confounding. Those with p-values of 0.15 or less are typically retained in the final model to balance between excluding potentially influential predictors and maintaining a parsimonious model.
+
+**Longitudinal Model Data Analysis Steps**
+
+1. **Model Specification**:
+   - **Link Function**: Selecting the appropriate link function is critical as it defines how the mean of the dependent variable relates to the linear predictor formed by the model. This choice depends on the nature and distribution of the dependent variable.
+   
+2. **Variance-Covariance Structure**:
+   - **Working Correlation Structure**: For each subject, define how measurements taken over time are correlated. This step is vital for handling the intra-subject correlation typical in repeated measures or longitudinal data, which affects the standard errors and tests of the model parameters.
+
+3. **Distribution of the Dependent Variable**:
+   - Choosing the correct distribution for the dependent variable, consistent with its nature (e.g., normal, binomial, Poisson), is fundamental in GLMs and impacts how the data variability is modeled.
+
+4. **Goodness-of-Fit Assessment**:
+   - Once the model is fit, assessing its goodness-of-fit is crucial. This involves evaluating how well the chosen model and its parameters describe the observed data. It checks if the specified model adequately captures the underlying data structure without overfitting or underfitting.
+
+  
+## Example myocardial infarction: PROC LOGISTIC vs PROC GENMOD 
+
+```SAS
+data MIdata;
+   input id gender race maritalstat mi anthrax;
+   datalines;
+   14 1 1 1 1 1
+   14 2 1 1 0 1
+   15 1 1 0 0 1
+   16 2 3 1 1 0
+   17 1 2 1 0 0
+   18 1 1 0 0 0
+   19 2 2 0 0 0
+   20 2 3 1 0 1
+   21 2 3 1 0 1
+   22 1 2 0 1 0
+   23 2 1 1 0 0
+   24 1 3 0 1 1
+   25 2 2 1 0 1
+   26 1 1 0 0 0
+   27 2 2 1 0 0
+   28 1 3 0 1 0
+   29 1 1 1 1 1
+   30 2 3 0 0 1
+   31 2 1 1 1 1
+   32 1 2 0 0 0
+   33 2 2 1 0 0
+   34 1 3 1 1 0
+   35 1 2 0 0 0
+   36 2 1 1 0 1
+   37 1 3 0 1 1
+   38 2 2 1 0 0
+   39 1 1 0 0 1
+   40 2 3 1 1 0
+   41 1 2 0 0 0
+   42 2 1 1 0 0
+   43 1 3 1 0 1
+   44 2 2 0 1 0
+   45 2 3 1 0 1
+   ;
+run;
+```
+
+### PROC LOGISTIC {-}
+
+Logistic regression is employed to predict a binary outcome (Y = 1 or Y = 0) using one or more predictors (X1, X2, …, Xp). The probability of the event occurring (Y = 1) is modeled using the logistic function:
+\[ P(Y=1) = \frac{1}{1 + \exp[-(\beta_0 + \sum_{k=1}^{p} \beta_k X_k)]} \]
+This formula defines how the log odds of the dependent event relate to the independent variables.
+
+
+```sas
+ods html path='c:\YourPath' body='Name.html';
+proc logistic data=MIdata descending;
+  class anthrax (ref = '0') race (ref='1') maritalstat (ref='0') gender (ref='1') / param=reference;
+  model mi=anthrax race maritalstat gender / clodds=wald clodds=pl lackfit;
+  title1 ‘Proc Logistic for Log Odds of MI Among those Being Vaccinated Against Anthrax After Controlling for Race, Marital Status and Gender’;
+run;
+ods html close;
+```
+
+- **Class Statement**: This statement is used to specify categorical predictors and their reference categories directly, thus avoiding the need for preliminary data manipulation to create dummy variables.
+- **Parameter Estimates**: The `param=reference` option is used to ensure that parameter estimates, odds ratios, and confidence intervals are calculated based on reference cell coding, as opposed to effect coding.
+- **Confidence Intervals**: The `clodds=` option specifies that confidence intervals for odds ratios should be computed, either using the Wald method or profile likelihood, which are critical for inferential statistics in logistic regression.
+- **Goodness of Fit**: The `lackfit` option is included to perform a Hosmer-Lemeshow test to assess the goodness of fit of the model. A well-fitting model is one where the null hypothesis (that the model fits the data well across different risk groups) is not rejected.
+
+While both PROC LOGISTIC and PROC GENMOD can estimate binary logistic models, PROC LOGISTIC is specifically tailored for binary or ordinal outcomes and provides specialized options for model diagnostics, reference category handling, and output management. In contrast, PROC GENMOD is more flexible and can handle various types of generalized linear models but with a broader focus.
+
+### PROC GENMOD {-}
+
+PROC GENMOD is versatile and used for fitting generalized linear models (GLMs) including logistic regression. It can handle different distributions and link functions, making it suitable for various data types beyond binary outcomes.
+
+```sas
+proc genmod data=MIdata descending;
+    class anthrax race maritalstat gender;
+    model mi = anthrax race maritalstat gender / dist=binomial link=logit;
+    estimate "Anthrax" anthrax -1 1 / exp;
+    estimate "Sex" gender -1 1 / exp;
+    estimate "Black" race -1 1 0 / exp;
+    estimate "Hispan" race -1 0 1 / exp;
+    estimate "maritalstat" maritalstat -1 1 / exp;
+run;
+quit;
+```
+
+- **Model Statement**:
+  - `dist=binomial`: Specifies that the dependent variable follows a binomial distribution, appropriate for binary outcome data.
+  - `link=logit`: Utilizes the logit link function which is common in logistic regression, transforming the probability of the outcome into an odds ratio.
+- **Estimate Statements**: These are used to compute the odds ratios for specific variables against their reference categories. For instance, `estimate "Anthrax" anthrax -1 1 / exp;` calculates the odds ratio for the presence versus absence of anthrax, adjusting for the other variables in the model.
+  - The `-1 1` indicates the contrasts for the categorical levels, essential for interpreting the direction and magnitude of effects.
+  - `/ exp` indicates that the results (odds ratios, standard errors, and confidence intervals) will be presented in exponential form, which is typical for logistic regression as it makes the interpretation of effects on an odds ratio scale straightforward.
+  
+Note: Unlike the LOGISTIC procedure, the GENMOD procedure will not give the global test of the null hypothesis that all of the parameters taken together in the fitted model are equal to 0 when compared to the model with only the intercept. To calculate the likelihood ratio chi-square test, take the deviance (in output) from the reduced model (or null model if you remove all variables) and minus the deviance in the full model. This will give you a chi-square statistic with the degrees of freedom equal to the number of variables removed. PROC GENMOD does include an LSMEANS statement that provides an extension of least squares means to the generalized linear model.
+
+### PROC GENMOD for Correlated Data {-}
+
+This approach incorporates Generalized Estimating Equations (GEE) to address the intra-subject correlation that often occurs in longitudinal or clustered data setups. Utilizing PROC GENMOD with the `repeated` statement allows for the proper handling of correlated outcome data in logistic regression, ensuring that the standard errors and confidence intervals account for the intra-subject correlation. This approach is indispensable in longitudinal studies or any research context where data are collected in clusters or repeated measures from the same subjects.
+
+```sas
+proc genmod data=MIdata descending;
+    class id anthrax race maritalstat gender;
+    model mi = anthrax race maritalstat gender / dist=binomial link=logit;
+    repeated subject=id / type=cs corrw covb;
+    estimate "Anthrax" anthrax -1 1 / exp;
+    estimate "Sex" gender -1 1 / exp;
+    estimate "Black" race -1 1 0 / exp;
+    estimate "Hispan" race -1 0 1 / exp;
+    estimate "maritalstat" maritalstat -1 1 / exp;
+run;
+quit;
+```
+
+
+- **Model Statement**: Defines the logistic regression model with the `dist=binomial` specifying the binomial distribution appropriate for binary outcome data, and `link=logit` indicating the use of the logistic link function.
+
+- **Repeated Statement**:
+  - `subject=id` declares that the repeated measurements are grouped by the `id` variable, indicating observations within the same subject are correlated.
+  - `type=cs` sets the correlation structure as "compound symmetry" (exchangeable), where all pairwise correlations are assumed to be equal.
+  - `corrw` and `covb` options request the output of the estimated working correlation and the covariance matrices of regression parameters, respectively.
+  
+- **Estimate Statements**: Provide a method to compute the odds ratios for different categorical levels of the variables, aiding in the interpretation of effects on the binary outcome.
+
+- **Covariance Structure**: The `type=cs` is a simplification often used when there is no prior knowledge of the specific pattern of correlations within clusters. Other types like autoregressive (`type=ar`) or unstructured (`type=un`) might be used based on the study design and the specific correlation pattern anticipated.
+
+- **Alternative Specifications**: For binary response data, the `logor` option could be used in place of `type=` to model the association of responses directly through the log odds ratio structure, which can be more intuitive in certain contexts.
+
+# R Implementation
+
+## Example myocardial infarction for Correlated Data
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+# Generate sample data
+set.seed(123)
+n <- 100  # Number of subjects
+MIdata <- data.frame(
+  id = rep(1:n, each = 1),
+  anthrax = sample(0:1, n, replace = TRUE),
+  race = sample(1:3, n, replace = TRUE),
+  maritalstat = sample(0:1, n, replace = TRUE),
+  gender = sample(1:2, n, replace = TRUE),
+  mi = sample(0:1, n, replace = TRUE)
+)
+
+# library(geepack)
+# Fit the model with GEE
+gee_model <- geeglm(mi ~ anthrax + factor(race) + maritalstat + gender, 
+                    data = MIdata, 
+                    family = binomial(link = "logit"), 
+                    id = id, 
+                    corstr = "exchangeable")
+
+# Summary of the model
+summary(gee_model)
+
+# Estimating Odds Ratios
+library(broom)
+# Get tidy summary of the model with exponentiated coefficients
+tidy(gee_model, exponentiate = TRUE)
+```
+
+**Note**: In R, unlike SAS, the estimate statements aren't a part of the standard geeglm function output. However, you can manually calculate specific contrasts or use post-hoc analysis techniques to compare specific groups or conditions as specified in your SAS code.
+
+For instance, to compute the odds ratio for "Anthrax" effect:
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+# Calculate odds ratios manually for specific contrasts
+# OR_anthrax <- exp(coef(gee_model)["anthrax"])
+
+coefficients <- summary(gee_model)$coefficients
+coeff <- coefficients[, "Estimate"]
+se <- coefficients[, "Std.err"]
+
+# Calculate confidence intervals manually
+alpha <- 0.05
+z <- qnorm(1 - alpha / 2)
+lower_ci <- coeff - z * se
+upper_ci <- coeff + z * se
+
+# Combine into a data frame
+conf_intervals <- data.frame(
+  Estimate = coeff,
+  LowerCI = lower_ci,
+  UpperCI = upper_ci
+)
+
+row.names(conf_intervals) <- row.names(coefficients)
+# Display the confidence intervals
+print(conf_intervals)
+```
+
+# Reference
+
+Zeger, S. L., & Liang, K. Y. (1986). Longitudinal data analysis using generalized linear models. Biometrika, 73(1), 13-22.
+
+Zeger, S. L., & Liang, K. Y. (1992). An overview of methods for the analysis of longitudinal data. Statistics in Medicine, 11(14-15), 1825-1839.
+
+Sullivan Pepe, M., & Anderson, G. L. (1994). A cautionary note on inference for marginal regression models with longitudinal data and general correlated response data. Communications in statistics-simulation and computation, 23(4), 939-951.
+
+Ballinger, G. A. (2004). Using generalized estimating equations for longitudinal data analysis. Organizational research methods, 7(2), 127-150.
+
+Fitzmaurice, G. M., Ware, J.H. and Laird, N. M. (2004). Applied Longitudinal Analysis. Wiley. (Chapter 13)
+
+Molenberghs, Geert and Verbeke, Geert (2005). Models for Discrete Longitudinal Data. Springer. (Chapter 8)
+
+Smith, T., & Smith, B. (2006). PROC GENMOD with GEE to analyze correlated outcomes data using SAS. San Diego (CA): Department of Defense Center for Deployment Health Research, Naval Health Research Center. [Link](https://www.lexjansen.com/wuss/2006/tutorials/TUT-Smith.pdf)
