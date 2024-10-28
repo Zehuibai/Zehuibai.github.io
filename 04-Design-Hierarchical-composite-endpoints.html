@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Hierarchical Composite Endpoints</title>
+
+<script src="site_libs/header-attrs-2.22/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-Estimands.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot_Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot_Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="07-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Hierarchical Composite Endpoints</p></h1>
+
+</div>
+
+
+<div id="multiple-endpoints" class="section level1">
+<h1>Multiple Endpoints</h1>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<div id="co-primary-endpoints" class="section level3">
+<h3>1. <strong>Co-primary Endpoints</strong></h3>
+<ul>
+<li><strong>Regulatory Expectations</strong>: A trial with co-primary
+endpoints is only considered successful if <strong>all</strong>
+co-primary endpoints show statistically significant effects. This
+increases the risk of <strong>Type I errors</strong>, where a true
+effect might be missed because the test becomes more stringent.
+Therefore, careful planning around sample size and statistical power is
+crucial to ensure the trial can detect significant effects across all
+endpoints.</li>
+<li><strong>Hypothesis/Trial Success</strong>: The null hypothesis (H₀)
+assumes that none of the endpoints show any effect (θ₁ = 0 ∧ … ∧ θₖ =
+0). The alternative hypothesis (Hₐ) requires that all endpoints must
+show an effect (θ₁ ≠ 0 ∧ … ∧ θₖ ≠ 0) for the trial to be
+successful.</li>
+</ul>
+</div>
+<div id="endpoint-family" class="section level3">
+<h3>2. <strong>Endpoint Family</strong></h3>
+<ul>
+<li><strong>Regulatory Expectations</strong>: When multiple primary
+endpoints are grouped, regulatory authorities expect careful
+<strong>management of multiplicity</strong> to control the risk of
+false-positive results due to multiple testing. A <strong>family-wise
+error rate control</strong> is recommended to prevent incorrect
+conclusions. This often requires adjustments in statistical procedures
+to ensure the results remain reliable across the multiple
+endpoints.</li>
+<li><strong>Hypothesis/Trial Success</strong>: Here, the null hypothesis
+(H₀) still assumes no effect for all endpoints (θ₁ = 0 ∧ … ∧ θₖ = 0),
+but the alternative hypothesis (Hₐ) allows the trial to be successful if
+at least one endpoint shows an effect (at least one θᵢ ≠ 0, i ∈
+{1,…,K}).</li>
+</ul>
+</div>
+<div id="composite-endpoints" class="section level3">
+<h3>3. <strong>Composite Endpoints</strong></h3>
+<ul>
+<li><strong>Regulatory Expectations</strong>: Composite endpoints
+combine multiple individual outcomes into a single measure. The
+treatment effects should be <strong>consistent across all
+components</strong> of the composite endpoint. If one component shows a
+large effect, it could dominate the overall result, which may not
+accurately reflect the true treatment benefit. Therefore, each
+component’s contribution to the overall effect must be carefully
+examined.</li>
+<li><strong>Hypothesis/Trial Success</strong>: The null hypothesis (H₀)
+assumes no effect on the composite endpoint (θc = 0), while the
+alternative hypothesis (Hₐ) indicates an effect on the composite
+endpoint (θc ≠ 0).</li>
+</ul>
+</div>
+<div id="multi-component-endpoints" class="section level3">
+<h3>4. <strong>Multi-component Endpoints</strong></h3>
+<ul>
+<li><strong>Regulatory Expectations</strong>: Multi-component endpoints
+evaluate several outcomes within a single endpoint to increase the
+trial’s efficiency. However, discrepancies among the effects of
+different components could undermine the ability to detect a significant
+overall treatment effect. <strong>Validation</strong> of the endpoint is
+critical to ensure it properly captures the overall treatment
+benefit.</li>
+<li><strong>Hypothesis/Trial Success</strong>: The null hypothesis (H₀)
+assumes no overall effect (θ = 0), while the alternative hypothesis (Hₐ)
+suggests there is a treatment effect (θ ≠ 0).</li>
+</ul>
+</div>
+</div>
+<div id="advantages-and-disadvantages-of-using-composite-endpoints"
+class="section level2">
+<h2>Advantages and disadvantages of using composite endpoints</h2>
+<div id="advantages" class="section level3">
+<h3>Advantages</h3>
+<ol style="list-style-type: decimal">
+<li><p><strong>Reduced Sample Size Requirement:</strong> Composite
+endpoints allow for a smaller sample size compared to evaluating each
+endpoint separately because they aggregate multiple outcomes, increasing
+the likelihood of observing an event and thus enhancing the power of the
+study.</p></li>
+<li><p><strong>Reduced Follow-up Period:</strong> The duration of
+follow-up can be shortened because an event is more likely to occur when
+multiple outcomes are combined. This can lead to quicker study
+conclusions and faster movement through trial phases.</p></li>
+<li><p><strong>Reduced Costs:</strong> A smaller sample size and shorter
+follow-up period contribute to lower overall costs. This includes fewer
+resources needed for patient management, monitoring, and data
+collection.</p></li>
+<li><p><strong>Can Assess the Net Clinical Benefit:</strong> By
+including variables of both safety and efficacy, composite endpoints can
+provide a holistic view of the intervention’s net clinical benefit. This
+approach reflects the balance between positive and negative outcomes,
+offering a comprehensive measure of a treatment’s overall
+effect.</p></li>
+</ol>
+</div>
+<div id="disadvantages" class="section level3">
+<h3>Disadvantages</h3>
+<ol style="list-style-type: decimal">
+<li><p><strong>Difficulty in Interpretation and Risk of Misleading
+Conclusions:</strong> Composite endpoints can be complex to analyze and
+interpret. If different components of the composite have varying levels
+of importance or clinical impact, the overall endpoint might mask or
+exaggerate the effect of the treatment.</p></li>
+<li><p><strong>Components Not Explicitly Discriminated:</strong> Often,
+the individual components of a composite endpoint are not analyzed
+separately in depth, which can obscure which specific outcomes are
+driving the overall effect. This lack of discrimination can lead to
+misunderstandings about the effectiveness of the treatment for
+particular aspects of patient health.</p></li>
+<li><p><strong>Lack of Complete Discussion by Authors:</strong> There
+might be insufficient discussion regarding the scope and implications of
+the results linked to the composite endpoint. Authors might not fully
+address how the composite nature of the endpoint affects the study
+conclusions, leaving gaps in the understanding of the data.</p></li>
+<li><p><strong>No Distinction in Clinical Significance of
+Components:</strong> Traditional analysis methods for composite
+endpoints treat all components as equally important, which might not
+reflect their true clinical relevance. This can lead to conclusions that
+do not accurately represent the value of the treatment for more
+significant outcomes.</p></li>
+<li><p><strong>Counts Only the First Occurrence of Any Event:</strong>
+In traditional analyses, once any component of the composite endpoint
+occurs, it is counted, and subsequent events are not considered. This
+approach may not accurately reflect the overall burden or frequency of
+health events over time, potentially underestimating the treatment’s
+impact or risks.</p></li>
+</ol>
+</div>
+</div>
+<div id="win-statistics" class="section level2">
+<h2>Win Statistics</h2>
+<ul>
+<li><strong>Win Statistics</strong>: This approach involves using all
+events with considerations for both the timing and severity of each
+event, providing a holistic view of the outcomes.</li>
+<li><strong>Weighted Composite Endpoint Semiparametric Proportional
+Rates</strong>: This model uses all events but adjusts for the different
+weights (importance or impact) assigned to each type of event,
+potentially providing a more nuanced analysis of the treatment
+effects.</li>
+<li><strong>Negative Binomial and Andersen-Gill Models</strong>: These
+are typically used for count data or recurrent events, respectively,
+often focusing on the frequency and timing of events.</li>
+</ul>
+<p><img src="02_Plots/StudyDesign/Comp_WinStatistics.png" width="75%" style="display: block; margin: auto;" /></p>
+<div id="generalized-pairwise-comparisons-gpc" class="section level3">
+<h3>Generalized Pairwise Comparisons (GPC)</h3>
+<p>“Generalized Pairwise Comparisons (GPC),” is a statistical method
+introduced by Buyse in 2010. This method builds on the idea of making
+pairwise comparisons between patients in a treatment group and those in
+a control group, refining previous methodologies by Finkelstein and
+Schoenfeld from 1999.</p>
+<p><strong>Purpose</strong>: GPC is designed to compare outcomes between
+each patient in a treatment group and every patient in a control group,
+one pair at a time.</p>
+<p>Mathematical Representation</p>
+<ul>
+<li><strong>Uᵢⱼ</strong>: This is the score assigned to a pairwise
+comparison between patient i from the treatment group and patient j from
+the control group.
+<ul>
+<li><strong>1</strong> is assigned if patient i (treatment) has a more
+favorable outcome than patient j (control).</li>
+<li><strong>0</strong> indicates a tie between the two patients, meaning
+their outcomes are equivalent.</li>
+<li><strong>-1</strong> is assigned if patient j (control) has a more
+favorable outcome than patient i (treatment).</li>
+</ul></li>
+<li><strong>i = 1, 2, …, Nₜ</strong> where Nₜ is the total number of
+patients in the treatment group.</li>
+<li><strong>j = 1, 2, …, Nc</strong> where Nc is the total number of
+patients in the control group.</li>
+</ul>
+<p><strong>Procedure for Comparison</strong></p>
+<ul>
+<li><strong>Starting Point</strong>: Each comparison starts with the
+most critical outcome. This could be a primary endpoint like survival or
+disease progression.</li>
+<li><strong>Priority of Outcomes</strong>: If the most critical outcome
+results in a tie between the two patients, the comparison moves to the
+next most critical outcome.</li>
+<li><strong>Handling Ties</strong>: If all compared outcomes result in a
+tie, the overall comparison remains a tie. This ensures that the
+comparisons are comprehensive and that outcomes of lower priority do not
+disproportionately influence the overall comparison.</li>
+</ul>
+<p><strong>Importance</strong> - <strong>Clinical Trials</strong>: GPC
+is particularly useful in clinical trials where multiple outcomes are
+considered, and it is essential to assess which treatment is more
+effective across a range of criteria. - <strong>Statistical
+Analysis</strong>: This method provides a structured approach to
+statistically differentiate between treatment and control groups based
+on multiple, prioritized outcomes.</p>
+<p><img src="02_Plots/StudyDesign/Comp_GPC.png" width="75%" style="display: block; margin: auto;" /></p>
+<ul>
+<li>Treatment Win</li>
+<li>Treatment Win</li>
+<li>Control Win</li>
+</ul>
+</div>
+<div id="win-ratios-win-odds-and-net-benefit" class="section level3">
+<h3>win ratios, win odds, and net benefit</h3>
+<p><strong>Definitions of Terms</strong> - <strong>πₜ</strong>:
+Probability that a treatment patient ‘wins’ in a comparison. -
+<strong>πₜₑ</strong>: Probability that a control patient ‘wins’ in a
+comparison. - <strong>πₜᵢₑ</strong>: Probability of a tie between a
+treatment and a control patient.</p>
+<p>The total of these probabilities (πₜ + πₜₑ + πₜᵢₑ) equals 1.</p>
+<p><strong>Win Ratio (WR)</strong> - <strong>Formula</strong>: WR = πₜ /
+πₜₑ - <strong>Interpretation</strong>: The win ratio is the ratio of the
+probability that a treatment patient wins to the probability that a
+control patient wins. This ratio gives a sense of how much more likely
+treatment patients are to have better outcomes compared to control
+patients.</p>
+<p><strong>Win Odds (WO)</strong> - <strong>Formula</strong>: - WO = (πₜ
++ 0.5πₜᵢₑ) / (πₜₑ + 0.5πₜᵢₑ) - This can be rewritten as: WO = (πₜ +
+0.5(1 - πₜ - πₜₑ)) / (πₜₑ + 0.5(1 - πₜ - πₜₑ)) - Which simplifies to: WO
+= (πₜ + 0.5(1 - πₜ - πₜₑ)) / (1 - [πₜ + 0.5(1 - πₜ - πₜₑ)]) -
+<strong>Interpretation</strong>: The win odds adjust the simple win
+ratio by considering ties as half-wins for both groups. This approach
+provides a balanced view that accounts for situations where neither
+group clearly outperforms the other.</p>
+<p><strong>Net Benefit (NB)</strong> - <strong>Formula</strong>: NB = πₜ
+- πₜₑ - <strong>Interpretation</strong>: The net benefit is the
+difference in probability of winning between the treatment and control
+groups. It quantifies the absolute advantage in terms of effectiveness
+that the treatment group has over the control group.</p>
+<p><strong>Practical Usage</strong> - <strong>Context</strong>: These
+metrics are particularly useful in clinical trials where multiple
+outcomes are considered, and outcomes have different weights or
+priorities. - <strong>Advantages</strong>: They provide a more nuanced
+assessment of treatment efficacy, especially in settings where outcomes
+are not strictly binary and where ties can frequently occur. -
+<strong>Framework</strong>: This method extends the traditional
+Mann-Whitney odds, allowing for a structured comparison that prioritizes
+outcomes based on clinical importance.</p>
+<p>The reference to Dong et al. [2020a] suggests that these concepts
+have been discussed in recent literature, offering a modern perspective
+on analyzing clinical trials data within a framework that prioritizes
+different aspects of patient outcomes. This method is particularly
+useful for complex clinical scenarios where a simple comparison of
+outcomes does not sufficiently capture the differences between treatment
+options.</p>
+</div>
+<div id="variance-estimation-for-logwr-logwo-and-nb"
+class="section level3">
+<h3>Variance Estimation for Log(WR), Log(WO), and NB:</h3>
+<ol style="list-style-type: decimal">
+<li><strong>Asymptotic Variances Under Null Hypothesis</strong>:
+<ul>
+<li>The variances for log-transformed WR, WO, and the NB are crucial for
+hypothesis testing in clinical trials. These variances help determine if
+observed differences in treatment effectiveness are statistically
+significant.</li>
+</ul></li>
+<li><strong>Formulas</strong>:
+<ul>
+<li><p><strong>Variance of log(WR)</strong> (<span
+class="math inline">\(\hat{\sigma}^2_{\log(WR)}\)</span>): <span
+class="math display">\[
+\hat{\sigma}^2_{\log(WR)} = \frac{\hat{\sigma}^2_t - 2\hat{\sigma}_{tc}
++ \hat{\sigma}^2_c}{[(N_t + N_c) / 2]^2}
+\]</span> Where <span class="math inline">\(\hat{\sigma}^2_t\)</span>
+and <span class="math inline">\(\hat{\sigma}^2_c\)</span> are the
+variances of the treatment and control outcomes, respectively, and <span
+class="math inline">\(\hat{\sigma}_{tc}\)</span> is the covariance
+between the treatment and control outcomes.</p></li>
+<li><p><strong>Variance of log(WO)</strong> (<span
+class="math inline">\(\hat{\sigma}^2_{\log(WO)}\)</span>): <span
+class="math display">\[
+\hat{\sigma}^2_{\log(WO)} = \frac{\hat{\sigma}^2_t - 2\hat{\sigma}_{tc}
++ \hat{\sigma}^2_c}{(N_t N_c / 2)^2}
+\]</span> This formula modifies the denominator to account for the
+sample sizes of both the treatment and control groups individually
+rather than their combined average.</p></li>
+<li><p><strong>Variance of NB</strong> (<span
+class="math inline">\(\hat{\sigma}^2_{NB}\)</span>): <span
+class="math display">\[
+\hat{\sigma}^2_{NB} = \frac{\hat{\sigma}^2_t - 2\hat{\sigma}_{tc} +
+\hat{\sigma}^2_c}{(N_t N_c)^2}
+\]</span> The formula for NB variance closely aligns with that of
+log(WO) but adjusts the denominator to directly reflect the product of
+the sample sizes, emphasizing the interaction between the two
+groups.</p></li>
+</ul></li>
+<li><strong>Interpretation</strong>:
+<ul>
+<li>These variance formulas allow researchers to quantify the
+uncertainty or the variability associated with the log-transformed
+ratios and differences between treatment and control groups under the
+assumption that no true difference exists (null hypothesis). They are
+essential for constructing confidence intervals and conducting
+significance tests.</li>
+</ul></li>
+<li><strong>Plug-in Estimators</strong>:
+<ul>
+<li>The plug-in estimators for <span
+class="math inline">\(\hat{\sigma}^2_t\)</span>, <span
+class="math inline">\(\hat{\sigma}_{tc}\)</span>, and <span
+class="math inline">\(\hat{\sigma}^2_c\)</span> are required to compute
+these variances. Detailed methodologies and examples for calculating
+these estimators can be found in the referenced Dong et al. [2016]
+publication, which likely provides the statistical underpinnings and
+proofs for these estimators.</li>
+</ul></li>
+</ol>
+</div>
+<div id="point-estimates" class="section level3">
+<h3>Point Estimates</h3>
+<p>Explains the mathematical relationships among three win statistics:
+Net Benefit (NB), Win Odds (WO), and Win Ratio (WR). These statistics
+are commonly used in clinical trials to compare two groups—typically a
+treatment group and a control group.</p>
+<ol style="list-style-type: decimal">
+<li><strong>Net Benefit (NB) as a Function of Win Ratio (WR):</strong>
+<ul>
+<li><strong>Formula</strong>: <span class="math inline">\(NB = \frac{WR
+- 1}{WR + 1 - P_{tie}}\)</span></li>
+<li><strong>Interpretation</strong>: This formula calculates the net
+benefit of a treatment over control, adjusting for the probability of a
+tie (<span class="math inline">\(P_{tie}\)</span>). It scales the win
+ratio by adjusting for ties, thus providing a balanced measure of net
+benefit that accounts for non-differential outcomes.</li>
+</ul></li>
+<li><strong>Net Benefit (NB) as a Function of Win Odds (WO):</strong>
+<ul>
+<li><strong>Formula</strong>: <span class="math inline">\(NB = \frac{WO
+- 1}{WO + 1}\)</span></li>
+<li><strong>Interpretation</strong>: This relationship demonstrates that
+net benefit can also be directly derived from win odds by a simple
+transformation, emphasizing how changes in win odds reflect on net
+benefit.</li>
+</ul></li>
+<li><strong>Win Odds (WO) as a Function of Net Benefit (NB):</strong>
+<ul>
+<li><strong>Formula</strong>: <span class="math inline">\(WO = \frac{1 +
+NB}{1 - NB}\)</span></li>
+<li><strong>Interpretation</strong>: This inverse relationship shows how
+win odds can be expressed in terms of net benefit. As net benefit
+increases, win odds increase exponentially, indicating a greater
+likelihood of a favorable outcome in the treatment group compared to the
+control group.</li>
+</ul></li>
+<li><strong>Win Odds (WO) as a Function of Win Ratio (WR) and
+Probability of a Tie:</strong>
+<ul>
+<li><strong>Formula</strong>: <span class="math inline">\(WO = \frac{WR
+- 0.5 P_{tie} (WR - 1)}{1 + 0.5 P_{tie} (WR - 1)}\)</span></li>
+<li><strong>Interpretation</strong>: This formula adjusts the win ratio
+for the effect of ties, thereby providing a more nuanced view of win
+odds when ties are a significant factor in the trial data.</li>
+</ul></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="source" class="section level1">
+<h1>Source</h1>
+<p>Project Optimus, Dose Escalation and Stratification Designs in Early
+Oncology Development</p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

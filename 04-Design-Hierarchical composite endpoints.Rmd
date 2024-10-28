@@ -1,0 +1,230 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Hierarchical Composite Endpoints
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+packages<-c("tidyverse", "kableExtra")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+```
+
+
+
+# Composite and Win Statistics
+
+## Introduction
+
+### 1. **Co-primary Endpoints**
+   - **Regulatory Expectations**: A trial with co-primary endpoints is only considered successful if **all** co-primary endpoints show statistically significant effects. This increases the risk of **Type I errors**, where a true effect might be missed because the test becomes more stringent. Therefore, careful planning around sample size and statistical power is crucial to ensure the trial can detect significant effects across all endpoints.
+   - **Hypothesis/Trial Success**: The null hypothesis (H₀) assumes that none of the endpoints show any effect (θ₁ = 0 ∧ … ∧ θₖ = 0). The alternative hypothesis (Hₐ) requires that all endpoints must show an effect (θ₁ ≠ 0 ∧ … ∧ θₖ ≠ 0) for the trial to be successful.
+
+### 2. **Endpoint Family**
+   - **Regulatory Expectations**: When multiple primary endpoints are grouped, regulatory authorities expect careful **management of multiplicity** to control the risk of false-positive results due to multiple testing. A **family-wise error rate control** is recommended to prevent incorrect conclusions. This often requires adjustments in statistical procedures to ensure the results remain reliable across the multiple endpoints.
+   - **Hypothesis/Trial Success**: Here, the null hypothesis (H₀) still assumes no effect for all endpoints (θ₁ = 0 ∧ … ∧ θₖ = 0), but the alternative hypothesis (Hₐ) allows the trial to be successful if at least one endpoint shows an effect (at least one θᵢ ≠ 0, i ∈ {1,…,K}).
+
+### 3. **Composite Endpoints**
+   - **Regulatory Expectations**: Composite endpoints combine multiple individual outcomes into a single measure. The treatment effects should be **consistent across all components** of the composite endpoint. If one component shows a large effect, it could dominate the overall result, which may not accurately reflect the true treatment benefit. Therefore, each component’s contribution to the overall effect must be carefully examined.
+   - **Hypothesis/Trial Success**: The null hypothesis (H₀) assumes no effect on the composite endpoint (θc = 0), while the alternative hypothesis (Hₐ) indicates an effect on the composite endpoint (θc ≠ 0).
+
+### 4. **Multi-component Endpoints**
+   - **Regulatory Expectations**: Multi-component endpoints evaluate several outcomes within a single endpoint to increase the trial's efficiency. However, discrepancies among the effects of different components could undermine the ability to detect a significant overall treatment effect. **Validation** of the endpoint is critical to ensure it properly captures the overall treatment benefit.
+   - **Hypothesis/Trial Success**: The null hypothesis (H₀) assumes no overall effect (θ = 0), while the alternative hypothesis (Hₐ) suggests there is a treatment effect (θ ≠ 0).
+
+ 
+
+## Advantages and disadvantages of using composite endpoints  
+
+### Advantages
+
+1. **Reduced Sample Size Requirement:**
+   Composite endpoints allow for a smaller sample size compared to evaluating each endpoint separately because they aggregate multiple outcomes, increasing the likelihood of observing an event and thus enhancing the power of the study.
+
+2. **Reduced Follow-up Period:**
+   The duration of follow-up can be shortened because an event is more likely to occur when multiple outcomes are combined. This can lead to quicker study conclusions and faster movement through trial phases.
+
+3. **Reduced Costs:**
+   A smaller sample size and shorter follow-up period contribute to lower overall costs. This includes fewer resources needed for patient management, monitoring, and data collection.
+
+4. **Can Assess the Net Clinical Benefit:**
+   By including variables of both safety and efficacy, composite endpoints can provide a holistic view of the intervention's net clinical benefit. This approach reflects the balance between positive and negative outcomes, offering a comprehensive measure of a treatment's overall effect.
+
+### Disadvantages
+
+1. **Difficulty in Interpretation and Risk of Misleading Conclusions:**
+   Composite endpoints can be complex to analyze and interpret. If different components of the composite have varying levels of importance or clinical impact, the overall endpoint might mask or exaggerate the effect of the treatment.
+
+2. **Components Not Explicitly Discriminated:**
+   Often, the individual components of a composite endpoint are not analyzed separately in depth, which can obscure which specific outcomes are driving the overall effect. This lack of discrimination can lead to misunderstandings about the effectiveness of the treatment for particular aspects of patient health.
+
+3. **Lack of Complete Discussion by Authors:**
+   There might be insufficient discussion regarding the scope and implications of the results linked to the composite endpoint. Authors might not fully address how the composite nature of the endpoint affects the study conclusions, leaving gaps in the understanding of the data.
+
+4. **No Distinction in Clinical Significance of Components:**
+   Traditional analysis methods for composite endpoints treat all components as equally important, which might not reflect their true clinical relevance. This can lead to conclusions that do not accurately represent the value of the treatment for more significant outcomes.
+
+5. **Counts Only the First Occurrence of Any Event:**
+   In traditional analyses, once any component of the composite endpoint occurs, it is counted, and subsequent events are not considered. This approach may not accurately reflect the overall burden or frequency of health events over time, potentially underestimating the treatment's impact or risks.
+ 
+## Win Statistics
+
+- **Win Statistics**: This approach involves using all events with considerations for both the timing and severity of each event, providing a holistic view of the outcomes.
+- **Weighted Composite Endpoint Semiparametric Proportional Rates**: This model uses all events but adjusts for the different weights (importance or impact) assigned to each type of event, potentially providing a more nuanced analysis of the treatment effects.
+- **Negative Binomial and Andersen-Gill Models**: These are typically used for count data or recurrent events, respectively, often focusing on the frequency and timing of events.
+
+ 
+```{r , echo=FALSE, fig.align="center", out.width = '75%'}
+knitr::include_graphics("./02_Plots/StudyDesign/Comp_WinStatistics.png") 
+```
+
+### Generalized Pairwise Comparisons (GPC)
+
+"Generalized Pairwise Comparisons (GPC)," is a statistical method introduced by Buyse in 2010. This method builds on the idea of making pairwise comparisons between patients in a treatment group and those in a control group, refining previous methodologies by Finkelstein and Schoenfeld from 1999.
+
+**Purpose**: GPC is designed to compare outcomes between each patient in a treatment group and every patient in a control group, one pair at a time.
+
+
+Mathematical Representation
+
+- **Uᵢⱼ**: This is the score assigned to a pairwise comparison between patient i from the treatment group and patient j from the control group.
+  - **1** is assigned if patient i (treatment) has a more favorable outcome than patient j (control).
+  - **0** indicates a tie between the two patients, meaning their outcomes are equivalent.
+  - **-1** is assigned if patient j (control) has a more favorable outcome than patient i (treatment).
+- **i = 1, 2, ..., Nₜ** where Nₜ is the total number of patients in the treatment group.
+- **j = 1, 2, ..., Nc** where Nc is the total number of patients in the control group.
+
+**Procedure for Comparison**
+
+- **Starting Point**: Each comparison starts with the most critical outcome. This could be a primary endpoint like survival or disease progression.
+- **Priority of Outcomes**: If the most critical outcome results in a tie between the two patients, the comparison moves to the next most critical outcome.
+- **Handling Ties**: If all compared outcomes result in a tie, the overall comparison remains a tie. This ensures that the comparisons are comprehensive and that outcomes of lower priority do not disproportionately influence the overall comparison.
+  
+**Importance**
+- **Clinical Trials**: GPC is particularly useful in clinical trials where multiple outcomes are considered, and it is essential to assess which treatment is more effective across a range of criteria.
+- **Statistical Analysis**: This method provides a structured approach to statistically differentiate between treatment and control groups based on multiple, prioritized outcomes.
+ 
+```{r , echo=FALSE, fig.align="center", out.width = '75%'}
+knitr::include_graphics("./02_Plots/StudyDesign/Comp_GPC.png") 
+```
+
+* Treatment Win
+* Treatment Win
+* Control Win
+
+
+### win ratios, win odds, and net benefit
+
+
+**Definitions of Terms**
+- **πₜ**: Probability that a treatment patient 'wins' in a comparison.
+- **πₜₑ**: Probability that a control patient 'wins' in a comparison.
+- **πₜᵢₑ**: Probability of a tie between a treatment and a control patient.
+
+The total of these probabilities (πₜ + πₜₑ + πₜᵢₑ) equals 1.
+
+**Win Ratio (WR)**
+- **Formula**: WR = πₜ / πₜₑ
+- **Interpretation**: The win ratio is the ratio of the probability that a treatment patient wins to the probability that a control patient wins. This ratio gives a sense of how much more likely treatment patients are to have better outcomes compared to control patients.
+
+**Win Odds (WO)**
+- **Formula**: 
+   - WO = (πₜ + 0.5πₜᵢₑ) / (πₜₑ + 0.5πₜᵢₑ)
+   - This can be rewritten as: WO = (πₜ + 0.5(1 - πₜ - πₜₑ)) / (πₜₑ + 0.5(1 - πₜ - πₜₑ))
+   - Which simplifies to: WO = (πₜ + 0.5(1 - πₜ - πₜₑ)) / (1 - [πₜ + 0.5(1 - πₜ - πₜₑ)])
+- **Interpretation**: The win odds adjust the simple win ratio by considering ties as half-wins for both groups. This approach provides a balanced view that accounts for situations where neither group clearly outperforms the other.
+
+**Net Benefit (NB)**
+- **Formula**: NB = πₜ - πₜₑ
+- **Interpretation**: The net benefit is the difference in probability of winning between the treatment and control groups. It quantifies the absolute advantage in terms of effectiveness that the treatment group has over the control group.
+
+**Practical Usage**
+- **Context**: These metrics are particularly useful in clinical trials where multiple outcomes are considered, and outcomes have different weights or priorities.
+- **Advantages**: They provide a more nuanced assessment of treatment efficacy, especially in settings where outcomes are not strictly binary and where ties can frequently occur.
+- **Framework**: This method extends the traditional Mann-Whitney odds, allowing for a structured comparison that prioritizes outcomes based on clinical importance.
+
+The reference to Dong et al. [2020a] suggests that these concepts have been discussed in recent literature, offering a modern perspective on analyzing clinical trials data within a framework that prioritizes different aspects of patient outcomes. This method is particularly useful for complex clinical scenarios where a simple comparison of outcomes does not sufficiently capture the differences between treatment options.
+
+### Variance Estimation for Log(WR), Log(WO), and NB:
+
+1. **Asymptotic Variances Under Null Hypothesis**:
+   - The variances for log-transformed WR, WO, and the NB are crucial for hypothesis testing in clinical trials. These variances help determine if observed differences in treatment effectiveness are statistically significant.
+
+2. **Formulas**:
+   - **Variance of log(WR)** (\(\hat{\sigma}^2_{\log(WR)}\)):
+     \[
+     \hat{\sigma}^2_{\log(WR)} = \frac{\hat{\sigma}^2_t - 2\hat{\sigma}_{tc} + \hat{\sigma}^2_c}{[(N_t + N_c) / 2]^2}
+     \]
+     Where \(\hat{\sigma}^2_t\) and \(\hat{\sigma}^2_c\) are the variances of the treatment and control outcomes, respectively, and \(\hat{\sigma}_{tc}\) is the covariance between the treatment and control outcomes.
+
+   - **Variance of log(WO)** (\(\hat{\sigma}^2_{\log(WO)}\)):
+     \[
+     \hat{\sigma}^2_{\log(WO)} = \frac{\hat{\sigma}^2_t - 2\hat{\sigma}_{tc} + \hat{\sigma}^2_c}{(N_t N_c / 2)^2}
+     \]
+     This formula modifies the denominator to account for the sample sizes of both the treatment and control groups individually rather than their combined average.
+
+   - **Variance of NB** (\(\hat{\sigma}^2_{NB}\)):
+     \[
+     \hat{\sigma}^2_{NB} = \frac{\hat{\sigma}^2_t - 2\hat{\sigma}_{tc} + \hat{\sigma}^2_c}{(N_t N_c)^2}
+     \]
+     The formula for NB variance closely aligns with that of log(WO) but adjusts the denominator to directly reflect the product of the sample sizes, emphasizing the interaction between the two groups.
+
+3. **Interpretation**:
+   - These variance formulas allow researchers to quantify the uncertainty or the variability associated with the log-transformed ratios and differences between treatment and control groups under the assumption that no true difference exists (null hypothesis). They are essential for constructing confidence intervals and conducting significance tests.
+
+4. **Plug-in Estimators**:
+   - The plug-in estimators for \(\hat{\sigma}^2_t\), \(\hat{\sigma}_{tc}\), and \(\hat{\sigma}^2_c\) are required to compute these variances. Detailed methodologies and examples for calculating these estimators can be found in the referenced Dong et al. [2016] publication, which likely provides the statistical underpinnings and proofs for these estimators.
+  
+  
+
+### Point Estimates
+
+Explains the mathematical relationships among three win statistics: Net Benefit (NB), Win Odds (WO), and Win Ratio (WR). These statistics are commonly used in clinical trials to compare two groups—typically a treatment group and a control group.  
+ 
+
+1. **Net Benefit (NB) as a Function of Win Ratio (WR):**
+   - **Formula**: \( NB = \frac{WR - 1}{WR + 1 - P_{tie}} \)
+   - **Interpretation**: This formula calculates the net benefit of a treatment over control, adjusting for the probability of a tie (\( P_{tie} \)). It scales the win ratio by adjusting for ties, thus providing a balanced measure of net benefit that accounts for non-differential outcomes.
+
+2. **Net Benefit (NB) as a Function of Win Odds (WO):**
+   - **Formula**: \( NB = \frac{WO - 1}{WO + 1} \)
+   - **Interpretation**: This relationship demonstrates that net benefit can also be directly derived from win odds by a simple transformation, emphasizing how changes in win odds reflect on net benefit.
+
+3. **Win Odds (WO) as a Function of Net Benefit (NB):**
+   - **Formula**: \( WO = \frac{1 + NB}{1 - NB} \)
+   - **Interpretation**: This inverse relationship shows how win odds can be expressed in terms of net benefit. As net benefit increases, win odds increase exponentially, indicating a greater likelihood of a favorable outcome in the treatment group compared to the control group.
+
+4. **Win Odds (WO) as a Function of Win Ratio (WR) and Probability of a Tie:**
+   - **Formula**: \( WO = \frac{WR - 0.5 P_{tie} (WR - 1)}{1 + 0.5 P_{tie} (WR - 1)} \)
+   - **Interpretation**: This formula adjusts the win ratio for the effect of ties, thereby providing a more nuanced view of win odds when ties are a significant factor in the trial data.
+
+ 
+# Source
+
+Project Optimus, Dose Escalation and Stratification Designs in Early Oncology Development
