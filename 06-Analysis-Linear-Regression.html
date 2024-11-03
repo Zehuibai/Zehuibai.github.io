@@ -1,0 +1,2485 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Linear Regression</title>
+
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-Estimands.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot_Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot_Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Linear-Regression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="07-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Linear Regression</p></h1>
+
+</div>
+
+
+<div id="correlation" class="section level2">
+<h2>Correlation</h2>
+<p>The correlation measures the strength of a linear relationship.</p>
+<div id="pearson-correlation-coefficient" class="section level3">
+<h3>Pearson correlation coefficient</h3>
+<p>The Pearson correlation coefficient measures the linear relationship
+between two variables, X and Y. It has values between +1 and -1, where 1
+indicates total positive linear correlation, 0 indicates no linear
+correlation, and -1 indicates total negative linear correlation. A key
+mathematical property of the Pearson correlation coefficient is its
+invariance under separate changes in the location and scale of the two
+variables. In other words, we can transform X to <span
+class="math inline">\(a + bX\)</span> and Y to <span
+class="math inline">\(c + dY\)</span> without changing the correlation
+coefficient, where <span class="math inline">\(a\)</span>, <span
+class="math inline">\(b\)</span>, <span
+class="math inline">\(c\)</span>, and <span
+class="math inline">\(d\)</span> are constants with <span
+class="math inline">\(b, d &gt; 0\)</span>. Note that more general
+linear transformations can, however, alter the correlation.</p>
+<p><span class="math display">\[{\displaystyle \rho _{X,Y}=\operatorname
+{corr} (X,Y)={\operatorname {cov} (X,Y) \over \sigma _{X}\sigma
+_{Y}}={\operatorname {E} [(X-\mu _{X})(Y-\mu _{Y})] \over \sigma
+_{X}\sigma _{Y}}}\]</span></p>
+<p><span class="math display">\[{\displaystyle \rho
+_{X,Y}={\operatorname {E} (XY)-\operatorname {E} (X)\operatorname {E}
+(Y) \over {\sqrt {\operatorname {E} (X^{2})-\operatorname {E}
+(X)^{2}}}\cdot {\sqrt {\operatorname {E} (Y^{2})-\operatorname {E}
+(Y)^{2}}}}}\]</span></p>
+<p><strong>Conditions for Applying the Pearson Correlation
+Coefficient:</strong></p>
+<p>In correlation analysis, the first consideration is whether there is
+likely a relationship between the two variables. If the answer is
+affirmative, then quantitative analysis can proceed. Additionally, the
+following factors must be noted (the first two are the strictest
+requirements, while the third is more lenient; if violated, the results
+tend to remain robust):</p>
+<ol style="list-style-type: decimal">
+<li><p>The Pearson correlation coefficient is suitable for cases of
+linear correlation. For more complex relationships, such as curvilinear
+correlations, the size of the Pearson correlation coefficient does not
+accurately represent the strength of association.</p></li>
+<li><p>Extreme values in the sample can significantly impact the Pearson
+correlation coefficient, so careful consideration and handling are
+needed. If necessary, outliers can be removed or transformed to avoid
+erroneous conclusions due to one or two extreme values.</p></li>
+<li><p>The Pearson correlation coefficient requires the variables to
+follow a bivariate normal distribution. It’s important to note that a
+bivariate normal distribution is not simply a requirement for each
+variable (X and Y) to be normally distributed individually but rather
+for them to jointly follow a bivariate normal distribution.</p></li>
+<li><p>Since the Pearson correlation coefficient is calculated based on
+the variances and covariances of the raw data, it is sensitive to
+outliers and measures linear relationships. Thus, a Pearson correlation
+coefficient of zero only indicates no linear relationship but does not
+rule out other types of relationships, such as curvilinear
+correlation.</p></li>
+</ol>
+</div>
+<div id="spearmans-rank-correlation-coefficient" class="section level3">
+<h3>Spearman’s Rank Correlation Coefficient</h3>
+<p>The Spearman and Kendall correlation coefficients are both based on
+the relative ranks and sizes of observations, forming a more general
+non-parametric method that is less sensitive to outliers and therefore
+more robust. They primarily measure the association between
+variables.</p>
+<p>Spearman’s rank correlation uses the ranks of the two variables to
+assess linear association and does not require any assumptions about the
+distribution of the original variables, making it a non-parametric
+statistical method. Therefore, it has a broader application range than
+the Pearson correlation coefficient. Spearman’s rank correlation can
+also be calculated for ordinal data. For data that meet Pearson’s
+assumptions, Spearman’s coefficient can also be calculated, although it
+has lower statistical efficiency and may not detect relationships as
+effectively as Pearson’s.</p>
+<p>When there are no ties in the data and the two variables are
+perfectly monotonically related, the Spearman correlation coefficient
+will be +1 or -1. Even if outliers are present, they typically do not
+significantly impact the Spearman correlation coefficient, as outliers’
+ranks tend to remain at the extremes (e.g., first or last), thus
+minimizing their effect on Spearman’s measure of association.</p>
+<p><span class="math display">\[{\displaystyle r_{s}=\rho
+_{\operatorname {rg} _{X},\operatorname {rg} _{Y}}={\frac {\operatorname
+{cov} (\operatorname {rg} _{X},\operatorname {rg} _{Y})}{\sigma
+_{\operatorname {rg} _{X}}\sigma _{\operatorname {rg}
+_{Y}}}}}\]</span></p>
+</div>
+<div id="kendalls-rank-correlation-coefficient" class="section level3">
+<h3>Kendall’s Rank Correlation Coefficient</h3>
+<p>The Kendall rank correlation coefficient is a measure of ordinal
+association, suitable for reflecting the correlation between categorical
+variables when both variables are ordered categories. It is denoted by
+the Greek letter <span class="math inline">\(\tau\)</span>, and ranges
+between -1 and 1. When <span class="math inline">\(\tau = 1\)</span>, it
+indicates perfect ordinal agreement between two random variables, while
+<span class="math inline">\(\tau = -1\)</span> indicates perfect ordinal
+disagreement. A value of <span class="math inline">\(\tau = 0\)</span>
+implies that the two variables are independent.</p>
+<p><strong>Formula:</strong> The Kendall coefficient is based on
+concordance. For two pairs of observations <span
+class="math inline">\((X_i, Y_i)\)</span> and <span
+class="math inline">\((X_j, Y_j)\)</span>, if <span
+class="math inline">\(X_i &gt; X_j\)</span> and <span
+class="math inline">\(Y_i &gt; Y_j\)</span> (or vice versa), the pair is
+considered concordant; otherwise, it is discordant. The Kendall
+correlation coefficient is calculated as follows:</p>
+<p><span class="math display">\[
+\tau = \frac{{\text{number of concordant pairs} - \text{number of
+discordant pairs}}}{{n \choose 2}}
+\]</span></p>
+<p>where <span class="math inline">\({n \choose 2} =
+\frac{n(n-1)}{2}\)</span> represents the number of ways to choose two
+items from <span class="math inline">\(n\)</span> items.</p>
+</div>
+<div id="intraclass-correlation-coefficient-icc" class="section level3">
+<h3>Intraclass Correlation Coefficient (ICC)</h3>
+<p>When measuring quantitative characteristics in units organized into
+groups, the intraclass correlation coefficient (ICC) describes how
+similar units within the same group are to each other. Unlike most
+correlation measures, ICC operates on group-structured data rather than
+paired observations. ICC is commonly used to assess the similarity of
+quantitative attributes among individuals with specific familial
+relationships or to evaluate the consistency or reliability of
+measurement methods or raters for the same quantitative outcome.</p>
+<p>Fisher’s original ICC is algebraically similar to the Pearson
+correlation coefficient but differs in that it centers and scales data
+based on a pooled mean and standard deviation across groups. This pooled
+scaling is meaningful for ICC because all quantities being measured are
+the same, although they pertain to different units in various
+groups.</p>
+<p>The formula for ICC is:</p>
+<p><span class="math display">\[
+r = \frac{1}{Ns^2} \sum_{n=1}^{N}(x_{n,1} - \bar{x})(x_{n,2} - \bar{x}),
+\]</span></p>
+<p>where:</p>
+<p><span class="math display">\[
+\bar{x} = \frac{1}{2N} \sum_{n=1}^{N}(x_{n,1} + x_{n,2}),
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+s^2 = \frac{1}{2N} \left\{ \sum_{n=1}^{N}(x_{n,1} - \bar{x})^2 +
+\sum_{n=1}^{N}(x_{n,2} - \bar{x})^2 \right\}.
+\]</span></p>
+<p>In Pearson correlation, each variable is centered and scaled by its
+own mean and standard deviation:</p>
+<p><span class="math display">\[
+r_{xy} = \frac{\sum_{i=1}^{n} \left( x_i - \bar{x} \right) \left( y_i -
+\bar{y} \right)}{\sqrt{\sum_{i=1}^{n} \left( x_i - \bar{x} \right)^2}
+\sqrt{\sum_{i=1}^{n} \left( y_i - \bar{y} \right)^2}}.
+\]</span></p>
+</div>
+<div id="visualize-the-correlation-in-r" class="section level3">
+<h3>Visualize the correlation in R</h3>
+<pre class="r"><code>bank&lt;- data.frame(
+  y=c(1018.4,1258.9,1359.4,1545.6,1761.6,1960.8),
+  x1=c(159,42,95,102,104,108),
+  x2=c(223.1,269.4,297.1,330.1,337.9,400.5),
+  x3=c(500,370,430,390,330,310),
+  x4=c(112.3,146.4,119.9,117.8,122.3,167.0),
+  w=c(5,6,8,3,6,8)
+)
+cor(bank[,c(2,3,4,5)],method = &quot;pearson&quot;)</code></pre>
+<pre><code>##            x1         x2         x3         x4
+## x1  1.0000000 -0.1604025  0.5095785 -0.4331830
+## x2 -0.1604025  1.0000000 -0.8558009  0.5987314
+## x3  0.5095785 -0.8558009  1.0000000 -0.7010598
+## x4 -0.4331830  0.5987314 -0.7010598  1.0000000</code></pre>
+<pre class="r"><code>## Visualize the correlation matrix
+library(corrplot)
+bank.cor &lt;- cor(bank)
+corrplot(bank.cor, method = &quot;ellipse&quot;)</code></pre>
+<p><img src="06-Analysis-Linear-Regression_files/figure-html/Corrplot-1.png" width="672" /></p>
+<pre class="r"><code>## devtools::install_github(&quot;kassambara/ggcorrplot&quot;)
+library(ggplot2)
+library(ggcorrplot)
+
+## Correlation matrix
+data(mtcars)
+corr &lt;- round(cor(mtcars), 1)
+
+## Plot
+ggcorrplot(corr, hc.order = TRUE, 
+           type = &quot;lower&quot;, 
+           lab = TRUE, 
+           lab_size = 3, 
+           method=&quot;circle&quot;, 
+           colors = c(&quot;tomato2&quot;, &quot;white&quot;, &quot;springgreen3&quot;), 
+           title=&quot;Correlogram of mtcars&quot;, 
+           ggtheme=theme_bw)</code></pre>
+<p><img src="06-Analysis-Linear-Regression_files/figure-html/Corrplot-2.png" width="672" /></p>
+</div>
+</div>
+<div id="ordinary-least-squares-ols" class="section level2">
+<h2>Ordinary least squares (OLS)</h2>
+<div id="assumpions" class="section level3">
+<h3>Assumpions</h3>
+<p><span class="math display">\[{\displaystyle \mathbf {y} =\mathbf {X}
+{\boldsymbol {\beta }}+{\boldsymbol {\varepsilon }}\;}  \ \ \ \
+{\displaystyle \;{\boldsymbol {\varepsilon }}\sim {\mathcal {N}}(\mathbf
+{0} ,\sigma ^{2}\mathbf {I} _{T})}.\]</span></p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(y_{i}=\alpha+\beta
+x_{i}+\varepsilon_{i}\)</span></li>
+<li><span
+class="math inline">\(\mathrm{E}\left(\varepsilon_{i}\right)=0\)</span></li>
+<li><span
+class="math inline">\(\operatorname{var}\left(\varepsilon_{i}\right)=\sigma^{2}\)</span></li>
+<li><span class="math inline">\(\operatorname{cov}\left(\varepsilon_{i},
+\varepsilon_{j}\right)=0\)</span></li>
+<li><span class="math inline">\(\varepsilon_{i} \sim\)</span> Normal
+Distribution</li>
+</ol>
+</div>
+<div id="interpretation" class="section level3">
+<h3>Interpretation</h3>
+<ul>
+<li><p><strong>Linearity</strong>: The relationship between the
+predictor and response variables should be linear. If this relationship
+isn’t clearly linear, <strong>data transformations</strong> (e.g.,
+logarithmic, polynomial, or exponential transformations) can be applied
+to the variables X or Y to achieve linearity.</p></li>
+<li><p><strong>Uncorrelated Residuals</strong>: Residuals (errors)
+should be uncorrelated with each other, meaning there should be no
+pattern in the residuals.</p></li>
+<li><p><strong>Homoscedasticity</strong>: The errors should be normally
+distributed and have constant variance. This implies that for different
+input values, the variance of the errors remains constant. If this
+assumption is violated, parameter estimates may become biased, leading
+to significance test results that are too high or too low, potentially
+resulting in incorrect conclusions. This situation is known as
+heteroscedasticity.</p></li>
+<li><p><strong>Non-collinearity</strong>: There should be no linear
+relationship between predictor variables; predictors should ideally be
+independent of each other. Collinearity can lead to biased
+estimates.</p></li>
+<li><p><strong>Outliers</strong>: Outliers can severely impact parameter
+estimation. Ideally, outliers should be removed before fitting a model
+using linear regression.</p></li>
+</ul>
+</div>
+<div id="matrix-solution" class="section level3">
+<h3>Matrix Solution</h3>
+<p>Least squares method minimum <span
+class="math inline">\(J\left(\theta_{0}, \theta_{1}\right)\)</span> and
+find out the smallest <span class="math inline">\(\theta_{0}\)</span>
+and <span class="math inline">\(\theta_{1}\)</span></p>
+<p><span class="math display">\[J(\theta_0, \theta_1) =
+\sum\limits_{i=1}^{m}(y^{(i)} - h_\theta(x^{(i)})^2 =
+\sum\limits_{i=1}^{m}(y^{(i)} -  \theta_0 - \theta_1
+x^{(i)})^2\]</span></p>
+<p>Assume <span class="math display">\[h_\theta(x_1, x_2, ...x_n) =
+\theta_0 + \theta_{1}x_1 + ... + \theta_{n}x_{n}\]</span> as <span
+class="math display">\[h_\mathbf{\theta}(\mathbf{x}) =
+\mathbf{X\theta}\]</span></p>
+<p><span class="math display">\[J(\mathbf\theta) =
+\frac{1}{2}(\mathbf{X\theta} - \mathbf{Y})^T(\mathbf{X\theta} -
+\mathbf{Y})\]</span></p>
+<p>Take the derivative of the θ vector for this loss function to 0</p>
+<p><span
+class="math display">\[\frac{\partial}{\partial\mathbf\theta}J(\mathbf\theta)
+= \mathbf{X}^T(\mathbf{X\theta} - \mathbf{Y}) = 0\]</span> <span
+class="math display">\[\mathbf{X^{T}X\theta} = \mathbf{X^{T}Y}\]</span>
+<span class="math display">\[\mathbf{\theta} =
+(\mathbf{X^{T}X})^{-1}\mathbf{X^{T}Y}\]</span></p>
+</div>
+<div id="gauss-markov-theorem" class="section level3">
+<h3>Gauss-Markov Theorem</h3>
+<p>The Gauss-Markov Theorem establishes that the Ordinary Least Squares
+(OLS) method has particularly desirable properties. Specifically, when
+the mean of the error terms is zero, the OLS estimator <span
+class="math inline">\(\hat{\beta}\)</span> is <strong>unbiased</strong>.
+If the error terms also have constant variance, then OLS provides the
+<strong>Best Linear Unbiased Estimator (BLUE)</strong>. Additionally, if
+the error terms in a linear regression model are uncorrelated, the OLS
+estimator has the lowest sampling variance among linear unbiased
+estimators. While <span class="math inline">\(\hat{\beta}\)</span> is a
+reasonable estimator, there are other options. However, OLS is preferred
+for three key reasons:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Orthogonal Projection</strong>: OLS results from an
+orthogonal projection onto the model space, providing a geometrically
+intuitive solution.</p></li>
+<li><p><strong>Maximum Likelihood Estimator</strong>: If the errors are
+independent and identically normally distributed, OLS serves as the
+<strong>maximum likelihood estimator (MLE)</strong>. In essence, the MLE
+for <span class="math inline">\(\hat{\beta}\)</span> is the value that
+maximizes the likelihood of observing the given data.</p></li>
+<li><p><strong>Gauss-Markov Theorem</strong>: The theorem confirms that
+OLS provides the <strong>best linear unbiased estimate (BLUE)</strong>,
+ensuring minimum variance within the class of linear unbiased
+estimators.</p></li>
+</ol>
+</div>
+<div id="limitation" class="section level3">
+<h3>limitation</h3>
+<p><strong>Limitations of Ordinary Least Squares (OLS):</strong></p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Matrix Inversion Requirement</strong>: OLS requires
+calculating the inverse of <span
+class="math inline">\(\left(\mathbf{X}^{\mathrm{T}}
+\mathbf{X}\right)\)</span>. If this matrix is not invertible, OLS cannot
+be directly applied. In such cases, gradient descent can still be used.
+Alternatively, we can restructure the sample data by removing redundant
+features to ensure that <span
+class="math inline">\(\left(\mathbf{X}^{\mathrm{T}}
+\mathbf{X}\right)\)</span> has a non-zero determinant, allowing OLS to
+proceed.</p></li>
+<li><p><strong>High Dimensionality</strong>: When the number of features
+(<span class="math inline">\(n\)</span>) is very large, calculating the
+inverse of the <span class="math inline">\(\left(\mathbf{X}^{\mathrm{T}}
+\mathbf{X}\right)\)</span> matrix (an <span class="math inline">\(n
+\times n\)</span> matrix) becomes computationally expensive or even
+infeasible. Iterative methods, like gradient descent, remain viable in
+such cases. As a rule of thumb, if <span
+class="math inline">\(n\)</span> exceeds 10,000 and distributed
+computing resources are limited, iterative methods are recommended.
+Alternatively, dimensionality reduction techniques, such as Principal
+Component Analysis (PCA), can reduce the feature space, enabling OLS to
+be applied.</p></li>
+<li><p><strong>Nonlinear Relationships</strong>: If the relationship
+between variables is not linear, OLS cannot be directly applied, as it
+is designed for linear models. Transforming the relationship into a
+linear form may allow OLS to be used, but gradient descent is a more
+flexible option that can handle nonlinear relationships.</p></li>
+<li><p><strong>Special Cases in Sample Size</strong>: When the number of
+samples (<span class="math inline">\(m\)</span>) is very small,
+specifically smaller than the number of features (<span
+class="math inline">\(n\)</span>), the system of equations is
+underdetermined, making it difficult to fit the data using standard
+optimization methods. When <span class="math inline">\(m = n\)</span>,
+the system can be solved using standard equations. If <span
+class="math inline">\(m &gt; n\)</span>, the system becomes
+overdetermined, which is the typical scenario where OLS performs
+effectively.</p></li>
+</ol>
+</div>
+</div>
+<div id="model-statistics" class="section level2">
+<h2>Model Statistics</h2>
+<div id="residuals-standard-error" class="section level3">
+<h3>Residuals Standard Error</h3>
+<pre><code>## Build Model
+y &lt;- c(8.04,6.95,7.58,8.81,8.33,9.96,7.24,4.26,10.84,4.82,5.68)
+x1 &lt;- c(10,8,13,9,11,14,6,4,12,7,5)
+set.seed(15)
+x2 &lt;- sqrt(y)+rnorm(length(y))
+model &lt;- lm(y~x1+x2)
+
+## Residual Standard error (Like Standard Deviation)
+k &lt;- length(model$coefficients)-1  # Subtract one to ignore intercept
+SSE &lt;- sum(model$residuals**2)
+n &lt;- length(model$residuals)
+Residual_Standard_Error &lt;- sqrt(SSE/(n-(1+k)))</code></pre>
+</div>
+<div id="r-squared-and-adjusted-r-squared" class="section level3">
+<h3>R-Squared and Adjusted R-Squared</h3>
+<p><strong>R-Squared Calculation</strong></p>
+<p>R<sup>2</sup> is a statistic that will give some information about
+the goodness of fit of a model. In regression, the R<sup>2</sup>
+coefficient of determination is a statistical measure of how well the
+regression predictions approximate the real data points. An
+R<sup>2</sup> of 1 indicates that the regression predictions perfectly
+fit the data.</p>
+<p>The total sum of squares <span class="math display">\[{\displaystyle
+SS_{\text{tot}}=\sum _{i}(y_{i}-{\bar {y}})^{2}}\]</span> The sum of
+squares of residuals <span class="math display">\[{\displaystyle
+SS_{\text{res}}=\sum _{i}(y_{i}-f_{i})^{2}=\sum
+_{i}e_{i}^{2}\,}\]</span> <span class="math display">\[{\displaystyle
+R^{2}=1-{SS_{\rm {res}} \over SS_{\rm {tot}}}\,}\]</span></p>
+<pre><code>## Build Model
+y &lt;- c(8.04,6.95,7.58,8.81,8.33,9.96,7.24,4.26,10.84,4.82,5.68)
+x1 &lt;- c(10,8,13,9,11,14,6,4,12,7,5)
+set.seed(15)
+x2 &lt;- sqrt(y)+rnorm(length(y))
+model &lt;- lm(y~x1+x2)
+
+## Multiple R-Squared
+SSyy &lt;- sum((y-mean(y))**2)
+SSE &lt;- sum(model$residuals**2)
+
+(SSyy-SSE)/SSyy
+ 
+# Alternatively
+1-SSE/SSyy</code></pre>
+<p><strong>Adjusted R-Squared</strong></p>
+<p>Adjusted R-Squared normalizes Multiple R-Squared by taking into
+account how many samples you have and how many variables you’re
+using.</p>
+<p><span class="math display">\[{\displaystyle {\bar
+{R}}^{2}=1-(1-R^{2}){n-1 \over n-p-1}}\]</span></p>
+<pre><code>## Adjusted R-Squared
+n &lt;- length(y)
+k &lt;- length(model$coefficients)-1  # Subtract one to ignore intercept
+SSE &lt;- sum(model$residuals**2)
+SSyy &lt;- sum((y-mean(y))**2)
+1-(SSE/SSyy)*(n-1)/(n-(k+1))</code></pre>
+</div>
+<div id="t-statistic" class="section level3">
+<h3>T Statistic</h3>
+<p>Null Hypothesis is that the coefficients associated with the
+variables is equal to zero. The alternate hypothesis is that the
+coefficients are not equal to zero (i.e. there exists a relationship
+between the independent variable in question and the dependent
+variable).</p>
+<p>We can interpret the t-value something like this. A larger t-value
+indicates that it is less likely that the coefficient is not equal to
+zero purely by chance. So, higher the t-value, the better.</p>
+<p>Pr(&gt;|t|) or p-value is the probability that you get a t-value as
+high or higher than the observed value when the Null Hypothesis (the β
+coefficient is equal to zero or that there is no relationship) is true.
+So if the Pr(&gt;|t|) is low, the coefficients are significant
+(significantly different from zero). If the Pr(&gt;|t|) is high, the
+coefficients are not significant.</p>
+<p><span class="math display">\[t−Statistic = {β−coefficient \over
+Std.Error}\]</span></p>
+</div>
+<div id="f-statistic" class="section level3">
+<h3>F Statistic</h3>
+<p><span class="math inline">\(\mathrm{H}_{0}: \beta_{1}=\ldots
+\beta_{\mathrm{p}-1}=0\)</span></p>
+<p><span class="math display">\[Std. Error = \sqrt{MSE} =
+\sqrt{\frac{SSE}{n-q}}\]</span> <span
+class="math display">\[MSR=\frac{\sum_{i}^{n}\left( \hat{y_{i} -
+\bar{y}}\right)}{q-1} = \frac{SST - SSE}{q - 1}\]</span> <span
+class="math display">\[F-statistic = \frac{MSR}{MSE}\]</span></p>
+<pre><code>linearMod &lt;- lm(dist ~ speed, data=cars)
+modelSummary &lt;- summary(linearMod)  # capture model summary as an object
+modelCoeffs &lt;- modelSummary$coefficients  # model coefficients
+beta.estimate &lt;- modelCoeffs[&quot;speed&quot;, &quot;Estimate&quot;]  # get beta estimate for speed
+std.error &lt;- modelCoeffs[&quot;speed&quot;, &quot;Std. Error&quot;]  # get std.error for speed
+
+t_value &lt;- beta.estimate/std.error  # calc t statistic
+
+p_value &lt;- 2*pt(-abs(t_value), df=nrow(cars)-ncol(cars))  # calc p Value
+
+f_statistic &lt;- modelSummary$fstatistic[1]  # fstatistic
+
+f &lt;- summary(linearMod)$fstatistic  # parameters for model p-value calc
+model_p &lt;- pf(f[1], f[2], f[3], lower=FALSE)
+
+
+## For Calculation
+data(savings)
+g &lt; - 1m (sr ˜ pop15 + pop75 + dpi + ddpi, savings)
+summary (g)
+
+## Test Beta1 = Beta2 = Beta3 = Beta4 = 0
+(tss &lt; - sum((savings$sr-mean (savings$sr))^2))
+(rss &lt; - deviance(g))
+(fstat &lt; - ((tss-rss)/4)/(rss/df.residual(g)))
+## F Test
+1-pf (fstat, 4, df.residual (g)) </code></pre>
+<p><strong>Model Comparasion</strong></p>
+<pre><code>g2 &lt; - 1m (sr ˜ pop75 + dpi + ddpi, savings)
+
+## d compute the RSS and the F-statistic:
+(rss2 &lt; - deviance (g2))
+(fstat &lt; - (deviance (g2)-deviance (g))/(deviance (g)/df.residual(g)))
+## P value
+1-pf (fstat, l, df.residual(g))
+
+## relate this to the t-based test and p-value by:
+sqrt (fstat) 
+(tstat &lt; - summary(g)$coef[2, 3])
+2 * (l-pt (sqrt (fstat), 45))
+
+## more convenient way to compare two nested models is:
+anova (g2, g)
+
+## Analysis of Variance Table
+## Model 1: sr ˜ pop75 + dpi + ddpi
+## Model 2: sr ˜ pop15 + pop75 + dpi + ddpi</code></pre>
+</div>
+<div id="confidence-intervals" class="section level3">
+<h3>Confidence Intervals</h3>
+<p><strong>Confidence Intervals for <span
+class="math inline">\(\beta\)</span></strong></p>
+<p><span class="math display">\[\hat{\beta}_{i} \pm t_{n-p}^{(\alpha /
+2)} \hat{\sigma} \sqrt{\left(X^{T} X\right)_{i i}^{-1}}\]</span></p>
+<p>Alternatively, a <span class="math inline">\(100(1-\alpha)
+\%\)</span> confidence region for <span
+class="math inline">\(\beta\)</span> satisfies:</p>
+<p><span class="math display">\[(\hat{\beta}-\beta)^{T} X^{T}
+X(\hat{\beta}-\beta) \leq p \hat{\sigma}^{2} F_{p,
+n-p}^{(\alpha)}\]</span></p>
+<p><strong>Confidence Intervals for Predictions</strong></p>
+<p>It’s essential to distinguish between predicting the future mean
+response and predicting an individual future observation.</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Prediction of a Future Observation</strong>: Suppose a
+specific house with characteristics <span
+class="math inline">\(x_0\)</span> is on the market. Its selling price
+would be <span class="math inline">\(x_0^{T} \beta +
+\varepsilon\)</span>, where <span
+class="math inline">\(\varepsilon\)</span> accounts for the random error
+with mean zero (<span class="math inline">\(\mathrm{E} \varepsilon =
+0\)</span>). The predicted price is <span class="math inline">\(x_0^{T}
+\hat{\beta}\)</span>. However, in assessing the variance of this
+prediction, the variance of <span
+class="math inline">\(\varepsilon\)</span> must be included.</p></li>
+<li><p><strong>Prediction of the Mean Response</strong>: Now consider
+the question, “What would a house with characteristics <span
+class="math inline">\(x_0\)</span> sell for on average?” Here, the
+average selling price is <span class="math inline">\(x_0^{T}
+\beta\)</span>, and it’s predicted by <span
+class="math inline">\(x_0^{T} \hat{\beta}\)</span>. In this case, only
+the variance in <span class="math inline">\(\hat{\beta}\)</span> needs
+to be considered.</p></li>
+</ol>
+<p>For a <strong>100(1–α)% confidence interval (CI) for a single future
+response</strong>, we have: <span class="math display">\[
+\hat{y}_{0} \pm t_{n-p}^{(\alpha / 2)} \hat{\sigma} \sqrt{1 + x_{0}^{T}
+(X^{T} X)^{-1} x_{0}}
+\]</span></p>
+<p>For a <strong>confidence interval for the mean response</strong> for
+a given <span class="math inline">\(x_0\)</span>, the CI is: <span
+class="math display">\[
+\hat{y}_{0} \pm t_{n-p}^{(\alpha / 2)} \hat{\sigma} \sqrt{x_{0}^{T}
+(X^{T} X)^{-1} x_{0}}
+\]</span></p>
+<p>In these formulas: - <span class="math inline">\(\hat{y}_0 = x_0^{T}
+\hat{\beta}\)</span> is the predicted value. - <span
+class="math inline">\(t_{n-p}^{(\alpha / 2)}\)</span> is the critical
+value from the <span class="math inline">\(t\)</span>-distribution with
+<span class="math inline">\(n - p\)</span> degrees of freedom,
+corresponding to the confidence level. - <span
+class="math inline">\(\hat{\sigma}\)</span> is the standard error of the
+estimate.</p>
+</div>
+<div id="likelihood-ratio-test" class="section level3">
+<h3>Likelihood-ratio test</h3>
+<p>likelihood-ratio test assesses the goodness of fit of two competing
+statistical models based on the ratio of their likelihoods, specifically
+one found by maximization over the entire parameter space and another
+found after imposing some constraint. If the constraint (i.e., the null
+hypothesis) is supported by the observed data, the two likelihoods
+should not differ by more than sampling error.</p>
+<p>Suppose that we have a statistical model with parameter space <span
+class="math inline">\({\displaystyle \Theta }\)</span>.</p>
+<ul>
+<li>A null hypothesis is often stated by saying that the parameter <span
+class="math inline">\({\displaystyle \theta }\)</span> is in a specified
+subset <span class="math inline">\({\displaystyle \Theta _{0}}\)</span>
+of <span class="math inline">\({\displaystyle \Theta }\)</span>.</li>
+<li>The alternative hypothesis is thus that <span
+class="math inline">\({\displaystyle \theta }\)</span> is in the
+complement of <span class="math inline">\({\displaystyle \Theta
+_{0}}\)</span></li>
+</ul>
+<p><span class="math display">\[{\displaystyle \lambda
+_{\text{LR}}=-2\ln \left[{\frac {~\sup _{\theta \in \Theta
+_{0}}{\mathcal {L}}(\theta )~}{~\sup _{\theta \in \Theta }{\mathcal
+{L}}(\theta )~}}\right]}\]</span></p>
+<p>Often the likelihood-ratio test statistic is expressed as a
+difference between the log-likelihoods <span
+class="math display">\[{\displaystyle \lambda _{\text{LR}}=-2\left[~\ell
+(\theta _{0})-\ell ({\hat {\theta }})~\right]}\]</span> <span
+class="math display">\[{\displaystyle \ell ({\hat {\theta }})\equiv \ln
+\left[~\sup _{\theta \in \Theta }{\mathcal {L}}(\theta
+)~\right]~}\]</span></p>
+</div>
+<div id="accuracy" class="section level3">
+<h3>Accuracy</h3>
+<p><strong>Accuracy</strong>: A simple correlation between the actuals
+and predicted values can be used as a form of accuracy measure. A higher
+correlation accuracy implies that the actuals and predicted values have
+similar directional movement, i.e. when the actuals values increase the
+predicteds also increase and vice-versa. <span
+class="math display">\[\text{Min Max Accuracy} = mean \left(
+\frac{min\left(actuals, predicteds\right)}{max\left(actuals, predicteds
+\right)} \right)\]</span> <span class="math display">\[\text{Mean
+Absolute Percentage Error \ (MAPE)} = mean\left(
+\frac{abs\left(predicteds−actuals\right)}{actuals}\right)\]</span></p>
+<pre><code>Step 1: Create the training (development) and test (validation) data samples from original data.
+Step 2: Develop the model on the training data and use it to predict the distance on test data
+Step 3: Review diagnostic measures.
+Step 4: Calculate prediction accuracy and error rates
+
+# Create Training and Test data -
+set.seed(100)  # setting seed to reproduce results of random sampling
+trainingRowIndex &lt;- sample(1:nrow(cars), 0.8*nrow(cars))  # row indices for training data
+trainingData &lt;- cars[trainingRowIndex, ]  # model training data
+testData  &lt;- cars[-trainingRowIndex, ]   # test data
+
+# Build the model on training data -
+lmMod &lt;- lm(dist ~ speed, data=trainingData)  # build the model
+distPred &lt;- predict(lmMod, testData)  # predict distance
+
+# Review diagnostic measures.
+summary (lmMod)  # model summary
+AIC (lmMod)  # Calculate akaike information criterion
+
+# Calculate prediction accuracy and error rates
+actuals_preds &lt;- data.frame(cbind(actuals=testData$dist, predicteds=distPred))  # make actuals_predicteds dataframe.
+correlation_accuracy &lt;- cor(actuals_preds)  
+correlation_accuracy
+
+# Now lets calculate the Min Max accuracy and MAPE:
+# 计算最小最大精度和MAPE：
+min_max_accuracy &lt;- mean(apply(actuals_preds, 1, min) / apply(actuals_preds, 1, max))  
+min_max_accuracy
+
+# Mean Absolute Percentage Error 
+mape &lt;- mean(abs((actuals_preds$predicteds - actuals_preds$actuals))/actuals_preds$actuals)  
+mape</code></pre>
+</div>
+</div>
+<div id="model-diagnostics" class="section level2">
+<h2>Model Diagnostics</h2>
+<p>The estimation and inference of the regression model depend on
+several assumptions. These assumptions need to be checked using
+regression diagnostics. We divide potential problems into three
+categories:</p>
+<ol style="list-style-type: decimal">
+<li>Error We have assumed that <span class="math inline">\(\varepsilon
+\sim \mathrm{N}\left(0, \sigma^{2} I\right)\)</span> or in words, that
+the errors are independent, have equal variance and are normally
+distributed.</li>
+<li>Model We have assumed that the structural part of the model <span
+class="math inline">\(E y=X \beta\)</span> is correct.</li>
+<li>Unusual observations Sometimes just a few observations do not fit
+the model. These few observations might change the choice and fit of the
+model.</li>
+</ol>
+<div id="checking-error-assumptions" class="section level3">
+<h3>Checking Error Assumptions</h3>
+<p><strong>1. Constant Variance (Residuals vs. fitted
+plots)</strong></p>
+<p>There are two approaches to dealing with nonconstant variance. Use of
+<strong>weighted least squares</strong> is appropriate when the form of
+the <strong>nonconstant variance</strong> is either known exactly or
+there is some known parametric form. Alternatively, one can transform
+the variables.</p>
+<p><strong>Assumptions Checks using Residual Plots</strong></p>
+<p>In order for the model to accurately explain the data and for your
+p-value to represent a meaningful test of the null hypothesis, we need
+to make some assumptions about the data. Many diagnostics about the
+regression model can be derived using plots of the residuals of the
+fitted model. The residuals can easily be obtained and examined, but the
+crucial concept is that these are sampled from a larger, unobservable
+population</p>
+<p><strong>The model assumptions are expressed in terms of the error
+distribution.</strong></p>
+<ol style="list-style-type: decimal">
+<li>Errors are independent</li>
+<li>Errors have constant variance</li>
+<li>Errors have mean zero</li>
+<li>Errors follow a normal distribution</li>
+</ol>
+<div class="figure" style="text-align: center">
+<img src="02_Plots/LR_Residums.png" alt="Figure: Residums Plots" width="100%" />
+<p class="caption">
+Figure: Residums Plots
+</p>
+</div>
+<p>Here’s a practical example using the built-in <code>cars</code>
+dataset in R, which contains data on car speeds and stopping distances.
+This example will walk you through scatter plots, box plots, density
+plots, and a bubble plot.</p>
+</div>
+<div id="scatter-plot-with-best-fit-line" class="section level3">
+<h3>1. Scatter Plot with Best Fit Line</h3>
+<p>This scatter plot visualizes the relationship between car speed and
+stopping distance. The <code>scatter.smooth()</code> function will plot
+the data along with a smoothed line to help visualize the trend.</p>
+<pre class="r"><code># Scatter plot with a smooth line
+scatter.smooth(x = cars$speed, y = cars$dist, main = &quot;Stopping Distance vs Speed&quot;,
+               xlab = &quot;Speed (mph)&quot;, ylab = &quot;Stopping Distance (ft)&quot;)</code></pre>
+</div>
+<div id="box-plot-to-check-for-outliers" class="section level3">
+<h3>2. Box Plot to Check for Outliers</h3>
+<p>Box plots help identify any outliers in the <code>speed</code> and
+<code>distance</code> variables.</p>
+<pre class="r"><code># Set up the plot area to display two plots side by side
+par(mfrow = c(1, 2))
+
+# Box plot for speed
+boxplot(cars$speed, main = &quot;Box Plot for Speed&quot;, 
+        sub = paste(&quot;Outliers:&quot;, paste(boxplot.stats(cars$speed)$out, collapse = &quot;, &quot;)))
+
+# Box plot for distance
+boxplot(cars$dist, main = &quot;Box Plot for Distance&quot;, 
+        sub = paste(&quot;Outliers:&quot;, paste(boxplot.stats(cars$dist)$out, collapse = &quot;, &quot;)))</code></pre>
+</div>
+<div id="density-plot-to-visualize-distribution" class="section level3">
+<h3>3. Density Plot to Visualize Distribution</h3>
+<p>Density plots are useful for checking the distribution of variables.
+Here, we use the <code>e1071</code> package to calculate skewness and
+visualize the density of <code>speed</code> and
+<code>distance</code>.</p>
+<pre class="r"><code># Load the e1071 library to calculate skewness
+library(e1071)
+
+# Set up the plot area to display two plots side by side
+par(mfrow = c(1, 2))
+
+# Density plot for speed
+plot(density(cars$speed), main = &quot;Density Plot: Speed&quot;, xlab = &quot;Speed&quot;, 
+     ylab = &quot;Density&quot;, sub = paste(&quot;Skewness:&quot;, round(skewness(cars$speed), 2)))
+polygon(density(cars$speed), col = &quot;blue&quot;, border = &quot;black&quot;)
+
+# Density plot for distance
+plot(density(cars$dist), main = &quot;Density Plot: Distance&quot;, xlab = &quot;Distance&quot;, 
+     ylab = &quot;Density&quot;, sub = paste(&quot;Skewness:&quot;, round(skewness(cars$dist), 2)))
+polygon(density(cars$dist), col = &quot;blue&quot;, border = &quot;black&quot;)</code></pre>
+</div>
+<div id="bubble-plot-to-add-a-third-dimension" class="section level3">
+<h3>4. Bubble Plot to Add a Third Dimension</h3>
+<p>A bubble plot is a scatter plot where the size of the bubbles
+represents a third variable. Here, we use <code>speed</code> for bubble
+size to illustrate its relationship with <code>distance</code>.</p>
+<pre class="r"><code># Bubble plot with bubble size representing speed
+symbols(cars$speed, cars$dist, circles = cars$speed, inches = 0.5,
+        main = &quot;Bubble Plot: Distance vs Speed&quot;, xlab = &quot;Speed (mph)&quot;, ylab = &quot;Stopping Distance (ft)&quot;)</code></pre>
+<p>This code provides an initial analysis and visual overview of the
+relationships and distributions in the dataset, which can be valuable
+before applying further modeling or statistical techniques.</p>
+<p><strong>2. Normality</strong></p>
+<p>The residuals can be assessed for normality using a Q–Q plot</p>
+<p>When the errors are not normal, least squares estimates may not be
+optimal. They will still be best linear unbiased estimates, but other
+robust estimators may be more effective. Also tests and confidence
+intervals are not exact. However, only long-tailed distributions cause
+large inaccuracies. Mild nonnormality can safely be ignored and the
+larger the sample size the less troublesome the nonnormality. For
+short-tailed distributions, the consequences of nonnormality are not
+serious and can reasonably</p>
+<!-- 当误差不正常时，最小二乘估计可能不是最佳的。 它们仍将是最佳的线性无偏估计，但其他稳健的估计量可能更有效。 同样，测试和置信区间也不精确。 但是，只有长尾分布会导致较大的误差。 轻度的非正常现象可以安全地忽略，样本量越大，非正常现象的麻烦就越小。对于短尾分布，非正态性的后果并不严重，并且可以合理地进行。 -->
+<p>The Shapiro-Wilk test is a formal test for normality, The null
+hypothesis is that the the residuals are normal.:</p>
+<pre><code>shapiro.test (residuals (g))</code></pre>
+<p><strong>3. Correlated Errors</strong></p>
+<p>Graphical checks include plots of <span
+class="math inline">\(\hat{\varepsilon}\)</span> against time and <span
+class="math inline">\(\hat{\varepsilon}_{i}\)</span> against <span
+class="math inline">\(\hat{\varepsilon}_{i-1}\)</span> while the Durbin
+Watson test uses the statistic (The null distribution based on the
+assumption of uncorrelated errors follows a linear combination of <span
+class="math inline">\(\chi^{2}\)</span> distributions.): <span
+class="math display">\[
+D
+W=\frac{\sum_{i=2}^{n}\left(\hat{\varepsilon}_{i}-\hat{\varepsilon}_{i-1}\right)^{2}}{\sum_{i=1}^{n}
+\hat{\varepsilon}_{i}^{2}}
+\]</span></p>
+</div>
+<div id="finding-unusual-observations" class="section level3">
+<h3>Finding Unusual Observations</h3>
+</div>
+</div>
+<div id="finding-unusual-observations-1" class="section level2">
+<h2>Finding Unusual Observations</h2>
+<div id="studentized-residuals" class="section level3">
+<h3>Studentized Residuals</h3>
+<p>The <strong>studentized residual</strong> <span
+class="math inline">\(r_i\)</span> is given by: <span
+class="math display">\[
+r_{i} = \frac{\hat{\varepsilon}_{i}}{\hat{\sigma} \sqrt{1 - h_{i}}}
+\]</span> where <span class="math inline">\(\hat{\varepsilon}_i\)</span>
+is the residual for observation <span class="math inline">\(i\)</span>,
+<span class="math inline">\(\hat{\sigma}\)</span> is the standard error
+of the residuals, and <span class="math inline">\(h_i\)</span> is the
+leverage for observation <span class="math inline">\(i\)</span>.</p>
+<p>If the model assumptions hold, the variance <span
+class="math inline">\(\operatorname{var}(r_i) = 1\)</span>, and the
+correlation <span class="math inline">\(\operatorname{corr}(r_i,
+r_j)\)</span> tends to be small. Studentized residuals are often
+preferred in residual plots because they are standardized to have equal
+variance, correcting the natural non-constant variance of residuals
+under constant error variance assumptions. However, if
+heteroscedasticity is present, studentization alone cannot correct for
+it.</p>
+</div>
+<div id="outlier" class="section level3">
+<h3>Outlier</h3>
+<p>An <strong>outlier</strong> is an observation that doesn’t fit the
+model well, often having a large residual. In linear regression, an
+outlier is defined as an observation whose value on the dependent
+variable is unusual given its predictor values. It may indicate a unique
+sample property or possibly a data entry error.</p>
+<p>To identify outliers, compute: <span class="math display">\[
+\hat{y}_{(i)} = x_{i}^{T} \hat{\beta}_{(i)}
+\]</span> where <span class="math inline">\(\hat{y}_{(i)}\)</span> is
+the predicted value for observation <span
+class="math inline">\(i\)</span> after excluding it from the model fit.
+If <span class="math inline">\(\hat{y}_{(i)} - y_i\)</span> is large,
+then case <span class="math inline">\(i\)</span> is considered an
+outlier. To quantify this, the variance of <span
+class="math inline">\(y_i - \hat{y}_{(i)}\)</span> is given by: <span
+class="math display">\[
+\operatorname{var}\left(y_{i} - \hat{y}_{(i)}\right) =
+\hat{\sigma}_{(i)}^{2}\left(1 + x_{i}^{T}\left(X_{(i)}^{T}
+X_{(i)}\right)^{-1} x_{i}\right)
+\]</span> We define <strong>jackknife residuals</strong> (or externally
+studentized residuals) as: <span class="math display">\[
+t_{i} = \frac{y_{i} - \hat{y}_{(i)}}{\hat{\sigma}_{(i)} \sqrt{1 +
+x_{i}^{T}\left(X_{(i)}^{T} X_{(i)}\right)^{-1} x_{i}}}
+\]</span> which, under correct model assumptions, follows a <span
+class="math inline">\(t\)</span>-distribution with <span
+class="math inline">\(n - p - 1\)</span> degrees of freedom if <span
+class="math inline">\(\varepsilon \sim \mathrm{N}(0, \sigma^2
+I)\)</span>. Alternatively, <span class="math inline">\(t_i\)</span> can
+be computed as: <span class="math display">\[
+t_{i} = \frac{\hat{\varepsilon}_{i}}{\hat{\sigma}_{(i)} \sqrt{1 -
+h_{i}}} = r_{i}\left(\frac{n - p - 1}{n - p - r_{i}^{2}}\right)^{1 / 2}
+\]</span> allowing us to avoid performing <span
+class="math inline">\(n\)</span> separate regressions. Since <span
+class="math inline">\(t_i \sim t_{n - p - 1}\)</span>, we can use it to
+test if case <span class="math inline">\(i\)</span> is an outlier.</p>
+</div>
+<div id="leverage" class="section level3">
+<h3>Leverage</h3>
+<p>An observation has <strong>high leverage</strong> if its predictor
+values are far from the mean, meaning it can exert significant influence
+on the regression coefficients. The leverage value <span
+class="math inline">\(h_i = H_{ii}\)</span> is useful for diagnostics.
+Since <span class="math display">\[
+\operatorname{var}(\hat{\varepsilon}_{i}) = \sigma^2 (1 - h_{i}),
+\]</span> a high leverage <span class="math inline">\(h_i\)</span> will
+reduce <span
+class="math inline">\(\operatorname{var}(\hat{\varepsilon}_{i})\)</span>,
+indicating that observation <span class="math inline">\(i\)</span> has a
+significant influence on the model.</p>
+</div>
+<div id="influence" class="section level3">
+<h3>Influence</h3>
+<p>An observation is <strong>influential</strong> if its removal
+significantly changes the estimated regression coefficients. Influence
+is often seen as a product of leverage and residual size.</p>
+<p>The <strong>Cook’s Distance</strong> is a popular diagnostic for
+influence, summarizing information into a single value for each
+observation: <span class="math display">\[
+D_{i} = \frac{(\hat{y} - \hat{y}_{(i)})^{T}(\hat{y} - \hat{y}_{(i)})}{p
+\hat{\sigma}^{2}} = \frac{1}{p} r_{i}^{2} \frac{h_{i}}{1 - h_{i}}
+\]</span> where <span class="math inline">\(p\)</span> is the number of
+predictors in the model, and <span class="math inline">\(r_i\)</span>
+and <span class="math inline">\(h_i\)</span> are the studentized
+residual and leverage for observation <span
+class="math inline">\(i\)</span>, respectively.</p>
+</div>
+<div id="checking-the-structure-of-the-model" class="section level3">
+<h3>Checking the Structure of the Model</h3>
+<p>We can look at plots of <span
+class="math inline">\(\hat{\varepsilon}\)</span> against <span
+class="math inline">\(\hat{y}\)</span> and <span
+class="math inline">\(x_{i}\)</span> to reveal problems or just simply
+look at plots of <span class="math inline">\(y\)</span> against each
+<span class="math inline">\(x_{i} .\)</span></p>
+<p>The disadvantage of these graphs is that other predictor variables
+affect the relationship. Partial regression or increased variable graph
+can help isolate the effect of <span
+class="math inline">\(x_{i}\)</span> Look at the response that removes
+the expected effect of other <span class="math inline">\(X_s\)</span>:
+<strong>Partial regression (left) and partial residual (right)
+plots</strong></p>
+<p><span class="math display">\[
+y-\sum_{j \neq i} x_{j}
+\hat{\beta}_{j}=\hat{y}+\hat{\varepsilon}-\sum_{j \neq i} x_{j}
+\hat{\beta}_{j}=x_{i} \hat{\beta}_{i}+\hat{\varepsilon}
+\]</span></p>
+</div>
+</div>
+<div id="sas-implementation-proc-reg" class="section level2">
+<h2>SAS implementation Proc Reg</h2>
+<div id="options" class="section level3">
+<h3>Options</h3>
+<p>Here’s an overview of various options used in regression analysis and
+diagnostic plotting, along with their descriptions:</p>
+<table>
+<colgroup>
+<col width="25%" />
+<col width="74%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Options</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>STB</strong></td>
+<td>Outputs the standardized partial regression coefficient matrix.</td>
+</tr>
+<tr class="even">
+<td><strong>CORRB</strong></td>
+<td>Outputs the parameter estimation matrix.</td>
+</tr>
+<tr class="odd">
+<td><strong>COLLINOINT</strong></td>
+<td>Performs multicollinearity analysis on predictor variables.</td>
+</tr>
+<tr class="even">
+<td><strong>P</strong></td>
+<td>Outputs individual observations, predicted values, and
+residuals.</td>
+</tr>
+<tr class="odd">
+<td><strong>R</strong></td>
+<td>Outputs each individual observation, residuals, and standard
+errors.</td>
+</tr>
+<tr class="even">
+<td><strong>CLM</strong></td>
+<td>Outputs the 95% confidence interval limits for the mean of the
+dependent variable.</td>
+</tr>
+<tr class="odd">
+<td><strong>CLI</strong></td>
+<td>Outputs the 95% confidence interval limits for each predicted
+value.</td>
+</tr>
+<tr class="even">
+<td><strong>MSE</strong></td>
+<td>Requests the variance of the random disturbance term to be
+output.</td>
+</tr>
+<tr class="odd">
+<td><strong>VIF</strong></td>
+<td>Outputs the Variance Inflation Factor (VIF), which measures
+multicollinearity. Higher VIF indicates greater variance due to
+multicollinearity.</td>
+</tr>
+<tr class="even">
+<td><strong>TOL</strong></td>
+<td>Outputs the tolerance level for multicollinearity. A smaller TOL
+suggests that more of the variable’s variance is explained by other
+predictors, indicating potential multicollinearity.</td>
+</tr>
+<tr class="odd">
+<td><strong>DW</strong></td>
+<td>Outputs the Durbin-Watson statistic to check for
+autocorrelation.</td>
+</tr>
+<tr class="even">
+<td><strong>Influence</strong></td>
+<td>Diagnoses outliers by outputting statistics for each observation.
+Cook’s D &gt; 50% or defits/debetas &gt; 2 suggests a significant
+influence of the point.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="plot-options" class="section level3">
+<h3>Plot Options</h3>
+<table>
+<colgroup>
+<col width="25%" />
+<col width="74%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Plot Options</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>FITPLOT</strong></td>
+<td>Scatter plot with regression line and confidence prediction
+bands.</td>
+</tr>
+<tr class="even">
+<td><strong>RESIDUALS</strong></td>
+<td>Residuals of the independent variable.</td>
+</tr>
+<tr class="odd">
+<td><strong>DIAGNOSTICS</strong></td>
+<td>Diagnostic plots (includes the following plots).</td>
+</tr>
+<tr class="even">
+<td><strong>COOKSD</strong></td>
+<td>Plot of Cook’s D statistic for influence diagnostics.</td>
+</tr>
+<tr class="odd">
+<td><strong>OBSERVEDBYPREDICTED</strong></td>
+<td>Plot of the observed dependent variable against predicted
+values.</td>
+</tr>
+<tr class="even">
+<td><strong>QQPLOT</strong></td>
+<td>Q-Q plot to test for normality of residuals.</td>
+</tr>
+<tr class="odd">
+<td><strong>RESIDUALBYPREDICTED</strong></td>
+<td>Plot of residuals versus predicted values.</td>
+</tr>
+<tr class="even">
+<td><strong>RESIDUALHISTOGRAM</strong></td>
+<td>Histogram of residuals.</td>
+</tr>
+<tr class="odd">
+<td><strong>RFPLOT</strong></td>
+<td>Residuals vs Fitted values plot.</td>
+</tr>
+<tr class="even">
+<td><strong>RSTUDENTBYLEVERAGE</strong></td>
+<td>Plot of studentized residuals versus leverage.</td>
+</tr>
+<tr class="odd">
+<td><strong>RSTUDENTBYPREDICTED</strong></td>
+<td>Plot of studentized residuals versus predicted values.</td>
+</tr>
+</tbody>
+</table>
+<p>These options and plots are valuable for evaluating model fit,
+diagnosing potential issues such as multicollinearity, identifying
+outliers, and checking assumptions like normality and homoscedasticity
+of residuals.</p>
+</div>
+<div id="diagnose" class="section level3">
+<h3>Diagnose</h3>
+<p><strong>Hat matrix diagonal SAS</strong></p>
+<p>The hat matrix diagonal measure is used to identify unusual values of
+the explanatory variables. The hat matrix depends only on the
+explanatory values and not on the dependent y values. The
+interpretation, then, is that the hat matrix is a measure of leverage
+among the independent, explanatory variables only. In contrast, a plot
+of residuals identifies observations that are unusual in terms of their
+Y values that we wish to explain. The hat matrix diagonal measure is
+used to identify unusual values of the explanatory variables.</p>
+<p>The “U” shape is a shape common to most hat matrix diagrams. We can
+think that the highest and lowest observed values of the explanatory
+variables are also the furthest away from the data center and will have
+the greatest impact. Observations close to the data center should have
+the least influence.</p>
+<!-- 
+帽子矩阵仅取决于解释性值，而不取决于相关的y值。 因此，解释是帽子矩阵仅是独立，解释性变量之间杠杆作用的量度。 相比之下，残差图可标识出我们希望解释的，在Y值方面不寻常的观察结果。
+
+“ U”形是大多数帽子矩阵图所共有的形状。我们可以认为，解释变量的最高和
+最低观测值也离数据中心最远，并且将产生最大的影响。靠近数据中心的观测
+值应具有最小的影响力。
+-->
+<pre><code>proc reg data=cold;
+    model maxt = lat long alt / p r influence ;
+    output out=inf h=h p=p r=r;
+    run;
+proc gplot data=inf;
+    plot h * p;
+run;</code></pre>
+<p><strong>Jackknife Diagnostics SAS</strong></p>
+<p>The jackknife measures how much the fitted model changes when one
+observation is deleted and the model is refitted. If an observation is
+deleted from the data set, and the new fit is very different from the
+original model based on the complete data set, the observation is
+considered to have an impact on the fit</p>
+<pre><code>proc reg data=cold;
+title2 ’Explain max Jan temperature’;
+model maxt = lat long alt / p influence partial;
+ods output OutputStatistics = diag;
+run;
+title2 ’Examine diagnostic data set’;
+proc print data=diag;
+run;</code></pre>
+<p><strong>Partial Regression Plots SAS</strong></p>
+<p>One way to solve the problem of the individual contribution of each
+explanatory variable is to use partial correlation and partial
+regression plots. These are obtained using the /partial option in proc
+reg.</p>
+<pre><code>proc reg data=lowbw;
+    model birthwt = headcirc length gestage momage toxemia
+    / partial influence p r pcorr1 pcorr2;
+    ods output OutputStatistics = diag;
+run;</code></pre>
+</div>
+</div>
+<div id="r-implementation" class="section level2">
+<h2>R implementation</h2>
+<p>Here’s a summary of commonly used functions in R for model
+diagnostics and checking assumptions, particularly useful when working
+with linear models (<code>lm</code> objects). These functions help
+evaluate model fit, detect heteroscedasticity, multicollinearity, and
+autocorrelation, and identify high leverage or influential points.</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="66%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Title</th>
+<th>Function</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Predicted Values</strong></td>
+<td><code>fitted(bank.lm)</code></td>
+</tr>
+<tr class="even">
+<td><strong>Model Coefficients</strong></td>
+<td><code>coef(bank.lm)</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Residual Sum of Squares</strong></td>
+<td><code>deviance(bank.lm)</code></td>
+</tr>
+<tr class="even">
+<td><strong>Residuals</strong></td>
+<td><code>residuals(bank.lm)</code></td>
+</tr>
+<tr class="odd">
+<td><strong>ANOVA Table</strong></td>
+<td><code>anova(bank.lm)</code></td>
+</tr>
+<tr class="even">
+<td><strong>Confidence Interval</strong></td>
+<td><code>confint(bank.lm, level = 0.95)</code></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>Heteroscedasticity Test</strong></td>
+<td><code>library(car)</code> then <code>ncvTest(bank.lm)</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Multicollinearity Check (VIF &gt; 10)</strong></td>
+<td><code>vif(bank.lm)</code></td>
+</tr>
+<tr class="even">
+<td><strong>Autocorrelation Test</strong></td>
+<td><code>durbinWatsonTest(bank.lm)</code></td>
+</tr>
+<tr class="odd">
+<td><strong>High Leverage Points (greater than 2–3 times
+mean)</strong></td>
+<td><code>hatvalues(bank.lm)</code></td>
+</tr>
+<tr class="even">
+<td><strong>Influential Points</strong></td>
+<td><code>cooks.distance(bank.lm)</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Outliers, High Leverage, and Influential
+Points</strong></td>
+<td><code>influence.measures(bank.lm)</code></td>
+</tr>
+<tr class="even">
+<td><strong>Influence Plot</strong></td>
+<td><code>influencePlot(bank.lm)</code></td>
+</tr>
+</tbody>
+</table>
+<p>These functions can be run on an <code>lm</code> model object (e.g.,
+<code>bank.lm</code>) to examine various diagnostic aspects and validate
+model assumptions.</p>
+</div>
+<div id="model-selection" class="section level2">
+<h2>Model Selection</h2>
+<p>Here’s an overview of three popular model selection methods in
+regression analysis: forward stepwise selection, backward stepwise
+regression, and best subset regression. Each approach can be used to
+choose the most appropriate predictors in a model.</p>
+<div id="forward-stepwise-selection" class="section level3">
+<h3>1. Forward Stepwise Selection</h3>
+<p>Forward stepwise selection starts with a model that has no features
+and adds one feature at a time. At each step, the feature that most
+reduces the residual sum of squares (RSS) is added, aiming to improve
+the model’s R-squared. However, adding a feature does not always improve
+model fit and interpretability.</p>
+<p><strong>Example Code in SAS:</strong></p>
+<pre class="sas"><code>title2 &#39;Forward stepwise selection&#39;;
+proc reg;
+    model birthwt = headcirc length gestage momage toxemia / selection=f;
+run;</code></pre>
+</div>
+<div id="backward-stepwise-regression" class="section level3">
+<h3>2. Backward Stepwise Regression</h3>
+<p>Backward stepwise regression begins with a model that includes all
+features, then removes the least significant feature one by one. A mixed
+approach can combine forward and backward selection to refine the model
+further, adding features initially and then removing those that no
+longer contribute to the model fit.</p>
+<p><strong>Example Code in SAS:</strong></p>
+<pre class="sas"><code>proc reg;
+    model birthwt = headcirc length gestage momage toxemia / selection=b;
+run;</code></pre>
+</div>
+<div id="best-subset-regression" class="section level3">
+<h3>3. Best Subset Regression</h3>
+<p>Best subset regression fits all possible models and allows the
+analyst to choose the best one based on criteria such as adjusted
+R-squared, Mallow’s <span class="math inline">\(C_p\)</span>, and
+Bayesian Information Criterion (BIC). This method becomes
+computationally intensive as the number of predictors increases, making
+it less practical for very large datasets.</p>
+<p><strong>Example Code in SAS:</strong></p>
+<pre class="sas"><code>title2 &#39;Selecting the best of all possible regression models&#39;;
+proc reg;
+    model birthwt = headcirc length gestage momage toxemia / selection=cp adjrsq r best=5;
+run;</code></pre>
+<p>The <code>/ selection = cp adjrsq r</code> option directs SAS to use
+Mallow’s <span class="math inline">\(C_p\)</span> criterion to rank
+models, displaying both adjusted and unadjusted R-squared statistics.
+<code>best=5</code> specifies that SAS should display the top 5
+models.</p>
+<p><strong>Example Code in R:</strong></p>
+<pre class="r"><code># Load necessary libraries
+library(leaps) 
+library(alr3)
+
+# Load data
+data(water)
+socal.water &lt;- water[ ,-1]  # Remove the first column if not needed
+
+# Fit the full model
+fit &lt;- lm(BSAAM ~ ., data = socal.water)
+summary(fit)
+
+# Perform best subset regression
+sub.fit &lt;- regsubsets(BSAAM ~ ., data = socal.water)
+best.summary &lt;- summary(sub.fit)
+print(best.summary)
+
+# Identifying models with minimum or maximum values
+which.min(best.summary$rss)   # Minimum RSS
+which.min(best.summary$bic)   # Minimum BIC
+which.max(best.summary$adjr2) # Maximum Adjusted R-squared
+
+# Plot model evaluation
+par(mfrow = c(1, 2))
+plot(best.summary$cp, xlab = &quot;Number of features&quot;, ylab = &quot;Cp&quot;)
+plot(sub.fit, scale = &quot;Cp&quot;)</code></pre>
+<p>This R code performs best subset regression on the <code>water</code>
+dataset. The <code>regsubsets()</code> function from the
+<code>leaps</code> package evaluates all possible subsets, and the
+<code>summary()</code> provides metrics like RSS, BIC, and adjusted
+R-squared, which you can use to choose the best model. The
+<code>which.min()</code> and <code>which.max()</code> functions help
+identify the subset with the best criterion value.</p>
+</div>
+<div id="k-fold-cross-validation" class="section level3">
+<h3>k-Fold Cross-Validation</h3>
+<p><strong>Background:</strong><br />
+Professor Tappi from Wright State University highlights the importance
+of testing regression models rigorously for predicting future
+observations. When a model is trained and tested on the same dataset, it
+can lead to overly optimistic conclusions about the model’s predictive
+performance, as it may not generalize well to new data. For a more
+unbiased assessment of prediction accuracy, a common approach is to hold
+back one observation, fit the model on the remaining data, and then use
+the held-out observation to test the prediction. This leave-one-out
+method reduces bias in evaluating model performance.</p>
+<p><strong>Purpose of k-Fold Cross-Validation:</strong></p>
+<p>While splitting the data into training and test sets (e.g., 80/20
+split) might provide an initial performance estimate, it doesn’t
+guarantee consistent results on other subsets. <strong>k-Fold
+Cross-Validation</strong> provides a more robust test by building
+multiple models on different portions of the data, ensuring the model’s
+performance is not overly dependent on one specific train-test
+split.</p>
+<p><strong>Procedure for k-Fold Cross-Validation:</strong></p>
+<ol style="list-style-type: decimal">
+<li>Divide the data into <strong>k</strong> mutually exclusive, random
+portions.</li>
+<li>Use each portion as a test set while training the model on the
+remaining <strong>k-1</strong> portions.</li>
+<li>Calculate the mean squared error (MSE) for each fold.</li>
+<li>Average the MSEs across all <strong>k</strong> folds to obtain a
+cross-validated error estimate.</li>
+</ol>
+<p>This cross-validated error estimate can then be used to compare
+models and helps determine which model generalizes best to new data.</p>
+</div>
+<div id="practical-difficulties-using-ols" class="section level3">
+<h3>Practical Difficulties Using OLS</h3>
+<p>When using Ordinary Least Squares (OLS) regression, several practical
+challenges can limit the reliability and interpretability of the
+results:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Nonrandom Samples</strong></p>
+<p>The way data is collected directly affects the conclusions that can
+be drawn. Hypothesis testing assumes that the data is a simple random
+sample from a larger population. This sample should ideally be large
+enough to represent the population accurately but still small in
+proportion to the overall population size. However, if the sample is not
+random, statistical inference can become unreliable. For non-random
+samples, descriptive statistics may still be useful, but applying
+inferential techniques might yield misleading results, and conclusions
+drawn from such data are inherently less reliable.</p></li>
+<li><p><strong>Choice and Range of Predictors</strong></p>
+<p>If significant predictors are omitted from the model, the model’s
+predictions can be poor, and it may misrepresent relationships between
+predictors and the response. The range and conditions of data collection
+can limit predictive effectiveness, and extrapolating beyond the
+observed range of data can be dangerous.</p></li>
+<li><p><strong>Model Misspecification</strong></p>
+<p>OLS relies on assumptions about the structure of both the systematic
+and random components of the model. For example, it assumes that errors
+follow a normal distribution: <span class="math inline">\(\varepsilon
+\sim \mathrm{N}(0, \sigma^2 I)\)</span>. If this assumption is
+incorrect, or if the assumed linear structure <span
+class="math inline">\(E(y) = X\beta\)</span> does not adequately
+represent the data, then the model’s reliability and accuracy may
+suffer.</p></li>
+<li><p><strong>Practical vs. Statistical Significance</strong></p>
+<p>Statistical significance does not always imply practical importance.
+Larger sample sizes tend to produce smaller p-values, so it’s essential
+not to equate statistical significance with the real-world importance of
+predictor effects. For large datasets, statistically significant results
+are easier to obtain, even if the actual effect is minor or
+inconsequential. Confidence intervals (CIs) for parameter estimates
+provide a better way to assess the size of an effect. CIs remain useful
+even when we fail to reject the null hypothesis, as they indicate the
+range of plausible values and the precision of estimates, offering
+insight into the real effect’s potential magnitude.</p></li>
+</ol>
+<p>Moreover, models are typically approximations of reality, making the
+exact interpretation of parameters open to question. As the amount of
+data increases, the power of tests grows, potentially detecting even
+trivial differences. Therefore, if we fail to reject the null
+hypothesis, it may simply indicate insufficient data rather than a lack
+of meaningful results, underscoring the importance of focusing on CIs
+rather than just hypothesis testing.</p>
+<p>Here’s the modified code with a different dataset,
+<code>mtcars</code>, to demonstrate collinearity diagnostics.</p>
+<pre class="r"><code># Load the mtcars dataset
+data(mtcars)
+
+# Fit a linear model
+g &lt;- lm(mpg ~ ., data = mtcars)
+summary(g)
+
+# Check the correlation matrix
+round(cor(mtcars), 3)
+
+# Check the eigendecomposition of X^T X
+x &lt;- model.matrix(g)[, -1]  # Remove intercept
+e &lt;- eigen(t(x) %*% x)
+e$values  # Eigenvalues
+
+# Condition numbers (ratio of largest eigenvalue to each eigenvalue)
+sqrt(e$values[1] / e$values)
+
+# Check the variance inflation factors (VIFs)
+# For the first predictor
+r_squared &lt;- summary(lm(x[, 1] ~ x[, -1]))$r.squared
+1 / (1 - r_squared)  # Calculate VIF for the first predictor
+
+# VIF for all predictors
+library(car)
+vif(g)</code></pre>
+</div>
+<div id="basic-transformations-for-skewed-data" class="section level3">
+<h3>Basic Transformations for Skewed Data</h3>
+<p>Transformations can be applied to data to address skewness and better
+meet model assumptions, particularly when dealing with positively or
+negatively skewed distributions. Here are some commonly used
+transformations:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Square-Root Transformation</strong> (for moderate
+skew):</p>
+<ul>
+<li>For <strong>positively skewed</strong> data: <span
+class="math inline">\(\sqrt{x}\)</span></li>
+<li>For <strong>negatively skewed</strong> data: <span
+class="math inline">\(\sqrt{\text{max}(x + 1) - x}\)</span></li>
+</ul></li>
+<li><p><strong>Log Transformation</strong> (for greater skew):</p>
+<ul>
+<li>For <strong>positively skewed</strong> data: <span
+class="math inline">\(\log_{10}(x)\)</span></li>
+<li>For <strong>negatively skewed</strong> data: <span
+class="math inline">\(\log_{10}(\text{max}(x + 1) - x)\)</span></li>
+</ul>
+<p>The logarithmic transformation pulls in large values and spreads out
+smaller values, reducing the impact of outliers.</p></li>
+<li><p><strong>Inverse Transformation</strong> (for severe skew):</p>
+<ul>
+<li>For <strong>positively skewed</strong> data: <span
+class="math inline">\(\frac{1}{x}\)</span></li>
+<li>For <strong>negatively skewed</strong> data: <span
+class="math inline">\(\frac{1}{\text{max}(x + 1) - x}\)</span></li>
+</ul></li>
+</ol>
+</div>
+<div id="attention" class="section level3">
+<h3>Attention</h3>
+<p>When data does not meet the normality assumption, consider running
+statistical tests (e.g., t-tests or ANOVA) on both transformed and
+untransformed data to assess if there are significant differences in
+results. If both tests lead to the same conclusion, you may opt to avoid
+transformation and proceed with the original data for simplicity.</p>
+<p>Be aware that transformations can complicate analysis. For instance,
+after transforming data and running a t-test, the results indicate
+differences based on the transformed scale (e.g., log scale), making
+interpretation less straightforward. Therefore, transformations are
+usually avoided unless necessary for valid analysis.</p>
+<hr />
+</div>
+<div id="additional-approaches-for-skewed-data" class="section level3">
+<h3>Additional Approaches for Skewed Data</h3>
+<p>If the response variable <span class="math inline">\(y\)</span> is
+continuous, positive, and has a right-skewed histogram (long right
+tail), consider these modeling options:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Box-Cox Transformation</strong>: This technique identifies
+an optimal power transformation to stabilize variance and make the data
+more normally distributed.</li>
+<li><strong>Gamma Regression</strong>: A gamma distribution can model
+response variables with positive values and right skew, offering a more
+flexible alternative to transformations for highly skewed data.</li>
+</ol>
+</div>
+<div id="transforming-the-response-variable-y-for-normality"
+class="section level3">
+<h3>Transforming the Response Variable <span
+class="math inline">\(y\)</span> for Normality</h3>
+<p>To make the density of a right-skewed response variable <span
+class="math inline">\(y\)</span> more normal, we can apply a
+transformation based on a parameter <span
+class="math inline">\(\lambda\)</span>, which is optimized via maximum
+likelihood estimation.</p>
+<p>The transformation is given by: <span class="math display">\[
+\tilde{y} = \begin{cases}
+\frac{y^{\lambda} - 1}{\lambda}, &amp; \text{if } \lambda \neq 0 \\
+\ln y, &amp; \text{if } \lambda = 0
+\end{cases}
+\]</span></p>
+</div>
+<div id="choosing-the-optimal-value-of-lambda" class="section level3">
+<h3>Choosing the Optimal Value of <span
+class="math inline">\(\lambda\)</span></h3>
+<p>The best <span class="math inline">\(\lambda\)</span> is chosen by
+fitting a linear model on transformed <span
+class="math inline">\(y\)</span> values across discrete <span
+class="math inline">\(\lambda\)</span> values and selecting the <span
+class="math inline">\(\lambda\)</span> that maximizes the likelihood
+function. However, since real-world data may not follow an exact normal
+distribution, researchers often “round” <span
+class="math inline">\(\lambda\)</span> to produce interpretable
+transformations.</p>
+<p>The table below summarizes suggested transformations based on the
+range of optimal <span class="math inline">\(\lambda\)</span>:</p>
+<p>Here’s the table in Markdown format:</p>
+<table>
+<colgroup>
+<col width="22%" />
+<col width="18%" />
+<col width="38%" />
+<col width="20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Range for Optimal <span class="math inline">\(\lambda\)</span></th>
+<th>Recommended <span class="math inline">\(\lambda\)</span></th>
+<th>Transformed <span class="math inline">\(\tilde{y}\)</span></th>
+<th>Transformation Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>[-2.5, -1.5)</td>
+<td>-2</td>
+<td><span class="math inline">\(\frac{1}{2} \left( 1 - \frac{1}{y^2}
+\right)\)</span></td>
+<td>Inverse Square</td>
+</tr>
+<tr class="even">
+<td>[-1.5, -0.75)</td>
+<td>-1</td>
+<td><span class="math inline">\(1 - \frac{1}{y}\)</span></td>
+<td>Inverse (Reciprocal)</td>
+</tr>
+<tr class="odd">
+<td>[-0.75, -0.25)</td>
+<td>-0.5</td>
+<td><span class="math inline">\(2 \left( 1 - \frac{1}{\sqrt{y}}
+\right)\)</span></td>
+<td>Inverse Square Root</td>
+</tr>
+<tr class="even">
+<td>[-0.25, 0.25)</td>
+<td>0</td>
+<td><span class="math inline">\(\ln y\)</span></td>
+<td>Natural Logarithm</td>
+</tr>
+<tr class="odd">
+<td>[0.25, 0.75)</td>
+<td>0.5</td>
+<td><span class="math inline">\(2 (\sqrt{y} - 1)\)</span></td>
+<td>Square Root</td>
+</tr>
+<tr class="even">
+<td>[0.75, 1.5)</td>
+<td>1</td>
+<td><span class="math inline">\(y - 1\)</span></td>
+<td>Linear</td>
+</tr>
+<tr class="odd">
+<td>[1.5, 2.5]</td>
+<td>2</td>
+<td><span class="math inline">\(\frac{1}{2} (y^2 - 1)\)</span></td>
+<td>Square</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="fitted-model-for-transformed-response" class="section level3">
+<h3>Fitted Model for Transformed Response</h3>
+<p>The fitted model for the transformed response <span
+class="math inline">\(\tilde{y}\)</span> can be represented as: <span
+class="math display">\[
+\widehat{\mathbb{E}}(\tilde{y}) =
+\widehat{\mathbb{E}}\left(\frac{y^{\lambda} - 1}{\lambda}\right) =
+\widehat{\beta}_{0} + \widehat{\beta}_{1} x_{1} + \cdots +
+\widehat{\beta}_{k} x_{k}
+\]</span></p>
+</div>
+<div id="interpretation-of-estimated-regression-coefficients"
+class="section level3">
+<h3>Interpretation of Estimated Regression Coefficients</h3>
+<ul>
+<li>For a continuous predictor <span
+class="math inline">\(x_{1}\)</span>, the estimated coefficient <span
+class="math inline">\(\widehat{\beta}_{1}\)</span> represents the change
+in the mean of the transformed response <span
+class="math inline">\(\widehat{\mathbb{E}}(\tilde{y})\)</span> for a
+one-unit increase in <span class="math inline">\(x_{1}\)</span>,
+assuming other predictors remain constant.</li>
+<li>If <span class="math inline">\(x_{1}\)</span> is an indicator
+variable, <span class="math inline">\(\widehat{\beta}_{1}\)</span>
+represents the difference in the mean of the transformed response <span
+class="math inline">\(\widehat{\mathbb{E}}(\tilde{y})\)</span> between
+<span class="math inline">\(x_{1} = 1\)</span> and <span
+class="math inline">\(x_{1} = 0\)</span>, with other predictors
+unchanged.</li>
+</ul>
+</div>
+</div>
+<div id="scaling" class="section level1">
+<h1>Scaling</h1>
+<p>Changing the units of measurement can help improve interpretability
+but does not affect parameter estimates. When predictor variables are on
+similar scales, the numerical stability of estimates increases.</p>
+<p>A comprehensive approach to scaling is to use the
+<code>scale()</code> function, which standardizes all variables to have
+a mean of 0 and a variance of 1. This approach has the advantage of
+placing all predictors and responses on a comparable scale, making
+comparisons easier. It also avoids potential numerical issues that can
+arise when variables are on vastly different scales.</p>
+<p>However, the downside to this scaling approach is that the regression
+coefficients now represent the effect of a one-standard-unit increase in
+a predictor on the response variable in standard units, which may not
+always be easy to interpret.</p>
+<div id="simple-slopes-analysis" class="section level2">
+<h2>Simple Slopes Analysis</h2>
+<blockquote>
+<p>If an interaction term is significant, a simple slopes analysis is
+needed.</p>
+</blockquote>
+<p>Simple slopes analysis is used to interpret the interaction effects
+in a regression model. When an interaction term is included, the
+regression output shows the slope of the predictor when the moderator
+variable is at zero—often an arbitrary or theoretically irrelevant
+value. To better understand the nature of the interaction, simple slopes
+analysis examines how the effect of one predictor on the dependent
+variable varies at different levels of the moderator.</p>
+<p>Since the moderator is often continuous, we typically select three
+representative values to represent its low, average, and high levels:
+<span class="math display">\[
+M_{a} - SD_{a}, \quad M_{a}, \quad M_{a} + SD_{a}
+\]</span> where <span class="math inline">\(M_{a}\)</span> is the mean
+and <span class="math inline">\(SD_{a}\)</span> is the standard
+deviation of the moderator <span class="math inline">\(a\)</span>.</p>
+<p>For example, in the model: <span class="math display">\[
+y = b_{0} + b_{1}x + b_{2}a + b_{3}(x - M_{x})(a - M_{a}),
+\]</span> the regression output provides slopes for <span
+class="math inline">\(x\)</span> at the mean of <span
+class="math inline">\(a\)</span>. However, we cannot obtain statistical
+metrics (e.g., significance tests, confidence intervals) for slopes at
+different levels of <span class="math inline">\(a\)</span> directly from
+this output.</p>
+<div id="steps-for-simple-slopes-analysis" class="section level3">
+<h3>Steps for Simple Slopes Analysis</h3>
+<p>To calculate simple slopes at different levels of <span
+class="math inline">\(a\)</span>, we adjust the moderator <span
+class="math inline">\(a\)</span> by subtracting values (e.g., <span
+class="math inline">\(\Delta\)</span>) to generate three new interaction
+terms: <span class="math display">\[
+\text{int}&#39; = (x - M_{x}) \cdot (a - \Delta),
+\]</span> where each new interaction term corresponds to a different
+level of <span class="math inline">\(a\)</span>: 1.
+<strong>When</strong> <span class="math inline">\(\Delta =
+M_{a}\)</span>: The regression equation remains the same as the
+original, with <span class="math inline">\(B_{1} = b_{1}\)</span>. 2.
+<strong>When</strong> <span class="math inline">\(\Delta = M_{a} -
+SD_{a}\)</span>: <span class="math inline">\(B_{1} = b_{1} - b_{3} \cdot
+SD_{a}\)</span>. 3. <strong>When</strong> <span
+class="math inline">\(\Delta = M_{a} + SD_{a}\)</span>: <span
+class="math inline">\(B_{1} = b_{1} + b_{3} \cdot SD_{a}\)</span>.</p>
+<p>By running three regressions with these new interaction terms, we
+obtain the regression coefficients for <span
+class="math inline">\(x\)</span>, which represent the simple slopes at
+different levels of <span class="math inline">\(a\)</span>. The
+statistical indicators for <span class="math inline">\(B_{1}\)</span>
+(significance, confidence intervals, standardized coefficients, etc.)
+are provided in each regression output.</p>
+</div>
+<div id="automating-simple-slopes-analysis-with-sim_slopes"
+class="section level3">
+<h3>Automating Simple Slopes Analysis with <code>sim_slopes</code></h3>
+<p>The <code>sim_slopes</code> function automates this process by taking
+a regression model with an interaction term as input and performing
+simple slopes analysis, yielding statistical information for each slope
+at the specified levels of the moderator.</p>
+</div>
+<div
+id="plotting-interactions-with-continuous-predictors-in-regression-models"
+class="section level3">
+<h3>Plotting Interactions with Continuous Predictors in Regression
+Models</h3>
+<p>Here’s an example of how to plot interaction effects in regression
+models using the <code>interactions</code> package in R.</p>
+<div id="interactions-of-continuous-variables" class="section level4">
+<h4>Interactions of Continuous Variables</h4>
+<pre class="r"><code>library(jtools) # for summ()
+library(interactions) # for interact_plot()
+
+# Using the `state.x77` dataset
+states &lt;- as.data.frame(state.x77)
+fiti &lt;- lm(Income ~ Illiteracy * Murder + `HS Grad`, data = states)
+summ(fiti)
+
+# Basic interaction plot
+interact_plot(fiti, pred = Illiteracy, modx = Murder)
+
+# Customizing labels and colors
+interact_plot(fiti, pred = Illiteracy, modx = Murder,
+              x.label = &quot;Custom X Label&quot;, y.label = &quot;Custom Y Label&quot;,
+              main.title = &quot;Sample Plot&quot;, legend.main = &quot;Custom Legend Title&quot;,
+              colors = &quot;seagreen&quot;)</code></pre>
+</div>
+<div id="interactions-involving-factors" class="section level4">
+<h4>Interactions Involving Factors</h4>
+<pre class="r"><code># Using the `iris` dataset
+fitiris &lt;- lm(Petal.Length ~ Petal.Width * Species, data = iris)
+interact_plot(fitiris, pred = Petal.Width, modx = Species)
+
+# Plot only specific levels of a factor
+interact_plot(fitiris, pred = Petal.Width, modx = Species,
+              modx.values = c(&quot;versicolor&quot;, &quot;virginica&quot;))</code></pre>
+</div>
+<div id="adding-observed-data-points-to-interaction-plots"
+class="section level4">
+<h4>Adding Observed Data Points to Interaction Plots</h4>
+<pre class="r"><code># Continuous interaction with observed points
+interact_plot(fiti, pred = Illiteracy, modx = Murder, plot.points = TRUE)
+
+# Categorical interaction with observed points and jitter
+interact_plot(fitiris, pred = Petal.Width, modx = Species,
+              plot.points = TRUE, jitter = 0.1, point.shape = TRUE)</code></pre>
+</div>
+<div id="confidence-bands" class="section level4">
+<h4>Confidence Bands</h4>
+<pre class="r"><code># Adding confidence intervals with robust standard errors
+interact_plot(fiti, pred = Illiteracy, modx = Murder, interval = TRUE, int.width = 0.8)</code></pre>
+</div>
+</div>
+<div id="checking-linearity-assumption" class="section level3">
+<h3>Checking Linearity Assumption</h3>
+<p>Testing the linearity assumption ensures that the relationship
+between the predictor and response variables is linear for different
+levels of the moderator. If the relationship is nonlinear, the
+interaction plot will show a “bend.”</p>
+<pre class="r"><code># Generate synthetic data to illustrate linearity check
+set.seed(99)
+x &lt;- rnorm(n = 200, mean = 3, sd = 1)
+err &lt;- rnorm(n = 200, mean = 0, sd = 4)
+w &lt;- rbinom(n = 200, size = 1, prob = 0.5)
+
+# Example where linearity assumption is satisfied
+y_1 &lt;- 5 - 4*x - 9*w + 3*w*x + err
+model_1 &lt;- lm(y_1 ~ x * w)
+summ(model_1)
+interact_plot(model_1, pred = x, modx = w, linearity.check = TRUE, plot.points = TRUE)
+
+# Example where linearity assumption is violated
+x_2 &lt;- runif(n = 200, min = -3, max = 3)
+y_2 &lt;- 2.5 - x_2^2 - 5*w + 2*w*(x_2^2) + err
+data_2 &lt;- as.data.frame(cbind(x_2, y_2, w))
+
+model_2 &lt;- lm(y_2 ~ x_2 * w, data = data_2)
+summ(model_2)
+interact_plot(model_2, pred = x_2, modx = w, linearity.check = TRUE, plot.points = TRUE)
+
+# Polynomial fitting for non-linearity
+model_3 &lt;- lm(y_2 ~ poly(x_2, 2) * w, data = data_2)
+summ(model_3)
+interact_plot(model_3, pred = x_2, modx = w, data = data_2, linearity.check = TRUE, plot.points = TRUE)</code></pre>
+<p>These examples illustrate various ways to use
+<code>interact_plot</code> for visualizing interaction effects, adding
+data points, adjusting labels, and checking the linearity
+assumption.</p>
+</div>
+</div>
+<div id="collinearity" class="section level2">
+<h2>Collinearity</h2>
+<p>When some predictors are linear combinations of others, the matrix
+<span class="math inline">\(X^{T} X\)</span> becomes singular, leading
+to exact collinearity. In this case, there is no unique least squares
+estimate of <span class="math inline">\(\beta\)</span>. If <span
+class="math inline">\(X^{T} X\)</span> is nearly singular, this results
+in collinearity (often called multicollinearity), which can cause
+serious issues with estimating <span
+class="math inline">\(\beta\)</span>, interpreting the model, and
+assessing associated quantities.</p>
+<div id="detecting-collinearity" class="section level3">
+<h3>Detecting Collinearity</h3>
+<p>There are several ways to detect collinearity:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Correlation Matrix</strong>: Examining the correlation
+matrix of predictors can reveal high pairwise correlations, which may
+indicate multicollinearity.</p></li>
+<li><p><strong>Regression of Each Predictor</strong>: Regress each
+predictor <span class="math inline">\(x_i\)</span> on all other
+predictors and compute <span class="math inline">\(R_i^2\)</span>.
+Repeat for all predictors. An <span class="math inline">\(R_i^2\)</span>
+close to 1 suggests issues, as it indicates a strong linear relationship
+with other predictors.</p></li>
+<li><p><strong>Eigenvalues of <span class="math inline">\(X^{T}
+X\)</span></strong>: Compute the eigenvalues of <span
+class="math inline">\(X^{T} X\)</span>, where <span
+class="math inline">\(\lambda_1\)</span> is the largest eigenvalue and
+others decrease. Small eigenvalues signal potential collinearity
+problems.</p></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="problems-with-the-error" class="section level1">
+<h1>Problems with the Error</h1>
+<p>The standard assumptions for the error term <span
+class="math inline">\(\varepsilon\)</span> are that it is independent
+and identically distributed (i.i.d.) with variance <span
+class="math inline">\(\sigma^2 I\)</span> and that it follows a normal
+distribution for standard statistical inference. However, these
+assumptions are often violated, so we need alternative approaches:</p>
+<ul>
+<li><strong>Generalized Least Squares (GLS)</strong>: Used when errors
+are not i.i.d.</li>
+<li><strong>Weighted Least Squares (WLS)</strong>: A special case of GLS
+for independent errors with unequal variances.</li>
+<li><strong>Robust Regression</strong>: Used when errors are not
+normally distributed.</li>
+</ul>
+<div id="generalized-least-squares-gls" class="section level2">
+<h2>Generalized Least Squares (GLS)</h2>
+<p>When <span class="math inline">\(\operatorname{var}(\varepsilon) =
+\sigma^2 \Sigma\)</span> and <span class="math inline">\(\Sigma\)</span>
+is known (up to a proportionality constant), we can use GLS. We write
+<span class="math inline">\(\Sigma = S S^T\)</span> (using Cholesky
+decomposition) to transform the model as follows:</p>
+<p><span class="math display">\[
+y = X \beta + \varepsilon \implies S^{-1} y = S^{-1} X \beta + S^{-1}
+\varepsilon
+\]</span> Letting <span class="math inline">\(y&#39; = S^{-1} y\)</span>
+and <span class="math inline">\(X&#39; = S^{-1} X\)</span>, the variance
+of <span class="math inline">\(\varepsilon&#39; = S^{-1}
+\varepsilon\)</span> becomes <span class="math inline">\(\sigma^2
+I\)</span>, allowing us to treat the model as if it were i.i.d. in the
+transformed form: <span class="math display">\[
+\text{Minimize: } (y - X \beta)^T \Sigma^{-1} (y - X \beta)
+\]</span> The GLS estimator of <span
+class="math inline">\(\beta\)</span> is then: <span
+class="math display">\[
+\hat{\beta} = (X^T \Sigma^{-1} X)^{-1} X^T \Sigma^{-1} y
+\]</span> We can apply diagnostics to <span class="math inline">\(S^{-1}
+\hat{\varepsilon}\)</span> to check for i.i.d. properties in the
+transformed residuals.</p>
+<p><strong>Example in R with <code>nlme</code> package:</strong></p>
+<pre class="r"><code>library(nlme)
+fm1 &lt;- gls(follicles ~ sin(2 * pi * Time) + cos(2 * pi * Time), data = Ovary,
+           correlation = corAR1(form = ~ 1 | Mare))
+summary(fm1)
+
+# Check confidence intervals
+intervals(fm1)</code></pre>
+</div>
+<div id="weighted-least-squares-wls" class="section level2">
+<h2>Weighted Least Squares (WLS)</h2>
+<p>When errors are uncorrelated but have unequal variances (diagonal
+<span class="math inline">\(\Sigma\)</span>), WLS can be used. We set
+<span class="math inline">\(\Sigma = \operatorname{diag}(1/w_1, \dots,
+1/w_n)\)</span> where <span class="math inline">\(w_i\)</span> are
+weights inversely proportional to the variance of each observation. In
+this case, cases with lower variability should receive higher
+weights.</p>
+<div id="model-formulation" class="section level3">
+<h3>Model Formulation</h3>
+<p><span class="math display">\[
+y = X \beta + \varepsilon
+\]</span> where the assumptions are: 1. <span
+class="math inline">\(E(\varepsilon) = 0\)</span> 2. <span
+class="math inline">\(\operatorname{Cov}(\varepsilon) = \sigma^2
+W\)</span>, where <span class="math inline">\(W\)</span> is a known
+positive definite matrix. 3. <span class="math inline">\(X\)</span> has
+full column rank. 4. <span class="math inline">\(\varepsilon \sim N(0,
+\sigma^2 W)\)</span>.</p>
+<p>In <code>lm()</code> in R, WLS is implemented with the
+<code>weights</code> argument.</p>
+</div>
+</div>
+<div id="robust-regression" class="section level2">
+<h2>Robust Regression</h2>
+<p>Robust regression is an alternative when errors are non-normal,
+especially with long-tailed distributions.</p>
+<ol style="list-style-type: decimal">
+<li>Robust estimators protect against long-tailed errors but cannot
+address model specification or variance structure issues.</li>
+<li>Robust estimation provides <span
+class="math inline">\(\hat{\beta}\)</span> with possible standard errors
+but without the usual inferential methods.</li>
+<li>Robust methods can be used alongside least squares as a check. Large
+differences between the two estimates suggest potential issues that
+should be investigated further.</li>
+</ol>
+</div>
+</div>
+<div id="shrinkage-methods" class="section level1">
+<h1>Shrinkage Methods</h1>
+<p>Shrinkage methods reduce the complexity of a model by applying
+penalties to reduce coefficient values, addressing issues like
+multicollinearity and overfitting. Here are three commonly used
+methods:</p>
+<div id="principal-component-analysis-pca" class="section level2">
+<h2>1. Principal Component Analysis (PCA)</h2>
+<p>Principal Component Analysis (PCA) reduces the dimensionality of data
+by finding a set of uncorrelated principal components. These components
+are linear combinations of the original variables that capture the
+maximum variance in the data. PCA is often used as a preprocessing step
+in regression, where a subset of principal components is selected as
+predictors in place of the original variables.</p>
+</div>
+<div id="partial-least-squares-pls" class="section level2">
+<h2>2. Partial Least Squares (PLS)</h2>
+<p>Partial Least Squares (PLS) is used to relate a set of input
+variables <span class="math inline">\(X_1, \dots, X_m\)</span> to one or
+more response variables <span class="math inline">\(Y_1, \dots,
+Y_k\)</span>. Like PCA, PLS creates linear combinations of predictors.
+However, unlike PCA, which doesn’t consider the response variable, PLS
+selects components that maximize the ability to predict <span
+class="math inline">\(Y\)</span> directly.</p>
+<p>In univariate PLS (for a single response variable <span
+class="math inline">\(Y\)</span>), the predicted response is: <span
+class="math display">\[
+\hat{y} = \beta_{1} T_{1} + \cdots + \beta_{p} T_{p}
+\]</span> where <span class="math inline">\(T_1, \dots, T_p\)</span> are
+the components derived to maximize correlation with <span
+class="math inline">\(Y\)</span>.</p>
+</div>
+<div id="ridge-regression" class="section level2">
+<h2>3. Ridge Regression</h2>
+<p>Ridge Regression addresses multicollinearity by adding a penalty to
+the least squares objective function. It minimizes: <span
+class="math display">\[
+\hat{\beta} = \left(X^{T} X + \lambda I\right)^{-1} X^{T} y
+\]</span> where <span class="math inline">\(\lambda\)</span> is a tuning
+parameter. When <span class="math inline">\(\lambda = 0\)</span>, ridge
+regression is equivalent to ordinary least squares. As <span
+class="math inline">\(\lambda\)</span> increases, the estimated
+coefficients shrink toward zero, reducing variance.</p>
+<div id="bias-variance-trade-off-in-ridge-regression"
+class="section level3">
+<h3>Bias-Variance Trade-off in Ridge Regression</h3>
+<p>Ridge regression introduces bias to reduce variance, leading to a
+trade-off between bias and variance. The mean square error (MSE) of an
+estimate <span class="math inline">\(\hat{\beta}\)</span> can be
+decomposed as: <span class="math display">\[
+E(\hat{\beta} - \beta)^2 = (E(\hat{\beta} - \beta))^2 + E(\hat{\beta} -
+E\hat{\beta})^2
+\]</span> where the MSE is the sum of the squared bias and variance.
+Increasing bias can decrease variance, and if this reduces the overall
+MSE, it may be preferable. Ridge regression leverages this trade-off by
+introducing a bias to achieve a lower variance.</p>
+<p>Frank and Friedman (1993) compared PCR, PLS, and ridge regression,
+finding that ridge regression performed best in their study. However,
+the effectiveness of each method varies with the data, making it hard to
+identify a universally superior technique.</p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

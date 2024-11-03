@@ -1,0 +1,457 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Factor Analysis Project
+author: "Zehui Bai"
+date: '`r format(Sys.time())`'
+output:
+  html_document:
+    df_print: paged
+    number_sections: yes
+    toc: yes
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    theme: flatly # <!-- https://bootswatch.com/3/  -->
+    highlight: tango
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                    1. load the required packages                       -->
+# <!-- ---------------------------------------------------------------------- --> 
+
+## if(!require(psych)){install.packages("psych")}
+
+packages<-c("tidyverse", "kableExtra", 
+            "gtsummary","inTextSummaryTable",
+            "Hmisc","htmltools","clinUtils")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                        2. Basic system settings                        -->
+# <!-- ---------------------------------------------------------------------- -->
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+
+
+## Open the folder
+open_folder <-function(dir){
+	if (.Platform['OS.type'] == "windows"){
+	shell.exec(dir)  
+	} else {
+	system(paste(Sys.getenv("R_BROWSER"), dir))
+  }
+}
+open_folder(getwd())
+
+## convert backslash to forward slash in R
+# gsub('"', "", gsub("\\\\", "/", readClipboard()))
+
+### get the path
+# rstudioapi::getSourceEditorContext()$path
+# dirname(rstudioapi::getSourceEditorContext()$path)
+
+### set working directory
+# getwd()
+# setwd("c:/Users/zbai/Desktop")
+# Sys.setlocale("LC_ALL","English")
+
+### get the R Version
+# paste(R.Version()[c("major", "minor")], collapse = ".")
+
+### convert backslash to forward slash 
+# scan("clipboard",what="string")
+# gsub('"', "", gsub("\\\\", "/", readClipboard())) 
+
+## Load all r functions
+## The directory where all source code files are saved.
+source_code_dir <- "C:/Users/baiz/Downloads/Data-Analyst-with-R/00 R Function/ZB Function/"  
+file_path_vec <- list.files(source_code_dir, full.names = T)
+for(f_path in file_path_vec){source(f_path)}
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                         3. Import the datasets                         -->
+# <!-- ---------------------------------------------------------------------- -->
+
+scores <- read.table("https://raw.githubusercontent.com/sunbeomk/PSYC490/main/scores.txt")
+scores_CFA <- scores
+
+# <!-- ---------------------------- -->
+# <!-- --3.1 Import csv data ------ -->
+# <!-- ---------------------------- -->
+
+# pfad <- "~/Desktop/SASUniversityEdition/myfolders/Daten"
+# mydata1 <- read.csv(file.path(pfad, "yourcsv_data.csv"), 
+#                     sep=";", 
+#                     header=TRUE)   
+
+## Import all csv data from folder
+# list_csv_files <- list.files(path = "./csvfolder/")
+# do.call(rbind, lapply(list_csv_files, function(x) read.csv(x, stringsAsFactors = FALSE)))
+
+# <!-- ---------------------------- -->
+# <!-- --3.2 Import xlsx data ----- -->
+# <!-- ---------------------------- -->
+
+# library(readxl)
+# mydata2 <- read_excel("C:/Users/zbai/Documents/GitHub/R-Projects/SAS/Yimeng/results-text.xlsx")
+
+# <!-- ---------------------------- -->
+# <!-- --3.3 Import sas7dbat data - -->
+# <!-- ---------------------------- -->
+
+# library(sas7bdat)
+# mydata3 <- read.sas7bdat("~/Desktop/SASUniversityEdition/myfolders/Daten/uis.sas7bdat")
+
+## Import all sas7dbat data from SASfolder
+# ZB.import.sas.folder("./SASfolder/")
+
+# <!-- ---------------------------- -->
+# <!-- --3.4 Import from copyboard --->
+# <!-- ---------------------------- -->
+# copdat <- read.delim("clipboard")
+# Data_D01 <- copdat
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                           4. Some Tools                                -->
+# <!-- ---------------------------------------------------------------------- -->
+
+## To check out vignettes for one specific package
+# browseVignettes("sjPlot")      ## sjPlot for Models Summary
+# browseVignettes("gtsummary")
+
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                           5. Citation                                -->
+# <!-- ---------------------------------------------------------------------- -->
+# citation("gtsummary")
+# <!-- ---------------------------------------------------------------------- -->
+```
+
+
+<!-- ----------------------------------------- -->
+<!-- -----------Mind Map of ToC--------------- -->
+<!-- ----------------------------------------- -->
+
+
+```{r mind map,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+library(mindr)
+input <- rstudioapi::getSourceEditorContext()$path 
+input_txt <- readLines(input, encoding = "UTF-8")
+## Widget Output
+mm_output <- mm(input_txt, 
+                output_type = c("widget"),
+                root = "")
+mm_output$widget
+```
+
+
+<!-- ----------------------------------------- -->
+<!-- --------------CSS Define----------------- -->
+<!-- ----------------------------------------- -->
+<style>
+.bold-list-257f96 + ol {
+    font-weight: 900;
+    color: #257f96;
+}
+.bold-list-ff9900 + ol {
+    font-weight: 900;
+    color: #ff9900;
+}
+</style>
+<!-- ----------------------------------------- -->
+
+# Introduction
+
+Factor analysis (FA) assumes that there are a number of underlying (latent) factors affecting the observed scores on items/tests. In other words, the traits underlying a test might be multidimensional.
+
+When a new measure is established, researchers often make assumptions about the traits that each item/subtest would measure. If the items are indeed loading on different factors in the same way as proposed, the test is said to have high factorial validity.
+
+Factor analysis can be divided into two types:
+
+* **Exploratory factor analysis (EFA)**: method to explore the underlying structure of a set of observed variables, and is a crucial step in the scale development process. For example, how many factors are needed to sufficiently explain the observed score variance? Which is the relationship between each item and factor?
+* **Confirmatory factor analysis (CFA)**: method to verify a hypothesized factor structure. In CFA, theory specifies which factor(s) an item should load on. Other entries are restricted to 0. You want to see if the hypothesized model fits the data well.
+
+
+## Types of Factoring Methods
+
+* **Principal Component Analysis (PCA)**: Extracts maximum variance as the first factor, then continues sequentially for subsequent factors.
+* **Common Factor Analysis**: Focuses on extracting common variance, excluding unique variances. Used in structural equation modeling (SEM).
+* **Image Factoring**: Based on the correlation matrix and uses OLS regression to predict factors.
+* **Maximum Likelihood Method**: Uses the maximum likelihood approach based on the correlation matrix.
+* **Other Methods**: Includes Alfa factoring and weight square methods, which are regression-based.
+
+
+**Factor Loading**: Represents the correlation between variables and factors, indicating how much variance in the variable is explained by the factor. A factor loading of 0.7 or higher is generally considered sufficient.
+
+**Eigenvalues**: Indicate the variance explained by a factor out of the total variance. A common rule is to consider factors with eigenvalues greater than one.
+
+**Factor Score**: A score for each observation that can be used in further analysis, assuming all variables will behave as these scores.
+
+**Criteria for determining the number of factors**: According to the Kaiser Criterion, Eigenvalues is a good criteria for determining a factor.  If Eigenvalues is greater than one, we should consider that a factor and if Eigenvalues is less than one, then we should not consider that a factor.  According to the variance extraction rule, it should be more than 0.7.  If variance is less than 0.7, then we should not consider that a factor.
+
+## Assumptions
+
+* **No outlier**: Assume that there are no outliers in data.
+* **Adequate sample size**: The case must be greater than the factor.
+* **No perfect multicollinearity**: Factor analysis is an interdependency technique.  There should not be perfect multicollinearity between the variables.
+* **Homoscedasticity**: Since factor analysis is a linear function of measured variables, it does not require homoscedasticity between the variables.
+* **Linearity**: Factor analysis is also based on linearity assumption.  Non-linear variables can also be used.  After transfer, however, it changes into linear variable.
+* **Interval Data**: Interval data are assumed.
+
+
+# Exploratory Factor Analysis (EFA)
+ 
+Assumes that any indicator or variable may be associated with any factor.  This is the most common factor analysis used by researchers and it is not based on any prior theory.
+
+
+## R base Implementation
+
+1. If 2 items/tests have high observed-score correlations, they might be related to (or loading on) some common factor. To get a general idea about the correlation between items/subtests, we can use the cor function in R to obtain a correlation matrix. 
+    + *The correlation matrix suggests that: tests 1, 2, 4, 6 are highly correlated, and  tests 3, 5, 7, 8 are also highly correlated.  The test correlations across these two groups are almost all zero.  This suggests that there may be 2 underlying factors, tests 1, 2, 4, 6 may load on one, and tests 3, 5, 7, 8  may load on the other.*
+2. EFA with 1 factor using the scores data. Here you assume there is only one underlying factor.
+    + *Loadings: You can see that some loadings are blank. In fact, loadings smaller than .1 in absolute value are omitted (so that a sparse structure is displayed more clearly). Tests 3,5,7,8 are the only ones with nontrivial loadings on the single factor.*
+    + *Looking at Proportion Var: About 40.2% variance in the data is explained by this single factor model.*
+3. EFA with 2 factors
+    + *With 2 factors, the proportion of explained variance (Cumulative var) increased to 78.9%.*
+4. EFA with Covariance Matrix
+    + *If the complete response data is not available, and we only have the covariance or correlation matrix containing the covariance/correlations between the indicators, we can still conduct factor analysis with this as the input.*
+5. Factor scores
+    + *The individual indicator/subtest scores would be the weighted sum of the factor scores, where the weights are the determined by factor loadings.*
+6. Rotational Indeterminacy
+    + *There exist infinitely many possible solutions to the EFA. This is called rotational indeterminacy. We can rotate the factors, so that the loadings will be as close as possible to a desired structure.*
+    + *There are two types of rotation methods:*
+        + **Orthogonal**: The underlying factors after rotation will be uncorrelated.
+        + **Oblique**: The underlying factors after rotation can be correlated.
+    
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+## Load Dataset
+head(scores) %>%
+  kable(caption = "Check Data Structure", format = "html") %>%
+  kable_styling(latex_options = "striped")
+  
+## Check Correlation
+cor_subtests <- cor(scores)
+round(cor_subtests, 2) %>%
+  kable(caption = "Check Data Correlation", format = "html") %>%
+  kable_styling(latex_options = "striped")
+
+library("corrplot")
+corrplot(cor_subtests, method = "circle", type = "upper", order = "hclust",
+         tl.col = "black", tl.srt = 45, addCoef.col = "black")
+
+## Single Factor Analysis
+efa_1 <- factanal(x = scores, factors = 1)
+loadings <- efa_1$loadings # Factor loadings
+loadings
+as.numeric(loadings)
+sum(loadings^2) # SS Loadings
+sum(loadings^2) / ncol(scores) # Proportion Var
+
+## EFA with 2 factors
+factanal(x = scores, factors = 2)
+
+## EFA with Covariance Matrix
+cov_mat <- cov(scores)
+round(cov_mat, 2) %>%
+  kable(caption = "Covariance Matrix", format = "html") %>%
+  kable_styling(latex_options = "striped")
+
+## Visualize the Covariance Matrix
+library("reshape2")
+cov_long <- melt(cov_mat)
+ggplot(cov_long, aes(x=Var1, y=Var2, fill=value)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Covariance Matrix", x = "", y = "")
+
+## covmat = to notify that the input data is a covariance matrix.
+## n.obs = which is the sample size you used for computing the covariance matrix
+factanal(covmat = cov_mat, 
+         factors = 2, 
+         n.obs = nrow(scores))
+
+## Factor scores
+## The individual indicator/subtest scores would be the weighted sum of the factor scores, where the weights are the determined by factor loadings.
+output <- factanal(x = scores, 
+                   factors = 2, 
+                   scores = "regression")
+head(output$scores)
+
+## Rotational Indeterminacy (varimax-Orthogonal rotation)
+varimax <- factanal(scores, 
+                    factors = 2, 
+                    rotation="varimax", 
+                    scores="regression")
+cor(varimax$scores)
+## Rotational Indeterminacy (varimax-oblique rotation)
+promax <- factanal(scores, 
+                   factors = 2, 
+                   rotation = "promax", 
+                   scores = "regression")
+cor(promax$scores)
+```
+
+
+## R psych Implementation
+
+### Check Data
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library(psych)
+## Look for outliers
+outlier(scores, plot=T, bad=10, na.rm=T)
+
+## Scree plot
+VSS.scree(scores)
+```
+
+
+### Fit Model
+
+An eigenvalue in the context of EFA represents the total variance explained by each factor. It is a measure of the factor's overall contribution to explaining the variability in the data. An eigenvalue explains how much of the information (variation) in the original variables is captured by the factor. Factors with higher eigenvalues are considered more important because they explain a larger portion of the total variance in the dataset. A factor loading of 0.40 or higher was the significant criterion for item assignment.
+
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+output2 <- fa(scores, # input data
+              nfactors = 2, # number of factors
+              rotate = "varimax", # rotation
+              scores = "regression") # factor score estimation
+
+
+output2$loadings # factor loadings
+
+output2$uniquenesses # uniqueness
+output2$communality # communality
+output2$uniquenesses + output2$communalities
+```
+
+### Visualize Results
+
+To visualize the results of a factor analysis conducted with the fa() function from the psych package in R, you can use various approaches depending on what aspects of the results you're interested in visualizing. Here are a few common methods:
+
+* **Scree Plot**: Shows the eigenvalues of factors to help determine the number of factors to retain.
+* **Factor Score Plot**: Plots the factor scores for each observation, usually for the first two factors. The Factor Score Plot visualizes how observations score on the first two factors, which can be useful for identifying patterns or clusters among observations.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+## Scree Plot
+fa.diagram(output2)
+
+# Factor Score Plot (for the first two factors)
+scores <- as.data.frame(output2$scores)
+ggplot(scores, aes(x = MR1, y = MR2)) + 
+  geom_point() + 
+  labs(x = "Factor 1 Scores", y = "Factor 2 Scores", title = "Factor Score Plot")
+```
+
+
+### Reliability Analysis
+
+Internal consistency is a measure of how well the items within a scale correlate with each other, indicating the extent to which all the items measure the same concept. It's a crucial aspect of scale reliability, ensuring that the scale consistently measures what it's intended to across different items.
+
+Two statistical methods will be used to calculate internal consistency:
+
+* **Cronbach’s Alpha (α)**: It ranges from 0 to 1, with higher values indicating greater internal consistency. A Cronbach's alpha of 0.7 or above is generally considered satisfactory, suggesting that the items on the scale are well-correlated and measure the same underlying construct.
+
+* **McDonald’s Omega (ω)**: McDonald's omega is another measure of internal consistency that, like Cronbach's alpha, ranges from 0 to 1. Omega is sometimes preferred over alpha because it can provide a more accurate estimate of internal consistency, especially in cases where the assumptions of Cronbach’s alpha are not met. A value greater than 0.7 is also considered satisfactory for McDonald’s omega, indicating good internal consistency.
+
+ 
+
+# Confirmatory Factor Analysis (CFA)
+
+Used to determine the factor and factor loading of measured variables, and to confirm what is expected on the basic or pre-established theory. CFA assumes that each factor is associated with a specified subset of measured variables.  It commonly uses two approaches:
+
+* **The traditional method**: Traditional factor method is based on principal factor analysis method rather than common factor analysis. Traditional method allows the researcher to know more about insight factor loading.
+* **The SEM approach**: CFA is an alternative approach of factor analysis which can be done in SEM.  In SEM, we will remove all straight arrows from the latent variable, and add only that arrow which has to observe the variable representing the covariance between every pair of latents.  We will also leave the straight arrows error free and disturbance terms to their respective variables.  If standardized error term in SEM is less than the absolute value two, then it is assumed good for that factor, and if it is more than two, it means that there is still some unexplained variance which can be explained by factor.  Chi-square and a number of other goodness-of-fit indexes are used to test how well the model fits.
+
+
+## R lavaan Implementation
+
+### Fit Model
+
+**Fitting a CFA model** in lavaan requires a special model syntax. Let’s say we fit a 2-factor CFA model where the first factor f1 is measured by x1, x2, x4, and x6. The second factor f2 is measured by x3, x5, x7, and x8.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+if (!requireNamespace("lavaan", quietly = TRUE)) install.packages("lavaan")
+library("lavaan")
+
+
+names(scores_CFA) <- paste0("x", 1:8)
+names(scores_CFA)
+
+model <- '
+f1 =~ x1 + x2 + x4 + x6
+f2 =~ x3 + x5 + x7 + x8
+'
+fit <- cfa(model = model, data = scores_CFA)
+result <- summary(fit, fit.measures = TRUE)  # fit.measures = TRUE to print additional fit indices
+print(result)
+
+## To extract parameter estimates (such as factor loadings, variances, covariances, etc.) from a lavaan model fit object in R, you can use the $ operator followed by pe or the parameterEstimates() 
+## result$pe
+parameterEstimates(fit)
+```
+ 
+ 
+### Visualize Results
+
+To visualize the results of a confirmatory factor analysis (CFA) performed with the lavaan package in R, you can create several types of plots, including path diagrams to show the relationships specified in the model, or plots to show the model fit. However, lavaan itself does not have built-in functions for plotting. Instead, you can use the semPlot package, which integrates well with lavaan and offers extensive capabilities for visualizing SEM models, including CFA.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+if (!requireNamespace("semPlot", quietly = TRUE)) install.packages("semPlot")
+library(semPlot)
+
+# Plotting the CFA model
+options(warn=-1)
+semPaths(fit, whatLabels = "est", layout = "tree", edge.label.cex = 0.75, node.label.cex = 0.75)
+options(warn=0)
+# Adding a title separately
+title("CFA Model")
+```
+
+
+# Reference
+
+[A PRACTICAL INTRODUCTION TO FACTOR ANALYSIS: EXPLORATORY FACTOR ANALYSIS](https://stats.oarc.ucla.edu/spss/seminars/introduction-to-factor-analysis/a-practical-introduction-to-factor-analysis/)
+
+[R Programming for Psychometrics - Factor Analysis](https://bookdown.org/sz_psyc490/r4psychometics/factor-analysis.html)
+
+Watkins, M. (2020). A Step-by-Step Guide to Exploratory Factor Analysis with R and RStudio (1st ed.). Routledge. https://doi.org/10.4324/9781003120001
+
+Bryant, F. B., & Yarnold, P. R. (1995). Principal components analysis and exploratory and confirmatory factor analysis. In L. G. Grimm & P. R. Yarnold (Eds.), Reading and understanding multivariate analysis. Washington, DC: American Psychological Association.
+
+Hatcher, L. (1994). A step-by-step approach to using the SAS system for factor analysis and structural equation modeling. Cary, NC: SAS Institute.
+
+
+# Session Info
+
+```{r , echo=FALSE, fig.align="center", out.width = '25%',fig.cap=" "}
+knitr::include_graphics("logo.png")
+sessionInfo()
+```
+ 
