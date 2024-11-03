@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Power and sample size calculations</title>
+
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-Estimands.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot-Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Flow-Chart.html">Flow Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-SSC-and-Power-Calculation.html">Sample Size and Power Calculations</a>
+    </li>
+    <li>
+      <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Linear-Regression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="07-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Power and sample size calculations</p></h1>
+
+</div>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>As statisticians, we often have to deal with power or sample size
+calculations. It can be very beneficial to visualise the impact that
+different factors have on the sample size or power. Produce data
+visualisation(s) or share tools that help your audience understand how
+power and sample size calculations work and what impacts the actual
+results of these calculations.</p>
+<p>Power and sample size calculations are fundamental components in the
+design of any clinical trial or scientific study. These calculations
+ensure that a study has a sufficient number of participants (sample
+size) to detect a statistically significant effect if one exists, while
+controlling for the risk of Type I (false positive) and Type II (false
+negative) errors. Visualizing these calculations can enhance
+understanding and decision-making in study planning by demonstrating the
+relationships between power, sample size, effect size, and significance
+level.</p>
+<div id="key-components-of-power-and-sample-size-visualizations"
+class="section level2">
+<h2>Key Components of Power and Sample Size Visualizations</h2>
+<ol style="list-style-type: decimal">
+<li><strong>Power Curves</strong>:
+<ul>
+<li>A power curve is a plot of statistical power against sample size,
+often for a range of effect sizes or significance levels.</li>
+<li>Power curves help researchers visualize how power increases as
+sample size grows, holding effect size constant. These plots are
+valuable for understanding how much data is needed to achieve a desired
+power level, such as 80% or 90%.</li>
+<li>A typical power curve demonstrates the diminishing returns in power
+gained by increasing sample size beyond a certain point.</li>
+</ul></li>
+<li><strong>Effect Size vs. Power</strong>:
+<ul>
+<li>Effect size represents the magnitude of the difference or
+association being tested. The larger the effect size, the easier it is
+to detect with a smaller sample.</li>
+<li>Visualizations plotting effect size against power can show how
+detectable a given effect is at different sample sizes, helping
+researchers assess whether their study design is practical for detecting
+meaningful differences.</li>
+</ul></li>
+<li><strong>Power vs. Significance Level (Alpha)</strong>:
+<ul>
+<li>This type of plot illustrates how changes in the significance level
+(alpha) affect statistical power, usually for a fixed sample size and
+effect size.</li>
+<li>Lowering alpha (e.g., from 0.05 to 0.01) increases the burden of
+proof, which can reduce power unless the sample size is adjusted. This
+visualization can highlight the trade-off between Type I error control
+and the power to detect true effects.</li>
+</ul></li>
+<li><strong>Sample Size Needed for Various Power Levels</strong>:
+<ul>
+<li>Visualizations can be used to estimate the sample size needed to
+achieve different power levels (e.g., 80%, 90%) for various effect sizes
+and significance levels.</li>
+<li>This type of visualization often appears as a line or bar chart
+showing required sample sizes to achieve specific power levels, given
+certain assumptions about effect size and alpha.</li>
+</ul></li>
+<li><strong>Interactive Visualization Tools</strong>:
+<ul>
+<li>Interactive tools allow researchers to dynamically adjust parameters
+like effect size, sample size, and alpha level to see how these changes
+impact power. These tools are highly beneficial in the planning phase,
+where researchers can experiment with different configurations.</li>
+</ul></li>
+</ol>
+</div>
+</div>
+<div id="shiny-app" class="section level1">
+<h1>Shiny App</h1>
+<div id="power-and-sample-size-tool" class="section level2">
+<h2>Power and Sample Size Tool</h2>
+<p><a href="https://steve-mallett.shinyapps.io/WWApr24Power/">Power and
+Sample Size Tool</a></p>
+<p><img src="02_Plots/Visualization/SSC/Shiny1.png" /></p>
+</div>
+<div id="pwrss-shiny-app" class="section level2">
+<h2>pwrss shiny app</h2>
+<p><a href="https://pwrss.shinyapps.io/index/">pwrss shiny app</a></p>
+<p><img src="02_Plots/Visualization/SSC/Shiny2.png" /></p>
+</div>
+</div>
+<div id="r-implementation" class="section level1">
+<h1>R Implementation</h1>
+<div id="pwr-built-in-visualization" class="section level2">
+<h2>pwr built-in visualization</h2>
+<pre class="r"><code>library(pwr)
+
+power1 &lt;-pwr.2p.test(h = ES.h(p1 = 0.60, p2 = 0.50), sig.level = 0.05, power = .80)
+plot(power1)</code></pre>
+<p><img src="05-Plot-SSC-and-Power-Calculation_files/figure-html/unnamed-chunk-1-1.png" width="960" /></p>
+</div>
+<div id="trellised-power-curvespwr" class="section level2">
+<h2>Trellised Power Curves::pwr</h2>
+<pre class="r"><code>fn_pwr &lt;- function(n, d) {
+  power &lt;- pwr.t.test(n = n,
+                      d = d,
+                      sig.level = 0.05,
+                      alternative = &quot;two.sided&quot;,
+                      type = &quot;two.sample&quot;)$power
+  return(power * 100)
+}
+
+ssize = c(2:12)
+msd &lt;- tibble(effect = rep(c(6, 8, 10), each = 3),
+              sd_inc = rep(c(1, 1.25, 1.5), 3)) %&gt;%
+  mutate(sd = 4 * sd_inc) %&gt;%
+  mutate(delta = effect / sd)
+
+pwr_tab &lt;- tibble(effect = factor(rep(msd$effect, each = length(ssize)),
+                                  levels = c(6, 8, 10),
+                                  labels = c(&quot;6%&quot;, &quot;8%&quot;, &quot;10%&quot;)),
+                  sd_inc = as.factor(rep(msd$sd_inc, each = length(ssize))),
+                  n = rep(ssize, length(msd$delta)),
+                  d = rep(msd$delta, each = length(ssize))) %&gt;%
+  mutate(power = fn_pwr(n, d)) 
+
+pwr_fig &lt;- ggplot(data = pwr_tab,
+                  aes(x = n, y = power, colour = sd_inc)) +
+  geom_line() +
+  geom_hline(yintercept = 80) +
+  geom_line(linewidth = 1) +
+  scale_x_continuous(breaks = ssize, name = &quot;Sample size&quot;) +
+  scale_y_continuous(breaks = seq(0, 100, by = 20)) +
+  labs(
+    y = &quot;Power (%)&quot;,
+    title = &quot;Power to detect deltas of 6, 8 and 10% in ejection fraction&quot;,
+    subtitles = &quot;Two-sided, two-sample t-test, alpha=0.05, sd=4&quot;,
+    colour = &quot;SD increase&quot;
+  ) +
+  geom_point(size = 2, shape = 21, fill = &quot;white&quot;) +
+  theme_bw() +
+  theme(
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    panel.grid.minor = element_blank(),
+    legend.position = &quot;bottom&quot;) +
+  scale_colour_viridis_d() +
+  facet_wrap(effect ~ .)
+
+pwr_fig</code></pre>
+<p><img src="05-Plot-SSC-and-Power-Calculation_files/figure-html/unnamed-chunk-2-1.png" width="960" /></p>
+</div>
+<div id="trellised-power-curvespwrss" class="section level2">
+<h2>Trellised Power Curves::pwrss</h2>
+<p>The <code>pwrss</code> R package enables statistical power and
+minimum required sample size calculations for:</p>
+<ol style="list-style-type: decimal">
+<li>Testing a proportion (one-sample) against a constant.</li>
+<li>Testing a mean (one-sample) against a constant.</li>
+<li>Testing the difference between two proportions (independent
+samples).</li>
+<li>Testing the difference between two means/groups (parametric and
+non-parametric tests for independent and paired samples).</li>
+<li>Testing a correlation (one-sample) against a constant.</li>
+<li>Testing the difference between two correlations (independent
+samples).</li>
+<li>Testing a coefficient (with standardized or unstandardized
+coefficients, with no covariates or covariate adjustment) in multiple
+linear regression, logistic regression, and Poisson regression.</li>
+<li>Testing an indirect effect (with standardized or unstandardized
+coefficients, with no covariates or covariate adjustment) in mediation
+analysis (Sobel, Joint, and Monte Carlo methods).</li>
+<li>Testing an <span class="math inline">\(R^2\)</span> against zero in
+linear regression.</li>
+<li>Testing an <span class="math inline">\(R^2\)</span> difference
+against zero in hierarchical regression.</li>
+<li>Testing an <span class="math inline">\(\eta^2\)</span> or <span
+class="math inline">\(f^2\)</span> (for main and interaction effects)
+against zero in analysis of variance (ANOVA), which can be one-way,
+two-way, or three-way.</li>
+<li>Testing an <span class="math inline">\(\eta^2\)</span> or <span
+class="math inline">\(f^2\)</span> (for main and interaction effects)
+against zero in analysis of covariance (ANCOVA), which can be one-way,
+two-way, or three-way.</li>
+<li>Testing an <span class="math inline">\(\eta^2\)</span> or <span
+class="math inline">\(f^2\)</span> (for between, within, and interaction
+effects) against zero in one-way repeated measures analysis of variance
+(RM-ANOVA), with non-sphericity correction and repeated measures
+correlation.</li>
+<li>Testing goodness-of-fit or independence in contingency tables.</li>
+</ol>
+<p>The alternative hypothesis can be formulated as “not equal,” “less,”
+“greater,” “non-inferior,” “superior,” or “equivalent” in (1), (2), (3),
+and (4); as “not equal,” “less,” or “greater” in (5), (6), (7), and (8);
+and always as “greater” in (9), (10), (11), (12), (13), and (14).</p>
+<table class="table" style="color: black; margin-left: auto; margin-right: auto;">
+<caption>
+95% Clopper-Pearson confidence interval (two-sided) for 25% ORR
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+Sample Size CHRONOS US
+</th>
+<th style="text-align:left;">
+CI Lower Limit
+</th>
+<th style="text-align:left;">
+CI Upper Limit
+</th>
+<th style="text-align:left;">
+CI Width
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+250
+</td>
+<td style="text-align:left;">
+0.1994115
+</td>
+<td style="text-align:left;">
+0.3105726
+</td>
+<td style="text-align:left;">
+0.11116113
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+255
+</td>
+<td style="text-align:left;">
+0.1989777
+</td>
+<td style="text-align:left;">
+0.3088724
+</td>
+<td style="text-align:left;">
+0.10989471
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+260
+</td>
+<td style="text-align:left;">
+0.1985643
+</td>
+<td style="text-align:left;">
+0.3072330
+</td>
+<td style="text-align:left;">
+0.10866871
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+265
+</td>
+<td style="text-align:left;">
+0.2016417
+</td>
+<td style="text-align:left;">
+0.3096395
+</td>
+<td style="text-align:left;">
+0.10799774
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+270
+</td>
+<td style="text-align:left;">
+0.2012030
+</td>
+<td style="text-align:left;">
+0.3080379
+</td>
+<td style="text-align:left;">
+0.10683492
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+275
+</td>
+<td style="text-align:left;">
+0.2007834
+</td>
+<td style="text-align:left;">
+0.3064906
+</td>
+<td style="text-align:left;">
+0.10570719
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+280
+</td>
+<td style="text-align:left;">
+0.2003819
+</td>
+<td style="text-align:left;">
+0.3049948
+</td>
+<td style="text-align:left;">
+0.10461288
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+285
+</td>
+<td style="text-align:left;">
+0.2032368
+</td>
+<td style="text-align:left;">
+0.3072509
+</td>
+<td style="text-align:left;">
+0.10401417
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+290
+</td>
+<td style="text-align:left;">
+0.2028140
+</td>
+<td style="text-align:left;">
+0.3057864
+</td>
+<td style="text-align:left;">
+0.10297232
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+295
+</td>
+<td style="text-align:left;">
+0.2024083
+</td>
+<td style="text-align:left;">
+0.3043681
+</td>
+<td style="text-align:left;">
+0.10195979
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+300
+</td>
+<td style="text-align:left;">
+0.2020187
+</td>
+<td style="text-align:left;">
+0.3029940
+</td>
+<td style="text-align:left;">
+0.10097526
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+305
+</td>
+<td style="text-align:left;">
+0.2046807
+</td>
+<td style="text-align:left;">
+0.3051175
+</td>
+<td style="text-align:left;">
+0.10043677
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+310
+</td>
+<td style="text-align:left;">
+0.2042731
+</td>
+<td style="text-align:left;">
+0.3037695
+</td>
+<td style="text-align:left;">
+0.09949636
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+315
+</td>
+<td style="text-align:left;">
+0.2038808
+</td>
+<td style="text-align:left;">
+0.3024615
+</td>
+<td style="text-align:left;">
+0.09858073
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+320
+</td>
+<td style="text-align:left;">
+0.2035029
+</td>
+<td style="text-align:left;">
+0.3011918
+</td>
+<td style="text-align:left;">
+0.09768883
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+325
+</td>
+<td style="text-align:left;">
+0.2059962
+</td>
+<td style="text-align:left;">
+0.3031974
+</td>
+<td style="text-align:left;">
+0.09720118
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+330
+</td>
+<td style="text-align:left;">
+0.2056029
+</td>
+<td style="text-align:left;">
+0.3019497
+</td>
+<td style="text-align:left;">
+0.09634681
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+335
+</td>
+<td style="text-align:left;">
+0.2052234
+</td>
+<td style="text-align:left;">
+0.3007370
+</td>
+<td style="text-align:left;">
+0.09551360
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+340
+</td>
+<td style="text-align:left;">
+0.2048569
+</td>
+<td style="text-align:left;">
+0.2995576
+</td>
+<td style="text-align:left;">
+0.09470072
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+345
+</td>
+<td style="text-align:left;">
+0.2072013
+</td>
+<td style="text-align:left;">
+0.3014577
+</td>
+<td style="text-align:left;">
+0.09425642
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+350
+</td>
+<td style="text-align:left;">
+0.2068215
+</td>
+<td style="text-align:left;">
+0.3002973
+</td>
+<td style="text-align:left;">
+0.09347576
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+_Note:__
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+a^Confidence Interval b
+</td>
+<td style="text-align:left;">
+sed on Clopper-
+</td>
+<td style="text-align:left;">
+earson method
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+</tbody>
+</table>
+<p><img src="05-Plot-SSC-and-Power-Calculation_files/figure-html/unnamed-chunk-5-1.png" width="960" /></p>
+</div>
+<div id="effect-size" class="section level2">
+<h2>Effect Size</h2>
+</div>
+<div id="hit-point" class="section level2">
+<h2>Hit Point</h2>
+<table class="table" style="color: black; margin-left: auto; margin-right: auto;">
+<caption>
+Sample Size Calculation for ORR 60%
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+CHRONOS_p
+</th>
+<th style="text-align:left;">
+ARES_p
+</th>
+<th style="text-align:left;">
+Power
+</th>
+<th style="text-align:right;">
+CHRONOS_n
+</th>
+<th style="text-align:right;">
+ARES_n
+</th>
+<th style="text-align:right;">
+ARES_EU_n
+</th>
+<th style="text-align:right;">
+ARES_US_n
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+20.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+21.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+22.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:right;">
+23
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+23.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+24.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+35
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+25.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+38
+</td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+26.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+27.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+43
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+28.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+46
+</td>
+<td style="text-align:right;">
+35
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+29.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+30.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+31.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+57
+</td>
+<td style="text-align:right;">
+43
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+32.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+62
+</td>
+<td style="text-align:right;">
+47
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+33.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+67
+</td>
+<td style="text-align:right;">
+51
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+34.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+73
+</td>
+<td style="text-align:right;">
+55
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+35.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+79
+</td>
+<td style="text-align:right;">
+60
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+36.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+86
+</td>
+<td style="text-align:right;">
+65
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+37.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+94
+</td>
+<td style="text-align:right;">
+71
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+38.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+103
+</td>
+<td style="text-align:right;">
+78
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+39.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+114
+</td>
+<td style="text-align:right;">
+86
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+40.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+126
+</td>
+<td style="text-align:right;">
+95
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+20
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+41.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+140
+</td>
+<td style="text-align:right;">
+105
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+30
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+42.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+156
+</td>
+<td style="text-align:right;">
+118
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+43
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+43.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+176
+</td>
+<td style="text-align:right;">
+132
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+57
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+44.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+199
+</td>
+<td style="text-align:right;">
+150
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+75
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+45.00%
+</td>
+<td style="text-align:left;">
+60.00%
+</td>
+<td style="text-align:left;">
+80%
+</td>
+<td style="text-align:right;">
+227
+</td>
+<td style="text-align:right;">
+171
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+96
+</td>
+</tr>
+</tbody>
+</table>
+<p><img src="05-Plot-SSC-and-Power-Calculation_files/figure-html/unnamed-chunk-8-1.png" width="960" /></p>
+</div>
+</div>
+<div id="other-tools" class="section level1">
+<h1>Other Tools</h1>
+<div id="statulator-tool" class="section level2">
+<h2>Statulator Tool</h2>
+<ul>
+<li><a href="https://statulator.com/SampleSize/ss2M.html#/"
+class="uri">https://statulator.com/SampleSize/ss2M.html#/</a></li>
+</ul>
+<p><img src="02_Plots/Visualization/SSC/Tool1.png" /> ## Power
+Analysis Software::G*Power</p>
+<ul>
+<li><a
+href="https://www.psychologie.hhu.de/arbeitsgruppen/allgemeine-psychologie-und-arbeitspsychologie/gpower"
+class="uri">https://www.psychologie.hhu.de/arbeitsgruppen/allgemeine-psychologie-und-arbeitspsychologie/gpower</a></li>
+</ul>
+<p><img src="02_Plots/Visualization/SSC/Tool2.png" /></p>
+</div>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<p>Bulus, M., &amp; Polat, C. (2023). pwrss R paketi ile istatistiksel
+güç analizi [Statistical power analysis with pwrss R package]. Ahi Evran
+Üniversitesi Kırşehir Eğitim Fakültesi Dergisi, 24(3), 2207-2328. <a
+href="https://doi.org/10.29299/kefad.1209913"
+class="uri">https://doi.org/10.29299/kefad.1209913</a></p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

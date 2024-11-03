@@ -609,9 +609,346 @@ alt="Typical Study Disposition Chart" />
 </div>
 </div>
 </div>
+<div id="consort-diagramm-in-sas" class="section level1">
+<h1>CONSORT Diagramm in SAS</h1>
+</div>
 <div id="automate-in-r" class="section level1">
 <h1>Automate in R</h1>
+<div id="gmisc-and-grid-package" class="section level2">
+<h2>Gmisc and grid Package</h2>
+<ol style="list-style-type: decimal">
+<li><strong><code>textGrob</code> for Text</strong>: I’ve used
+<code>textGrob</code> for the text inside each box.</li>
+<li><strong><code>rectGrob</code> for Boxes</strong>: Rectangles
+(<code>rectGrob</code>) are drawn around each <code>textGrob</code> to
+create visible boxes.</li>
+<li><strong><code>grid.segments</code> for Connections</strong>:
+Connections are made with <code>grid.segments</code>, adding arrows to
+match the flow.</li>
+</ol>
+<pre class="r"><code>library(grid)
+library(Gmisc)
+library(gridExtra) 
+
+grid.newpage()
+
+# Define parameters
+leftx &lt;- 0.25
+midx &lt;- 0.5
+rightx &lt;- 0.75
+width &lt;- 0.4
+gp &lt;- gpar(fill = &quot;lightgrey&quot;, col = &quot;black&quot;, fontsize = 10, fontfamily = &quot;sans&quot;)
+
+# Create boxes with labels
+total &lt;- textGrob(&quot;Total\nN = NNN&quot;, x = midx, y = 0.9, gp = gp)
+rando &lt;- textGrob(&quot;Randomized\nN = NNN&quot;, x = midx, y = 0.75, gp = gp)
+inel &lt;- textGrob(&quot;Ineligible\nN = NNN&quot;, x = rightx, y = 0.825, gp = gp)
+
+
+# Boxes for Group Allocation
+g1 &lt;- textGrob(&quot;Allocated to Group 1\nN = NNN&quot;, x = leftx, y = 0.5, gp = gp)
+g2 &lt;- textGrob(&quot;Allocated to Group 2\nN = NNN&quot;, x = rightx, y = 0.5, gp = gp)
+
+# Boxes for Follow-up
+g11 &lt;- textGrob(&quot;Followed up\nN = NNN&quot;, x = leftx, y = 0.3, gp = gp)
+g21 &lt;- textGrob(&quot;Followed up\nN = NNN&quot;, x = rightx, y = 0.3, gp = gp)
+
+# Boxes for Completion
+g12 &lt;- textGrob(&quot;Completed\nN = NNN&quot;, x = leftx, y = 0.1, gp = gp)
+g22 &lt;- textGrob(&quot;Completed\nN = NNN&quot;, x = rightx, y = 0.1, gp = gp)
+
+# Draw rectangles around textGrob elements to resemble boxes
+grid.draw(rectGrob(x = midx, y = 0.9, width = width, height = 0.1, gp = gp))
+grid.draw(total)
+
+grid.draw(rectGrob(x = midx, y = 0.75, width = width, height = 0.1, gp = gp))
+grid.draw(rando)
+
+grid.draw(rectGrob(x = rightx, y = 0.825, width = 0.25, height = 0.05, gp = gp))
+grid.draw(inel)
+
+grid.draw(rectGrob(x = leftx, y = 0.5, width = width, height = 0.1, gp = gp))
+grid.draw(g1)
+
+grid.draw(rectGrob(x = rightx, y = 0.5, width = width, height = 0.1, gp = gp))
+grid.draw(g2)
+
+grid.draw(rectGrob(x = leftx, y = 0.3, width = width, height = 0.1, gp = gp))
+grid.draw(g11)
+
+grid.draw(rectGrob(x = rightx, y = 0.3, width = width, height = 0.1, gp = gp))
+grid.draw(g21)
+
+grid.draw(rectGrob(x = leftx, y = 0.1, width = width, height = 0.1, gp = gp))
+grid.draw(g12)
+
+grid.draw(rectGrob(x = rightx, y = 0.1, width = width, height = 0.1, gp = gp))
+grid.draw(g22)
+
+# Draw connections
+grid.segments(x0 = midx, y0 = 0.85, x1 = midx, y1 = 0.8, arrow = arrow(type = &quot;closed&quot;, length = unit(0.15, &quot;inches&quot;)))
+grid.segments(x0 = midx, y0 = 0.85, x1 = rightx, y1 = 0.825, arrow = arrow(type = &quot;closed&quot;, length = unit(0.15, &quot;inches&quot;)))
+
+grid.segments(x0 = midx, y0 = 0.7, x1 = leftx, y1 = 0.55, arrow = arrow(type = &quot;closed&quot;, length = unit(0.15, &quot;inches&quot;)))
+grid.segments(x0 = midx, y0 = 0.7, x1 = rightx, y1 = 0.55, arrow = arrow(type = &quot;closed&quot;, length = unit(0.15, &quot;inches&quot;)))
+
+grid.segments(x0 = leftx, y0 = 0.45, x1 = leftx, y1 = 0.35, arrow = arrow(type = &quot;closed&quot;, length = unit(0.15, &quot;inches&quot;)))
+grid.segments(x0 = rightx, y0 = 0.45, x1 = rightx, y1 = 0.35, arrow = arrow(type = &quot;closed&quot;, length = unit(0.15, &quot;inches&quot;)))
+
+grid.segments(x0 = leftx, y0 = 0.25, x1 = leftx, y1 = 0.15, arrow = arrow(type = &quot;closed&quot;, length = unit(0.15, &quot;inches&quot;)))
+grid.segments(x0 = rightx, y0 = 0.25, x1 = rightx, y1 = 0.15, arrow = arrow(type = &quot;closed&quot;, length = unit(0.15, &quot;inches&quot;)))</code></pre>
 <p><img src="05-Plot-Flow-Chart_files/figure-html/unnamed-chunk-1-1.png" width="960" /></p>
+</div>
+<div id="consort-package" class="section level2">
+<h2>consort package</h2>
+<div id="consort-diagram-produced-with-consort_plot"
+class="section level3">
+<h3>Consort diagram produced with consort_plot</h3>
+<p>When the number of subjects in the final analysis is less than the
+number of subjects initially entering the study, it is important to
+detail the observation filtering process. This is often done with a
+consort diagram, and fortunately R has the consort package by Alim Dayim
+for drawing data-driven diagrams. To demonstrate its use let’s simulate
+a two-treatment randomized clinical trial in which 1000 subjects were
+screened for participation.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">id</th>
+<th align="right">age</th>
+<th align="right">pain</th>
+<th align="right">hxmed</th>
+<th align="right">consent</th>
+<th align="right">randomized</th>
+<th align="left">tx</th>
+<th align="right">futime</th>
+<th align="right">y</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">51</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">63</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">A</td>
+<td align="right">3.0000</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">47</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">A</td>
+<td align="right">3.0000</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">84</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">65</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">B</td>
+<td align="right">3.0000</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">48</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">A</td>
+<td align="right">3.0000</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">67</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">B</td>
+<td align="right">2.0566</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="right">71</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="right">69</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">B</td>
+<td align="right">1.2815</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">55</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">B</td>
+<td align="right">1.2388</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="right">11</td>
+<td align="right">83</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">A</td>
+<td align="right">3.0000</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="right">66</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">A</td>
+<td align="right">3.0000</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="right">51</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">B</td>
+<td align="right">3.0000</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">14</td>
+<td align="right">27</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="right">15</td>
+<td align="right">77</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">A</td>
+<td align="right">3.0000</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>Now show the flow of qualifications and exclusions in a consort
+diagram. consort_plot wants multiple reasons for exclusions to be
+prioritized in a hierarchy, and NA to be used to denote “no exclusion”.
+Use the Hmisc function seqFreq that creates a factor variable whose
+first level is the most common exclusion, second level is the most
+common exclusion after excluding subjects based on the first exclusion,
+and so on. seqFreq also returns an attribute obs.per.numcond with a
+frequency tabulation of the number of observations having a given number
+of conditions.</p>
+<p><img src="05-Plot-Flow-Chart_files/figure-html/unnamed-chunk-3-1.png" width="960" /></p>
+</div>
+<div id="consort-diagram-using-component-functions"
+class="section level3">
+<h3>Consort diagram using component functions</h3>
+<p>consort provides another way to build the diagram that may be more
+flexible and intuitive after we define some helper functions. The
+built-in R pipe operator |&gt; is used.</p>
+<p><img src="05-Plot-Flow-Chart_files/figure-html/unnamed-chunk-4-1.png" width="960" /></p>
+</div>
+</div>
+<div id="sankey-plot" class="section level2">
+<h2>Sankey plot</h2>
+<p><a href="https://sankey-dev.apps.vahub.lilly.com"
+class="uri">https://sankey-dev.apps.vahub.lilly.com</a></p>
+<div class="float">
+<img src="02_Plots/Visualization/FlowChart/Sankey-ShinyApp.png"
+alt="Sankey-ShinyApp" />
+<div class="figcaption">Sankey-ShinyApp</div>
+</div>
+<p><img src="05-Plot-Flow-Chart_files/figure-html/unnamed-chunk-5-1.png" width="960" /></p>
+</div>
+<div id="individual-subjects" class="section level2">
+<h2>Individual subjects</h2>
+<p><img src="02_Plots/Visualization/FlowChart/Individual1.jpg"
+alt="Disposition – Overall" /> <img
+src="02_Plots/Visualization/FlowChart/Individual2.jpg"
+alt="Discontinuation – Overall" /> <img
+src="02_Plots/Visualization/FlowChart/Individual3.jpg"
+alt="Discontinuation – Initial Period" /> <img
+src="02_Plots/Visualization/FlowChart/Individual4.jpg"
+alt="Discontinuation – Maintenance Period" /></p>
+<p><strong>waffle chart</strong></p>
+<ol style="list-style-type: decimal">
+<li><strong>Data Definition</strong>: <code>data_treatment_A</code> and
+<code>data_treatment_B</code> define the counts for “Discontinued” and
+“Completed” for each treatment group.</li>
+<li><strong>Color Palette</strong>: The colors for “Discontinued” and
+“Completed” are set with <code>colors</code>.</li>
+<li><strong>Waffle Plots</strong>: <code>waffle</code> is used to create
+individual waffle charts for Treatment A and Treatment B.</li>
+<li><strong>Combining Plots</strong>: <code>plot_grid</code> from the
+<code>cowplot</code> package is used to arrange the waffle plots
+side-by-side and add titles for the overall plot.</li>
+</ol>
+<p><img src="05-Plot-Flow-Chart_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
+</div>
 </div>
 <div id="reference" class="section level1">
 <h1>Reference</h1>
@@ -619,6 +956,11 @@ alt="Typical Study Disposition Chart" />
 Retrieved from <a
 href="https://graphicsprinciples.github.io/posts/2024-09-12-wonderful-wednesdays-may-2024/"
 class="uri">https://graphicsprinciples.github.io/posts/2024-09-12-wonderful-wednesdays-may-2024/</a></p>
+<p>Harrell, F. E., Jr. (2024). R Workflow for Reproducible Data Analysis
+and Reporting. Department of Biostatistics, School of Medicine,
+Vanderbilt University. Published September 26, 2024. <a
+href="https://hbiostat.org/rflow/"
+class="uri">https://hbiostat.org/rflow/</a></p>
 </div>
 
 
