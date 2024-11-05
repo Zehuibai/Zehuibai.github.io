@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Bayesian methods - Alternatives to Power</title>
+
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Alternatives-to-Power.html">Bayesian methods - Alternatives to Power</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-Estimands.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot-Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Flow-Chart.html">Flow Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-SSC-and-Power-Calculation.html">Sample Size and Power Calculations</a>
+    </li>
+    <li>
+      <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Linear-Regression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="07-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Bayesian methods - Alternatives to Power</p></h1>
+
+</div>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<div id="sample-size-determination-using-power" class="section level2">
+<h2>Sample Size Determination using Power</h2>
+<ul>
+<li><strong>What is Power?</strong>
+<ul>
+<li>Power in the context of statistical testing is the probability that
+a test will reject the null hypothesis when the null hypothesis is
+false. Essentially, it measures a study’s ability to detect an effect,
+if there is one.</li>
+<li>The common target for power is 80% or 90%, meaning there’s an 80% or
+90% chance of detecting an effect if it exists.</li>
+</ul></li>
+<li><strong>Calculating Sample Size Based on Power:</strong>
+<ul>
+<li>To determine the appropriate sample size using power, researchers
+need to specify:
+<ul>
+<li>The effect size (the magnitude of the difference or association they
+expect to find and consider meaningful).</li>
+<li>The significance level (usually set at 0.05, this is the probability
+of incorrectly rejecting the null hypothesis).</li>
+<li>The desired power level (to avoid Type II errors, i.e., failing to
+reject the null hypothesis when it is false).</li>
+</ul></li>
+<li>Statistical software or power tables can then be used to calculate
+the number of subjects required.</li>
+</ul></li>
+<li><strong>Challenges with Power-Based Methods:</strong>
+<ul>
+<li><strong>Assumption Dependency:</strong> The calculation of power is
+highly sensitive to the assumptions about the effect size, variance, and
+distribution of the data. If these assumptions are incorrect, the actual
+power of the study may be much lower or higher than desired, leading to
+underpowered or overpowered studies.</li>
+<li><strong>Underpowered studies</strong> may fail to detect true
+effects, potentially leading to false conclusions that no effect
+exists.</li>
+<li><strong>Overpowered studies</strong> can waste resources and may
+detect differences that, while statistically significant, are not
+meaningful in practical terms.</li>
+</ul></li>
+</ul>
+<p><strong>Alternative Methods to Power</strong> These methods aim to
+address the limitations of traditional power-based calculations by
+incorporating additional information or different statistical
+philosophies:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Confidence Interval Estimation:</strong>
+<ul>
+<li>Focuses on estimating a range within which the true effect size is
+expected to lie with a specified probability (e.g., 95% confidence
+interval). This method prioritizes the precision of the estimate over
+the test of a hypothesis.</li>
+</ul></li>
+<li><strong>Bayesian Methods:</strong>
+<ul>
+<li><strong>Prior Information:</strong> Bayesian approaches incorporate
+prior information or beliefs into the analysis alongside the data
+obtained from the study.</li>
+<li><strong>Posterior Distributions:</strong> These methods focus on the
+posterior distribution of the parameter of interest, which combines
+prior information and observed data.</li>
+<li><strong>Flexible Decision-Making:</strong> Bayesian methods can
+provide a flexible framework for decision-making based on the posterior
+probabilities of different hypotheses or the probability of achieving
+certain endpoints.</li>
+</ul></li>
+<li><strong>Hybrid Bayesian-Frequentist Approaches:</strong>
+<ul>
+<li>Combine the strengths of both frameworks to optimize the study
+design. For instance, they might use Bayesian methods to estimate
+parameters and frequentist methods to control type I and II error
+rates.</li>
+</ul></li>
+</ol>
+</div>
+<div id="alternative-methods-to-traditional-power-calculations"
+class="section level2">
+<h2>Alternative methods to traditional power calculations</h2>
+<p>Alternative methods to traditional power calculations for sample size
+determination provide flexibility and can incorporate more information
+into the study design. Here’s a detailed overview of some of these
+methods:</p>
+<div id="statistical-intervals" class="section level3">
+<h3>1. Statistical Intervals</h3>
+<ul>
+<li><strong>Description</strong>: This method involves calculating
+sample sizes to ensure the width of a statistical interval (like a
+confidence or prediction interval) meets a predetermined criterion. For
+instance, ensuring a 95% confidence interval for a mean difference is no
+wider than a specific value.</li>
+<li><strong>Types</strong>:
+<ul>
+<li><strong>Confidence Intervals</strong>: Focus on covering the true
+parameter value with a specified probability (e.g., 95% or 99%).</li>
+<li><strong>Prediction Intervals</strong>: Provide a range within which
+future observations are expected to fall.</li>
+<li><strong>Bayesian Credible Intervals</strong>: Similar to confidence
+intervals but in a Bayesian context, where the interval reflects the
+range containing the parameter with a certain probability, based on
+prior and current data.</li>
+<li><strong>Mixed Bayesian Likelihood Intervals (MBL)</strong>:
+Incorporate both Bayesian priors and likelihood derived from the data to
+construct intervals.</li>
+</ul></li>
+</ul>
+</div>
+<div id="hybrid-bayesian-methods" class="section level3">
+<h3>2. Hybrid Bayesian Methods</h3>
+<ul>
+<li><strong>Description</strong>: These methods blend Bayesian and
+frequentist approaches to leverage the strengths of both, especially
+useful in complex models or when incorporating prior information is
+crucial.</li>
+<li><strong>Examples</strong>:
+<ul>
+<li><strong>MBL Intervals</strong>: As mentioned, these use Bayesian
+priors and data-derived likelihoods.</li>
+<li><strong>Posterior Errors</strong>: Focus on the probability of
+parameter estimates falling within specific ranges.</li>
+<li><strong>Assurance</strong>: Calculates the probability that a future
+study will achieve statistical significance, considering prior
+data.</li>
+<li><strong>Predictive Power</strong>: Estimates the likelihood of
+achieving certain statistical power based on prior data and model
+predictions.</li>
+<li><strong>Adaptive Designs</strong>: Allow modifications to the trial
+or statistical procedures based on interim results, which can include
+updating sample size.</li>
+</ul></li>
+</ul>
+</div>
+<div id="pure-bayesian-methods" class="section level3">
+<h3>3. Pure Bayesian Methods</h3>
+<ul>
+<li><strong>Description</strong>: Entirely based on Bayesian statistics,
+these methods use prior distributions and data to update beliefs about
+parameters through the posterior distribution.</li>
+<li><strong>Examples</strong>:
+<ul>
+<li><strong>Bayes Factors</strong>: Used to compare models or hypotheses
+by calculating the ratio of their posterior probabilities, providing a
+measure of evidence.</li>
+<li><strong>Credible Intervals</strong>: As described, these offer a
+probabilistic interpretation of parameter estimation.</li>
+<li><strong>Continual Reassessment Method (CRM)</strong>: Typically used
+in dose-finding studies in clinical trials to adjust dose levels based
+on patient outcomes dynamically.</li>
+<li><strong>Utility/Cost Function</strong>: Incorporates decision
+analysis by evaluating the expected utility or cost associated with
+different sample sizes.</li>
+</ul></li>
+</ul>
+</div>
+<div id="hypothetical-figure-explanation" class="section level3">
+<h3>Hypothetical Figure Explanation</h3>
+<p>A helpful figure could be a flowchart or a decision tree that
+illustrates when and how to apply each of these methods: -
+<strong>Top</strong>: Decision criteria based on study goals (estimation
+precision, existing data, model complexity). -
+<strong>Branches</strong>: Leading to different methods, showing paths
+based on whether prior data exists, whether the study aims at estimation
+or hypothesis testing, and the level of acceptable uncertainty. -
+<strong>Leaves</strong>: Specific methods with brief notes on their
+application contexts and advantages.</p>
+</div>
+</div>
+<div id="key-summary" class="section level2">
+<h2>Key Summary</h2>
+<ol style="list-style-type: decimal">
+<li><strong>Challenges with Power as a Metric</strong>:
+<ul>
+<li><strong>Power</strong> is traditionally the most common metric for
+determining sample size in studies. It is designed to detect a specified
+effect size with a certain probability (commonly 80% or 90%).</li>
+<li><strong>Issues</strong>: Power calculations depend heavily on the
+accuracy of assumed parameters, such as effect size and variance. Any
+deviation from these assumptions can result in studies being
+under-powered (leading to a higher chance of Type II errors) or
+over-powered (wasting resources).</li>
+</ul></li>
+<li><strong>Statistical Intervals as Alternatives</strong>:
+<ul>
+<li><strong>Statistical Intervals</strong>: Methods like confidence
+intervals and prediction intervals provide an alternative approach by
+focusing on the precision of estimates rather than testing against a
+null hypothesis.</li>
+<li><strong>Limitations</strong>: Similar to power, the effectiveness of
+interval-based methods depends on the accuracy of underlying
+assumptions. If these assumptions are invalid, the intervals may not
+accurately reflect the true variability or uncertainty in parameter
+estimates.</li>
+</ul></li>
+<li><strong>Bayesian Methods for Addressing Issues</strong>:
+<ul>
+<li><strong>MBL Intervals</strong>: Mixed Bayesian Likelihood (MBL)
+intervals incorporate Bayesian priors with frequentist likelihood,
+aiming to provide a balance that respects both Bayesian informativeness
+and frequentist reliability.</li>
+<li><strong>Posterior Error Approach</strong>: This method uses Bayesian
+posterior probabilities to reassess Type I and II error rates, providing
+a more intuitive measure of “success” based on the probability of these
+errors given the observed data.</li>
+</ul></li>
+<li><strong>Role of Sensitivity Analysis</strong>:
+<ul>
+<li><strong>Purpose</strong>: Sensitivity analysis involves testing how
+sensitive the results of a study are to changes in the assumptions upon
+which the statistical analyses are based.</li>
+<li><strong>Bayesian Sensitivity Analysis</strong>: Incorporating
+Bayesian methods, such as Bayesian Assurance, into sensitivity analysis
+helps formalize the framework for assessing uncertainty. Bayesian
+Assurance, for example, evaluates the probability of achieving study
+objectives across a range of plausible values for uncertain parameters,
+offering a comprehensive view of potential study outcomes.</li>
+</ul></li>
+</ol>
+</div>
+</div>
+<div id="statistical-intervals-1" class="section level1">
+<h1>Statistical Intervals</h1>
+<div id="introduction-to-statistical-intervals" class="section level2">
+<h2>Introduction to Statistical Intervals</h2>
+<ol style="list-style-type: decimal">
+<li><strong>Confidence Intervals</strong>
+<ul>
+<li><strong>Definition</strong>: A range of values for a parameter of
+interest from a population, calculated from sample data. The confidence
+interval aims to contain the true population parameter with a specified
+confidence level (typically 95%).</li>
+<li><strong>Interpretation</strong>: Under repeated sampling of the
+population, 95% (or another level) of such intervals would contain the
+true population parameter. This frequentist approach assumes that the
+parameter is a fixed value and the randomness comes from the data.</li>
+</ul></li>
+<li><strong>Credible Intervals</strong>
+<ul>
+<li><strong>Definition</strong>: In Bayesian statistics, a credible
+interval provides a range within which the true parameter value lies,
+with a certain degree of belief (or probability). For instance, a 95%
+credible interval means there is a 95% belief, based on the data and
+prior information, that the interval contains the true parameter
+value.</li>
+<li><strong>Interpretation</strong>: The credible interval treats the
+unknown parameter as a random variable, which is a fundamental departure
+from the frequentist interpretation. The interval itself is derived from
+the posterior distribution of the parameter, which combines prior
+beliefs and the likelihood of the observed data.</li>
+</ul></li>
+</ol>
+<p><strong>Visual Representation (Hypothetical)</strong></p>
+<ul>
+<li><strong>95% Credible Interval</strong>
+<ul>
+<li><strong>Graphic</strong>: Typically, this would be depicted as a
+fixed interval on a line, where the bounds of the interval are
+determined by the 2.5th and 97.5th percentiles of the posterior
+distribution. The area under the curve within these bounds represents
+95% of the posterior probability.</li>
+<li><strong>Key Point</strong>: The interval represents a probability
+concerning the parameter’s value, not the long-term behavior of an
+estimator as in frequentist approaches.</li>
+</ul></li>
+<li><strong>95% Confidence Interval</strong>
+<ul>
+<li><strong>Graphic</strong>: This might also be shown as a fixed
+interval on a line, calculated from sample data, such that if the
+experiment were repeated many times, 95% of such intervals would contain
+the true parameter value.</li>
+<li><strong>Key Point</strong>: The confidence interval is about the
+long-term frequency of the interval capturing the parameter, assuming
+the data collection process is repeated under the same conditions.</li>
+</ul></li>
+</ul>
+<p><strong>Key Differences</strong></p>
+<ul>
+<li><strong>Parameter Treatment</strong>: Confidence intervals treat the
+parameter as fixed and data as variable, whereas credible intervals
+treat the parameter as a variable.</li>
+<li><strong>Interpretation</strong>: Confidence intervals are about
+repeated sampling reliability, whereas credible intervals are about
+belief or probability given the data and prior knowledge.</li>
+</ul>
+</div>
+<div id="credible-interval-construction" class="section level2">
+<h2>Credible Interval Construction</h2>
+<ul>
+<li><strong>Adcock (1988) and Joseph &amp; Bélisle (1997)</strong>:
+These authors have proposed methods to construct credible intervals for
+normal means. These methods incorporate Bayesian principles to derive
+intervals that have a specified probability of containing the parameter
+of interest, considering prior knowledge and the data obtained.</li>
+<li><strong>Methodology</strong>: The choice of method for constructing
+credible intervals depends on the selection criteria related to how the
+intervals are evaluated and the estimation methodology used, which
+influences the type of credible interval derived.</li>
+</ul>
+<p>** Selection Criteria and Estimation Methodology**</p>
+<ol style="list-style-type: decimal">
+<li><strong>Selection Criteria</strong>:
+<ul>
+<li><strong>Average Coverage Criterion (ACC)</strong>: This criterion
+focuses on ensuring that the interval covers the true parameter value
+with a specified average probability across many repetitions. This is
+similar to the concept of confidence but within a Bayesian
+framework.</li>
+<li><strong>Average Length Criterion (ALC)</strong>: This criterion aims
+to minimize the expected length of the credible interval, which can be
+particularly useful when the precision of the interval (i.e., its width)
+is as important as its coverage.</li>
+<li><strong>Worst Outcome Criterion (WOC)</strong>: Focuses on
+minimizing the worst-case scenario regarding the interval’s failure to
+include the true parameter. This criterion is conservative and aims to
+provide robust intervals under the least favorable conditions.</li>
+</ul></li>
+<li><strong>Estimation Methodology</strong>:
+<ul>
+<li><strong>Known Precision</strong>: When the precision (inverse of the
+variance) of the underlying distribution is known, methods can directly
+incorporate this information to more accurately define the bounds of the
+credible interval.</li>
+<li><strong>Unknown Precision</strong>: If the precision is unknown, the
+estimation involves more uncertainty, and methods may need to estimate
+this parameter from the data, which can affect the width and placement
+of the credible interval.</li>
+<li><strong>Mixed Bayesian/Likelihood</strong>: This approach combines
+Bayesian priors with likelihood methods derived from the data to balance
+between prior beliefs and observed evidence. This hybrid method can
+provide a flexible and nuanced way to estimate parameters and construct
+intervals.</li>
+</ul></li>
+</ol>
+</div>
+<div id="sample-size-determination-using-intervals"
+class="section level2">
+<h2>Sample Size Determination using Intervals</h2>
+<div id="confidence-intervals" class="section level3">
+<h3>Confidence Intervals</h3>
+<ul>
+<li><strong>Purpose</strong>: The sample size is calculated to ensure
+that the confidence interval reliably includes the true population
+parameter, like the mean, with a certain level of confidence, commonly
+95%.</li>
+<li><strong>Formula</strong>: <span class="math display">\[
+n \geq \frac{4\sigma^2 Z^2_{1-\alpha/2}}{l^2}
+\]</span>
+<ul>
+<li>Where:
+<ul>
+<li><span class="math inline">\(n\)</span> is the sample size.</li>
+<li><span class="math inline">\(\sigma^2\)</span> is the variance of the
+data.</li>
+<li><span class="math inline">\(Z_{1-\alpha/2}\)</span> is the z-score
+associated with the desired confidence level (e.g., 1.96 for 95%
+confidence).</li>
+<li><span class="math inline">\(l\)</span> is the half-width of the
+desired confidence interval.</li>
+</ul></li>
+<li>This formula calculates the minimum number of observations required
+to ensure that the confidence interval around the mean is no wider than
+<span class="math inline">\(2l\)</span> with a specified confidence
+level.</li>
+</ul></li>
+</ul>
+</div>
+<div id="credible-intervals" class="section level3">
+<h3>Credible Intervals</h3>
+<ul>
+<li><strong>Purpose</strong>: Unlike confidence intervals, the
+construction of credible intervals in Bayesian statistics depends not
+only on the data but also on prior distributions and the selected
+methodology. These intervals represent a Bayesian probability that the
+interval contains the true parameter.</li>
+<li><strong>Formula</strong>: The specific formula depends on whether
+precision is known or unknown, and on the selection criteria (such as
+ACC, ALC, WOC).
+<ul>
+<li><strong>Known Precision (ACC, ALC, WOC)</strong>: <span
+class="math display">\[
+n \geq \frac{4Z^2_{1-\alpha/2}}{\lambda l^2} - n_0
+\]</span>
+<ul>
+<li>Where:
+<ul>
+<li><span class="math inline">\(\lambda\)</span> is the precision of the
+data (<span class="math inline">\(\lambda = 1/\sigma^2\)</span>).</li>
+<li><span class="math inline">\(n_0\)</span> is a prior sample size,
+reflecting the amount of prior information.</li>
+</ul></li>
+</ul></li>
+<li><strong>Unknown Precision (ACC)</strong>: <span
+class="math display">\[
+n = \frac{4\beta}{\nu l^2} + 2\nu_{1-\alpha/2} - n_0
+\]</span>
+<ul>
+<li>Where:
+<ul>
+<li><span class="math inline">\(\beta\)</span> and <span
+class="math inline">\(\nu\)</span> parameters are related to the prior
+distribution on the precision and might be derived from prior data or
+beliefs.</li>
+<li><span class="math inline">\(\nu_{1-\alpha/2}\)</span> corresponds to
+a critical value from the chi-squared distribution, adjusted for the
+confidence level.</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="bayesian-methods" class="section level1">
+<h1>Bayesian Methods</h1>
+<div id="the-bayesian-paradigm" class="section level2">
+<h2>The Bayesian Paradigm</h2>
+<ol style="list-style-type: decimal">
+<li><strong>Combination of Knowledge Sources</strong>:
+<ul>
+<li><strong>Bayesian statistics</strong> uniquely integrates various
+sources of information. It combines prior knowledge (which may come from
+expert opinions, previous studies, or established theories) with
+empirical data collected in real-world scenarios. This approach
+contrasts with frequentist statistics, which relies solely on the data
+from the current study without incorporating prior information.</li>
+</ul></li>
+<li><strong>Treatment of Parameters</strong>:
+<ul>
+<li>In the Bayesian framework, parameters of interest are treated as
+random variables. This means that rather than having fixed but unknown
+values (as in frequentist statistics), parameters are assumed to have
+probability distributions. This allows for a more dynamic and
+probabilistic description of parameters, reflecting the real uncertainty
+about their true values.</li>
+</ul></li>
+<li><strong>Bayes’ Theorem</strong>:
+<ul>
+<li>The core of Bayesian analysis is <strong>Bayes’ Theorem</strong>,
+which mathematically describes how to update the probability estimate
+for a hypothesis as more evidence or information becomes available. The
+theorem is expressed as: <span class="math display">\[
+P(\Theta|D) = \frac{P(D|\Theta) \times P(\Theta)}{P(D)}
+\]</span>
+<ul>
+<li><strong><span class="math inline">\(P(\Theta|D)\)</span></strong>:
+The <strong>posterior distribution</strong>—the probability of the
+parameter <span class="math inline">\(\Theta\)</span> given the data
+<span class="math inline">\(D\)</span>. This is what we want to learn
+about.</li>
+<li><strong><span class="math inline">\(P(D|\Theta)\)</span></strong>:
+The <strong>likelihood</strong>—the probability of observing the data
+<span class="math inline">\(D\)</span> given a parameter <span
+class="math inline">\(\Theta\)</span>.</li>
+<li><strong><span class="math inline">\(P(\Theta)\)</span></strong>: The
+<strong>prior distribution</strong>—the probability of the parameter
+before observing the current data, based on past knowledge.</li>
+<li><strong><span class="math inline">\(P(D)\)</span></strong>: The
+<strong>evidence or marginal likelihood</strong>—the total probability
+of observing the data under all possible values of <span
+class="math inline">\(\Theta\)</span>. This acts as a normalizing
+constant.</li>
+</ul></li>
+</ul></li>
+<li><strong>Posterior Distribution</strong>:
+<ul>
+<li>The posterior distribution combines the prior distribution and the
+likelihood of the observed data. It represents a complete and updated
+belief about the parameter after considering both the prior information
+and the new data. This distribution is central in Bayesian inference as
+it provides the basis for making statistical decisions and
+predictions.</li>
+</ul></li>
+<li><strong>Making Inferences</strong>:
+<ul>
+<li>Bayesian inference uses the posterior distribution to make decisions
+and predictions. One can summarize the posterior through its mean (to
+provide an estimate of the parameter), mode (to find the most likely
+value), or variance (to understand the uncertainty associated with the
+estimate). Furthermore, credible intervals (the Bayesian equivalent of
+confidence intervals) can be derived from the posterior to give an
+interval estimate that likely contains the true parameter value with a
+certain probability.</li>
+</ul></li>
+</ol>
+<p><img src="02_Plots/SSC/SSC_Bayesian.png" /></p>
+</div>
+<div
+id="methodologies-within-bayesian-statistics-for-sample-size-determination-ssd"
+class="section level2">
+<h2>Methodologies within Bayesian statistics for sample size
+determination (SSD)</h2>
+<p>Two primary methodologies within Bayesian statistics for sample size
+determination (SSD): Pure Bayesian Sample Size Methods and Hybrid
+Bayesian Sample Size Methods.</p>
+<ul>
+<li><strong>Choosing Between Pure and Hybrid Methods</strong>:
+<ul>
+<li>The choice between pure and hybrid Bayesian methods depends on the
+specific needs of the research, the availability and quality of prior
+information, and regulatory considerations.</li>
+<li>Pure Bayesian methods are more suitable when comprehensive prior
+information is available and when there is flexibility in the approach
+to inference, such as in early-phase clinical trials or exploratory
+studies.</li>
+<li>Hybrid methods are particularly useful when there is a need to
+satisfy both Bayesian and frequentist criteria, often required in
+later-phase clinical trials or studies that must meet specific
+regulatory standards.</li>
+</ul></li>
+</ul>
+<div id="pure-bayesian-sample-size-methods" class="section level3">
+<h3>Pure Bayesian Sample Size Methods</h3>
+<ol style="list-style-type: decimal">
+<li><strong>Overview</strong>:
+<ul>
+<li>These methods rely entirely on Bayesian principles to determine the
+required sample size for a study.</li>
+<li>The calculation of sample size is based on specific Bayesian
+parameters which include prior distributions and the likelihood of
+observing the data.</li>
+</ul></li>
+<li><strong>Key Features</strong>:
+<ul>
+<li><strong>Bayes Factors</strong>: Used in hypothesis testing, Bayes
+factors compare the evidence provided by the data for two competing
+hypotheses. The sample size is determined to ensure that the Bayes
+factor will adequately support the true model.</li>
+<li><strong>Credible Intervals</strong>: These are Bayesian analogs to
+confidence intervals. The sample size is calculated to achieve a
+credible interval of a specified width with a certain probability,
+ensuring precise estimation of parameters.</li>
+<li><strong>Continual Reassessment Method (CRM)</strong>: Commonly used
+in phase I clinical trials to find a dose that is both effective and
+safe. It adjusts the dose level based on the outcomes observed in
+previous patients, using a Bayesian updating rule.</li>
+<li><strong>Utility/Cost Function</strong>: Considers the trade-off
+between the cost of sampling and the benefit of information gained,
+optimizing the sample size to maximize the expected utility.</li>
+</ul></li>
+</ol>
+</div>
+<div id="hybrid-bayesian-sample-size-methods" class="section level3">
+<h3>Hybrid Bayesian Sample Size Methods</h3>
+<ol style="list-style-type: decimal">
+<li><strong>Overview</strong>:
+<ul>
+<li>Hybrid methods integrate Bayesian statistics with traditional
+frequentist approaches to sample size determination, leveraging the
+strengths of both frameworks.</li>
+</ul></li>
+<li><strong>Key Features</strong>:
+<ul>
+<li><strong>MBL (Mixed Bayesian Likelihood) Intervals</strong>: Combine
+likelihood methods with Bayesian priors to form intervals that provide a
+compromise between frequentist and Bayesian inference principles.</li>
+<li><strong>Posterior Errors</strong>: Focus on the probability of
+parameter estimates falling within specific ranges, considering both
+prior information and data likelihood.</li>
+<li><strong>Assurance</strong>: Computes the probability that future
+studies will achieve significant results, considering both prior
+information and potential future data.</li>
+<li><strong>Predictive Power</strong>: Looks at the likelihood of
+achieving certain statistical power in future experiments based on both
+prior and potential new data.</li>
+<li><strong>Bayesian Adaptive Designs</strong>: These designs allow for
+modifications of the study parameters (like sample size) as data are
+collected, based on predefined Bayesian updating rules.</li>
+</ul></li>
+</ol>
+</div>
+</div>
+<div id="bayesian-assurance-overview" class="section level2">
+<h2>Bayesian Assurance Overview</h2>
+<ol style="list-style-type: decimal">
+<li><strong>Definition and Purpose</strong>:
+<ul>
+<li><strong>Bayesian Assurance</strong> is essentially the Bayesian
+counterpart to the frequentist concept of statistical power. It is
+defined as the unconditional probability of a clinical trial achieving a
+successful outcome, which typically means obtaining statistically
+significant results.</li>
+<li>The concept is used to evaluate the likelihood of trial success
+under varying assumptions about the effect size and other parameters
+relevant to the study.</li>
+</ul></li>
+<li><strong>Calculation</strong>:
+<ul>
+<li>Bayesian Assurance is calculated as the expected value of the power
+of a test, averaged over all plausible values of the effect size. These
+plausible values are derived from the prior distribution specified for
+the effect size, which incorporates expert opinion or historical
+data.</li>
+<li>The calculation integrates over the prior distribution of the effect
+size to account for all possible values that the effect size could
+realistically take, weighted by their probabilities.</li>
+</ul></li>
+<li><strong>Comparison to Traditional Power</strong>:
+<ul>
+<li>Unlike traditional power, which calculates the probability of
+detecting an effect of a specified size (assuming that size is the true
+effect), Bayesian Assurance takes into account the uncertainty in the
+effect size by averaging the power across a distribution of possible
+effect sizes.</li>
+<li>This provides a more comprehensive and realistic assessment of the
+trial’s potential success, considering the variability and uncertainty
+inherent in clinical research.</li>
+</ul></li>
+</ol>
+<p><strong>Practical Implications</strong></p>
+<ol style="list-style-type: decimal">
+<li><strong>Closer Representation of Trial Success</strong>:
+<ul>
+<li>By considering a range of effect sizes as per their prior
+probabilities, Bayesian Assurance can offer a more nuanced view of the
+likelihood of trial success. It reflects a broader set of scenarios than
+a single-point estimate used in traditional power calculations.</li>
+</ul></li>
+<li><strong>Formalizes Sensitivity Analysis</strong>:
+<ul>
+<li>Bayesian Assurance can be seen as formalizing the sensitivity
+analysis process by systematically varying the effect size according to
+its prior distribution. This helps stakeholders understand how changes
+in assumptions about the effect size impact the trial’s chance of
+success.</li>
+</ul></li>
+<li><strong>Integration in Trial Design</strong>:
+<ul>
+<li>Implementing Bayesian Assurance in clinical trial design helps in
+planning by allowing researchers to adjust sample sizes or other design
+parameters to meet a desired assurance level. This can lead to more
+efficient resource use and better-planned studies that are more likely
+to yield conclusive results.</li>
+</ul></li>
+</ol>
+</div>
+<div id="posterior-error-approach" class="section level2">
+<h2>Posterior Error Approach</h2>
+<p>Posterior Error Approach is a method developed by Lee &amp; Zelen in
+2000 that integrates both frequentist and Bayesian statistical
+frameworks to address certain issues in statistical analysis,
+specifically in hypothesis testing.</p>
+<ol style="list-style-type: decimal">
+<li><strong>Hybrid Approach</strong>:
+<ul>
+<li>This method represents a fusion of frequentist and Bayesian
+principles. By combining these two frameworks, the approach aims to
+utilize the strengths of each, offering a more comprehensive statistical
+analysis method.</li>
+</ul></li>
+<li><strong>Focus on Inverse-Conditional Errors</strong>:
+<ul>
+<li>Unlike traditional frequentist approaches that focus on Type I and
+Type II errors (the probabilities of incorrectly rejecting a true null
+hypothesis and failing to reject a false one, respectively), the
+posterior error approach uses Bayesian posterior probabilities to
+reassess these error rates. This allows for a dynamic recalculation of
+error probabilities based on observed data and prior beliefs.</li>
+</ul></li>
+</ol>
+<p><strong>Key Features of the Posterior Error Approach</strong></p>
+<ol style="list-style-type: decimal">
+<li><strong>Bayesian Posterior Errors</strong>:
+<ul>
+<li>These are calculated based on the definition of success used in
+frequentist statistics, often utilizing the p-value derived from data
+analysis. By incorporating Bayesian probabilities, these errors offer a
+posterior probability of Type I/II errors given the observed data.</li>
+</ul></li>
+<li><strong>Assumption of Frequentist Analysis</strong>:
+<ul>
+<li>The approach assumes that a typical frequentist analysis will
+follow. This implies that the initial data analysis is conducted using
+conventional methods, and Bayesian posterior probabilities are then
+applied to reassess the error rates.</li>
+</ul></li>
+<li><strong>Intuitive and Reflective Decision-Making</strong>:
+<ul>
+<li>Bayesian methods are often considered more intuitive because they
+provide probabilities directly interpretable in terms of the evidence
+provided by the data. This approach, therefore, can offer clearer
+insights into the decision-making process by reflecting both prior
+beliefs and new evidence.</li>
+</ul></li>
+</ol>
+<p><strong>Note: Practical Implications and Considerations</strong></p>
+<ol style="list-style-type: decimal">
+<li><strong>Regulatory Perspective</strong>:
+<ul>
+<li>While Bayesian approaches are gaining acceptance, regulatory bodies
+often have specific guidelines that favor frequentist statistics. The
+integration of Bayesian methods via the posterior error approach can
+face scrutiny or require additional justification when used in
+regulatory submissions.</li>
+</ul></li>
+<li><strong>Conversion to Bayesian Probabilities</strong>:
+<ul>
+<li>The method involves converting traditional frequentist outcomes
+(like p-values) into Bayesian probabilities. This requires clear
+articulation of prior probabilities against the null hypothesis (H0),
+which needs to be justified logically and empirically.</li>
+</ul></li>
+<li><strong>Sensitivity Analysis</strong>:
+<ul>
+<li>The approach can also be viewed as a form of sensitivity analysis,
+examining how conclusions might change under different assumptions about
+the prior distribution. This is crucial for robustness checks in
+statistical analysis.</li>
+</ul></li>
+</ol>
+</div>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<p>nQuery-Alternative to Power</p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,340 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Bayesian methods - Alternatives to Power
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+packages<-c("tidyverse", "kableExtra")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+```
+
+
+# Introduction
+
+## Sample Size Determination using Power
+
+- **What is Power?** 
+  - Power in the context of statistical testing is the probability that a test will reject the null hypothesis when the null hypothesis is false. Essentially, it measures a study's ability to detect an effect, if there is one.
+  - The common target for power is 80% or 90%, meaning there's an 80% or 90% chance of detecting an effect if it exists.
+
+- **Calculating Sample Size Based on Power:**
+  - To determine the appropriate sample size using power, researchers need to specify:
+    - The effect size (the magnitude of the difference or association they expect to find and consider meaningful).
+    - The significance level (usually set at 0.05, this is the probability of incorrectly rejecting the null hypothesis).
+    - The desired power level (to avoid Type II errors, i.e., failing to reject the null hypothesis when it is false).
+  - Statistical software or power tables can then be used to calculate the number of subjects required.
+
+- **Challenges with Power-Based Methods:**
+  - **Assumption Dependency:** The calculation of power is highly sensitive to the assumptions about the effect size, variance, and distribution of the data. If these assumptions are incorrect, the actual power of the study may be much lower or higher than desired, leading to underpowered or overpowered studies.
+  - **Underpowered studies** may fail to detect true effects, potentially leading to false conclusions that no effect exists.
+  - **Overpowered studies** can waste resources and may detect differences that, while statistically significant, are not meaningful in practical terms.
+
+**Alternative Methods to Power**
+These methods aim to address the limitations of traditional power-based calculations by incorporating additional information or different statistical philosophies:
+
+1. **Confidence Interval Estimation:**
+   - Focuses on estimating a range within which the true effect size is expected to lie with a specified probability (e.g., 95% confidence interval). This method prioritizes the precision of the estimate over the test of a hypothesis.
+
+2. **Bayesian Methods:**
+   - **Prior Information:** Bayesian approaches incorporate prior information or beliefs into the analysis alongside the data obtained from the study.
+   - **Posterior Distributions:** These methods focus on the posterior distribution of the parameter of interest, which combines prior information and observed data.
+   - **Flexible Decision-Making:** Bayesian methods can provide a flexible framework for decision-making based on the posterior probabilities of different hypotheses or the probability of achieving certain endpoints.
+
+3. **Hybrid Bayesian-Frequentist Approaches:**
+   - Combine the strengths of both frameworks to optimize the study design. For instance, they might use Bayesian methods to estimate parameters and frequentist methods to control type I and II error rates.
+   
+## Alternative methods to traditional power calculations 
+
+Alternative methods to traditional power calculations for sample size determination provide flexibility and can incorporate more information into the study design. Here’s a detailed overview of some of these methods:
+
+ 
+
+### 1. Statistical Intervals
+
+- **Description**: This method involves calculating sample sizes to ensure the width of a statistical interval (like a confidence or prediction interval) meets a predetermined criterion. For instance, ensuring a 95% confidence interval for a mean difference is no wider than a specific value.
+- **Types**:
+  - **Confidence Intervals**: Focus on covering the true parameter value with a specified probability (e.g., 95% or 99%).
+  - **Prediction Intervals**: Provide a range within which future observations are expected to fall.
+  - **Bayesian Credible Intervals**: Similar to confidence intervals but in a Bayesian context, where the interval reflects the range containing the parameter with a certain probability, based on prior and current data.
+  - **Mixed Bayesian Likelihood Intervals (MBL)**: Incorporate both Bayesian priors and likelihood derived from the data to construct intervals.
+
+### 2. Hybrid Bayesian Methods
+
+- **Description**: These methods blend Bayesian and frequentist approaches to leverage the strengths of both, especially useful in complex models or when incorporating prior information is crucial.
+- **Examples**:
+  - **MBL Intervals**: As mentioned, these use Bayesian priors and data-derived likelihoods.
+  - **Posterior Errors**: Focus on the probability of parameter estimates falling within specific ranges.
+  - **Assurance**: Calculates the probability that a future study will achieve statistical significance, considering prior data.
+  - **Predictive Power**: Estimates the likelihood of achieving certain statistical power based on prior data and model predictions.
+  - **Adaptive Designs**: Allow modifications to the trial or statistical procedures based on interim results, which can include updating sample size.
+
+### 3. Pure Bayesian Methods
+
+- **Description**: Entirely based on Bayesian statistics, these methods use prior distributions and data to update beliefs about parameters through the posterior distribution.
+- **Examples**:
+  - **Bayes Factors**: Used to compare models or hypotheses by calculating the ratio of their posterior probabilities, providing a measure of evidence.
+  - **Credible Intervals**: As described, these offer a probabilistic interpretation of parameter estimation.
+  - **Continual Reassessment Method (CRM)**: Typically used in dose-finding studies in clinical trials to adjust dose levels based on patient outcomes dynamically.
+  - **Utility/Cost Function**: Incorporates decision analysis by evaluating the expected utility or cost associated with different sample sizes.
+
+### Hypothetical Figure Explanation
+
+A helpful figure could be a flowchart or a decision tree that illustrates when and how to apply each of these methods:
+- **Top**: Decision criteria based on study goals (estimation precision, existing data, model complexity).
+- **Branches**: Leading to different methods, showing paths based on whether prior data exists, whether the study aims at estimation or hypothesis testing, and the level of acceptable uncertainty.
+- **Leaves**: Specific methods with brief notes on their application contexts and advantages.
+
+## Key Summary
+
+1. **Challenges with Power as a Metric**:
+   - **Power** is traditionally the most common metric for determining sample size in studies. It is designed to detect a specified effect size with a certain probability (commonly 80% or 90%).
+   - **Issues**: Power calculations depend heavily on the accuracy of assumed parameters, such as effect size and variance. Any deviation from these assumptions can result in studies being under-powered (leading to a higher chance of Type II errors) or over-powered (wasting resources).
+
+2. **Statistical Intervals as Alternatives**:
+   - **Statistical Intervals**: Methods like confidence intervals and prediction intervals provide an alternative approach by focusing on the precision of estimates rather than testing against a null hypothesis.
+   - **Limitations**: Similar to power, the effectiveness of interval-based methods depends on the accuracy of underlying assumptions. If these assumptions are invalid, the intervals may not accurately reflect the true variability or uncertainty in parameter estimates.
+
+3. **Bayesian Methods for Addressing Issues**:
+   - **MBL Intervals**: Mixed Bayesian Likelihood (MBL) intervals incorporate Bayesian priors with frequentist likelihood, aiming to provide a balance that respects both Bayesian informativeness and frequentist reliability.
+   - **Posterior Error Approach**: This method uses Bayesian posterior probabilities to reassess Type I and II error rates, providing a more intuitive measure of “success” based on the probability of these errors given the observed data.
+
+4. **Role of Sensitivity Analysis**:
+   - **Purpose**: Sensitivity analysis involves testing how sensitive the results of a study are to changes in the assumptions upon which the statistical analyses are based.
+   - **Bayesian Sensitivity Analysis**: Incorporating Bayesian methods, such as Bayesian Assurance, into sensitivity analysis helps formalize the framework for assessing uncertainty. Bayesian Assurance, for example, evaluates the probability of achieving study objectives across a range of plausible values for uncertain parameters, offering a comprehensive view of potential study outcomes.
+
+ 
+# Statistical Intervals
+
+## Introduction to Statistical Intervals
+
+1. **Confidence Intervals**
+   - **Definition**: A range of values for a parameter of interest from a population, calculated from sample data. The confidence interval aims to contain the true population parameter with a specified confidence level (typically 95%).
+   - **Interpretation**: Under repeated sampling of the population, 95% (or another level) of such intervals would contain the true population parameter. This frequentist approach assumes that the parameter is a fixed value and the randomness comes from the data.
+
+2. **Credible Intervals**
+   - **Definition**: In Bayesian statistics, a credible interval provides a range within which the true parameter value lies, with a certain degree of belief (or probability). For instance, a 95% credible interval means there is a 95% belief, based on the data and prior information, that the interval contains the true parameter value.
+   - **Interpretation**: The credible interval treats the unknown parameter as a random variable, which is a fundamental departure from the frequentist interpretation. The interval itself is derived from the posterior distribution of the parameter, which combines prior beliefs and the likelihood of the observed data.
+
+**Visual Representation (Hypothetical)**
+
+- **95% Credible Interval**
+  - **Graphic**: Typically, this would be depicted as a fixed interval on a line, where the bounds of the interval are determined by the 2.5th and 97.5th percentiles of the posterior distribution. The area under the curve within these bounds represents 95% of the posterior probability.
+  - **Key Point**: The interval represents a probability concerning the parameter’s value, not the long-term behavior of an estimator as in frequentist approaches.
+
+- **95% Confidence Interval**
+  - **Graphic**: This might also be shown as a fixed interval on a line, calculated from sample data, such that if the experiment were repeated many times, 95% of such intervals would contain the true parameter value.
+  - **Key Point**: The confidence interval is about the long-term frequency of the interval capturing the parameter, assuming the data collection process is repeated under the same conditions.
+
+**Key Differences**
+
+- **Parameter Treatment**: Confidence intervals treat the parameter as fixed and data as variable, whereas credible intervals treat the parameter as a variable.
+- **Interpretation**: Confidence intervals are about repeated sampling reliability, whereas credible intervals are about belief or probability given the data and prior knowledge.
+
+
+## Credible Interval Construction
+ 
+- **Adcock (1988) and Joseph & Bélisle (1997)**: These authors have proposed methods to construct credible intervals for normal means. These methods incorporate Bayesian principles to derive intervals that have a specified probability of containing the parameter of interest, considering prior knowledge and the data obtained.
+- **Methodology**: The choice of method for constructing credible intervals depends on the selection criteria related to how the intervals are evaluated and the estimation methodology used, which influences the type of credible interval derived. 
+ 
+** Selection Criteria and Estimation Methodology**
+
+1. **Selection Criteria**:
+   - **Average Coverage Criterion (ACC)**: This criterion focuses on ensuring that the interval covers the true parameter value with a specified average probability across many repetitions. This is similar to the concept of confidence but within a Bayesian framework.
+   - **Average Length Criterion (ALC)**: This criterion aims to minimize the expected length of the credible interval, which can be particularly useful when the precision of the interval (i.e., its width) is as important as its coverage.
+   - **Worst Outcome Criterion (WOC)**: Focuses on minimizing the worst-case scenario regarding the interval's failure to include the true parameter. This criterion is conservative and aims to provide robust intervals under the least favorable conditions.
+
+2. **Estimation Methodology**:
+   - **Known Precision**: When the precision (inverse of the variance) of the underlying distribution is known, methods can directly incorporate this information to more accurately define the bounds of the credible interval.
+   - **Unknown Precision**: If the precision is unknown, the estimation involves more uncertainty, and methods may need to estimate this parameter from the data, which can affect the width and placement of the credible interval.
+   - **Mixed Bayesian/Likelihood**: This approach combines Bayesian priors with likelihood methods derived from the data to balance between prior beliefs and observed evidence. This hybrid method can provide a flexible and nuanced way to estimate parameters and construct intervals.
+   
+  
+
+## Sample Size Determination using Intervals
+
+### Confidence Intervals
+
+- **Purpose**: The sample size is calculated to ensure that the confidence interval reliably includes the true population parameter, like the mean, with a certain level of confidence, commonly 95%.
+- **Formula**:
+  \[
+  n \geq \frac{4\sigma^2 Z^2_{1-\alpha/2}}{l^2}
+  \]
+  - Where:
+    - \( n \) is the sample size.
+    - \( \sigma^2 \) is the variance of the data.
+    - \( Z_{1-\alpha/2} \) is the z-score associated with the desired confidence level (e.g., 1.96 for 95% confidence).
+    - \( l \) is the half-width of the desired confidence interval.
+  - This formula calculates the minimum number of observations required to ensure that the confidence interval around the mean is no wider than \( 2l \) with a specified confidence level.
+
+### Credible Intervals
+
+- **Purpose**: Unlike confidence intervals, the construction of credible intervals in Bayesian statistics depends not only on the data but also on prior distributions and the selected methodology. These intervals represent a Bayesian probability that the interval contains the true parameter.
+- **Formula**: The specific formula depends on whether precision is known or unknown, and on the selection criteria (such as ACC, ALC, WOC).
+  - **Known Precision (ACC, ALC, WOC)**:
+    \[
+    n \geq \frac{4Z^2_{1-\alpha/2}}{\lambda l^2} - n_0
+    \]
+    - Where:
+      - \( \lambda \) is the precision of the data (\( \lambda = 1/\sigma^2 \)).
+      - \( n_0 \) is a prior sample size, reflecting the amount of prior information.
+  - **Unknown Precision (ACC)**:
+    \[
+    n = \frac{4\beta}{\nu l^2} + 2\nu_{1-\alpha/2} - n_0
+    \]
+    - Where:
+      - \( \beta \) and \( \nu \) parameters are related to the prior distribution on the precision and might be derived from prior data or beliefs.
+      - \( \nu_{1-\alpha/2} \) corresponds to a critical value from the chi-squared distribution, adjusted for the confidence level.
+      
+ 
+# Bayesian Methods
+
+
+## The Bayesian Paradigm
+
+1. **Combination of Knowledge Sources**:
+   - **Bayesian statistics** uniquely integrates various sources of information. It combines prior knowledge (which may come from expert opinions, previous studies, or established theories) with empirical data collected in real-world scenarios. This approach contrasts with frequentist statistics, which relies solely on the data from the current study without incorporating prior information.
+
+2. **Treatment of Parameters**:
+   - In the Bayesian framework, parameters of interest are treated as random variables. This means that rather than having fixed but unknown values (as in frequentist statistics), parameters are assumed to have probability distributions. This allows for a more dynamic and probabilistic description of parameters, reflecting the real uncertainty about their true values.
+
+3. **Bayes' Theorem**:
+   - The core of Bayesian analysis is **Bayes’ Theorem**, which mathematically describes how to update the probability estimate for a hypothesis as more evidence or information becomes available. The theorem is expressed as:
+     \[
+     P(\Theta|D) = \frac{P(D|\Theta) \times P(\Theta)}{P(D)}
+     \]
+     - **\( P(\Theta|D) \)**: The **posterior distribution**—the probability of the parameter \( \Theta \) given the data \( D \). This is what we want to learn about.
+     - **\( P(D|\Theta) \)**: The **likelihood**—the probability of observing the data \( D \) given a parameter \( \Theta \).
+     - **\( P(\Theta) \)**: The **prior distribution**—the probability of the parameter before observing the current data, based on past knowledge.
+     - **\( P(D) \)**: The **evidence or marginal likelihood**—the total probability of observing the data under all possible values of \( \Theta \). This acts as a normalizing constant.
+
+4. **Posterior Distribution**:
+   - The posterior distribution combines the prior distribution and the likelihood of the observed data. It represents a complete and updated belief about the parameter after considering both the prior information and the new data. This distribution is central in Bayesian inference as it provides the basis for making statistical decisions and predictions.
+
+5. **Making Inferences**:
+   - Bayesian inference uses the posterior distribution to make decisions and predictions. One can summarize the posterior through its mean (to provide an estimate of the parameter), mode (to find the most likely value), or variance (to understand the uncertainty associated with the estimate). Furthermore, credible intervals (the Bayesian equivalent of confidence intervals) can be derived from the posterior to give an interval estimate that likely contains the true parameter value with a certain probability.
+   
+![](./02_Plots/SSC/SSC_Bayesian.png)
+
+## Methodologies within Bayesian statistics for sample size determination (SSD)
+
+Two primary methodologies within Bayesian statistics for sample size determination (SSD): Pure Bayesian Sample Size Methods and Hybrid Bayesian Sample Size Methods. 
+
+
+- **Choosing Between Pure and Hybrid Methods**:
+  - The choice between pure and hybrid Bayesian methods depends on the specific needs of the research, the availability and quality of prior information, and regulatory considerations.
+  - Pure Bayesian methods are more suitable when comprehensive prior information is available and when there is flexibility in the approach to inference, such as in early-phase clinical trials or exploratory studies.
+  - Hybrid methods are particularly useful when there is a need to satisfy both Bayesian and frequentist criteria, often required in later-phase clinical trials or studies that must meet specific regulatory standards.
+
+### Pure Bayesian Sample Size Methods
+
+1. **Overview**:
+   - These methods rely entirely on Bayesian principles to determine the required sample size for a study.
+   - The calculation of sample size is based on specific Bayesian parameters which include prior distributions and the likelihood of observing the data.
+
+2. **Key Features**:
+   - **Bayes Factors**: Used in hypothesis testing, Bayes factors compare the evidence provided by the data for two competing hypotheses. The sample size is determined to ensure that the Bayes factor will adequately support the true model.
+   - **Credible Intervals**: These are Bayesian analogs to confidence intervals. The sample size is calculated to achieve a credible interval of a specified width with a certain probability, ensuring precise estimation of parameters.
+   - **Continual Reassessment Method (CRM)**: Commonly used in phase I clinical trials to find a dose that is both effective and safe. It adjusts the dose level based on the outcomes observed in previous patients, using a Bayesian updating rule.
+   - **Utility/Cost Function**: Considers the trade-off between the cost of sampling and the benefit of information gained, optimizing the sample size to maximize the expected utility.
+
+### Hybrid Bayesian Sample Size Methods
+
+1. **Overview**:
+   - Hybrid methods integrate Bayesian statistics with traditional frequentist approaches to sample size determination, leveraging the strengths of both frameworks.
+
+2. **Key Features**:
+   - **MBL (Mixed Bayesian Likelihood) Intervals**: Combine likelihood methods with Bayesian priors to form intervals that provide a compromise between frequentist and Bayesian inference principles.
+   - **Posterior Errors**: Focus on the probability of parameter estimates falling within specific ranges, considering both prior information and data likelihood.
+   - **Assurance**: Computes the probability that future studies will achieve significant results, considering both prior information and potential future data.
+   - **Predictive Power**: Looks at the likelihood of achieving certain statistical power in future experiments based on both prior and potential new data.
+   - **Bayesian Adaptive Designs**: These designs allow for modifications of the study parameters (like sample size) as data are collected, based on predefined Bayesian updating rules.
+ 
+ 
+## Bayesian Assurance Overview
+
+1. **Definition and Purpose**:
+   - **Bayesian Assurance** is essentially the Bayesian counterpart to the frequentist concept of statistical power. It is defined as the unconditional probability of a clinical trial achieving a successful outcome, which typically means obtaining statistically significant results.
+   - The concept is used to evaluate the likelihood of trial success under varying assumptions about the effect size and other parameters relevant to the study.
+
+2. **Calculation**:
+   - Bayesian Assurance is calculated as the expected value of the power of a test, averaged over all plausible values of the effect size. These plausible values are derived from the prior distribution specified for the effect size, which incorporates expert opinion or historical data.
+   - The calculation integrates over the prior distribution of the effect size to account for all possible values that the effect size could realistically take, weighted by their probabilities.
+
+3. **Comparison to Traditional Power**:
+   - Unlike traditional power, which calculates the probability of detecting an effect of a specified size (assuming that size is the true effect), Bayesian Assurance takes into account the uncertainty in the effect size by averaging the power across a distribution of possible effect sizes.
+   - This provides a more comprehensive and realistic assessment of the trial’s potential success, considering the variability and uncertainty inherent in clinical research.
+
+**Practical Implications**
+
+1. **Closer Representation of Trial Success**:
+   - By considering a range of effect sizes as per their prior probabilities, Bayesian Assurance can offer a more nuanced view of the likelihood of trial success. It reflects a broader set of scenarios than a single-point estimate used in traditional power calculations.
+
+2. **Formalizes Sensitivity Analysis**:
+   - Bayesian Assurance can be seen as formalizing the sensitivity analysis process by systematically varying the effect size according to its prior distribution. This helps stakeholders understand how changes in assumptions about the effect size impact the trial's chance of success.
+
+3. **Integration in Trial Design**:
+   - Implementing Bayesian Assurance in clinical trial design helps in planning by allowing researchers to adjust sample sizes or other design parameters to meet a desired assurance level. This can lead to more efficient resource use and better-planned studies that are more likely to yield conclusive results.
+   
+## Posterior Error Approach
+
+Posterior Error Approach is a method developed by Lee & Zelen in 2000 that integrates both frequentist and Bayesian statistical frameworks to address certain issues in statistical analysis, specifically in hypothesis testing.  
+ 
+1. **Hybrid Approach**:
+   - This method represents a fusion of frequentist and Bayesian principles. By combining these two frameworks, the approach aims to utilize the strengths of each, offering a more comprehensive statistical analysis method.
+
+2. **Focus on Inverse-Conditional Errors**:
+   - Unlike traditional frequentist approaches that focus on Type I and Type II errors (the probabilities of incorrectly rejecting a true null hypothesis and failing to reject a false one, respectively), the posterior error approach uses Bayesian posterior probabilities to reassess these error rates. This allows for a dynamic recalculation of error probabilities based on observed data and prior beliefs.
+
+**Key Features of the Posterior Error Approach**
+
+1. **Bayesian Posterior Errors**:
+   - These are calculated based on the definition of success used in frequentist statistics, often utilizing the p-value derived from data analysis. By incorporating Bayesian probabilities, these errors offer a posterior probability of Type I/II errors given the observed data.
+
+2. **Assumption of Frequentist Analysis**:
+   - The approach assumes that a typical frequentist analysis will follow. This implies that the initial data analysis is conducted using conventional methods, and Bayesian posterior probabilities are then applied to reassess the error rates.
+
+3. **Intuitive and Reflective Decision-Making**:
+   - Bayesian methods are often considered more intuitive because they provide probabilities directly interpretable in terms of the evidence provided by the data. This approach, therefore, can offer clearer insights into the decision-making process by reflecting both prior beliefs and new evidence.
+
+**Note: Practical Implications and Considerations**
+
+1. **Regulatory Perspective**:
+   - While Bayesian approaches are gaining acceptance, regulatory bodies often have specific guidelines that favor frequentist statistics. The integration of Bayesian methods via the posterior error approach can face scrutiny or require additional justification when used in regulatory submissions.
+
+2. **Conversion to Bayesian Probabilities**:
+   - The method involves converting traditional frequentist outcomes (like p-values) into Bayesian probabilities. This requires clear articulation of prior probabilities against the null hypothesis (H0), which needs to be justified logically and empirically.
+
+3. **Sensitivity Analysis**:
+   - The approach can also be viewed as a form of sensitivity analysis, examining how conclusions might change under different assumptions about the prior distribution. This is crucial for robustness checks in statistical analysis.
+ 
+
+# Reference
+ 
+nQuery-Alternative to Power
