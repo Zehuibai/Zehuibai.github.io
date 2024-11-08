@@ -1,0 +1,138 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Correlation Visualization
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+ 
+```{r, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+# getwd()
+# Sys.setlocale("LC_ALL","English")
+
+## devtools::install_github("kupietz/kableExtra")
+packages<-c("tidyverse", "kableExtra",  
+            "ggpubr","gridExtra","ggtext",
+            "corrgram","GGally")
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+```
+ 
+
+## Correlogram using GGally Package
+
+### Scatterplot matrix using ggpairs()
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE} 
+# library("GGally")
+ 
+# Create data 
+data <- data.frame( var1 = 1:100 + rnorm(100,sd=20), 
+                    v2 = 1:100 + rnorm(100,sd=27), 
+                    v3 = rep(1, 100) + rnorm(100, sd = 1)) 
+data$v4 = data$var1 ** 2 
+data$v5 = -(data$var1 ** 2) 
+ 
+# Check correlations (as scatterplots), distribution and print corrleation coefficient 
+ggpairs(data, title="correlogram with ggpairs()") 
+
+
+## Split by group
+data(flea)
+ggpairs(flea, columns = 2:4, ggplot2::aes(colour=species)) 
+```
+
+### Visualize correlation using ggcorr()
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE} 
+# library("GGally")
+ 
+# Create data 
+data <- data.frame( var1 = 1:100 + rnorm(100,sd=20), 
+                    v2 = 1:100 + rnorm(100,sd=27), 
+                    v3 = rep(1, 100) + rnorm(100, sd = 1)) 
+data$v4 = data$var1 ** 2 
+data$v5 = -(data$var1 ** 2) 
+ 
+# Check correlation between variables
+#cor(data) 
+ 
+# Nice visualization of correlations
+ggcorr(data, method = c("everything", "pearson")) 
+```
+
+### Change plot types
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE} 
+# From the help page:
+data(tips, package = "reshape")
+ggpairs(
+  tips[, c(1, 3, 4, 2)],
+  upper = list(continuous = "density", combo = "box_no_facet"),
+  lower = list(continuous = "points", combo = "dot_no_facet")
+)
+```
+
+
+## Correlogram using corrgram Package
+
+### Scatterplot matrix with ggpairs()
+
+Relationship can be visualized with different methods:
+
+* panel.ellipse to display ellipses
+* panel.shade for coloured squares
+* panel.pie for pie charts
+* panel.pts for scatterplots
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE} 
+# Corrgram library
+# library("corrgram")
+
+# mtcars dataset is natively available in R
+# head(mtcars)
+
+# First
+corrgram(mtcars, 
+         order=TRUE, 
+         lower.panel=panel.shade, 
+         upper.panel=panel.pie, 
+         text.panel=panel.txt, 
+         main="Car Milage Data in PC2/PC1 Order") 
+
+# Second
+corrgram(mtcars, 
+         order=TRUE, 
+         lower.panel=panel.ellipse, 
+         upper.panel=panel.pts, 
+         text.panel=panel.txt, 
+         diag.panel=panel.minmax, 
+         main="Car Milage Data in PC2/PC1 Order") 
+
+# Third
+corrgram(mtcars, 
+         order=NULL, 
+         lower.panel=panel.shade, 
+         upper.panel=NULL, 
+         text.panel=panel.txt, 
+         main="Car Milage Data (unsorted)")
+```
+ 

@@ -37,6 +37,13 @@
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/viz-1.8.2/viz.js"></script>
+<link href="site_libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+<script src="site_libs/grViz-binding-1.0.11/grViz.js"></script>
+<script src="site_libs/d3-4.5.0/d3.min.js"></script>
+<script src="site_libs/forceNetwork-binding-0.4/forceNetwork.js"></script>
 <link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
 
@@ -358,6 +365,9 @@ div.tocify {
       <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
     </li>
     <li>
+      <a href="03-SSC-Alternatives-to-Power.html">Bayesian methods - Alternatives to Power</a>
+    </li>
+    <li>
       <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
     </li>
   </ul>
@@ -434,7 +444,19 @@ div.tocify {
       <a href="05-Plot-Laboratory-Data.html">Laboratory Data Visualization</a>
     </li>
     <li>
+      <a href="05-Plot-Time-To-Event.html">Time to Event Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-PRO-Data.html">Patient Reported Outcome Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Forest-Plot.html">Forest Plot</a>
+    </li>
+    <li>
       <a href="05-Plot-Flow-Chart.html">Flow Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-SSC-and-Power-Calculation.html">Sample Size and Power Calculations</a>
     </li>
     <li>
       <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
@@ -612,8 +634,8 @@ alt="Typical Study Disposition Chart" />
 <div id="consort-diagramm-in-sas" class="section level1">
 <h1>CONSORT Diagramm in SAS</h1>
 </div>
-<div id="automate-in-r" class="section level1">
-<h1>Automate in R</h1>
+<div id="consort-diagramm-in-r" class="section level1">
+<h1>CONSORT Diagramm in R</h1>
 <div id="gmisc-and-grid-package" class="section level2">
 <h2>Gmisc and grid Package</h2>
 <ol style="list-style-type: decimal">
@@ -913,19 +935,107 @@ built-in R pipe operator |&gt; is used.</p>
 <p><img src="05-Plot-Flow-Chart_files/figure-html/unnamed-chunk-4-1.png" width="960" /></p>
 </div>
 </div>
-<div id="sankey-plot" class="section level2">
-<h2>Sankey plot</h2>
-<p><a href="https://sankey-dev.apps.vahub.lilly.com"
-class="uri">https://sankey-dev.apps.vahub.lilly.com</a></p>
-<div class="float">
-<img src="02_Plots/Visualization/FlowChart/Sankey-ShinyApp.png"
-alt="Sankey-ShinyApp" />
-<div class="figcaption">Sankey-ShinyApp</div>
+<div id="diagrammer-package" class="section level2">
+<h2>DiagrammeR Package</h2>
+<div id="basic-flowchart-using-grviz" class="section level3">
+<h3>Basic flowchart using <code>grViz</code></h3>
+<pre class="r"><code>library(&quot;DiagrammeR&quot;)
+
+grViz(&quot;digraph flowchart {
+      # node definitions with substituted label text
+      node [fontname = Helvetica, shape = rectangle]        
+      tab1 [label = &#39;@@1&#39;]
+      tab2 [label = &#39;@@2&#39;]
+      tab3 [label = &#39;@@3&#39;]
+      tab4 [label = &#39;@@4&#39;]
+      tab5 [label = &#39;@@5&#39;]
+
+      # edge definitions with the node IDs
+      tab1 -&gt; tab2 -&gt; tab3 -&gt; tab4 -&gt; tab5;
+      }
+
+      [1]: &#39;Questionnaire sent to n=1000 participants&#39;
+      [2]: &#39;Participants responded to questionnaire n=850&#39;
+      [3]: &#39;Participants came to clinic for evaluation n=700&#39;
+      [4]: &#39;Participants eligible for the study n=600&#39;
+      [5]: &#39;Study sample n=600&#39;
+      &quot;)</code></pre>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-d13c98c6210be7465e7b" style="width:960px;height:576px;"></div>
+<script type="application/json" data-for="htmlwidget-d13c98c6210be7465e7b">{"x":{"diagram":"digraph flowchart {\n      # node definitions with substituted label text\n      node [fontname = Helvetica, shape = rectangle]        \n      tab1 [label = \"Questionnaire sent to n=1000 participants\"]\n      tab2 [label = \"Participants responded to questionnaire n=850\"]\n      tab3 [label = \"Participants came to clinic for evaluation n=700\"]\n      tab4 [label = \"Participants eligible for the study n=600\"]\n      tab5 [label = \"Study sample n=600\"]\n\n      # edge definitions with the node IDs\n      tab1 -> tab2 -> tab3 -> tab4 -> tab5;\n      }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>grViz(&quot;digraph flowchart {
+      # node definitions with substituted label text
+      node [fontname = Helvetica, shape = rectangle]        
+      tab1 [label = &#39;@@1&#39;]
+      tab2 [label = &#39;@@2&#39;]
+      tab3 [label = &#39;@@3&#39;]
+      tab4 [label = &#39;@@4&#39;]
+      tab5 [label = &#39;@@5&#39;]
+
+      # edge definitions with the node IDs
+      tab1 -&gt; tab2;
+      tab2 -&gt; tab3;
+      tab2 -&gt; tab4 -&gt; tab5
+      }
+
+      [1]: &#39;Questionnaire sent to n=1000 participants&#39;
+      [2]: &#39;Participants came to clinic for evaluation n=700&#39;
+      [3]: &#39;Participants non-eligible for the study n=100&#39;
+      [4]: &#39;Participants eligible for the study n=600&#39;
+      [5]: &#39;Study sample n=600&#39;
+      &quot;)</code></pre>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-6d045c74fa4318d6ed18" style="width:960px;height:576px;"></div>
+<script type="application/json" data-for="htmlwidget-6d045c74fa4318d6ed18">{"x":{"diagram":"digraph flowchart {\n      # node definitions with substituted label text\n      node [fontname = Helvetica, shape = rectangle]        \n      tab1 [label = \"Questionnaire sent to n=1000 participants\"]\n      tab2 [label = \"Participants came to clinic for evaluation n=700\"]\n      tab3 [label = \"Participants non-eligible for the study n=100\"]\n      tab4 [label = \"Participants eligible for the study n=600\"]\n      tab5 [label = \"Study sample n=600\"]\n\n      # edge definitions with the node IDs\n      tab1 -> tab2;\n      tab2 -> tab3;\n      tab2 -> tab4 -> tab5\n      }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
-<p><img src="05-Plot-Flow-Chart_files/figure-html/unnamed-chunk-5-1.png" width="960" /></p>
+<div id="graphviz-attributes" class="section level3">
+<h3>Graphviz Attributes</h3>
+<ul>
+<li>Node Attributes</li>
+<li>Edge Attributes</li>
+<li>Colors</li>
+<li>Node Shapes</li>
+<li>Arrow Shapes</li>
+</ul>
+<p>See more under <code>Graphviz and mermaid in DiagrammeR</code></p>
+<pre class="r"><code>grViz(diagram = &quot;digraph flowchart {
+      # define node aesthetics
+      node [fontname = Arial, shape = oval, color = Lavender, style = filled]        
+      tab1 [label = &#39;@@1&#39;]
+      tab2 [label = &#39;@@2&#39;]
+      tab3 [label = &#39;@@3&#39;]
+      tab4 [label = &#39;@@4&#39;]
+# set up node layout
+      tab1 -&gt; tab2;
+      tab2 -&gt; tab3;
+      tab2 -&gt; tab4
+      }
+[1]: &#39;Learning Data Science&#39;
+      [2]: &#39;Industry vs Technical Knowledge&#39;
+      [3]: &#39;Python/R&#39;
+      [4]: &#39;Domain Experience&#39;
+      &quot;)</code></pre>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-b6746418138c5a5d7439" style="width:960px;height:576px;"></div>
+<script type="application/json" data-for="htmlwidget-b6746418138c5a5d7439">{"x":{"diagram":"digraph flowchart {\n      # define node aesthetics\n      node [fontname = Arial, shape = oval, color = Lavender, style = filled]        \n      tab1 [label = \"Learning Data Science\"]\n      tab2 [label = \"Industry vs Technical Knowledge\"]\n      tab3 [label = \"Python/R\"]\n      tab4 [label = \"Domain Experience\"]\n# set up node layout\n      tab1 -> tab2;\n      tab2 -> tab3;\n      tab2 -> tab4\n      }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>grViz(&quot;digraph {
+graph [layout = dot, rankdir = LR]
+# define the global styles of the nodes. We can override these in box if we wish
+node [shape = rectangle, style = filled, fillcolor = Linen]
+
+data1 [label = &#39;Dataset 1&#39;, shape = folder, fillcolor = Beige]
+data2 [label = &#39;Dataset 2&#39;, shape = folder, fillcolor = Beige]
+process [label =  &#39;Process \n Data&#39;]
+statistical [label = &#39;Statistical \n Analysis&#39;]
+results [label= &#39;Results&#39;]
+
+# edge definitions with the node IDs
+{data1 data2}  -&gt; process -&gt; statistical -&gt; results
+}&quot;)</code></pre>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-4fb7111e423dcffba87c" style="width:960px;height:576px;"></div>
+<script type="application/json" data-for="htmlwidget-4fb7111e423dcffba87c">{"x":{"diagram":"digraph {\ngraph [layout = dot, rankdir = LR]\n# define the global styles of the nodes. We can override these in box if we wish\nnode [shape = rectangle, style = filled, fillcolor = Linen]\n\ndata1 [label = \"Dataset 1\", shape = folder, fillcolor = Beige]\ndata2 [label = \"Dataset 2\", shape = folder, fillcolor = Beige]\nprocess [label =  \"Process \n Data\"]\nstatistical [label = \"Statistical \n Analysis\"]\nresults [label= \"Results\"]\n\n# edge definitions with the node IDs\n{data1 data2}  -> process -> statistical -> results\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
-<div id="individual-subjects" class="section level2">
-<h2>Individual subjects</h2>
+</div>
+</div>
+<div id="individual-subjects" class="section level1">
+<h1>Individual subjects</h1>
 <p><img src="02_Plots/Visualization/FlowChart/Individual1.jpg"
 alt="Disposition – Overall" /> <img
 src="02_Plots/Visualization/FlowChart/Individual2.jpg"
@@ -947,7 +1057,173 @@ individual waffle charts for Treatment A and Treatment B.</li>
 <code>cowplot</code> package is used to arrange the waffle plots
 side-by-side and add titles for the overall plot.</li>
 </ol>
-<p><img src="05-Plot-Flow-Chart_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
+<p><img src="05-Plot-Flow-Chart_files/figure-html/unnamed-chunk-5-1.png" width="960" /></p>
+</div>
+<div id="gantt-chart-diagrammer-package" class="section level1">
+<h1>Gantt Chart DiagrammeR Package</h1>
+<pre class="r"><code># Define the Gantt chart and plot the result (not shown)
+# library(DiagrammeR)
+
+Gantt &lt;- mermaid(&quot;
+gantt
+    title Project Timeline
+    dateFormat YYYY-MM-DD
+
+    section Initiation
+    Planning           :a1, 2016-01-01, 10d
+    Data processing    :after a1, 30d
+    Data analysis      :b1, 2016-03-01, 15d
+&quot;)
+
+# Print the Gantt chart
+# Gantt</code></pre>
+<p><img src="02_Plots/Visualization/FlowChart/Timeline1.png" /></p>
+</div>
+<div id="sankey-plot" class="section level1">
+<h1>Sankey Plot</h1>
+<p><a href="https://sankey-dev.apps.vahub.lilly.com"
+class="uri">https://sankey-dev.apps.vahub.lilly.com</a></p>
+<div class="float">
+<img src="02_Plots/Visualization/FlowChart/Sankey-ShinyApp.png"
+alt="Sankey-ShinyApp" />
+<div class="figcaption">Sankey-ShinyApp</div>
+</div>
+<p><img src="05-Plot-Flow-Chart_files/figure-html/unnamed-chunk-7-1.png" width="960" /></p>
+<p><a
+href="https://rpubs.com/techanswers88/sankey-with-own-data-in-ggplot">More
+Explor</a></p>
+<div id="ggalluvial-package" class="section level2">
+<h2>ggalluvial package</h2>
+<p>A Sankey diagram allows to study flows. Entities (nodes) are
+represented by rectangles or text. Arrows or arcs are used to show flows
+between them. In R, the networkD3 package is the best way to build
+them</p>
+<p>A Sankey Diagram is a visualisation technique that allows to display
+flows. Several entities (nodes) are represented by rectangles or text.
+Their links are represented with arrow or arcs that have a width
+proportional to the importance of the flow.</p>
+<pre class="r"><code>## https://stackoverflow.com/questions/74903359/sankey-diagram-with-ggplot
+tribble(
+~parm, ~value,
+&quot;b1&quot;, 0.009,
+&quot;g1&quot;, 0.664,
+&quot;b2&quot;, 0.000,
+&quot;ra&quot;, 0.000,
+&quot;rc&quot;, 0.000,
+&quot;ax&quot;, 0.084,
+&quot;cx&quot;, 0.086,
+&quot;ex&quot;, 0.179,
+&quot;ay&quot;, 0.045,
+&quot;cy&quot;, 0.043,
+&quot;ey&quot;, 0.102
+) -&gt; doc1
+
+doc2 &lt;- tribble(
+  ~parm, ~value,
+  &quot;b1&quot;, 0.181,
+  &quot;g1&quot;, 0.289,
+  &quot;b2&quot;, 0.181,
+  &quot;ra&quot;, 0.000,
+  &quot;rc&quot;, 0.000,
+  &quot;ax&quot;, 0.001,
+  &quot;cx&quot;, 0.001,
+  &quot;ex&quot;, 0.002,
+  &quot;ay&quot;, 0.001,
+  &quot;cy&quot;, 0.001,
+  &quot;ey&quot;, 0.002,
+  &quot;re&quot;, 0.000,
+  &quot;rf&quot;, 0.000,
+  &quot;b3&quot;, 0.289
+)
+
+library(&quot;metan&quot;)
+doc1 &lt;- doc1 %&gt;% mutate(model = &quot;exp&quot;)
+doc2 &lt;- doc2 %&gt;% mutate(model = &quot;exp2&quot;)
+finalpow &lt;- doc1 %&gt;% full_join(doc2)
+a &lt;- pivot_wider(finalpow, names_from = model, values_from = value)
+
+library(&quot;ggalluvial&quot;)
+
+## using your data frame a
+finalpow &lt;- a %&gt;% pivot_longer(cols = c(exp, exp2)) %&gt;%
+  ## you need to manually drop all NA, because geom_alluvium won&#39;t do that for you
+  drop_na()
+## I&#39;d  create a separate data frame for annotation
+df_lab &lt;- finalpow %&gt;%
+  filter(name == &quot;exp&quot;) %&gt;%
+  ## for labelling, you need to manually arrange labels in correct position
+  arrange(desc(parm))
+
+ggplot(mapping = aes(y = value, x = name)) +
+  geom_alluvium(
+    data = finalpow,
+    aes(fill = parm, alluvium = parm),
+    color = &quot;black&quot;, alpha = 1
+  ) +
+  ggrepel::geom_label_repel(
+    data = df_lab,
+    aes(label = parm, y = value),
+    ## you cannot just use the y value, you need to stack
+    position = position_stack(vjust = .5)
+  )</code></pre>
+<p><img src="05-Plot-Flow-Chart_files/figure-html/unnamed-chunk-8-1.png" width="960" /></p>
+</div>
+</div>
+<div id="network-chart" class="section level1">
+<h1>Network Chart</h1>
+<div id="ggnet-network-visualization" class="section level2">
+<h2>ggnet network visualization</h2>
+<pre class="r"><code># devtools::install_github(&quot;briatte/ggnet&quot;)
+# https://briatte.github.io/ggnet/
+library(ggnet)
+library(sna)
+library(network)
+
+# random graph
+net = rgraph(10, mode = &quot;graph&quot;, tprob = 0.5)
+net = network(net, directed = FALSE)
+
+# vertex names
+network.vertex.names(net) = letters[1:10]
+
+ggnet2(net, size = 6, color = &quot;black&quot;, edge.size = 1, edge.color = &quot;grey&quot;)</code></pre>
+<p><img src="05-Plot-Flow-Chart_files/figure-html/unnamed-chunk-9-1.png" width="960" /></p>
+<pre class="r"><code># ggnet2(net, mode = &quot;circle&quot;)
+# ggnet2(net, mode = &quot;kamadakawai&quot;)
+ggnet2(net, mode = &quot;target&quot;, layout.par = list(niter = 100))</code></pre>
+<p><img src="05-Plot-Flow-Chart_files/figure-html/unnamed-chunk-9-2.png" width="960" /></p>
+</div>
+<div id="interactive-network-customization" class="section level2">
+<h2>Interactive network customization</h2>
+<pre class="r"><code># Libraries
+library(&quot;igraph&quot;)
+library(&quot;networkD3&quot;)
+
+# create a dataset:
+data &lt;- data_frame(
+  from=c(&quot;A&quot;, &quot;A&quot;, &quot;B&quot;, &quot;D&quot;, &quot;C&quot;, &quot;D&quot;, &quot;E&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;, &quot;K&quot;, &quot;A&quot;, &quot;M&quot;),
+  to=c(&quot;B&quot;, &quot;E&quot;, &quot;F&quot;, &quot;A&quot;, &quot;C&quot;, &quot;A&quot;, &quot;B&quot;, &quot;Z&quot;, &quot;A&quot;, &quot;C&quot;, &quot;A&quot;, &quot;B&quot;, &quot;K&quot;)
+)
+
+# Plot
+p &lt;- simpleNetwork(data, height=&quot;100px&quot;, width=&quot;100px&quot;,        
+        Source = 1,                 # column number of source
+        Target = 2,                 # column number of target
+        linkDistance = 10,          # distance between node. Increase this value to have more space between nodes
+        charge = -900,                # numeric value indicating either the strength of the node repulsion (negative value) or attraction (positive value)
+        fontSize = 14,               # size of the node names
+        fontFamily = &quot;serif&quot;,       # font og node names
+        linkColour = &quot;#666&quot;,        # colour of edges, MUST be a common colour for the whole graph
+        nodeColour = &quot;#69b3a2&quot;,     # colour of nodes, MUST be a common colour for the whole graph
+        opacity = 0.9,              # opacity of nodes. 0=transparent. 1=no transparency
+        zoom = T                    # Can you zoom on the figure?
+        )
+p</code></pre>
+<div class="forceNetwork html-widget html-fill-item" id="htmlwidget-d277fd6b3d19f84d420a" style="width:960px;height:576px;"></div>
+<script type="application/json" data-for="htmlwidget-d277fd6b3d19f84d420a">{"x":{"links":{"source":[0,0,1,3,2,3,4,1,2,3,6,0,7],"target":[1,4,5,0,2,0,1,8,0,2,0,1,6],"value":[1,1,1,1,1,1,1,1,1,1,1,1,1],"colour":["#666","#666","#666","#666","#666","#666","#666","#666","#666","#666","#666","#666","#666"]},"nodes":{"name":["A","B","C","D","E","F","K","M","Z"],"group":[1,1,1,1,1,1,1,1,1],"nodesize":[8,8,8,8,8,8,8,8,8]},"options":{"NodeID":"name","Group":"group","colourScale":"d3.scaleOrdinal(['#69b3a2'])","fontSize":14,"fontFamily":"serif","clickTextSize":35,"linkDistance":10,"linkWidth":"'1.5px'.toString()","charge":-900,"opacity":0.9,"zoom":true,"legend":false,"arrows":false,"nodesize":true,"radiusCalculation":"d.nodesize","bounded":false,"opacityNoHover":1,"clickAction":null}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code># save the widget
+# library(htmlwidgets)
+# saveWidget(p, file=paste0( getwd(), &quot;/HtmlWidget/networkInteractive2.html&quot;))</code></pre>
 </div>
 </div>
 <div id="reference" class="section level1">

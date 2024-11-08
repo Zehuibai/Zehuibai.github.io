@@ -1,0 +1,172 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Patient Reported Outcome Visualization
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                    1. load the required packages                       -->
+# <!-- ---------------------------------------------------------------------- --> 
+
+## if(!require(psych)){install.packages("psych")}
+
+packages<-c("tidyverse", "kableExtra")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                        2. Basic system settings                        -->
+# <!-- ---------------------------------------------------------------------- -->
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+
+## convert backslash to forward slash in R
+# gsub('"', "", gsub("\\\\", "/", readClipboard()))
+
+### get the path
+# rstudioapi::getSourceEditorContext()$path
+# dirname(rstudioapi::getSourceEditorContext()$path)
+
+### set working directory
+# getwd()
+# setwd("c:/Users/zbai/Desktop")
+# Sys.setlocale("LC_ALL","English")
+
+### get the R Version
+# paste(R.Version()[c("major", "minor")], collapse = ".")
+
+### convert backslash to forward slash 
+# scan("clipboard",what="string")
+# gsub('"', "", gsub("\\\\", "/", readClipboard())) 
+
+## Load all r functions
+## The directory where all source code files are saved.
+source_code_dir <- "C:/Users/baiz/Downloads/Data-Analyst-with-R/00 R Function/ZB Function/"  
+file_path_vec <- list.files(source_code_dir, full.names = T)
+for(f_path in file_path_vec){source(f_path)}
+ 
+```
+ 
+ 
+# Introduction
+ 
+![Typical Study Flow Diagram](./02_Plots/Visualization/FlowChart/Example1.png)
+
+## Histogram
+
+In data analysis, especially when dealing with questionnaire data, `geom_histogram()` in `ggplot2` can be an essential tool for visualizing the distribution of responses. Histograms are particularly effective for showing the frequency of score occurrences across a range of values, making them ideal for summarizing the results from questionnaires where responses are often scaled (e.g., Likert scales from 1 to 5).
+ 
+
+1. **Data Structure Preparation**: Your dataset should contain numeric or ordinal scale responses to questionnaire items. Each response is treated as an individual data point.
+
+2. **Plotting with `geom_histogram()`**:
+   - **Bin Settings**: By default, `geom_histogram()` will attempt to create 30 bins of equal width, but for questionnaire data, you might set the `binwidth` to 1 if your data are integers representing something like a Likert scale. This will create a bin for each possible score, aligning perfectly with the questionnaire's scoring system.
+   - **Aesthetic Mapping**: Map the x-axis to your questionnaire score variable. Optionally, you can fill the bars based on another variable, such as different groups or demographics within your survey population, to compare distributions across categories.
+   - **Position Adjustment**: If you are filling based on a factor (like age group or gender), using `position = "dodge"` will place the groups side by side for easier comparison, rather than the default stacking.
+
+3. **Customizations and Improvements**:
+   - **Labels and Titles**: Adding clear labels for the x-axis and y-axis, as well as a descriptive title, can help in immediately understanding the plot’s purpose. For instance, x could be "Questionnaire Score" and y "Frequency of Responses".
+   - **Theme Adjustments**: Customize the plot appearance using `theme()` to improve readability and presentation quality. For example, adjusting text size, changing the legend position, or modifying background colors.
+
+4. **Statistical Overlays**:
+   - **Adding Mean/Mode Lines**: You can overlay additional information such as a vertical line showing the mean or mode of the distribution using `geom_vline()`, which can provide insights into the central tendency of the responses.
+   - **Annotations**: Annotate specific features of the histogram, like notable peaks or unusual gaps, to draw attention to important aspects of the data.
+
+5. **Analysis Interpretation**:
+   - Histograms allow you to quickly grasp the distribution of responses, identify common and outlier responses, and assess the skewness or symmetry of the data.
+   - By comparing histograms from different demographic groups, you can explore how opinions or behaviors differ across these groups, potentially guiding more detailed statistical tests or reporting insights.
+
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+data <- data.frame(
+  Group = c(rep("Active Treatment", 200), rep("Placebo", 200)),
+  Time = c(rep("Baseline", 100), rep("Week 16", 100), rep("Baseline", 100), rep("Week 16", 100)),
+  DLQI_Score = c(sample(0:30, 100, replace = TRUE), sample(0:30, 100, replace = TRUE),
+                 sample(0:30, 100, replace = TRUE), sample(0:30, 100, replace = TRUE))
+)
+ 
+
+# Create the plot
+plot1 <- ggplot(data, aes(x = DLQI_Score, fill = Time)) +
+  geom_histogram(stat = "count", binwidth = 1, position = position_dodge(width = 0.9)) +
+  facet_wrap(~ Group, scales = "free_y") +
+  labs(
+    title = "Improved Quality of life after 16 weeks of treatment",
+    x = "Total DLQI Score",
+    y = "Patients"
+  ) +
+  scale_fill_brewer(palette = "Set1", labels = c("Baseline", "Week 16")) +
+  theme_minimal() +
+  theme(
+    legend.title = element_blank(),
+    plot.title = element_text(hjust = 0.5)
+  )
+# Print the plot
+print(plot1)
+
+
+plot2 <- ggplot(data, aes(x = DLQI_Score, fill = Time)) +
+  geom_histogram(stat = "count", binwidth = 1, position = position_dodge(width = 0.9)) +
+  facet_grid(Group ~ ., scales = "free_y", space = "free_y") +
+  labs(
+    title = "Improved Quality of life after 16 weeks of treatment",
+    x = "Total DLQI Score",
+    y = "Patients"
+  ) +
+  scale_fill_brewer(palette = "Set1", labels = c("Baseline", "Week 16")) +
+  theme_minimal() +
+  theme(
+    legend.title = element_blank(),
+    plot.title = element_text(hjust = 0.5),
+    strip.background = element_blank(),
+    strip.text = element_text(face = "bold")
+  )
+
+# Print the plot
+print(plot2)
+
+plot3 <- ggplot(data, aes(x = DLQI_Score, fill = Time)) +
+  geom_histogram(stat = "count", binwidth = 1, position = position_dodge(width = 0.9)) +
+  facet_grid(Time ~ Group, scales = "free_y", space = "free") +  # Adjust faceting
+  labs(
+    title = "Improved Quality of life after 16 weeks of treatment",
+    x = "Total DLQI Score",
+    y = "Patients"
+  ) +
+  scale_fill_brewer(palette = "Set1", labels = c("Baseline", "Week 16")) +
+  theme_minimal() +
+  theme(
+    legend.title = element_blank(),
+    plot.title = element_text(hjust = 0.5),
+    strip.background = element_rect(fill = "gray90"),
+    strip.text = element_text(face = "bold")
+  )
+
+# Print the plot
+print(plot3)
+```
+

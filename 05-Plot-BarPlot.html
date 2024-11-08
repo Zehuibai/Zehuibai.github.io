@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Bar Chart</title>
+
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.10.4.9000/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+<script src="site_libs/d3-bundle-5.16.0/d3-bundle.min.js"></script>
+<script src="site_libs/d3-lasso-0.0.5/d3-lasso.min.js"></script>
+<script src="site_libs/save-svg-as-png-1.4.17/save-svg-as-png.min.js"></script>
+<script src="site_libs/flatbush-4.4.0/flatbush.min.js"></script>
+<link href="site_libs/ggiraphjs-0.8.10/ggiraphjs.min.css" rel="stylesheet" />
+<script src="site_libs/ggiraphjs-0.8.10/ggiraphjs.min.js"></script>
+<script src="site_libs/girafe-binding-0.8.10/girafe.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Alternatives-to-Power.html">Bayesian methods - Alternatives to Power</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-Estimands.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot-Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Time-To-Event.html">Time to Event Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-PRO-Data.html">Patient Reported Outcome Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-SSC-and-Power-Calculation.html">Sample Size and Power Calculations Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Correlation.html">Correlation Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-ScatterPlot.html">Scatter and Line Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-BarPlot.html">Bar Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-PieChart.html">Pie Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-BoxPlot.html">Box Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Histogram.html">Histogram</a>
+    </li>
+    <li>
+      <a href="05-Plot-Forest-Plot.html">Forest Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Flow-Chart.html">Flow Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Linear-Regression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="07-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Bar Chart</p></h1>
+
+</div>
+
+
+<div id="basic-aesthetic" class="section level2">
+<h2>Basic Aesthetic</h2>
+<pre class="r"><code># Color Aesthetic
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = cut ))</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = color ))</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<pre class="r"><code># Position aesthetic
+# position adjustment options: &quot;identity&quot;, &quot;dodge&quot; or &quot;fill&quot;.
+# position =“fill” is like overlay, but each bar has same height. 
+# position =“dodge” put objects together
+
+ggplot(data = diamonds, mapping = aes(x = cut, fill = clarity)) + 
+  geom_bar(alpha = 1/5, position = &quot;identity&quot;)</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-2-3.png" width="672" /></p>
+</div>
+<div id="grouped-and-stacked-barplot" class="section level2">
+<h2>Grouped and Stacked Barplot</h2>
+<div id="position-option" class="section level3">
+<h3>Position Option</h3>
+<pre class="r"><code># library(viridis)
+# library(hrbrthemes)
+
+p1 &lt;- ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = &quot;dodge&quot;)+
+    scale_fill_viridis(discrete = T) +
+    ggtitle(&quot;Add Title Here...&quot;) +
+    theme_ipsum() +
+    xlab(&quot;&quot;)
+p1</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>p2 &lt;- ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = &quot;stack&quot;)+
+    scale_fill_viridis(discrete = T) +
+    ggtitle(&quot;Add Title Here...&quot;) +
+    theme_ipsum() +
+    xlab(&quot;&quot;)
+p2</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<pre class="r"><code>p3 &lt;- ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = &quot;fill&quot;, width = 0.5) + 
+  theme(axis.text.x = element_text(angle=65, vjust=0.6)) + 
+  labs(title=&quot;Add Title Here...&quot;, 
+       subtitle=&quot;Add Subtitle Here...&quot;) 
+p3</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-3-3.png" width="672" /></p>
+</div>
+<div id="facet-option" class="section level3">
+<h3>Facet Option</h3>
+<pre class="r"><code>ggplot(data = diamonds, mapping = aes(x = cut, colour = clarity)) + 
+  geom_bar(fill = NA, position = &quot;identity&quot;)+
+  facet_wrap(~color) +
+  theme(legend.position = &quot;top&quot;)</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code># Graph
+ggplot(data = diamonds, mapping = aes(x = cut, colour = clarity)) + 
+    geom_bar(fill = NA, position = &quot;identity&quot;)+
+    scale_fill_viridis(discrete = T, option = &quot;E&quot;) +
+    ggtitle(&quot;Add Title Here...&quot;) +
+    facet_wrap(~color) +
+    theme_ipsum() +
+    theme(legend.position=&quot;none&quot;) +
+    xlab(&quot;&quot;)</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+</div>
+</div>
+<div id="negative-values" class="section level2">
+<h2>Negative Values</h2>
+<p>Stacked barplot with negative values with ggplot2</p>
+<pre class="r"><code># Load the dataset that is stored on the web
+data &lt;- read.table(&quot;./01_Datasets/stacked_barplot_negative_values.csv&quot;, header=T, sep=&quot;,&quot;)
+
+# transform the format
+data_long &lt;- gather(data, group, value, groupA:groupD) %&gt;%
+  arrange(factor(x, levels = c(&quot;Jan&quot;, &quot;Feb&quot;, &quot;Mar&quot;, &quot;Apr&quot;, &quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sept&quot;, &quot;Oct&quot;))) %&gt;% 
+  mutate(x=factor(x, levels=unique(x)))
+
+# And that&#39;s the result!
+head(data_long, 4) %&gt;%
+  kable(caption = &quot;Data sets&quot;, format = &quot;html&quot;) %&gt;%
+  kable_styling(latex_options = &quot;striped&quot;)</code></pre>
+<table class="table" style="color: black; margin-left: auto; margin-right: auto;">
+<caption>
+Data sets
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+x
+</th>
+<th style="text-align:left;">
+group
+</th>
+<th style="text-align:right;">
+value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Jan
+</td>
+<td style="text-align:left;">
+groupA
+</td>
+<td style="text-align:right;">
+12
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jan
+</td>
+<td style="text-align:left;">
+groupB
+</td>
+<td style="text-align:right;">
+19
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jan
+</td>
+<td style="text-align:left;">
+groupC
+</td>
+<td style="text-align:right;">
+-9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jan
+</td>
+<td style="text-align:left;">
+groupD
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># library(hrbrthemes)
+# library(viridis)
+
+# plot
+ggplot(data_long, aes(fill=group, y=value, x=x)) + 
+  geom_bar(position=&quot;stack&quot;, stat=&quot;identity&quot;) + 
+  scale_fill_viridis(discrete=TRUE, name=&quot;&quot;) +
+  theme_ipsum() +
+  ylab(&quot;Money input&quot;) + 
+  xlab(&quot;Month&quot;)</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="percentage-plot" class="section level2">
+<h2>Percentage Plot</h2>
+<div id="calculate-percentage-in-data" class="section level3">
+<h3>Calculate Percentage in Data</h3>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="transfer-percentage-in-ggplot" class="section level3">
+<h3>Transfer Percentage in ggplot</h3>
+<pre class="r"><code>data(tips, package = &quot;reshape2&quot;)
+library(scales)  # for percentage scales
+
+## Alternative 1
+ggplot(data = tips) + 
+  geom_bar(mapping = aes(x = day, 
+                         y = ..prop.., 
+                         group = 1, 
+                         fill = factor(..x..)
+                         )
+           )+
+  scale_y_continuous(labels = scales::percent) +
+  labs(title=&quot;Add Title Here...&quot;)+
+  ylab(&quot;relative frequencies&quot;)+
+  theme_classic()</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>## Alternative 2
+ggplot(tips, aes(x = day)) +  
+  geom_bar(aes(y = (..count..)/sum(..count..), fill=day))+
+  scale_y_continuous(labels = scales::percent) +
+  labs(title=&quot;Add Title Here...&quot;)+
+  ylab(&quot;relative frequencies&quot;)+
+  theme_classic()</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+<pre class="r"><code>## Alternative 3
+ggplot(tips, aes(day, group = sex)) + 
+          geom_bar(aes(y = ..prop.., fill = factor(..x..)), stat=&quot;count&quot;) + 
+          scale_y_continuous(labels=scales::percent) +
+          ylab(&quot;relative frequencies&quot;) +
+          facet_grid(~sex)</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-7-3.png" width="672" /></p>
+<pre class="r"><code>## Alternative 4
+ggplot(tips, aes(x= day,  group=sex)) + 
+    geom_bar(aes(y = ..prop.., fill = factor(..x..)), stat=&quot;count&quot;) +
+    geom_text(aes( label = scales::percent(..prop..),
+                   y= ..prop.. ), stat= &quot;count&quot;, vjust = -0.5) +
+    labs(y = &quot;Percent&quot;, fill=&quot;day&quot;) +
+    facet_grid(~sex) +
+    scale_y_continuous(labels = scales::percent)</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-7-4.png" width="672" /></p>
+</div>
+</div>
+<div id="text" class="section level2">
+<h2>Text</h2>
+<div id="add-text-by-group" class="section level3">
+<h3>Add Text by Group</h3>
+<pre class="r"><code>Rotation_5 &lt;- readRDS(file = &quot;./01_Datasets/Rotation_5.rds&quot;)
+
+ggplot(data = Rotation_5, aes(x = Visit, y= Percentage, fill=Treatment)) +
+  geom_bar(stat=&quot;identity&quot;, width =0.5,
+           position=position_dodge()) +
+  geom_text(aes(label=N), vjust=1.6, color=&quot;white&quot;,
+            position = position_dodge(0.5), size=3.5)+
+  geom_text(aes(label=P, x=Visit, y=0.97),hjust=0.4, size=3.5)+
+  scale_fill_brewer(palette=&quot;Paired&quot;)+
+  scale_y_continuous(labels = scales::percent, breaks=seq(0, 1, 0.1)) +
+  theme_bw() +
+  theme(legend.position = &quot;none&quot;) +
+  labs(x = &quot;&quot;,
+       y = &quot;Responder rate&quot;,
+       title = &quot;Rotational stability within 5° from Visit H0 (sitting)&quot;)</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/identity-1.png" width="672" /></p>
+</div>
+<div id="change-text-and-bar-color" class="section level3">
+<h3>Change Text and Bar Color</h3>
+<p>The ggtext package defines two new theme elements, element_markdown()
+and element_textbox(). Both behave similarly to element_text() but
+render the provided text as markdown/html. element_markdown() is meant
+as a direct replacement for element_text(), and it renders text without
+word wrapping. To start a new line, use the <br> tag or add two spaces
+before the end of a line.</p>
+<pre class="r"><code># remotes::install_github(&quot;wilkelab/ggtext&quot;)
+# library(&quot;ggtext&quot;) 
+# library(&quot;glue&quot;)
+
+data &lt;- tibble(
+  bactname = c(&quot;Staphylococcaceae&quot;, &quot;Moraxella&quot;, &quot;Streptococcus&quot;, &quot;Acinetobacter&quot;),
+  OTUname = c(&quot;OTU 1&quot;, &quot;OTU 2&quot;, &quot;OTU 3&quot;, &quot;OTU 4&quot;),
+  value = c(-0.5, 0.5, 2, 3)
+)
+
+data %&gt;% mutate(
+  color = c(&quot;#009E73&quot;, &quot;#D55E00&quot;, &quot;#0072B2&quot;, &quot;#000000&quot;),
+  name = glue(&quot;&lt;i style=&#39;color:{color}&#39;&gt;{bactname}&lt;/i&gt; ({OTUname})&quot;),
+  name = fct_reorder(name, value)
+)  %&gt;%
+  ggplot(aes(value, name, fill = color)) + 
+  geom_col(alpha = 0.5) + 
+  scale_fill_identity() +
+  labs(caption = &quot;Example posted on **stackoverflow.com**&lt;br&gt;(using made-up data)&quot;) +
+  theme(
+    axis.text.y = element_markdown(),
+    plot.caption = element_markdown(lineheight = 1.2)
+  )</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/ggtext-1.png" width="672" /></p>
+</div>
+</div>
+<div id="change-coordinate" class="section level2">
+<h2>Change Coordinate</h2>
+<pre class="r"><code># coord_polar() uses polar coordinates
+bar &lt;- ggplot(data = diamonds) + 
+  geom_bar(
+    mapping = aes(x = cut, fill = cut), 
+    show.legend = FALSE,
+    width = 1
+  ) + 
+  theme(aspect.ratio = 1) +
+  labs(x = NULL, y = NULL)
+bar + coord_flip()</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/coordinary%20system-1.png" width="672" /></p>
+<pre class="r"><code>bar + coord_polar()</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/coordinary%20system-2.png" width="672" /></p>
+</div>
+<div id="ordered-bar-plot" class="section level2">
+<h2>Ordered Bar Plot</h2>
+<pre class="r"><code>## Ordered Bar Chart 
+cty_mpg &lt;- aggregate(mpg$cty, by=list(mpg$manufacturer), FUN=mean)  # aggregate
+colnames(cty_mpg) &lt;- c(&quot;make&quot;, &quot;mileage&quot;)  # change column names
+cty_mpg &lt;- cty_mpg[order(cty_mpg$mileage), ]  # sort
+cty_mpg$make &lt;- factor(cty_mpg$make, levels = cty_mpg$make)  # to retain the order in plot.
+
+# Draw plot
+ggplot(cty_mpg, aes(x=make, y=mileage)) + 
+  geom_bar(stat=&quot;identity&quot;, width=.5, fill=&quot;tomato3&quot;) + 
+  labs(title=&quot;Ordered Bar Chart&quot;, 
+       subtitle=&quot;Make Vs Avg. Mileage&quot;, 
+       caption=&quot;source: mpg&quot;) + 
+  theme(axis.text.x = element_text(angle=65, vjust=0.6)) +
+  theme_bw()</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><strong>Ordered bar plots by group</strong></p>
+<pre class="r"><code># Load data
+data(&quot;mtcars&quot;)
+dfm &lt;- mtcars
+# Convert the cyl variable to a factor
+dfm$cyl &lt;- as.factor(dfm$cyl)
+# Add the name colums
+dfm$name &lt;- rownames(dfm)
+
+# library(&quot;ggpubr&quot;)
+dfm %&gt;% ggbarplot(x = &quot;name&quot;, y = &quot;mpg&quot;,
+          fill = &quot;cyl&quot;,               # change fill color by cyl
+          color = &quot;white&quot;,            # Set bar border colors to white
+          palette = &quot;jco&quot;,            # jco journal color palett. see ?ggpar
+          sort.val = &quot;desc&quot;,          # Sort the value in dscending order
+          sort.by.groups = FALSE,     # Don&#39;t sort inside each group
+          x.text.angle = 90           # Rotate vertically x axis texts
+          )</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>ggbarplot(dfm, x = &quot;name&quot;, y = &quot;mpg&quot;,
+          fill = &quot;cyl&quot;,               # change fill color by cyl
+          color = &quot;white&quot;,            # Set bar border colors to white
+          palette = &quot;jco&quot;,            # jco journal color palett. see ?ggpar
+          sort.val = &quot;asc&quot;,           # Sort the value in dscending order
+          sort.by.groups = TRUE,      # Sort inside each group
+          x.text.angle = 90           # Rotate vertically x axis texts
+          )</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
+</div>
+<div id="lollipop-chart" class="section level2">
+<h2>Lollipop Chart</h2>
+<pre class="r"><code>## Lollipop charts conveys the same information as in bar charts. By reducing the thick bars into thin lines, it reduces the clutter and lays more emphasis on the value. It looks nice and modern.
+ggplot(cty_mpg, aes(x=make, y=mileage)) + 
+  geom_point(size=3) + 
+  geom_segment(aes(x=make, 
+                   xend=make, 
+                   y=0, 
+                   yend=mileage)) + 
+  labs(title=&quot;Lollipop Chart&quot;, 
+       subtitle=&quot;Make Vs Avg. Mileage&quot;, 
+       caption=&quot;source: mpg&quot;) + 
+  theme(axis.text.x = element_text(angle=65, vjust=0.6))</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+<div id="deviation-graphs" class="section level2">
+<h2>Deviation Graphs</h2>
+<pre class="r"><code># Data Prep
+data(&quot;mtcars&quot;)  # load data
+mtcars$`car name` &lt;- rownames(mtcars)  # create new column for car names
+mtcars$mpg_z &lt;- round((mtcars$mpg - mean(mtcars$mpg))/sd(mtcars$mpg), 2)  # compute normalized mpg
+mtcars$mpg_type &lt;- ifelse(mtcars$mpg_z &lt; 0, &quot;below&quot;, &quot;above&quot;)  # above / below avg flag
+mtcars &lt;- mtcars[order(mtcars$mpg_z), ]  # sort
+mtcars$`car name` &lt;- factor(mtcars$`car name`, levels = mtcars$`car name`)  # convert to factor to retain sorted order in plot.
+
+ggplot(mtcars, aes(x=`car name`, y=mpg_z, label=mpg_z)) + 
+  geom_bar(stat=&#39;identity&#39;, aes(fill=mpg_type), width=.5)  +
+  scale_fill_manual(name=&quot;Mileage&quot;, 
+                    labels = c(&quot;Above Average&quot;, &quot;Below Average&quot;), 
+                    values = c(&quot;above&quot;=&quot;#00ba38&quot;, &quot;below&quot;=&quot;#f8766d&quot;)) + 
+  labs(subtitle=&quot;Normalised mileage from &#39;mtcars&#39;&quot;, 
+       title= &quot;Diverging Bars&quot;) + 
+  coord_flip() +
+  theme_bw()</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><strong>Alternative using ggpubr package</strong></p>
+<pre class="r"><code># Diverging Barcharts
+mtcars %&gt;%
+  ggbarplot(x = &quot;car name&quot;, y = &quot;mpg_z&quot;,
+          fill = &quot;mpg_type&quot;,           # change fill color by mpg_level
+          color = &quot;white&quot;,            # Set bar border colors to white
+          palette = &quot;jco&quot;,            # jco journal color palett. see ?ggpar
+          sort.val = &quot;asc&quot;,           # Sort the value in ascending order
+          sort.by.groups = FALSE,     # Don&#39;t sort inside each group
+          x.text.angle = 90,          # Rotate vertically x axis texts
+          ylab = &quot;MPG z-score&quot;,
+          xlab = FALSE,
+          legend.title = &quot;MPG Group&quot;
+          )</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre class="r"><code>mtcars %&gt;%
+  ggbarplot(x = &quot;car name&quot;, y = &quot;mpg_z&quot;,
+          fill = &quot;mpg_type&quot;,           # change fill color by mpg_level
+          color = &quot;white&quot;,            # Set bar border colors to white
+          palette = &quot;jco&quot;,            # jco journal color palett. see ?ggpar
+          sort.val = &quot;desc&quot;,           # Sort the value in ascending order
+          sort.by.groups = FALSE,     # Don&#39;t sort inside each group
+          x.text.angle = 90,          # Rotate vertically x axis texts
+          ylab = &quot;MPG z-score&quot;,
+          xlab = TRUE,
+          rotate = TRUE,
+          legend.title = &quot;MPG Group&quot;,
+          ggtheme = theme_minimal()
+          )</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-12-2.png" width="672" /></p>
+</div>
+<div id="means-and-error-bars" class="section level2">
+<h2>Means and Error Bars</h2>
+<pre class="r"><code>PrimEnd &lt;- data.frame(&#39;Primary Endpoint&#39;=c(&quot;Primary Analysis&quot;, 
+                                           &quot;Sensitivity Analysis 1&quot;,
+                                           &quot;Sensitivity Analysis 2&quot;,
+                                           &quot;Primary Analysis after imputation&quot;),
+                      mean=c(-0.2945, -0.08334, -0.2926, -0.2395),
+                      LL=c(-0.9612, -0.2861, -0.9344, -0.7521),
+                      UL=c(0.3722, 0.1194, 0.3491, 0.2730),
+                      pvalue=c(&quot;P = 0.313&quot;, &quot;P = 0.347&quot;, &quot;P = 0.304&quot;,&quot;P = 0.359&quot;))
+level &lt;- PrimEnd$Primary.Endpoint
+
+PrimEnd$Primary.Endpoint &lt;- factor(PrimEnd$Primary.Endpoint, levels=level)
+
+ggplot(PrimEnd, aes(x=Primary.Endpoint, y=mean)) + 
+  geom_line() +
+  geom_point()+
+  geom_text(aes(label=pvalue),hjust=-0.2, vjust=0) +
+  geom_hline(aes(yintercept=0, color=&quot;black&quot;, linetype=&quot;dot&quot;)) + 
+  geom_errorbar(aes(ymin=LL, ymax=UL), width = 0.5, size = 0.5)+
+  theme_bw() +
+  theme(legend.position = &quot;none&quot;) +
+  labs(x = &quot;&quot;,
+       y = &quot;Difference between the IOLs&quot;,
+       title = &quot;Superiority analysis in mean absolute rotation between Visit H0 (sitting) and H1&quot;)</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/geom_errorbar-1.png" width="672" /></p>
+<pre class="r"><code>tg &lt;- ToothGrowth
+# Gives count, mean, standard deviation, standard error of the mean, and confidence interval (default 95%).
+#   data: a data frame.
+#   measurevar: the name of a column that contains the variable to be summariezed
+#   groupvars: a vector containing names of columns that contain grouping variables
+#   na.rm: a boolean that indicates whether to ignore NA&#39;s
+#   conf.interval: the percent range of the confidence interval (default is 95%)
+summarySE &lt;- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
+                      conf.interval=.95, .drop=TRUE) {
+    library(plyr)
+
+    # New version of length which can handle NA&#39;s: if na.rm==T, don&#39;t count them
+    length2 &lt;- function (x, na.rm=FALSE) {
+        if (na.rm) sum(!is.na(x))
+        else       length(x)
+    }
+
+    # This does the summary. For each group&#39;s data frame, return a vector with
+    # N, mean, and sd
+    datac &lt;- ddply(data, groupvars, .drop=.drop,
+      .fun = function(xx, col) {
+        c(N    = length2(xx[[col]], na.rm=na.rm),
+          mean = mean   (xx[[col]], na.rm=na.rm),
+          sd   = sd     (xx[[col]], na.rm=na.rm)
+        )
+      },
+      measurevar
+    )
+
+    # Rename the &quot;mean&quot; column    
+    datac &lt;- rename(datac, c(&quot;mean&quot; = measurevar))
+
+    datac$se &lt;- datac$sd / sqrt(datac$N)  # Calculate standard error of the mean
+
+    # Confidence interval multiplier for standard error
+    # Calculate t-statistic for confidence interval: 
+    # e.g., if conf.interval is .95, use .975 (above/below), and use df=N-1
+    ciMult &lt;- qt(conf.interval/2 + .5, datac$N-1)
+    datac$ci &lt;- datac$se * ciMult
+
+    return(datac)
+}
+tgc &lt;- summarySE(tg, measurevar=&quot;len&quot;, groupvars=c(&quot;supp&quot;,&quot;dose&quot;))
+# The errorbars overlapped, so use position_dodge to move them horizontally
+pd &lt;- position_dodge(0.1) 
+ggplot(tgc, aes(x=dose, y=len, colour=supp, group=supp)) + 
+    geom_errorbar(aes(ymin=len-se, ymax=len+se), colour=&quot;black&quot;, width=.1, position=pd) +
+    geom_line(position=pd) +
+    geom_point(position=pd, size=3, shape=21, fill=&quot;white&quot;) + # 21 is filled circle
+    xlab(&quot;Dose (mg)&quot;) +
+    ylab(&quot;Tooth length&quot;) +
+    scale_colour_hue(name=&quot;Supplement type&quot;,    # Legend label, use darker colors
+                     breaks=c(&quot;OJ&quot;, &quot;VC&quot;),
+                     labels=c(&quot;Orange juice&quot;, &quot;Ascorbic acid&quot;),
+                     l=40) +                    # Use darker colors, lightness=40
+    ggtitle(&quot;The Effect of Vitamin C on\nTooth Growth in Guinea Pigs&quot;) +
+    expand_limits(y=0) +                        # Expand y range
+    scale_y_continuous(breaks=0:20*4) +         # Set tick every 4
+    theme_bw() +
+    theme(legend.justification=c(1,0),
+          legend.position=c(1,0))               # Position legend in bottom right</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/geom_errorbar-2.png" width="672" /></p>
+<pre class="r"><code>tgc2 &lt;- tgc
+tgc2$dose &lt;- factor(tgc2$dose)
+ggplot(tgc2, aes(x=dose, y=len, fill=supp)) + 
+    geom_bar(position=position_dodge(), stat=&quot;identity&quot;,
+             colour=&quot;black&quot;, # Use black outlines,
+             size=.3) +      # Thinner lines
+    geom_errorbar(aes(ymin=len-se, ymax=len+se),
+                  size=.3,    # Thinner lines
+                  width=.2,
+                  position=position_dodge(.9)) +
+    xlab(&quot;Dose (mg)&quot;) +
+    ylab(&quot;Tooth length&quot;) +
+    scale_fill_hue(name=&quot;Supplement type&quot;, # Legend label, use darker colors
+                   breaks=c(&quot;OJ&quot;, &quot;VC&quot;),
+                   labels=c(&quot;Orange juice&quot;, &quot;Ascorbic acid&quot;)) +
+    ggtitle(&quot;The Effect of Vitamin C on\nTooth Growth in Guinea Pigs&quot;) +
+    scale_y_continuous(breaks=0:20*4) +
+    theme_bw()</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/geom_errorbar-3.png" width="672" /></p>
+</div>
+<div id="circular-barplot" class="section level2">
+<h2>Circular Barplot</h2>
+<div id="basic-using-coord_polar" class="section level3">
+<h3>Basic Using coord_polar()</h3>
+<pre class="r"><code># Create dataset
+data &lt;- data.frame(
+  id=seq(1,60),
+  individual=paste( &quot;Mister &quot;, seq(1,60), sep=&quot;&quot;),
+  value=sample( seq(10,100), 60, replace=T)
+)
+ 
+# Get the name and the y position of each label
+label_data &lt;- data
+ 
+# calculate the ANGLE of the labels
+number_of_bar &lt;- nrow(label_data)
+angle &lt;-  90 - 360 * (label_data$id-0.5) /number_of_bar     
+# Substracting 0.5 because the letter must have the angle of the center of the bars. 
+# Not extreme right(1) or extreme left (0)
+ 
+# calculate the alignment of labels: right or left
+# If I am on the left part of the plot, my labels have currently an angle &lt; -90
+label_data$hjust&lt;-ifelse( angle &lt; -90, 1, 0)
+ 
+# flip angle BY to make them readable
+label_data$angle&lt;-ifelse(angle &lt; -90, angle+180, angle)
+# ----- ------------------------------------------- ---- #
+ 
+# Start the plot
+p &lt;- ggplot(data, aes(x=as.factor(id), y=value)) +       # Note that id is a factor. If x is numeric, there is some space between the first bar
+  # This add the bars with a blue color
+  geom_bar(stat=&quot;identity&quot;, fill=alpha(&quot;skyblue&quot;, 0.7)) +
+  # Limits of the plot = very important. The negative value controls the size of the inner circle, the positive one is useful to add size over each bar
+  ylim(-100,120) +
+  # Custom the theme: no axis title and no cartesian grid
+  theme_minimal() +
+  theme(
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    plot.margin = unit(rep(-1,4), &quot;cm&quot;)      # Adjust the margin to make in sort labels are not truncated!
+  ) +
+  # This makes the coordinate polar instead of cartesian.
+  coord_polar(start = 0) +
+  # Add the labels, using the label_data dataframe that we have created before
+  geom_text(data=label_data, aes(x=id, y=value+10, label=individual, hjust=hjust), color=&quot;black&quot;, fontface=&quot;bold&quot;,alpha=0.8, size=3, angle= label_data$angle, inherit.aes = FALSE ) 
+ 
+p</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+<div id="circular-barplot-with-gap" class="section level3">
+<h3>Circular barplot with gap</h3>
+<pre class="r"><code># Create dataset
+data &lt;- data.frame(
+  individual=paste( &quot;Mister &quot;, seq(1,60), sep=&quot;&quot;),
+  value=sample( seq(10,100), 60, replace=T)
+)
+ 
+# Set a number of &#39;empty bar&#39;
+empty_bar &lt;- 10
+ 
+# Add lines to the initial dataset
+to_add &lt;- matrix(NA, empty_bar, ncol(data))
+colnames(to_add) &lt;- colnames(data)
+data &lt;- rbind(data, to_add)
+data$id &lt;- seq(1, nrow(data))
+ 
+# Get the name and the y position of each label
+label_data &lt;- data
+number_of_bar &lt;- nrow(label_data)
+angle &lt;- 90 - 360 * (label_data$id-0.5) /number_of_bar     # I substract 0.5 because the letter must have the angle of the center of the bars. Not extreme right(1) or extreme left (0)
+label_data$hjust &lt;- ifelse( angle &lt; -90, 1, 0)
+label_data$angle &lt;- ifelse(angle &lt; -90, angle+180, angle)
+ 
+# Make the plot
+p &lt;- ggplot(data, aes(x=as.factor(id), y=value)) +       # Note that id is a factor. If x is numeric, there is some space between the first bar
+  geom_bar(stat=&quot;identity&quot;, fill=alpha(&quot;green&quot;, 0.3)) +
+  ylim(-100,120) +
+  theme_minimal() +
+  theme(
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    plot.margin = unit(rep(-1,4), &quot;cm&quot;) 
+  ) +
+  coord_polar(start = 0) + 
+  geom_text(data=label_data, aes(x=id, y=value+10, label=individual, hjust=hjust), color=&quot;black&quot;, fontface=&quot;bold&quot;,alpha=0.6, size=2.5, angle= label_data$angle, inherit.aes = FALSE ) 
+ 
+p</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
+<div id="groups" class="section level3">
+<h3>Groups</h3>
+<pre class="r"><code># Create dataset
+data &lt;- data.frame(
+  individual=paste( &quot;Mister &quot;, seq(1,60), sep=&quot;&quot;),
+  group=c( rep(&#39;A&#39;, 10), rep(&#39;B&#39;, 30), rep(&#39;C&#39;, 14), rep(&#39;D&#39;, 6)) ,
+  value=sample( seq(10,100), 60, replace=T)
+)
+
+# Order data:
+data = data %&gt;% arrange(group, value) 
+
+# Set a number of &#39;empty bar&#39; to add at the end of each group
+empty_bar &lt;- 4
+to_add &lt;- data.frame( matrix(NA, empty_bar*nlevels(data$group), ncol(data)) )
+colnames(to_add) &lt;- colnames(data)
+to_add$group &lt;- rep(levels(data$group), each=empty_bar)
+data &lt;- rbind(data, to_add)
+data &lt;- data %&gt;% arrange(group)
+data$id &lt;- seq(1, nrow(data))
+ 
+# Get the name and the y position of each label
+label_data &lt;- data
+number_of_bar &lt;- nrow(label_data)
+angle &lt;- 90 - 360 * (label_data$id-0.5) /number_of_bar     # I substract 0.5 because the letter must have the angle of the center of the bars. Not extreme right(1) or extreme left (0)
+label_data$hjust &lt;- ifelse( angle &lt; -90, 1, 0)
+label_data$angle &lt;- ifelse(angle &lt; -90, angle+180, angle)
+ 
+# Make the plot
+p &lt;- ggplot(data, aes(x=as.factor(id), y=value, fill=group)) +       # Note that id is a factor. If x is numeric, there is some space between the first bar
+  geom_bar(stat=&quot;identity&quot;, alpha=0.5) +
+  ylim(-100,120) +
+  theme_minimal() +
+  theme(
+    legend.position = &quot;none&quot;,
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    plot.margin = unit(rep(-1,4), &quot;cm&quot;) 
+  ) +
+  coord_polar() + 
+  geom_text(data=label_data, aes(x=id, y=value+10, label=individual, hjust=hjust), color=&quot;black&quot;, fontface=&quot;bold&quot;,alpha=0.6, size=2.5, angle= label_data$angle, inherit.aes = FALSE ) 
+ 
+p</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+</div>
+<div id="customization" class="section level3">
+<h3>Customization</h3>
+<pre class="r"><code># Create dataset
+data &lt;- data.frame(
+  individual=paste( &quot;Mister &quot;, seq(1,60), sep=&quot;&quot;),
+  group=c( rep(&#39;A&#39;, 10), rep(&#39;B&#39;, 30), rep(&#39;C&#39;, 14), rep(&#39;D&#39;, 6)) ,
+  value=sample( seq(10,100), 60, replace=T)
+)
+ 
+# Set a number of &#39;empty bar&#39; to add at the end of each group
+empty_bar &lt;- 3
+to_add &lt;- data.frame( matrix(NA, empty_bar*nlevels(data$group), ncol(data)) )
+colnames(to_add) &lt;- colnames(data)
+to_add$group &lt;- rep(levels(data$group), each=empty_bar)
+data &lt;- rbind(data, to_add)
+data &lt;- data %&gt;% arrange(group)
+data$id &lt;- seq(1, nrow(data))
+ 
+# Get the name and the y position of each label
+label_data &lt;- data
+number_of_bar &lt;- nrow(label_data)
+angle &lt;- 90 - 360 * (label_data$id-0.5) /number_of_bar     # I substract 0.5 because the letter must have the angle of the center of the bars. Not extreme right(1) or extreme left (0)
+label_data$hjust &lt;- ifelse( angle &lt; -90, 1, 0)
+label_data$angle &lt;- ifelse(angle &lt; -90, angle+180, angle)
+ 
+# prepare a data frame for base lines
+base_data &lt;- data %&gt;% 
+  group_by(group) %&gt;% 
+  dplyr::summarize(start=min(id), end=max(id) - empty_bar) %&gt;% 
+  rowwise() %&gt;% 
+  mutate(title=mean(c(start, end)))
+ 
+# prepare a data frame for grid (scales)
+grid_data &lt;- base_data
+grid_data$end &lt;- grid_data$end[ c( nrow(grid_data), 1:nrow(grid_data)-1)] + 1
+grid_data$start &lt;- grid_data$start - 1
+grid_data &lt;- grid_data[-1,]
+ 
+# Make the plot
+ggplot(data, aes(x=as.factor(id), y=value, fill=group)) +       # Note that id is a factor. If x is numeric, there is some space between the first bar
+  
+  geom_bar(aes(x=as.factor(id), y=value, fill=group), stat=&quot;identity&quot;, alpha=0.5) +
+  
+  # Add a val=100/75/50/25 lines. I do it at the beginning to make sur barplots are OVER it.
+  geom_segment(data=grid_data, aes(x = end, y = 80, xend = start, yend = 80), colour = &quot;grey&quot;, alpha=1, size=0.3 , inherit.aes = FALSE ) +
+  geom_segment(data=grid_data, aes(x = end, y = 60, xend = start, yend = 60), colour = &quot;grey&quot;, alpha=1, size=0.3 , inherit.aes = FALSE ) +
+  geom_segment(data=grid_data, aes(x = end, y = 40, xend = start, yend = 40), colour = &quot;grey&quot;, alpha=1, size=0.3 , inherit.aes = FALSE ) +
+  geom_segment(data=grid_data, aes(x = end, y = 20, xend = start, yend = 20), colour = &quot;grey&quot;, alpha=1, size=0.3 , inherit.aes = FALSE ) +
+  
+  # Add text showing the value of each 100/75/50/25 lines
+  annotate(&quot;text&quot;, x = rep(max(data$id),4), y = c(20, 40, 60, 80), label = c(&quot;20&quot;, &quot;40&quot;, &quot;60&quot;, &quot;80&quot;) , color=&quot;grey&quot;, size=3 , angle=0, fontface=&quot;bold&quot;, hjust=1) +
+  
+  geom_bar(aes(x=as.factor(id), y=value, fill=group), stat=&quot;identity&quot;, alpha=0.5) +
+  ylim(-100,120) +
+  theme_minimal() +
+  theme(
+    legend.position = &quot;none&quot;,
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    plot.margin = unit(rep(-1,4), &quot;cm&quot;) 
+  ) +
+  coord_polar() + 
+  geom_text(data=label_data, aes(x=id, y=value+10, label=individual, hjust=hjust), color=&quot;black&quot;, fontface=&quot;bold&quot;,alpha=0.6, size=2.5, angle= label_data$angle, inherit.aes = FALSE ) +
+  
+  # Add base line information
+  geom_segment(data=base_data, aes(x = start, y = -5, xend = end, yend = -5), colour = &quot;black&quot;, alpha=0.8, size=0.6 , inherit.aes = FALSE )  +
+  geom_text(data=base_data, aes(x = title, y = -18, label=group), hjust=c(1,1,0,0), colour = &quot;black&quot;, alpha=0.8, size=4, fontface=&quot;bold&quot;, inherit.aes = FALSE)</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+</div>
+<div id="circular-stacked-barplot" class="section level3">
+<h3>Circular Stacked Barplot</h3>
+<pre class="r"><code># Create dataset
+data &lt;- data.frame(
+  individual=paste( &quot;Mister &quot;, seq(1,60), sep=&quot;&quot;),
+  group=c( rep(&#39;A&#39;, 10), rep(&#39;B&#39;, 30), rep(&#39;C&#39;, 14), rep(&#39;D&#39;, 6)) ,
+  value1=sample( seq(10,100), 60, replace=T),
+  value2=sample( seq(10,100), 60, replace=T),
+  value3=sample( seq(10,100), 60, replace=T)
+)
+ 
+# Transform data in a tidy format (long format)
+data &lt;- data %&gt;% gather(key = &quot;observation&quot;, value=&quot;value&quot;, -c(1,2)) 
+ 
+# Set a number of &#39;empty bar&#39; to add at the end of each group
+empty_bar &lt;- 2
+nObsType &lt;- nlevels(as.factor(data$observation))
+to_add &lt;- data.frame( matrix(NA, empty_bar*nlevels(data$group)*nObsType, ncol(data)) )
+colnames(to_add) &lt;- colnames(data)
+to_add$group &lt;- rep(levels(data$group), each=empty_bar*nObsType )
+data &lt;- rbind(data, to_add)
+data &lt;- data %&gt;% arrange(group, individual)
+data$id &lt;- rep( seq(1, nrow(data)/nObsType) , each=nObsType)
+ 
+# Get the name and the y position of each label
+label_data &lt;- data %&gt;%  
+  group_by(id, individual) %&gt;% dplyr::summarize(tot=sum(value)) 
+number_of_bar &lt;- nrow(label_data)
+angle &lt;- 90 - 360 * (label_data$id-0.5) /number_of_bar     
+# I substract 0.5 because the letter must have the angle of the center of the bars. Not extreme right(1) or extreme left (0)
+label_data$hjust &lt;- ifelse(angle &lt; -90, 1, 0)
+label_data$angle &lt;- ifelse(angle &lt; -90, angle+180, angle)
+ 
+# prepare a data frame for base lines
+base_data &lt;- data %&gt;% 
+  group_by(group) %&gt;% 
+  dplyr::summarize(start=min(id), end=max(id) - empty_bar) %&gt;% 
+  rowwise() %&gt;% 
+  mutate(title=mean(c(start, end)))
+ 
+# prepare a data frame for grid (scales)
+grid_data &lt;- base_data
+grid_data$end &lt;- grid_data$end[ c( nrow(grid_data), 1:nrow(grid_data)-1)] + 1
+grid_data$start &lt;- grid_data$start - 1
+grid_data &lt;- grid_data[-1,]
+ 
+# Make the plot
+p &lt;- ggplot(data) +      
+  
+  # Add the stacked bar
+  geom_bar(aes(x=as.factor(id), y=value, fill=observation), stat=&quot;identity&quot;, alpha=0.5) +
+  scale_fill_viridis(discrete=TRUE) +
+  
+  # Add a val=100/75/50/25 lines. I do it at the beginning to make sur barplots are OVER it.
+  geom_segment(data=grid_data, aes(x = end, y = 0, xend = start, yend = 0), colour = &quot;grey&quot;, alpha=1, size=0.3 , inherit.aes = FALSE ) +
+  geom_segment(data=grid_data, aes(x = end, y = 50, xend = start, yend = 50), colour = &quot;grey&quot;, alpha=1, size=0.3 , inherit.aes = FALSE ) +
+  geom_segment(data=grid_data, aes(x = end, y = 100, xend = start, yend = 100), colour = &quot;grey&quot;, alpha=1, size=0.3 , inherit.aes = FALSE ) +
+  geom_segment(data=grid_data, aes(x = end, y = 150, xend = start, yend = 150), colour = &quot;grey&quot;, alpha=1, size=0.3 , inherit.aes = FALSE ) +
+  geom_segment(data=grid_data, aes(x = end, y = 200, xend = start, yend = 200), colour = &quot;grey&quot;, alpha=1, size=0.3 , inherit.aes = FALSE ) +
+  
+  # Add text showing the value of each 100/75/50/25 lines
+  ggplot2::annotate(&quot;text&quot;, x = rep(max(data$id),5), y = c(0, 50, 100, 150, 200), label = c(&quot;0&quot;, &quot;50&quot;, &quot;100&quot;, &quot;150&quot;, &quot;200&quot;) , color=&quot;grey&quot;, size=6 , angle=0, fontface=&quot;bold&quot;, hjust=1) +
+  
+  ylim(-150,max(label_data$tot, na.rm=T)) +
+  theme_minimal() +
+  theme(
+    legend.position = &quot;none&quot;,
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    plot.margin = unit(rep(-1,4), &quot;cm&quot;) 
+  ) +
+  coord_polar() +
+  
+  # Add labels on top of each bar
+  geom_text(data=label_data, aes(x=id, y=tot+10, label=individual, hjust=hjust), color=&quot;black&quot;, fontface=&quot;bold&quot;,alpha=0.6, size=5, angle= label_data$angle, inherit.aes = FALSE ) +
+  
+  # Add base line information
+  geom_segment(data=base_data, aes(x = start, y = -5, xend = end, yend = -5), colour = &quot;black&quot;, alpha=0.8, size=0.6 , inherit.aes = FALSE )  +
+  geom_text(data=base_data, aes(x = title, y = -18, label=group), hjust=c(1,1,0,0), colour = &quot;black&quot;, alpha=0.8, size=4, fontface=&quot;bold&quot;, inherit.aes = FALSE)
+
+p</code></pre>
+<p><img src="05-Plot-BarPlot_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<pre class="r"><code># Save at png
+# ggsave(p, file=&quot;output.png&quot;, width=10, height=10)</code></pre>
+</div>
+</div>
+<div id="interactive-plot" class="section level2">
+<h2>Interactive Plot</h2>
+<div id="plotly-package" class="section level3">
+<h3>plotly package</h3>
+<pre class="r"><code># library(viridis)
+# library(hrbrthemes)
+
+p1 &lt;- ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = &quot;dodge&quot;)+
+    scale_fill_viridis(discrete = T) +
+    ggtitle(&quot;Add Title Here...&quot;) +
+    theme_ipsum() +
+    xlab(&quot;&quot;)
+ggplotly(p1)</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-a7b3ccb4b6466166c8ad" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-a7b3ccb4b6466166c8ad">{"x":{"data":[{"orientation":"v","width":[0.11250000000000004,0.11249999999999982,0.11249999999999982,0.11249999999999982,0.11250000000000071],"base":[0,0,0,0,0],"x":[0.60625000000000007,1.6062500000000002,2.6062500000000002,3.6062500000000002,4.6062500000000002],"y":[210,96,84,205,146],"text":["count:  210<br />cut: Fair<br />clarity: I1","count:   96<br />cut: Good<br />clarity: I1","count:   84<br />cut: Very Good<br />clarity: I1","count:  205<br />cut: Premium<br />clarity: I1","count:  146<br />cut: Ideal<br />clarity: I1"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(68,1,84,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"I1","legendgroup":"I1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.11250000000000004,0.11249999999999982,0.11249999999999982,0.11249999999999982,0.11250000000000071],"base":[0,0,0,0,0],"x":[0.71875,1.71875,2.71875,3.71875,4.71875],"y":[466,1081,2100,2949,2598],"text":["count:  466<br />cut: Fair<br />clarity: SI2","count: 1081<br />cut: Good<br />clarity: SI2","count: 2100<br />cut: Very Good<br />clarity: SI2","count: 2949<br />cut: Premium<br />clarity: SI2","count: 2598<br />cut: Ideal<br />clarity: SI2"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(70,51,126,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"SI2","legendgroup":"SI2","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.11250000000000004,0.11249999999999982,0.11249999999999982,0.11249999999999982,0.11250000000000071],"base":[0,0,0,0,0],"x":[0.83125000000000004,1.83125,2.8312499999999998,3.8312499999999998,4.8312499999999998],"y":[408,1560,3240,3575,4282],"text":["count:  408<br />cut: Fair<br />clarity: SI1","count: 1560<br />cut: Good<br />clarity: SI1","count: 3240<br />cut: Very Good<br />clarity: SI1","count: 3575<br />cut: Premium<br />clarity: SI1","count: 4282<br />cut: Ideal<br />clarity: SI1"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(54,92,141,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"SI1","legendgroup":"SI1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.11250000000000004,0.11249999999999982,0.11249999999999982,0.11249999999999982,0.11250000000000071],"base":[0,0,0,0,0],"x":[0.94374999999999998,1.9437500000000001,2.9437500000000001,3.9437500000000001,4.9437499999999996],"y":[261,978,2591,3357,5071],"text":["count:  261<br />cut: Fair<br />clarity: VS2","count:  978<br />cut: Good<br />clarity: VS2","count: 2591<br />cut: Very Good<br />clarity: VS2","count: 3357<br />cut: Premium<br />clarity: VS2","count: 5071<br />cut: Ideal<br />clarity: VS2"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(39,127,142,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"VS2","legendgroup":"VS2","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.11249999999999993,0.11249999999999982,0.11249999999999982,0.11250000000000071,0.11250000000000071],"base":[0,0,0,0,0],"x":[1.0562499999999999,2.0562499999999999,3.0562499999999999,4.0562500000000004,5.0562500000000004],"y":[170,648,1775,1989,3589],"text":["count:  170<br />cut: Fair<br />clarity: VS1","count:  648<br />cut: Good<br />clarity: VS1","count: 1775<br />cut: Very Good<br />clarity: VS1","count: 1989<br />cut: Premium<br />clarity: VS1","count: 3589<br />cut: Ideal<br />clarity: VS1"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(31,161,135,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"VS1","legendgroup":"VS1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.11249999999999982,0.11249999999999982,0.11249999999999982,0.11250000000000071,0.11250000000000071],"base":[0,0,0,0,0],"x":[1.16875,2.1687500000000002,3.1687500000000002,4.1687500000000002,5.1687500000000002],"y":[69,286,1235,870,2606],"text":["count:   69<br />cut: Fair<br />clarity: VVS2","count:  286<br />cut: Good<br />clarity: VVS2","count: 1235<br />cut: Very Good<br />clarity: VVS2","count:  870<br />cut: Premium<br />clarity: VVS2","count: 2606<br />cut: Ideal<br />clarity: VVS2"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(74,193,109,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"VVS2","legendgroup":"VVS2","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.11249999999999982,0.11249999999999982,0.11249999999999982,0.11250000000000071,0.11250000000000071],"base":[0,0,0,0,0],"x":[1.28125,2.28125,3.28125,4.28125,5.28125],"y":[17,186,789,616,2047],"text":["count:   17<br />cut: Fair<br />clarity: VVS1","count:  186<br />cut: Good<br />clarity: VVS1","count:  789<br />cut: Very Good<br />clarity: VVS1","count:  616<br />cut: Premium<br />clarity: VVS1","count: 2047<br />cut: Ideal<br />clarity: VVS1"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(159,218,58,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"VVS1","legendgroup":"VVS1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.11249999999999982,0.11249999999999982,0.11249999999999982,0.11250000000000071,0.11250000000000071],"base":[0,0,0,0,0],"x":[1.3937499999999998,2.3937499999999998,3.3937499999999998,4.3937499999999998,5.3937499999999998],"y":[9,71,268,230,1212],"text":["count:    9<br />cut: Fair<br />clarity: IF","count:   71<br />cut: Good<br />clarity: IF","count:  268<br />cut: Very Good<br />clarity: IF","count:  230<br />cut: Premium<br />clarity: IF","count: 1212<br />cut: Ideal<br />clarity: IF"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(253,231,37,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"IF","legendgroup":"IF","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":95.701120797011214,"r":39.850560398505614,"b":74.885844748858446,"l":86.176836861768393},"font":{"color":"rgba(0,0,0,1)","family":"Arial Narrow","size":15.276048152760483},"title":{"text":"<b> Add Title Here... <\/b>","font":{"color":"rgba(0,0,0,1)","family":"Arial Narrow","size":23.910336239103366},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,5.5999999999999996],"tickmode":"array","ticktext":["Fair","Good","Very Good","Premium","Ideal"],"tickvals":[1,2,3,4,5],"categoryorder":"array","categoryarray":["Fair","Good","Very Good","Premium","Ideal"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.8190120381901207,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"Arial Narrow","size":15.276048152760483},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(204,204,204,1)","gridwidth":0.265670402656704,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"Arial Narrow","size":11.955168119551683}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-253.55000000000001,5324.5500000000002],"tickmode":"array","ticktext":["0","1000","2000","3000","4000","5000"],"tickvals":[0,1000,2000.0000000000002,3000,4000,5000],"categoryorder":"array","categoryarray":["0","1000","2000","3000","4000","5000"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.8190120381901207,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"Arial Narrow","size":15.276048152760483},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(204,204,204,1)","gridwidth":0.26567040265670405,"zeroline":false,"anchor":"x","title":{"text":"count","font":{"color":"rgba(0,0,0,1)","family":"Arial Narrow","size":11.955168119551683}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"Arial Narrow","size":12.220838522208389},"title":{"text":"clarity","font":{"color":"rgba(0,0,0,1)","family":"Arial Narrow","size":15.276048152760483}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"353c45c838b5":{"x":{},"fill":{},"type":"bar"}},"cur_data":"353c45c838b5","visdat":{"353c45c838b5":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>p2 &lt;- ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = &quot;stack&quot;)+
+    scale_fill_viridis(discrete = T) +
+    ggtitle(&quot;Add Title Here...&quot;) +
+    theme_ipsum() +
+    xlab(&quot;&quot;)
+ggplotly(p2)</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-a34ace5d37c4ed7ebd5e" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-a34ace5d37c4ed7ebd5e">{"x":{"data":[{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036],"base":[1400,4810,11998,13586,21405],"x":[1,2,3,4,5],"y":[210,96,84,205,146],"text":["count:  210<br />cut: Fair<br />clarity: I1","count:   96<br />cut: Good<br />clarity: I1","count:   84<br />cut: Very Good<br />clarity: I1","count:  205<br />cut: Premium<br />clarity: I1","count:  146<br />cut: Ideal<br />clarity: I1"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(68,1,84,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"I1","legendgroup":"I1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036],"base":[934,3729,9898,10637,18807],"x":[1,2,3,4,5],"y":[466,1081,2100,2949,2598],"text":["count:  466<br />cut: Fair<br />clarity: SI2","count: 1081<br />cut: Good<br />clarity: SI2","count: 2100<br />cut: Very Good<br />clarity: SI2","count: 2949<br />cut: Premium<br />clarity: SI2","count: 2598<br />cut: Ideal<br />clarity: SI2"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(70,51,126,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"SI2","legendgroup":"SI2","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036],"base":[526,2169,6658,7062,14525],"x":[1,2,3,4,5],"y":[408,1560,3240,3575,4282],"text":["count:  408<br />cut: Fair<br />clarity: SI1","count: 1560<br />cut: Good<br />clarity: SI1","count: 3240<br />cut: Very Good<br />clarity: SI1","count: 3575<br />cut: Premium<br />clarity: SI1","count: 4282<br />cut: Ideal<br />clarity: SI1"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(54,92,141,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"SI1","legendgroup":"SI1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036],"base":[265,1191,4067,3705,9454],"x":[1,2,3,4,5],"y":[261,978,2591,3357,5071],"text":["count:  261<br />cut: Fair<br />clarity: VS2","count:  978<br />cut: Good<br />clarity: VS2","count: 2591<br />cut: Very Good<br />clarity: VS2","count: 3357<br />cut: Premium<br />clarity: VS2","count: 5071<br />cut: Ideal<br />clarity: VS2"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(39,127,142,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"VS2","legendgroup":"VS2","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036],"base":[95,543,2292,1716,5865],"x":[1,2,3,4,5],"y":[170,648,1775,1989,3589],"text":["count:  170<br />cut: Fair<br />clarity: VS1","count:  648<br />cut: Good<br />clarity: VS1","count: 1775<br />cut: Very Good<br />clarity: VS1","count: 1989<br />cut: Premium<br />clarity: VS1","count: 3589<br />cut: Ideal<br />clarity: VS1"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(31,161,135,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"VS1","legendgroup":"VS1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036],"base":[26,257,1057,846,3259],"x":[1,2,3,4,5],"y":[69,286,1235,870,2606],"text":["count:   69<br />cut: Fair<br />clarity: VVS2","count:  286<br />cut: Good<br />clarity: VVS2","count: 1235<br />cut: Very Good<br />clarity: VVS2","count:  870<br />cut: Premium<br />clarity: VVS2","count: 2606<br />cut: Ideal<br />clarity: VVS2"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(74,193,109,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"VVS2","legendgroup":"VVS2","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036],"base":[9,71,268,230,1212],"x":[1,2,3,4,5],"y":[17,186,789,616,2047],"text":["count:   17<br />cut: Fair<br />clarity: VVS1","count:  186<br />cut: Good<br />clarity: VVS1","count:  789<br />cut: Very Good<br />clarity: VVS1","count:  616<br />cut: Premium<br />clarity: VVS1","count: 2047<br />cut: Ideal<br />clarity: VVS1"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(159,218,58,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"VVS1","legendgroup":"VVS1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036],"base":[0,0,0,0,0],"x":[1,2,3,4,5],"y":[9,71,268,230,1212],"text":["count:    9<br />cut: Fair<br />clarity: IF","count:   71<br />cut: Good<br />clarity: IF","count:  268<br />cut: Very Good<br />clarity: IF","count:  230<br />cut: Premium<br />clarity: IF","count: 1212<br />cut: Ideal<br />clarity: IF"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(253,231,37,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"IF","legendgroup":"IF","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":95.701120797011214,"r":39.850560398505614,"b":74.885844748858446,"l":93.814860938148641},"font":{"color":"rgba(0,0,0,1)","family":"Arial Narrow","size":15.276048152760483},"title":{"text":"<b> Add Title Here... <\/b>","font":{"color":"rgba(0,0,0,1)","family":"Arial Narrow","size":23.910336239103366},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,5.5999999999999996],"tickmode":"array","ticktext":["Fair","Good","Very Good","Premium","Ideal"],"tickvals":[1,2,3,4,5],"categoryorder":"array","categoryarray":["Fair","Good","Very Good","Premium","Ideal"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.8190120381901207,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"Arial Narrow","size":15.276048152760483},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(204,204,204,1)","gridwidth":0.265670402656704,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"Arial Narrow","size":11.955168119551683}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-1077.55,22628.549999999999],"tickmode":"array","ticktext":["0","5000","10000","15000","20000"],"tickvals":[0,5000.0000000000009,10000,15000,20000],"categoryorder":"array","categoryarray":["0","5000","10000","15000","20000"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.8190120381901207,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"Arial Narrow","size":15.276048152760483},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(204,204,204,1)","gridwidth":0.26567040265670405,"zeroline":false,"anchor":"x","title":{"text":"count","font":{"color":"rgba(0,0,0,1)","family":"Arial Narrow","size":11.955168119551683}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"Arial Narrow","size":12.220838522208389},"title":{"text":"clarity","font":{"color":"rgba(0,0,0,1)","family":"Arial Narrow","size":15.276048152760483}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"353c133c24e5":{"x":{},"fill":{},"type":"bar"}},"cur_data":"353c133c24e5","visdat":{"353c133c24e5":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>p3 &lt;- ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = &quot;fill&quot;, width = 0.5) + 
+  theme(axis.text.x = element_text(angle=65, vjust=0.6)) + 
+  labs(title=&quot;Add Title Here...&quot;, 
+       subtitle=&quot;Add Subtitle Here...&quot;) 
+ggplotly(p3)</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-05fe24b537d83eb99c65" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-05fe24b537d83eb99c65">{"x":{"data":[{"orientation":"v","width":[0.5,0.5,0.5,0.5,0.5],"base":[0.86956521739130432,0.98043212392988177,0.99304750869061409,0.98513523312305129,0.99322537237251174],"x":[1,2,3,4,5],"y":[0.13043478260869568,0.019567876070118229,0.0069524913093859109,0.01486476687694871,0.0067746276274882611],"text":["count: 0.130434783<br />cut: Fair<br />clarity: I1","count: 0.019567876<br />cut: Good<br />clarity: I1","count: 0.006952491<br />cut: Very Good<br />clarity: I1","count: 0.014864767<br />cut: Premium<br />clarity: I1","count: 0.006774628<br />cut: Ideal<br />clarity: I1"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(68,1,84,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"I1","legendgroup":"I1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.5,0.5,0.5,0.5,0.5],"base":[0.5801242236024845,0.76008968609865468,0.81923522595596754,0.77130012326879849,0.8726741218504942],"x":[1,2,3,4,5],"y":[0.28944099378881982,0.22034243783122709,0.17381228273464655,0.2138351098542528,0.12055125052201754],"text":["count: 0.289440994<br />cut: Fair<br />clarity: SI2","count: 0.220342438<br />cut: Good<br />clarity: SI2","count: 0.173812283<br />cut: Very Good<br />clarity: SI2","count: 0.213835110<br />cut: Premium<br />clarity: SI2","count: 0.120551251<br />cut: Ideal<br />clarity: SI2"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(70,51,126,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"SI2","legendgroup":"SI2","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.5,0.5,0.5,0.5,0.5],"base":[0.32670807453416151,0.44211169995923361,0.55106770402251282,0.51207309114639987,0.67398264581689948],"x":[1,2,3,4,5],"y":[0.25341614906832299,0.31797798613942108,0.26816752193345472,0.25922703212239862,0.19869147603359472],"text":["count: 0.253416149<br />cut: Fair<br />clarity: SI1","count: 0.317977986<br />cut: Good<br />clarity: SI1","count: 0.268167522<br />cut: Very Good<br />clarity: SI1","count: 0.259227032<br />cut: Premium<br />clarity: SI1","count: 0.198691476<br />cut: Ideal<br />clarity: SI1"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(54,92,141,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"SI1","legendgroup":"SI1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.5,0.5,0.5,0.5,0.5],"base":[0.16459627329192547,0.2427639624949042,0.3366164542294322,0.26865346965412223,0.43868033965941255],"x":[1,2,3,4,5],"y":[0.16211180124223604,0.19934773746432941,0.21445124979308061,0.24341962149227764,0.23530230615748693],"text":["count: 0.162111801<br />cut: Fair<br />clarity: VS2","count: 0.199347737<br />cut: Good<br />clarity: VS2","count: 0.214451250<br />cut: Very Good<br />clarity: VS2","count: 0.243419621<br />cut: Premium<br />clarity: VS2","count: 0.235302306<br />cut: Ideal<br />clarity: VS2"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(39,127,142,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"VS2","legendgroup":"VS2","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.5,0.5,0.5,0.5,0.5],"base":[0.059006211180124224,0.1106807990216062,0.18970369144181426,0.12442897541875136,0.27214514407684098],"x":[1,2,3,4,5],"y":[0.10559006211180125,0.13208316347329802,0.14691276278761795,0.14422449423537087,0.16653519558257157],"text":["count: 0.105590062<br />cut: Fair<br />clarity: VS1","count: 0.132083163<br />cut: Good<br />clarity: VS1","count: 0.146912763<br />cut: Very Good<br />clarity: VS1","count: 0.144224494<br />cut: Premium<br />clarity: VS1","count: 0.166535196<br />cut: Ideal<br />clarity: VS1"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(31,161,135,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"VS1","legendgroup":"VS1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.5,0.5,0.5,0.5,0.5],"base":[0.016149068322981366,0.052384834896045659,0.087485515643105444,0.061344355014139658,0.15122268108208436],"x":[1,2,3,4,5],"y":[0.042857142857142858,0.05829596412556054,0.10221817579870882,0.063084620404611713,0.12092246299475662],"text":["count: 0.042857143<br />cut: Fair<br />clarity: VVS2","count: 0.058295964<br />cut: Good<br />clarity: VVS2","count: 0.102218176<br />cut: Very Good<br />clarity: VVS2","count: 0.063084620<br />cut: Premium<br />clarity: VVS2","count: 0.120922463<br />cut: Ideal<br />clarity: VVS2"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(74,193,109,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"VVS2","legendgroup":"VVS2","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.5,0.5,0.5,0.5,0.5],"base":[0.0055900621118012426,0.014472075010191602,0.02218175798708823,0.016677543325357116,0.056238689619971229],"x":[1,2,3,4,5],"y":[0.010559006211180125,0.037912759885854061,0.065303757656017217,0.044666811688782546,0.094983991462113143],"text":["count: 0.010559006<br />cut: Fair<br />clarity: VVS1","count: 0.037912760<br />cut: Good<br />clarity: VVS1","count: 0.065303758<br />cut: Very Good<br />clarity: VVS1","count: 0.044666812<br />cut: Premium<br />clarity: VVS1","count: 0.094983991<br />cut: Ideal<br />clarity: VVS1"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(159,218,58,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"VVS1","legendgroup":"VVS1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.5,0.5,0.5,0.5,0.5],"base":[0,0,0,0,0],"x":[1,2,3,4,5],"y":[0.0055900621118012426,0.014472075010191602,0.02218175798708823,0.016677543325357116,0.056238689619971229],"text":["count: 0.005590062<br />cut: Fair<br />clarity: IF","count: 0.014472075<br />cut: Good<br />clarity: IF","count: 0.022181758<br />cut: Very Good<br />clarity: IF","count: 0.016677543<br />cut: Premium<br />clarity: IF","count: 0.056238690<br />cut: Ideal<br />clarity: IF"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(253,231,37,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"IF","legendgroup":"IF","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.762557077625573,"r":7.3059360730593621,"b":81.905028033864568,"l":48.949771689497723},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"Add Title Here...","font":{"color":"rgba(0,0,0,1)","family":"","size":17.534246575342465},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,5.5999999999999996],"tickmode":"array","ticktext":["Fair","Good","Very Good","Premium","Ideal"],"tickvals":[1,2,3,4,5],"categoryorder":"array","categoryarray":["Fair","Good","Very Good","Premium","Ideal"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-65,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"cut","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.050000000000000003,1.05],"tickmode":"array","ticktext":["0.00","0.25","0.50","0.75","1.00"],"tickvals":[0,0.25,0.5,0.75,1],"categoryorder":"array","categoryarray":["0.00","0.25","0.50","0.75","1.00"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"count","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"clarity","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"353c4b784d70":{"x":{},"fill":{},"type":"bar"}},"cur_data":"353c4b784d70","visdat":{"353c4b784d70":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="ggiraph-package" class="section level3">
+<h3>ggiraph package</h3>
+<pre class="r"><code>## reference https://rkabacoff.github.io/datavis/Interactive.html#ggiraph
+library(&quot;ggiraph&quot;)
+library(&quot;patchwork&quot;)
+data(gapminder, package=&quot;gapminder&quot;)
+
+# subset Asian countries
+asia &lt;- gapminder %&gt;%
+  filter(continent == &quot;Asia&quot;) %&gt;%
+  select(year, country, lifeExp)
+
+p1 &lt;- ggplot(asia[asia$year == 1982,], 
+       aes(y = reorder(country, lifeExp), 
+           x=lifeExp,
+           tooltip = lifeExp,
+           data_id = country)) +
+  geom_bar_interactive(stat=&quot;identity&quot;, 
+                       fill=&quot;steelblue&quot;) +
+  labs(y=&quot;&quot;, x=&quot;1982&quot;) + 
+  theme_minimal()
+
+p2 &lt;- ggplot(asia[asia$year == 2007,], 
+             aes(y = reorder(country, lifeExp), 
+                 x=lifeExp,
+                 tooltip = lifeExp,
+                 data_id = country)) +
+  geom_bar_interactive(stat=&quot;identity&quot;, 
+                       fill=&quot;steelblue&quot;) +
+  labs(y=&quot;&quot;, x=&quot;2007&quot;) + 
+  theme_minimal()
+
+p3 &lt;- (p1 | p2) +
+  plot_annotation(title = &quot;Life Expectancy in Asia&quot;)
+girafe(code = print (p3)) </code></pre>
+<div class="girafe html-widget html-fill-item" id="htmlwidget-1081f32d933dfcd8be30" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-1081f32d933dfcd8be30">{"x":{"html":"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='ggiraph-svg' role='graphics-document' id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25' viewBox='0 0 504 360'>\n <defs id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_defs'>\n  <clipPath id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_c1'>\n   <rect x='0' y='0' width='504' height='360'/>\n  <\/clipPath>\n  <clipPath id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_c2'>\n   <rect x='111.84' y='28.66' width='381.2' height='294.37'/>\n  <\/clipPath>\n  <clipPath id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_c3'>\n   <rect x='5.48' y='23.18' width='246.52' height='331.34'/>\n  <\/clipPath>\n  <clipPath id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_c4'>\n   <rect x='252' y='23.18' width='246.52' height='331.34'/>\n  <\/clipPath>\n  <clipPath id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_c5'>\n   <rect x='111.84' y='28.66' width='134.68' height='294.37'/>\n  <\/clipPath>\n  <clipPath id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_c6'>\n   <rect x='358.36' y='28.66' width='134.68' height='294.37'/>\n  <\/clipPath>\n <\/defs>\n <g id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_rootg' class='ggiraph-svg-rootg'>\n  <g clip-path='url(#svg_c912b03a_bde0_49f5_8fe4_b73339194d25_c1)'>\n   <rect x='0' y='0' width='504' height='360' fill='#FFFFFF' fill-opacity='1' stroke='#FFFFFF' stroke-opacity='1' stroke-width='0.75' stroke-linejoin='round' stroke-linecap='round' class='ggiraph-svg-bg'/>\n   <rect x='0' y='0' width='504' height='360' fill='#FFFFFF' fill-opacity='1' stroke='#FFFFFF' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='round'/>\n  <\/g>\n  <g clip-path='url(#svg_c912b03a_bde0_49f5_8fe4_b73339194d25_c5)'>\n   <polyline points='133.84,323.02 133.84,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='165.60,323.02 165.60,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='197.35,323.02 197.35,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='229.11,323.02 229.11,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,317.70 246.52,317.70' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,308.84 246.52,308.84' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,299.97 246.52,299.97' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,291.10 246.52,291.10' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,282.24 246.52,282.24' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,273.37 246.52,273.37' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,264.51 246.52,264.51' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,255.64 246.52,255.64' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,246.77 246.52,246.77' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,237.91 246.52,237.91' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,229.04 246.52,229.04' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,220.17 246.52,220.17' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,211.31 246.52,211.31' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,202.44 246.52,202.44' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,193.57 246.52,193.57' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,184.71 246.52,184.71' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,175.84 246.52,175.84' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,166.97 246.52,166.97' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,158.11 246.52,158.11' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,149.24 246.52,149.24' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,140.37 246.52,140.37' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,131.51 246.52,131.51' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,122.64 246.52,122.64' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,113.78 246.52,113.78' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,104.91 246.52,104.91' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,96.04 246.52,96.04' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,87.18 246.52,87.18' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,78.31 246.52,78.31' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,69.44 246.52,69.44' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,60.58 246.52,60.58' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,51.71 246.52,51.71' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,42.84 246.52,42.84' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='111.84,33.98 246.52,33.98' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='117.96,323.02 117.96,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='149.72,323.02 149.72,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='181.48,323.02 181.48,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='213.23,323.02 213.23,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='244.99,323.02 244.99,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e1' x='117.96' y='313.71' width='63.28' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='39.854' data-id='Afghanistan'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e2' x='117.96' y='92.05' width='109.64' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='69.052' data-id='Bahrain'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e3' x='117.96' y='287.11' width='79.4' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='50.009' data-id='Bangladesh'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e4' x='117.96' y='278.25' width='80.91' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='50.957' data-id='Cambodia'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e5' x='117.96' y='136.38' width='104.04' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='65.525' data-id='China'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e6' x='117.96' y='38.85' width='119.8' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='75.45' data-id='Hong Kong, China'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e7' x='117.96' y='251.65' width='89.86' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='56.596' data-id='India'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e8' x='117.96' y='260.52' width='89.17' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='56.159' data-id='Indonesia'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e9' x='117.96' y='216.18' width='94.66' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='59.62' data-id='Iran'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e10' x='117.96' y='207.32' width='98.5' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='62.038' data-id='Iraq'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e11' x='117.96' y='47.72' width='118.21' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='74.45' data-id='Israel'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e12' x='117.96' y='29.99' width='122.44' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='77.11' data-id='Japan'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e13' x='117.96' y='171.85' width='101.21' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='63.739' data-id='Jordan'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e14' x='117.96' y='83.19' width='109.72' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='69.1' data-id='Korea, Dem. Rep.'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e15' x='117.96' y='118.65' width='106.58' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='67.123' data-id='Korea, Rep.'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e16' x='117.96' y='74.32' width='113.22' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='71.309' data-id='Kuwait'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e17' x='117.96' y='127.52' width='106.36' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='66.983' data-id='Lebanon'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e18' x='117.96' y='109.79' width='107.97' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='68' data-id='Malaysia'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e19' x='117.96' y='242.78' width='91.28' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='57.489' data-id='Mongolia'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e20' x='117.96' y='233.92' width='92.18' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='58.056' data-id='Myanmar'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e21' x='117.96' y='295.98' width='78.75' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='49.594' data-id='Nepal'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e22' x='117.96' y='189.58' width='99.6' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='62.728' data-id='Oman'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e23' x='117.96' y='269.38' width='89.17' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='56.158' data-id='Pakistan'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e24' x='117.96' y='198.45' width='98.57' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='62.082' data-id='Philippines'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e25' x='117.96' y='180.72' width='100.05' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='63.012' data-id='Saudi Arabia'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e26' x='117.96' y='65.45' width='113.94' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='71.76' data-id='Singapore'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e27' x='117.96' y='100.92' width='109.17' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='68.757' data-id='Sri Lanka'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e28' x='117.96' y='154.12' width='102.56' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='64.59' data-id='Syria'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e29' x='117.96' y='56.59' width='114.58' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='72.16' data-id='Taiwan'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e30' x='117.96' y='145.25' width='102.57' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='64.597' data-id='Thailand'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e31' x='117.96' y='225.05' width='93.39' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='58.816' data-id='Vietnam'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e32' x='117.96' y='162.98' width='102.26' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='64.406' data-id='West Bank and Gaza'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e33' x='117.96' y='304.85' width='77.98' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='49.113' data-id='Yemen, Rep.'/>\n  <\/g>\n  <g clip-path='url(#svg_c912b03a_bde0_49f5_8fe4_b73339194d25_c1)'>\n   <text x='60.42' y='320.85' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Afghanistan<\/text>\n   <text x='56.34' y='311.99' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Yemen, Rep.<\/text>\n   <text x='83.92' y='303.12' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Nepal<\/text>\n   <text x='60.42' y='294.25' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Bangladesh<\/text>\n   <text x='66.8' y='285.39' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Cambodia<\/text>\n   <text x='73.16' y='276.52' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Pakistan<\/text>\n   <text x='68.74' y='267.66' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Indonesia<\/text>\n   <text x='87.82' y='258.79' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>India<\/text>\n   <text x='71.2' y='249.92' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Mongolia<\/text>\n   <text x='70.23' y='241.06' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Myanmar<\/text>\n   <text x='74.78' y='232.19' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Vietnam<\/text>\n   <text x='91.74' y='223.32' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Iran<\/text>\n   <text x='91.74' y='214.46' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Iraq<\/text>\n   <text x='64.36' y='205.59' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Philippines<\/text>\n   <text x='82.94' y='196.72' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Oman<\/text>\n   <text x='57' y='187.86' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Saudi Arabia<\/text>\n   <text x='80' y='178.99' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Jordan<\/text>\n   <text x='23.89' y='170.12' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>West Bank and Gaza<\/text>\n   <text x='86.87' y='161.26' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Syria<\/text>\n   <text x='73.16' y='152.39' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Thailand<\/text>\n   <text x='83.92' y='143.52' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>China<\/text>\n   <text x='72.64' y='134.66' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Lebanon<\/text>\n   <text x='59.94' y='125.79' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Korea, Rep.<\/text>\n   <text x='72.19' y='116.93' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Malaysia<\/text>\n   <text x='69.73' y='108.06' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Sri Lanka<\/text>\n   <text x='76.58' y='99.19' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Bahrain<\/text>\n   <text x='36.47' y='90.33' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Korea, Dem. Rep.<\/text>\n   <text x='80.5' y='81.46' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Kuwait<\/text>\n   <text x='66.78' y='72.59' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Singapore<\/text>\n   <text x='79.52' y='63.73' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Taiwan<\/text>\n   <text x='85.39' y='54.86' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Israel<\/text>\n   <text x='34.98' y='45.99' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Hong Kong, China<\/text>\n   <text x='82.93' y='37.13' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Japan<\/text>\n   <text x='115.52' y='334.26' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>0<\/text>\n   <text x='144.82' y='334.26' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>20<\/text>\n   <text x='176.58' y='334.26' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>40<\/text>\n   <text x='208.34' y='334.26' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>60<\/text>\n   <text x='240.09' y='334.26' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>80<\/text>\n   <text x='166.94' y='346.72' font-size='8.25pt' font-family='Arial'>1982<\/text>\n  <\/g>\n  <g clip-path='url(#svg_c912b03a_bde0_49f5_8fe4_b73339194d25_c6)'>\n   <polyline points='379.31,323.02 379.31,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='408.95,323.02 408.95,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='438.59,323.02 438.59,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='468.24,323.02 468.24,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='0.53' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,317.70 493.04,317.70' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,308.84 493.04,308.84' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,299.97 493.04,299.97' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,291.10 493.04,291.10' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,282.24 493.04,282.24' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,273.37 493.04,273.37' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,264.51 493.04,264.51' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,255.64 493.04,255.64' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,246.77 493.04,246.77' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,237.91 493.04,237.91' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,229.04 493.04,229.04' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,220.17 493.04,220.17' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,211.31 493.04,211.31' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,202.44 493.04,202.44' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,193.57 493.04,193.57' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,184.71 493.04,184.71' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,175.84 493.04,175.84' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,166.97 493.04,166.97' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,158.11 493.04,158.11' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,149.24 493.04,149.24' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,140.37 493.04,140.37' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,131.51 493.04,131.51' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,122.64 493.04,122.64' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,113.78 493.04,113.78' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,104.91 493.04,104.91' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,96.04 493.04,96.04' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,87.18 493.04,87.18' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,78.31 493.04,78.31' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,69.44 493.04,69.44' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,60.58 493.04,60.58' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,51.71 493.04,51.71' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,42.84 493.04,42.84' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='358.36,33.98 493.04,33.98' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='364.48,323.02 364.48,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='394.13,323.02 394.13,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='423.77,323.02 423.77,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='453.42,323.02 453.42,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <polyline points='483.06,323.02 483.06,28.66' fill='none' stroke='#EBEBEB' stroke-opacity='1' stroke-width='1.07' stroke-linejoin='round' stroke-linecap='butt'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e34' x='364.48' y='313.71' width='64.96' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='43.828' data-id='Afghanistan'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e35' x='364.48' y='100.92' width='112.11' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='75.635' data-id='Bahrain'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e36' x='364.48' y='260.52' width='94.95' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='64.062' data-id='Bangladesh'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e37' x='364.48' y='295.98' width='88.52' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='59.723' data-id='Cambodia'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e38' x='364.48' y='145.25' width='108.14' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='72.961' data-id='China'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e39' x='364.48' y='38.85' width='121.85' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='82.208' data-id='Hong Kong, China'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e40' x='364.48' y='251.65' width='95.9' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='64.698' data-id='India'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e41' x='364.48' y='207.32' width='104.72' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='70.65' data-id='Indonesia'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e42' x='364.48' y='198.45' width='105.18' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='70.964' data-id='Iran'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e43' x='364.48' y='304.85' width='88.26' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='59.545' data-id='Iraq'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e44' x='364.48' y='47.72' width='119.68' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='80.745' data-id='Israel'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e45' x='364.48' y='29.99' width='122.44' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='82.603' data-id='Japan'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e46' x='364.48' y='162.98' width='107.51' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='72.535' data-id='Jordan'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e47' x='364.48' y='225.05' width='99.75' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='67.297' data-id='Korea, Dem. Rep.'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e48' x='364.48' y='65.45' width='116.54' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='78.623' data-id='Korea, Rep.'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e49' x='364.48' y='83.19' width='115' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='77.588' data-id='Kuwait'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e50' x='364.48' y='180.72' width='106.71' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='71.993' data-id='Lebanon'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e51' x='364.48' y='118.65' width='110.04' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='74.241' data-id='Malaysia'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e52' x='364.48' y='233.92' width='99.02' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='66.803' data-id='Mongolia'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e53' x='364.48' y='287.11' width='92' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='62.069' data-id='Myanmar'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e54' x='364.48' y='269.38' width='94.54' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='63.785' data-id='Nepal'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e55' x='364.48' y='92.05' width='112.11' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='75.64' data-id='Oman'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e56' x='364.48' y='242.78' width='97.06' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='65.483' data-id='Pakistan'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e57' x='364.48' y='189.58' width='106.26' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='71.688' data-id='Philippines'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e58' x='364.48' y='154.12' width='107.87' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='72.777' data-id='Saudi Arabia'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e59' x='364.48' y='56.59' width='118.54' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='79.972' data-id='Singapore'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e60' x='364.48' y='171.85' width='107.31' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='72.396' data-id='Sri Lanka'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e61' x='364.48' y='127.52' width='109.9' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='74.143' data-id='Syria'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e62' x='364.48' y='74.32' width='116.21' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='78.4' data-id='Taiwan'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e63' x='364.48' y='216.18' width='104.67' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='70.616' data-id='Thailand'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e64' x='364.48' y='109.79' width='110.05' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='74.249' data-id='Vietnam'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e65' x='364.48' y='136.38' width='108.83' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='73.422' data-id='West Bank and Gaza'/>\n   <rect id='svg_c912b03a_bde0_49f5_8fe4_b73339194d25_e66' x='364.48' y='278.25' width='92.93' height='7.98' fill='#4682B4' fill-opacity='1' stroke='none' title='62.698' data-id='Yemen, Rep.'/>\n  <\/g>\n  <g clip-path='url(#svg_c912b03a_bde0_49f5_8fe4_b73339194d25_c1)'>\n   <text x='306.94' y='320.85' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Afghanistan<\/text>\n   <text x='338.26' y='311.99' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Iraq<\/text>\n   <text x='313.32' y='303.12' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Cambodia<\/text>\n   <text x='316.75' y='294.25' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Myanmar<\/text>\n   <text x='302.86' y='285.39' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Yemen, Rep.<\/text>\n   <text x='330.44' y='276.52' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Nepal<\/text>\n   <text x='306.94' y='267.66' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Bangladesh<\/text>\n   <text x='334.34' y='258.79' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>India<\/text>\n   <text x='319.68' y='249.92' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Pakistan<\/text>\n   <text x='317.72' y='241.06' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Mongolia<\/text>\n   <text x='282.99' y='232.19' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Korea, Dem. Rep.<\/text>\n   <text x='319.68' y='223.32' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Thailand<\/text>\n   <text x='315.26' y='214.46' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Indonesia<\/text>\n   <text x='338.26' y='205.59' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Iran<\/text>\n   <text x='310.88' y='196.72' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Philippines<\/text>\n   <text x='319.16' y='187.86' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Lebanon<\/text>\n   <text x='316.25' y='178.99' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Sri Lanka<\/text>\n   <text x='326.52' y='170.12' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Jordan<\/text>\n   <text x='303.52' y='161.26' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Saudi Arabia<\/text>\n   <text x='330.44' y='152.39' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>China<\/text>\n   <text x='270.41' y='143.52' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>West Bank and Gaza<\/text>\n   <text x='333.39' y='134.66' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Syria<\/text>\n   <text x='318.71' y='125.79' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Malaysia<\/text>\n   <text x='321.3' y='116.93' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Vietnam<\/text>\n   <text x='323.1' y='108.06' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Bahrain<\/text>\n   <text x='329.46' y='99.19' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Oman<\/text>\n   <text x='327.02' y='90.33' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Kuwait<\/text>\n   <text x='326.04' y='81.46' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Taiwan<\/text>\n   <text x='306.46' y='72.59' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Korea, Rep.<\/text>\n   <text x='313.3' y='63.73' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Singapore<\/text>\n   <text x='331.91' y='54.86' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Israel<\/text>\n   <text x='281.5' y='45.99' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Hong Kong, China<\/text>\n   <text x='329.45' y='37.13' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>Japan<\/text>\n   <text x='362.04' y='334.26' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>0<\/text>\n   <text x='389.23' y='334.26' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>20<\/text>\n   <text x='418.88' y='334.26' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>40<\/text>\n   <text x='448.52' y='334.26' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>60<\/text>\n   <text x='478.17' y='334.26' font-size='6.6pt' font-family='Arial' fill='#4D4D4D' fill-opacity='1'>80<\/text>\n   <text x='413.46' y='346.72' font-size='8.25pt' font-family='Arial'>2007<\/text>\n   <text x='10.96' y='14.93' font-size='9.9pt' font-family='Arial'>Life Expectancy in Asia<\/text>\n  <\/g>\n <\/g>\n<\/svg>","js":null,"uid":"svg_c912b03a_bde0_49f5_8fe4_b73339194d25","ratio":1.4,"settings":{"tooltip":{"css":".tooltip_SVGID_ { padding:5px;background:black;color:white;border-radius:2px;text-align:left; ; position:absolute;pointer-events:none;z-index:999;}","placement":"doc","opacity":0.9,"offx":10,"offy":10,"use_cursor_pos":true,"use_fill":false,"use_stroke":false,"delay_over":200,"delay_out":500},"hover":{"css":".hover_data_SVGID_ { fill:orange;stroke:black;cursor:pointer; }\ntext.hover_data_SVGID_ { stroke:none;fill:orange; }\ncircle.hover_data_SVGID_ { fill:orange;stroke:black; }\nline.hover_data_SVGID_, polyline.hover_data_SVGID_ { fill:none;stroke:orange; }\nrect.hover_data_SVGID_, polygon.hover_data_SVGID_, path.hover_data_SVGID_ { fill:orange;stroke:none; }\nimage.hover_data_SVGID_ { stroke:orange; }","reactive":true,"nearest_distance":null},"hover_inv":{"css":""},"hover_key":{"css":".hover_key_SVGID_ { fill:orange;stroke:black;cursor:pointer; }\ntext.hover_key_SVGID_ { stroke:none;fill:orange; }\ncircle.hover_key_SVGID_ { fill:orange;stroke:black; }\nline.hover_key_SVGID_, polyline.hover_key_SVGID_ { fill:none;stroke:orange; }\nrect.hover_key_SVGID_, polygon.hover_key_SVGID_, path.hover_key_SVGID_ { fill:orange;stroke:none; }\nimage.hover_key_SVGID_ { stroke:orange; }","reactive":true},"hover_theme":{"css":".hover_theme_SVGID_ { fill:orange;stroke:black;cursor:pointer; }\ntext.hover_theme_SVGID_ { stroke:none;fill:orange; }\ncircle.hover_theme_SVGID_ { fill:orange;stroke:black; }\nline.hover_theme_SVGID_, polyline.hover_theme_SVGID_ { fill:none;stroke:orange; }\nrect.hover_theme_SVGID_, polygon.hover_theme_SVGID_, path.hover_theme_SVGID_ { fill:orange;stroke:none; }\nimage.hover_theme_SVGID_ { stroke:orange; }","reactive":true},"select":{"css":".select_data_SVGID_ { fill:red;stroke:black;cursor:pointer; }\ntext.select_data_SVGID_ { stroke:none;fill:red; }\ncircle.select_data_SVGID_ { fill:red;stroke:black; }\nline.select_data_SVGID_, polyline.select_data_SVGID_ { fill:none;stroke:red; }\nrect.select_data_SVGID_, polygon.select_data_SVGID_, path.select_data_SVGID_ { fill:red;stroke:none; }\nimage.select_data_SVGID_ { stroke:red; }","type":"multiple","only_shiny":true,"selected":[]},"select_inv":{"css":""},"select_key":{"css":".select_key_SVGID_ { fill:red;stroke:black;cursor:pointer; }\ntext.select_key_SVGID_ { stroke:none;fill:red; }\ncircle.select_key_SVGID_ { fill:red;stroke:black; }\nline.select_key_SVGID_, polyline.select_key_SVGID_ { fill:none;stroke:red; }\nrect.select_key_SVGID_, polygon.select_key_SVGID_, path.select_key_SVGID_ { fill:red;stroke:none; }\nimage.select_key_SVGID_ { stroke:red; }","type":"single","only_shiny":true,"selected":[]},"select_theme":{"css":".select_theme_SVGID_ { fill:red;stroke:black;cursor:pointer; }\ntext.select_theme_SVGID_ { stroke:none;fill:red; }\ncircle.select_theme_SVGID_ { fill:red;stroke:black; }\nline.select_theme_SVGID_, polyline.select_theme_SVGID_ { fill:none;stroke:red; }\nrect.select_theme_SVGID_, polygon.select_theme_SVGID_, path.select_theme_SVGID_ { fill:red;stroke:none; }\nimage.select_theme_SVGID_ { stroke:red; }","type":"single","only_shiny":true,"selected":[]},"zoom":{"min":1,"max":1,"duration":300},"toolbar":{"position":"topright","pngname":"diagram","tooltips":null,"fixed":false,"hidden":[],"delay_over":200,"delay_out":500},"sizing":{"rescale":true,"width":1}}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

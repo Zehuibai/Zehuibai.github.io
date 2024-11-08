@@ -414,11 +414,78 @@ add_annotations(x = total$log2rr, y = total$p1, text = total$term, xref = "x", y
 p
 ```
 
+
+## Tendril Plot
+
+The Tendril plot concept is illustrated using the preferred term of Back Pain. Events on placebo tilt the tendril to the right and events on active tilt the tendril to the left.
+In this illustrative plot, events are colored by treatment arm; yellow and brown circles for placebo and active arm, respectively. The distance between points are proportional to time between events.
+
+![](./02_Plots/Visualization/AEs/AE_Tendril_Intro.png)
+
+[Tendril Plot Shiny App](https://steve-mallett.shinyapps.io/TendrilPlot/)
+
+This tendril plot provides a visual comparison of System Organ Class Adverse Events (AEs) between a placebo group and an intervention group in a clinical study. Each tendril represents a different category of AEs, such as gastrointestinal or neurological, differentiated by color. The plot's horizontal axis divides the two study groups, while the vertical axis indicates the progression of the study, though specific time units are not provided.
+
+In the plot, the length and direction of each tendril illustrate the incidence and progression of AEs in each category relative to the treatment group. For example, lines extending significantly toward the intervention side indicate a higher occurrence of AEs in that group compared to placebo. This visual tool is effective for quickly assessing the safety profile and identifying the most prevalent adverse events in each treatment group during the study.
+
+![](./02_Plots/Visualization/AEs/AE_Tendril.png)
+
+
+## Double Dot Plot 
+
+![](./02_Plots/Visualization/ForestPlot/DoubleDot.png)
+
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+library(gridExtra)
+
+# Simulating data
+set.seed(123)
+data <- data.frame(
+  Category = c("Social circumstances", "Immune system disorders", "Endocrine disorders",
+               "Neoplasms benign, malignant and unspecified (incl cysts and polyps)", 
+               "Ear and labyrinth disorders", "General disorders and administration site conditions",
+               "Injury, poisoning and procedural complications", "Investigations", "Nervous system disorders",
+               "Metabolism and nutrition disorders", "Vascular disorders", "Renal and urinary disorders",
+               "Infections and infestations", "Musculoskeletal and connective tissue disorders",
+               "Skin and subcutaneous tissue disorders", "Pregnancy, puerperium and perinatal conditions",
+               "Congenital, familial and genetic disorders", "Gastrointestinal disorders", "Eye disorders",
+               "Respiratory, thoracic and mediastinal disorders", "Reproductive system and breast disorders",
+               "Cardiac disorders", "Hepatobiliary disorders", "Psychiatric disorders", "Surgical and medical procedures"),
+  Proportion = runif(25, 0.01, 0.04),
+  Proportion2 = runif(25, 0.01, 0.04),
+  RelativeRisk = runif(25, 0.5, 2),
+  LowerCI = runif(25, 0.1, 1.5),
+  UpperCI = runif(25, 1.5, 3),
+  Pvalue = runif(25, 0.001, 1)
+)
+
+data$Significant <- ifelse(data$Pvalue < 0.05, "red", "black")
+
+
+double_dot_plot <- ggplot(data, aes(x = Category)) +
+  geom_point(aes(y = Proportion), color = "blue", size = 3) +
+  geom_point(aes(y = Proportion2), color = "red", size = 3) +
+  coord_flip() +
+  scale_y_continuous(labels = scales::percent_format(), breaks = seq(0, 0.04, by = 0.01)) +
+  labs(y = "Proportion", x = NULL, title = "Double Dot Plot") +
+  theme_minimal()
+
+risk_plot <- ggplot(data, aes(x = Category, y = RelativeRisk)) +
+  geom_pointrange(aes(ymin = LowerCI, ymax = UpperCI), size = 0.5) +
+  geom_text(aes(label = sprintf("%.3f", Pvalue), color = Significant), hjust = 1.5, size = 3) +
+  coord_flip() +
+  scale_y_log10(breaks = c(0.1, 0.5, 1, 2, 10), labels = scales::trans_format("log10", scales::math_format(10^.x))) +
+  labs(y = "Relative Risk with 95% CI", x = NULL, title = "Relative Risk Plot") +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), axis.title.y = element_blank()) +
+  scale_color_identity()
+
+grid.arrange(double_dot_plot, risk_plot, ncol = 2)
+
+```
 # Reference
 
 * [Most Frequent AE by Relative Risk/Forest Plot using](https://www.linkedin.com/pulse/most-frequent-ae-relative-risk-using-r-jagadish-katam/?trackingId=GllB04d3RAe%2BIPwtx1czFg%3D%3D)
-
-## Heat Map
-
 * [Adverse Event Data – gRaphically](https://www.lexjansen.com/phuse/2018/dv/DV11.pdf)
-* 
+* SIG (2024, Feb. 8). VIS-SIG Blog: Wonderful Wednesdays February 2024. Retrieved from https://graphicsprinciples.github.io/posts/2024-09-01-wonderful-wednesdays-february-2024/

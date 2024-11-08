@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Forest Plot</title>
+
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Alternatives-to-Power.html">Bayesian methods - Alternatives to Power</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-Estimands.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot-Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-PRO-Data.html">Patient Reported Outcome Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Forest-Plot.html">Forest Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Flow-Chart.html">Flow Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-SSC-and-Power-Calculation.html">Sample Size and Power Calculations</a>
+    </li>
+    <li>
+      <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Linear-Regression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="07-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Forest Plot</p></h1>
+
+</div>
+
+
+<div id="general-forest-plot" class="section level1">
+<h1>General Forest Plot</h1>
+<div id="annotated-forest-plots-alternative-1" class="section level2">
+<h2>Annotated Forest Plots Alternative 1</h2>
+<pre class="r"><code>## Example data frame
+dat &lt;- data.frame(
+  Index = c(1, 2, 3, 4), ## This provides an order to the data
+  label = c(&quot;Age (65 and older versus &lt;65)&quot;, &quot;Male versus Female&quot;, &quot;High income versus Low income&quot;, &quot;High school or higher versus No High school&quot;),
+  OR = c(1.00, 2.00, 3.00, 0.50),
+  LL = c(0.25, 0.90, 2.25, 0.2),
+  UL = c(1.75, 3.10, 3.75, 0.8),
+  CI = c(&quot;0.25, 1.75&quot;, &quot;0.90, 3.10&quot;, &quot;2.25, 3.75&quot;, &quot;0.20, 0.80&quot;)
+)
+dat</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Index"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["label"],"name":[2],"type":["chr"],"align":["left"]},{"label":["OR"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["LL"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["UL"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["CI"],"name":[6],"type":["chr"],"align":["left"]}],"data":[{"1":"1","2":"Age (65 and older versus <65)","3":"1.0","4":"0.25","5":"1.75","6":"0.25, 1.75"},{"1":"2","2":"Male versus Female","3":"2.0","4":"0.90","5":"3.10","6":"0.90, 3.10"},{"1":"3","2":"High income versus Low income","3":"3.0","4":"2.25","5":"3.75","6":"2.25, 3.75"},{"1":"4","2":"High school or higher versus No High school","3":"0.5","4":"0.20","5":"0.80","6":"0.20, 0.80"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>plot1 &lt;- ggplot(dat, aes(y = Index, x = OR)) +
+  geom_point(shape = 18, size = 5) +  
+  geom_errorbarh(aes(xmin = LL, xmax = UL), height = 0.25) +
+  geom_vline(xintercept = 1, color = &quot;red&quot;, linetype = &quot;dashed&quot;, cex = 1, alpha = 0.5) +
+  scale_y_continuous(name = &quot;&quot;, breaks=1:4, labels = dat$label, trans = &quot;reverse&quot;) +
+  xlab(&quot;Odds Ratio (95% CI)&quot;) + 
+  ylab(&quot; &quot;) + 
+  theme_bw() +
+  theme(panel.border = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(colour = &quot;black&quot;),
+        axis.text.y = element_text(size = 12, colour = &quot;black&quot;),
+        axis.text.x.bottom = element_text(size = 12, colour = &quot;black&quot;),
+        axis.title.x = element_text(size = 12, colour = &quot;black&quot;))
+
+
+## Create the table-base pallete
+table_base &lt;- ggplot(dat, aes(y=label)) +
+  ylab(NULL) + xlab(&quot;  &quot;) + 
+  theme(plot.title = element_text(hjust = 0.5, size=12), 
+        axis.text.x = element_text(color=&quot;white&quot;, hjust = -3, size = 25), ## This is used to help with alignment
+        axis.line = element_blank(),
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank(),
+        axis.title.y = element_blank(), 
+        legend.position = &quot;none&quot;,
+        panel.background = element_blank(), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        plot.background = element_blank())
+
+## OR point estimate table
+tab1 &lt;- table_base + 
+  labs(title = &quot;space&quot;) +
+  geom_text(aes(y = rev(Index), x = 1, label = sprintf(&quot;%0.1f&quot;, round(OR, digits = 1))), size = 4) + ## decimal places
+  ggtitle(&quot;OR&quot;)
+
+## 95% CI table
+tab2 &lt;- table_base +
+  geom_text(aes(y = rev(Index), x = 1, label = CI), size = 4) + 
+  ggtitle(&quot;95% CI&quot;)
+
+## Merge tables with plot
+library(&quot;gridExtra&quot;) 
+grid.arrange(plot1, tab1, tab2, 
+             layout_matrix = matrix(c(1,1,1,1,1,1,1,1,1,1,2,3,3), nrow = 1))</code></pre>
+<p><img src="05-Plot-Forest-Plot_files/figure-html/unnamed-chunk-1-1.png" width="1152" /></p>
+</div>
+<div id="annotated-forest-plots-alternative-2" class="section level2">
+<h2>Annotated Forest Plots Alternative 2</h2>
+<pre class="r"><code>library(&quot;gt&quot;)
+
+res_log &lt;- read_csv(&quot;https://raw.githubusercontent.com/kathoffman/steroids-trial-emulation/main/output/res_log.csv&quot;)
+res &lt;- read_csv(&quot;https://raw.githubusercontent.com/kathoffman/steroids-trial-emulation/main/output/res.csv&quot;)
+
+# res &lt;- res_log |&gt;
+#       rename_with(~str_c(&quot;log.&quot;, .), estimate:conf.high) |&gt;
+#   select(-p.value) |&gt;
+#   full_join(res)
+ForestData &lt;- res_log %&gt;%
+      rename_with(~str_c(&quot;log.&quot;, .), estimate:conf.high) %&gt;%
+  select(-p.value) %&gt;%
+  full_join(res)
+## Get a glimpse of your data
+## glimpse(ForestData)
+ForestData %&gt;% kbl() %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;))</code></pre>
+<table class="table table-striped table-hover table-condensed" style="color: black; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+model
+</th>
+<th style="text-align:right;">
+log.estimate
+</th>
+<th style="text-align:right;">
+log.conf.low
+</th>
+<th style="text-align:right;">
+log.conf.high
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+conf.low
+</th>
+<th style="text-align:right;">
+conf.high
+</th>
+<th style="text-align:right;">
+p.value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:right;">
+-0.6846879
+</td>
+<td style="text-align:right;">
+-0.8947661
+</td>
+<td style="text-align:right;">
+-0.4746097
+</td>
+<td style="text-align:right;">
+0.5042476
+</td>
+<td style="text-align:right;">
+0.4087032
+</td>
+<td style="text-align:right;">
+0.6221278
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B
+</td>
+<td style="text-align:right;">
+-0.0525578
+</td>
+<td style="text-align:right;">
+-0.4201151
+</td>
+<td style="text-align:right;">
+0.3149994
+</td>
+<td style="text-align:right;">
+0.9487994
+</td>
+<td style="text-align:right;">
+0.6569712
+</td>
+<td style="text-align:right;">
+1.3702585
+</td>
+<td style="text-align:right;">
+0.7792783
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:right;">
+-0.0864096
+</td>
+<td style="text-align:right;">
+-0.4567781
+</td>
+<td style="text-align:right;">
+0.2839589
+</td>
+<td style="text-align:right;">
+0.9172184
+</td>
+<td style="text-align:right;">
+0.6333208
+</td>
+<td style="text-align:right;">
+1.3283783
+</td>
+<td style="text-align:right;">
+0.6474743
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:right;">
+-0.1214702
+</td>
+<td style="text-align:right;">
+-0.5869119
+</td>
+<td style="text-align:right;">
+0.3439714
+</td>
+<td style="text-align:right;">
+0.8856174
+</td>
+<td style="text-align:right;">
+0.5560418
+</td>
+<td style="text-align:right;">
+1.4105383
+</td>
+<td style="text-align:right;">
+0.6089951
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E
+</td>
+<td style="text-align:right;">
+-0.4216403
+</td>
+<td style="text-align:right;">
+-0.8819218
+</td>
+<td style="text-align:right;">
+0.0386411
+</td>
+<td style="text-align:right;">
+0.6559699
+</td>
+<td style="text-align:right;">
+0.4139865
+</td>
+<td style="text-align:right;">
+1.0393974
+</td>
+<td style="text-align:right;">
+0.0725863
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:right;">
+-0.2575052
+</td>
+<td style="text-align:right;">
+-0.5093796
+</td>
+<td style="text-align:right;">
+-0.0056308
+</td>
+<td style="text-align:right;">
+0.7729776
+</td>
+<td style="text-align:right;">
+0.6008682
+</td>
+<td style="text-align:right;">
+0.9943850
+</td>
+<td style="text-align:right;">
+0.0450936
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+G
+</td>
+<td style="text-align:right;">
+0.0526079
+</td>
+<td style="text-align:right;">
+-0.2671835
+</td>
+<td style="text-align:right;">
+0.3723992
+</td>
+<td style="text-align:right;">
+1.0540163
+</td>
+<td style="text-align:right;">
+0.7655326
+</td>
+<td style="text-align:right;">
+1.4512123
+</td>
+<td style="text-align:right;">
+0.7471289
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+H
+</td>
+<td style="text-align:right;">
+0.0427286
+</td>
+<td style="text-align:right;">
+-0.2871902
+</td>
+<td style="text-align:right;">
+0.3726475
+</td>
+<td style="text-align:right;">
+1.0436546
+</td>
+<td style="text-align:right;">
+0.7503690
+</td>
+<td style="text-align:right;">
+1.4515726
+</td>
+<td style="text-align:right;">
+0.7996192
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I
+</td>
+<td style="text-align:right;">
+-0.4624971
+</td>
+<td style="text-align:right;">
+-0.7340078
+</td>
+<td style="text-align:right;">
+-0.1909864
+</td>
+<td style="text-align:right;">
+0.6297092
+</td>
+<td style="text-align:right;">
+0.4799815
+</td>
+<td style="text-align:right;">
+0.8261438
+</td>
+<td style="text-align:right;">
+0.0008419
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+J
+</td>
+<td style="text-align:right;">
+0.0798845
+</td>
+<td style="text-align:right;">
+-0.2224750
+</td>
+<td style="text-align:right;">
+0.3822440
+</td>
+<td style="text-align:right;">
+1.0831619
+</td>
+<td style="text-align:right;">
+0.8005350
+</td>
+<td style="text-align:right;">
+1.4655697
+</td>
+<td style="text-align:right;">
+0.6045771
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>## Make point and line range section of the plot
+p_mid &lt;- ForestData |&gt;
+  ## 1. Reverse order of factor levels
+  ggplot(aes(y = fct_rev(model))) + 
+  theme_classic() +
+  ## 2. Show all of our information (point estimate and 95% confidence interval) on the graph
+  geom_point(aes(x=log.estimate), shape=15, size=3) +
+  geom_linerange(aes(xmin=log.conf.low, xmax=log.conf.high)) +
+  ## 3. Add a vertical line at 0 and rename the x axis, zoom to the exact height and width
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  labs(x=&quot;Log Hazard Ratio&quot;, y=&quot;&quot;) +
+  coord_cartesian(ylim=c(1,11), xlim=c(-1, .5)) +
+  ## 4. Add text about protective vs. harmful using the annotate layer
+  annotate(&quot;text&quot;, x = -.32, y = 11, label = &quot;Corticosteroids protective&quot;) +
+  annotate(&quot;text&quot;, x = .3, y = 11, label = &quot;Corticosteroids harmful&quot;) +
+  ## 5. remove everything on the y axis
+  theme(axis.line.y = element_blank(),
+        axis.ticks.y= element_blank(),
+        axis.text.y= element_blank(),
+        axis.title.y= element_blank())
+p_mid</code></pre>
+<p><img src="05-Plot-Forest-Plot_files/figure-html/unnamed-chunk-2-1.png" width="1152" /></p>
+<pre class="r"><code>## Create estimate annotations plot
+# wrangle results into pre-plotting table form
+# res_plot &lt;- ForestData |&gt;
+#   # round estimates and 95% CIs to 2 decimal places for journal specifications
+#   mutate(across(
+#     c(estimate, conf.low, conf.high),
+#     ~ str_pad(
+#       round(.x, 2),
+#       width = 4,
+#       pad = &quot;0&quot;,
+#       side = &quot;right&quot;
+#     )
+#   ),
+#   # add an &quot;-&quot; between HR estimate confidence intervals
+#   estimate_lab = paste0(estimate, &quot; (&quot;, conf.low, &quot;-&quot;, conf.high, &quot;)&quot;)) |&gt;
+#   # round p-values to two decimal places, except in cases where p &lt; .001
+#   mutate(p.value = case_when(
+#     p.value &lt; .001 ~ &quot;&lt;0.001&quot;,
+#     round(p.value, 2) == .05 ~ as.character(round(p.value,3)),
+#     p.value &lt; .01 ~ str_pad( # if less than .01, go one more decimal place
+#       as.character(round(p.value, 3)),
+#       width = 4,
+#       pad = &quot;0&quot;,
+#       side = &quot;right&quot;
+#     ),
+#     TRUE ~ str_pad( # otherwise just round to 2 decimal places and pad string so that .2 reads as 0.20
+#       as.character(round(p.value, 2)),
+#       width = 4,
+#       pad = &quot;0&quot;,
+#       side = &quot;right&quot;
+#     )
+#   )) |&gt;
+#   # add a row of data that are actually column names which will be shown on the plot in the next step
+#   bind_rows(
+#     data.frame(
+#       model = &quot;Model&quot;,
+#       estimate_lab = &quot;Hazard Ratio (95% CI)&quot;,
+#       conf.low = &quot;&quot;,
+#       conf.high = &quot;&quot;,
+#       p.value = &quot;p-value&quot;
+#     )
+#   ) |&gt;
+#   mutate(model = fct_rev(fct_relevel(model, &quot;Model&quot;)))
+# saveRDS(res_plot, file = &quot;res_plot.rds&quot;)
+res_plot &lt;- readRDS(&quot;./01_Datasets/res_plot.rds&quot;)
+
+res_plot %&gt;% kbl() %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;))</code></pre>
+<table class="table table-striped table-hover table-condensed" style="color: black; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+model
+</th>
+<th style="text-align:right;">
+log.estimate
+</th>
+<th style="text-align:right;">
+log.conf.low
+</th>
+<th style="text-align:right;">
+log.conf.high
+</th>
+<th style="text-align:left;">
+estimate
+</th>
+<th style="text-align:left;">
+conf.low
+</th>
+<th style="text-align:left;">
+conf.high
+</th>
+<th style="text-align:left;">
+p.value
+</th>
+<th style="text-align:left;">
+estimate_lab
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:right;">
+-0.6846879
+</td>
+<td style="text-align:right;">
+-0.8947661
+</td>
+<td style="text-align:right;">
+-0.4746097
+</td>
+<td style="text-align:left;">
+0.50
+</td>
+<td style="text-align:left;">
+0.41
+</td>
+<td style="text-align:left;">
+0.62
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+0.50 (0.41-0.62)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B
+</td>
+<td style="text-align:right;">
+-0.0525578
+</td>
+<td style="text-align:right;">
+-0.4201151
+</td>
+<td style="text-align:right;">
+0.3149994
+</td>
+<td style="text-align:left;">
+0.95
+</td>
+<td style="text-align:left;">
+0.66
+</td>
+<td style="text-align:left;">
+1.37
+</td>
+<td style="text-align:left;">
+0.78
+</td>
+<td style="text-align:left;">
+0.95 (0.66-1.37)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:right;">
+-0.0864096
+</td>
+<td style="text-align:right;">
+-0.4567781
+</td>
+<td style="text-align:right;">
+0.2839589
+</td>
+<td style="text-align:left;">
+0.92
+</td>
+<td style="text-align:left;">
+0.63
+</td>
+<td style="text-align:left;">
+1.33
+</td>
+<td style="text-align:left;">
+0.65
+</td>
+<td style="text-align:left;">
+0.92 (0.63-1.33)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:right;">
+-0.1214702
+</td>
+<td style="text-align:right;">
+-0.5869119
+</td>
+<td style="text-align:right;">
+0.3439714
+</td>
+<td style="text-align:left;">
+0.89
+</td>
+<td style="text-align:left;">
+0.56
+</td>
+<td style="text-align:left;">
+1.41
+</td>
+<td style="text-align:left;">
+0.61
+</td>
+<td style="text-align:left;">
+0.89 (0.56-1.41)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E
+</td>
+<td style="text-align:right;">
+-0.4216403
+</td>
+<td style="text-align:right;">
+-0.8819218
+</td>
+<td style="text-align:right;">
+0.0386411
+</td>
+<td style="text-align:left;">
+0.66
+</td>
+<td style="text-align:left;">
+0.41
+</td>
+<td style="text-align:left;">
+1.04
+</td>
+<td style="text-align:left;">
+0.07
+</td>
+<td style="text-align:left;">
+0.66 (0.41-1.04)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:right;">
+-0.2575052
+</td>
+<td style="text-align:right;">
+-0.5093796
+</td>
+<td style="text-align:right;">
+-0.0056308
+</td>
+<td style="text-align:left;">
+0.77
+</td>
+<td style="text-align:left;">
+0.60
+</td>
+<td style="text-align:left;">
+0.99
+</td>
+<td style="text-align:left;">
+0.045
+</td>
+<td style="text-align:left;">
+0.77 (0.60-0.99)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+G
+</td>
+<td style="text-align:right;">
+0.0526079
+</td>
+<td style="text-align:right;">
+-0.2671835
+</td>
+<td style="text-align:right;">
+0.3723992
+</td>
+<td style="text-align:left;">
+1.05
+</td>
+<td style="text-align:left;">
+0.77
+</td>
+<td style="text-align:left;">
+1.45
+</td>
+<td style="text-align:left;">
+0.75
+</td>
+<td style="text-align:left;">
+1.05 (0.77-1.45)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+H
+</td>
+<td style="text-align:right;">
+0.0427286
+</td>
+<td style="text-align:right;">
+-0.2871902
+</td>
+<td style="text-align:right;">
+0.3726475
+</td>
+<td style="text-align:left;">
+1.04
+</td>
+<td style="text-align:left;">
+0.75
+</td>
+<td style="text-align:left;">
+1.45
+</td>
+<td style="text-align:left;">
+0.80
+</td>
+<td style="text-align:left;">
+1.04 (0.75-1.45)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+I
+</td>
+<td style="text-align:right;">
+-0.4624971
+</td>
+<td style="text-align:right;">
+-0.7340078
+</td>
+<td style="text-align:right;">
+-0.1909864
+</td>
+<td style="text-align:left;">
+0.63
+</td>
+<td style="text-align:left;">
+0.48
+</td>
+<td style="text-align:left;">
+0.83
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+0.63 (0.48-0.83)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+J
+</td>
+<td style="text-align:right;">
+0.0798845
+</td>
+<td style="text-align:right;">
+-0.2224750
+</td>
+<td style="text-align:right;">
+0.3822440
+</td>
+<td style="text-align:left;">
+1.08
+</td>
+<td style="text-align:left;">
+0.80
+</td>
+<td style="text-align:left;">
+1.47
+</td>
+<td style="text-align:left;">
+0.60
+</td>
+<td style="text-align:left;">
+1.08 (0.80-1.47)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Model
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+p-value
+</td>
+<td style="text-align:left;">
+Hazard Ratio (95% CI)
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>p_left &lt;-
+  res_plot  |&gt;
+  ggplot(aes(y = model)) +
+  geom_text(aes(x = 0, label = model), hjust = 0, fontface = &quot;bold&quot;) +
+  geom_text(
+    aes(x = 1, label = estimate_lab),
+    hjust = 0,
+    fontface = ifelse(res_plot$estimate_lab == &quot;Hazard Ratio (95% CI)&quot;, &quot;bold&quot;, &quot;plain&quot;) 
+  ) +
+  ## Remove the background and edit the sizing
+  theme_void() +
+  coord_cartesian(xlim = c(0, 4))
+p_left</code></pre>
+<p><img src="05-Plot-Forest-Plot_files/figure-html/unnamed-chunk-2-2.png" width="1152" /></p>
+<pre class="r"><code>## Create p-value annotations
+p_right &lt;-
+  res_plot  |&gt;
+  ggplot() +
+  geom_text(
+    aes(x = 0, y = model, label = p.value),
+    hjust = 0,
+    fontface = ifelse(res_plot$p.value == &quot;p-value&quot;, &quot;bold&quot;, &quot;plain&quot;)
+  ) +
+  theme_void() 
+p_right</code></pre>
+<p><img src="05-Plot-Forest-Plot_files/figure-html/unnamed-chunk-2-3.png" width="1152" /></p>
+<pre class="r"><code>## Merge tables with plot
+library(&quot;gridExtra&quot;)
+grid.arrange(p_left, p_mid, p_right, 
+             layout_matrix = matrix(c(1,1,1,2,2,2,2,2,2,2,2,2,3,3), nrow = 1))</code></pre>
+<p><img src="05-Plot-Forest-Plot_files/figure-html/unnamed-chunk-2-4.png" width="1152" /></p>
+<pre class="r"><code>## ggsave(&quot;forest-plot.eps&quot;, width=9, height=4)</code></pre>
+</div>
+<div id="meta-package" class="section level2">
+<h2>meta package</h2>
+<pre class="r"><code>Forest.df &lt;- data.frame(study=c(&#39;S1&#39;, &#39;S2&#39;, &#39;S3&#39;, &#39;S4&#39;, &#39;S5&#39;, &#39;S6&#39;, &#39;S7&#39;),
+                        index=1:7,
+                        effect=c(-.4, -.25, -.1, .1, .15, .2, .3),
+                        lower=c(-.43, -.29, -.17, -.02, .04, .17, .27),
+                        upper=c(-.37, -.21, -.03, .22, .24, .23, .33))
+## create forest plot
+ggplot(data=Forest.df, 
+       aes(y=index, x=effect, xmin=lower, xmax=upper,
+           label=as.character(effect))) +
+  geom_label(vjust=-0.1) + 
+  geom_errorbarh(height=.1) +
+  scale_y_continuous(breaks=1:nrow(Forest.df), labels=Forest.df$study) +
+  labs(title=&#39;Effect Size by Study&#39;, 
+       x=&#39;Effect Size&#39;, 
+       y = &#39;Study&#39;) +
+  geom_vline(xintercept=0, color=&#39;black&#39;, linetype=&#39;dashed&#39;, alpha=.5) +
+  theme_classic() # theme_minimal()</code></pre>
+<p><img src="05-Plot-Forest-Plot_files/figure-html/unnamed-chunk-3-1.png" width="1152" /></p>
+<pre class="r"><code>## https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/forest.html
+library(&quot;meta&quot;)
+data(Fleiss93)
+metaresult&lt;-metabin(event.e, n.e,event.c,n.c,data=Fleiss93,sm=&quot;RR&quot;,
+                    studlab=paste(study, year),random=FALSE)
+forest(metaresult)</code></pre>
+<p><img src="05-Plot-Forest-Plot_files/figure-html/unnamed-chunk-3-2.png" width="1152" /></p>
+</div>
+<div id="ggforestplot-package-based-on-se" class="section level2">
+<h2>ggforestplot package (based on SE)</h2>
+<p>The R package ggforestplot allows to plot vertical forest plots,
+a.k.a. blobbograms, and it’s based on ggplot2, see more click (here)[<a
+href="https://nightingalehealth.github.io/ggforestplot/articles/ggforestplot.html"
+class="uri">https://nightingalehealth.github.io/ggforestplot/articles/ggforestplot.html</a>]</p>
+<div id="basic-forestplot" class="section level3">
+<h3>Basic Forestplot</h3>
+<pre class="r"><code># devtools::install_github(&quot;NightingaleHealth/ggforestplot&quot;)
+library(&quot;ggforestplot&quot;)
+
+df &lt;-
+  ggforestplot::df_linear_associations %&gt;%
+  filter(
+    trait == &quot;BMI&quot;,
+    dplyr::row_number() &lt;= 30
+  )
+
+ggforestplot::forestplot(
+  df = df,
+  name = name,
+  estimate = beta,
+  se = se,
+  pvalue = pvalue,
+  psignif = 0.002,
+  xlab = &quot;1-SD increment in BMI\nper 1-SD increment in biomarker concentration&quot;,
+  title = &quot;Associations of blood biomarkers to BMI&quot;
+)</code></pre>
+<p><img src="05-Plot-Forest-Plot_files/figure-html/unnamed-chunk-4-1.png" width="1152" /></p>
+</div>
+<div id="comparing-several-traits" class="section level3">
+<h3>Comparing several traits</h3>
+<pre class="r"><code># Extract the biomarker names
+selected_bmrs &lt;- df %&gt;% pull(name)
+
+# Filter the demo dataset for the biomarkers above and all three traits:
+# BMI, HOMA-IR and fasting glucose
+df_compare_traits &lt;-
+  ggforestplot::df_linear_associations %&gt;%
+  filter(name %in% selected_bmrs) %&gt;%
+  # Set class to factor to set order of display.
+  mutate(
+    trait = factor(
+      trait,
+      levels = c(&quot;BMI&quot;, &quot;HOMA-IR&quot;, &quot;Fasting glucose&quot;)
+    )
+  )
+
+# Draw a forestplot of cross-sectional, linear associations
+# Notice how the df variable &#39;trait&#39; is used here to color the points
+ggforestplot::forestplot(
+  df = df_compare_traits,
+  estimate = beta,
+  pvalue = pvalue,
+  psignif = 0.002,
+  xlab = &quot;1-SD increment in cardiometabolic trait\nper 1-SD increment in biomarker concentration&quot;,
+  title = &quot;Biomarker associations to metabolic traits&quot;,
+  colour = trait
+)</code></pre>
+<p><img src="05-Plot-Forest-Plot_files/figure-html/unnamed-chunk-5-1.png" width="1152" /></p>
+</div>
+<div id="grouping-the-biomarkers" class="section level3">
+<h3>Grouping the biomarkers</h3>
+<pre class="r"><code>library(&quot;ggforce&quot;)
+# Filter df_NG_biomarker_metadata, that contain the groups, for only the 30
+# biomarkers under discussion
+df_grouping &lt;-
+  df_NG_biomarker_metadata %&gt;%
+  filter(name %in% df_compare_traits$name)
+# Join the association data frame df_compare_traits with group data
+df_compare_traits_groups &lt;-
+  df_compare_traits %&gt;%
+  # use right_join, with df_grouping on the right, to preserve the order of
+  # biomarkers it specifies.
+  dplyr::right_join(., df_grouping, by = &quot;name&quot;) %&gt;%
+  dplyr::mutate(
+    group = factor(.data$group, levels = unique(.data$group))
+  )
+
+# Draw a forestplot of cross-sectional, linear associations.
+forestplot(
+  df = df_compare_traits_groups,
+  estimate = beta,
+  pvalue = pvalue,
+  psignif = 0.002,
+  xlab = &quot;1-SD increment in cardiometabolic trait\nper 1-SD increment in biomarker concentration&quot;,
+  colour = trait
+) +
+  ggforce::facet_col(
+    facets = ~group,
+    scales = &quot;free_y&quot;,
+    space = &quot;free&quot;
+  )</code></pre>
+<p><img src="05-Plot-Forest-Plot_files/figure-html/unnamed-chunk-6-1.png" width="1152" /></p>
+</div>
+</div>
+<div id="ggplot2" class="section level2">
+<h2>ggplot2</h2>
+<pre class="r"><code>library(readxl)
+Master_Cancer_D01 &lt;- read_excel(&quot;./01_Datasets/HR_Ratio_2024.02.09.xlsx&quot;)
+
+Breast_Cancer_Factor &lt;- c(
+  &quot;3. Impact of Adjuvant Chemotherapy on Breast Cancer Survival&quot;,
+  &quot;3. Breast Cancer Diagnosis to Surgery Time&quot;,
+  &quot;2. Platinum Chemotherapy for Early Triple-Negative Breast Cancer&quot;,
+  &quot;2. Breast Cancer Diagnosis to Surgery Time&quot;,
+  &quot;1. Trastuzumab Regimen in HER2+ Early-Stage Breast Cancer: Meta-Analysis&quot;,
+  &quot;1. Breast Cancer Diagnosis to Surgery Time&quot;
+  )
+ 
+Breast_Cancer_Label&lt;- c(
+  &quot; Impact of Adjuvant Chemotherapy on Breast Cancer Survival&quot;,
+  &quot; Breast Cancer Diagnosis to Surgery Time&quot;,
+  &quot;  Platinum Chemotherapy for Early Triple-Negative Breast Cancer&quot;,
+  &quot;  Breast Cancer Diagnosis to Surgery Time&quot;,
+  &quot;   Trastuzumab Regimen in HER2+ Early-Stage Breast Cancer: Meta-Analysis&quot;,
+  &quot;   Breast Cancer Diagnosis to Surgery Time&quot;
+  ) 
+ 
+Breast_Cancer_Label &lt;- paste0(Breast_Cancer_Label,
+                              &quot;\n&quot;,
+                              rev(Master_Cancer_D01[which(Master_Cancer_D01$CancerType == &quot;Breast Cancer&quot;),]$Cite))
+
+Breast_Cancer_Data &lt;- Master_Cancer_D01 %&gt;%
+  filter(CancerType == &quot;Breast Cancer&quot;) %&gt;%
+  mutate(Category = factor(Category, levels = Breast_Cancer_Factor, labels=Breast_Cancer_Label))
+  
+Breast_Cancer_Plot &lt;- 
+  Breast_Cancer_Data %&gt;%
+  ggplot(aes(x = Estimate, y = Category)) + 
+  scale_x_continuous(trans = &quot;log10&quot;, 
+                breaks = c(0.6, 0.8, 1.0, 1.2, 1.5),
+                limits = c(0.5, 1.5)) + 
+  theme_forest() + 
+  scale_colour_ng_d() + 
+  scale_fill_ng_d() + 
+  geom_stripes() + 
+  geom_vline(xintercept = 1, linetype = &quot;dashed&quot;, size = 0.5, colour = &quot;black&quot;) + 
+  geom_hline(yintercept = 4.5, linetype = &quot;solid&quot;, size = 1.2, colour = &quot;black&quot;) + 
+  geom_hline(yintercept = 2.5, linetype = &quot;solid&quot;, size = 1.2, colour = &quot;black&quot;) + 
+  geom_effect(ggplot2::aes(xmin = conf.low, xmax = conf.high), 
+        position = ggstance::position_dodgev(height = 0.5)) + 
+        ggplot2::scale_shape_manual(values = c(21L, 22L, 23L, 
+            24L, 25L)) + guides(colour = guide_legend(reverse = TRUE), 
+        shape = guide_legend(reverse = TRUE)) +
+  annotate(&quot;text&quot;, x = 0.65, y = Inf, label = &quot;Relative Improvement in\nOverall Survival From Treatment&quot;, 
+           hjust = 0, vjust = 1, colour = &quot;black&quot;,size = 5) +
+  annotate(&quot;text&quot;, x = 1.08, y = Inf, label = &quot;Relative Decrease in\nOverall Survival From Delay&quot;, 
+           hjust = 0, vjust = 1, colour = &quot;black&quot;,size = 5) +
+  geom_textbox(aes(label = paste0(format(Estimate, digits = 3),
+                             &quot; [&quot;,
+                             format(conf.low, digits = 3),&quot;,&quot;,
+                             format(conf.high, digits = 3),
+                             &quot;]&quot;), 
+              x = Estimate), hjust = 0.5, vjust = 1.3, width = 0.132)+ 
+  labs(title = &quot;Figure 1: Breast Cancer&quot;) +
+  labs(subtitle = &quot;&quot;) +
+  labs(x = &quot;Hazard Ratio&quot;) +
+  labs(y = &quot;&quot;) +
+  theme(text = element_text(size = 16)) 
+
+png(&#39;./02_Plots/Visualization/ForestPlot/HR_Breast_Cancer.png&#39;,width=16, height=8,unit=&quot;in&quot;, res=600)
+Breast_Cancer_Plot
+dev.off()</code></pre>
+<pre><code>## cairo_pdf 
+##         2</code></pre>
+<pre class="r"><code>knitr::include_graphics(&quot;./02_Plots/Visualization/ForestPlot/HR_Breast_Cancer.png&quot;)</code></pre>
+<p><img src="02_Plots/Visualization/ForestPlot/HR_Breast_Cancer.png" width="4800" /></p>
+</div>
+</div>
+<div id="alternative-to-forest-plot" class="section level1">
+<h1>Alternative to Forest Plot</h1>
+<div id="dlqi-data" class="section level2">
+<h2>DLQI data</h2>
+<p><img src="02_Plots/Visualization/ForestPlot/DLQI_1.png" /></p>
+<p><strong>Source: Figure 2 in Muntyanu A, Gabrielli S, Donovan J,
+Gooderham M, Guenther L, Hanna S, et al. The burden of alopecia areata:
+A scoping review focusing on quality of life, mental health and work
+productivity. J Eur Acad Dermatol Venereol. 2023; 37: 1490–1520. <a
+href="https://doi.org/10.1111/jdv.18926"
+class="uri">https://doi.org/10.1111/jdv.18926</a></strong></p>
+<pre class="r"><code># Example data frame
+data &lt;- data.frame(
+  Study_Number = 1:12,
+  Mean_DLQI = c(4.8, 3.5, 2.1, 10.69, 6.1, 7.9, 7.7, 8.1636, 7.21, 5.8, 6.8, 6.4),
+  Lower_CI = c(2, 1, 1, 9, 4, 6, 5, 7, 6, 4, 5, 5),  # Example lower CI values
+  Upper_CI = c(8, 6, 4, 12, 8, 10, 10, 10, 9, 8, 9, 8)  # Example upper CI values
+)
+ 
+
+ggplot(data, aes(x = factor(Study_Number), y = Mean_DLQI)) +
+  geom_col(fill = &quot;salmon&quot;, width = 0.7) +  # Bars with salmon fill
+  geom_errorbar(aes(ymin = Lower_CI, ymax = Upper_CI), width = 0.2, color = &quot;black&quot;) +  # Error bars
+  geom_label(aes(label = round(Mean_DLQI, 2)), vjust = -1.5, fill = &quot;white&quot;, color = &quot;black&quot;, 
+             fontface = &quot;bold&quot;, label.size = 0.5) +  # Label with white background
+  labs(
+    title = &quot;DLQI in Alopecia Areata Studies&quot;,
+    x = &quot;Study Number&quot;,
+    y = &quot;DLQI Score&quot;
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),  # Centering the title
+    axis.title.x = element_text(face = &quot;bold&quot;),
+    axis.title.y = element_text(face = &quot;bold&quot;),
+    axis.text.x = element_text(angle = 90, hjust = 1)  # Angle x axis text for readability
+  )</code></pre>
+<p><img src="05-Plot-Forest-Plot_files/figure-html/unnamed-chunk-8-1.png" width="1152" /></p>
+<p><strong>Updated version 1</strong></p>
+<p><img src="02_Plots/Visualization/ForestPlot/DLQI_2.png" /></p>
+<pre class="r"><code># Sample data
+data &lt;- data.frame(
+  Study = c(&quot;Abedini et al.&quot;, &quot;Liu et al.&quot;, &quot;Shi et al.&quot;, &quot;Ghajarzadeh et al.&quot;,
+            &quot;Velez-Muniz et al.&quot;, &quot;Qi et al.&quot;, &quot;Ito et al.&quot;, &quot;Ferentinos et al.&quot;, &quot;Andersen et al.&quot;),
+  N = c(176, 383, 532, 100, 126, 698, 400, 52, 1494),
+  Mean_DLQI = c(1.5, 2.5, 3.0, 4.0, 5.5, 4.5, 6.0, 6.5, 7.0),
+  Lower_CI = c(0.5, 1.5, 2.5, 3.5, 4.0, 3.5, 5.5, 6.0, 6.0),
+  Upper_CI = c(2.5, 3.5, 3.5, 4.5, 7.0, 5.5, 6.5, 8.0, 10.0)
+)
+
+data &lt;- data %&gt;%
+  arrange(Mean_DLQI) %&gt;%
+  mutate(Study = factor(Study, levels = Study))
+
+# Determine the number of studies to set the y position for annotations
+num_studies &lt;- nrow(data)
+
+ggplot(data, aes(y = Study, x = Mean_DLQI, xmin = Lower_CI, xmax = Upper_CI)) +
+  geom_rect(aes(xmin = 0, xmax = 1, ymin = -Inf, ymax = Inf), fill = &quot;#FFD885&quot;, alpha = 0.2) +  # None
+  geom_rect(aes(xmin = 2, xmax = 5, ymin = -Inf, ymax = Inf), fill = &quot;#E4D383&quot;, alpha = 0.2) +  # Small
+  geom_rect(aes(xmin = 6, xmax = 10, ymin = -Inf, ymax = Inf), fill = &quot;#9BBC93&quot;, alpha = 0.2) +  # Moderate
+  geom_pointrange(size = 0.5, color = &quot;black&quot;) +
+  annotate(&quot;text&quot;, x = 1, y = num_studies + 0.5, label = &quot;None&quot;, vjust = 0) +
+  annotate(&quot;text&quot;, x = 3.5, y = num_studies + 0.5, label = &quot;Small&quot;, vjust = 0) +
+  annotate(&quot;text&quot;, x = 7.5, y = num_studies + 0.5, label = &quot;Medium&quot;, vjust = 0) +
+  scale_y_discrete(limits = c(levels(data$Study), &quot; &quot;), expand = c(0, 0.1)) +  # Extend y-axis
+  scale_x_continuous(&quot;Mean DLQI Score&quot;, breaks = 0:10) +
+  labs(y = &quot;Study&quot;, title = &quot;Across Studies, alopecia areata had on average a small or moderate impact on patients&#39; lives&quot;) +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())</code></pre>
+<p><img src="05-Plot-Forest-Plot_files/figure-html/unnamed-chunk-9-1.png" width="1152" /></p>
+<p><strong>Updated version 2</strong></p>
+<p><img src="02_Plots/Visualization/ForestPlot/DLQI_3.png" /></p>
+</div>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<ul>
+<li>SIG (2024, Feb. 8). VIS-SIG Blog: Wonderful Wednesdays February
+2024. Retrieved from <a
+href="https://graphicsprinciples.github.io/posts/2024-09-01-wonderful-wednesdays-february-2024/"
+class="uri">https://graphicsprinciples.github.io/posts/2024-09-01-wonderful-wednesdays-february-2024/</a></li>
+</ul>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -25,7 +25,8 @@ knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
 
 ## if(!require(psych)){install.packages("psych")}
 
-packages<-c("tidyverse", "kableExtra")
+packages<-c("tidyverse", "kableExtra",
+            "ggpubr","gridExtra","ggtext")
 
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
@@ -117,7 +118,7 @@ Study flow charts in clinical trials are visual representations of the different
 
 # CONSORT Diagramm in SAS
 
-# Automate in R
+# CONSORT Diagramm in R
 
 ## Gmisc and grid Package
 
@@ -310,11 +311,181 @@ w <- r[, {
 ]
 ```
 
+
+
+## DiagrammeR Package
+
+### Basic flowchart using `grViz`
+
+```{r DiagrammeR,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library("DiagrammeR")
+
+grViz("digraph flowchart {
+      # node definitions with substituted label text
+      node [fontname = Helvetica, shape = rectangle]        
+      tab1 [label = '@@1']
+      tab2 [label = '@@2']
+      tab3 [label = '@@3']
+      tab4 [label = '@@4']
+      tab5 [label = '@@5']
+
+      # edge definitions with the node IDs
+      tab1 -> tab2 -> tab3 -> tab4 -> tab5;
+      }
+
+      [1]: 'Questionnaire sent to n=1000 participants'
+      [2]: 'Participants responded to questionnaire n=850'
+      [3]: 'Participants came to clinic for evaluation n=700'
+      [4]: 'Participants eligible for the study n=600'
+      [5]: 'Study sample n=600'
+      ")
+
+grViz("digraph flowchart {
+      # node definitions with substituted label text
+      node [fontname = Helvetica, shape = rectangle]        
+      tab1 [label = '@@1']
+      tab2 [label = '@@2']
+      tab3 [label = '@@3']
+      tab4 [label = '@@4']
+      tab5 [label = '@@5']
+
+      # edge definitions with the node IDs
+      tab1 -> tab2;
+      tab2 -> tab3;
+      tab2 -> tab4 -> tab5
+      }
+
+      [1]: 'Questionnaire sent to n=1000 participants'
+      [2]: 'Participants came to clinic for evaluation n=700'
+      [3]: 'Participants non-eligible for the study n=100'
+      [4]: 'Participants eligible for the study n=600'
+      [5]: 'Study sample n=600'
+      ")
+```
+
+### Graphviz Attributes
  
+* Node Attributes
+* Edge Attributes
+* Colors
+* Node Shapes
+* Arrow Shapes
+
+See more under `Graphviz and mermaid in DiagrammeR`
 
 
 
-## Sankey plot
+```{r Graphviz-Attributes,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+grViz(diagram = "digraph flowchart {
+      # define node aesthetics
+      node [fontname = Arial, shape = oval, color = Lavender, style = filled]        
+      tab1 [label = '@@1']
+      tab2 [label = '@@2']
+      tab3 [label = '@@3']
+      tab4 [label = '@@4']
+# set up node layout
+      tab1 -> tab2;
+      tab2 -> tab3;
+      tab2 -> tab4
+      }
+[1]: 'Learning Data Science'
+      [2]: 'Industry vs Technical Knowledge'
+      [3]: 'Python/R'
+      [4]: 'Domain Experience'
+      ")
+
+
+grViz("digraph {
+graph [layout = dot, rankdir = LR]
+# define the global styles of the nodes. We can override these in box if we wish
+node [shape = rectangle, style = filled, fillcolor = Linen]
+
+data1 [label = 'Dataset 1', shape = folder, fillcolor = Beige]
+data2 [label = 'Dataset 2', shape = folder, fillcolor = Beige]
+process [label =  'Process \n Data']
+statistical [label = 'Statistical \n Analysis']
+results [label= 'Results']
+
+# edge definitions with the node IDs
+{data1 data2}  -> process -> statistical -> results
+}")
+```
+
+
+
+ 
+# Individual subjects
+
+
+![Disposition – Overall](./02_Plots/Visualization/FlowChart/Individual1.jpg)
+![Discontinuation – Overall](./02_Plots/Visualization/FlowChart/Individual2.jpg)
+![Discontinuation – Initial Period](./02_Plots/Visualization/FlowChart/Individual3.jpg)
+![Discontinuation – Maintenance Period](./02_Plots/Visualization/FlowChart/Individual4.jpg)
+
+**waffle chart**
+
+1. **Data Definition**: `data_treatment_A` and `data_treatment_B` define the counts for "Discontinued" and "Completed" for each treatment group.
+2. **Color Palette**: The colors for "Discontinued" and "Completed" are set with `colors`.
+3. **Waffle Plots**: `waffle` is used to create individual waffle charts for Treatment A and Treatment B.
+4. **Combining Plots**: `plot_grid` from the `cowplot` package is used to arrange the waffle plots side-by-side and add titles for the overall plot.
+
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+library(waffle) 
+library(cowplot)
+
+# Define the data for each treatment group
+data_treatment_A <- c(`Discontinued` = 28, `Completed` = 72)  # Example counts for Treatment A
+data_treatment_B <- c(`Discontinued` = 30, `Completed` = 70)  # Example counts for Treatment B
+
+# Set colors for Discontinued and Completed
+colors <- c("Discontinued" = "red", "Completed" = "blue")
+
+# Create the waffle plots for Treatment A and Treatment B
+waffle_A <- waffle(data_treatment_A, rows = 10, colors = colors, title = "Treatment A (N=100)")
+waffle_B <- waffle(data_treatment_B, rows = 10, colors = colors, title = "Treatment B (N=100)")
+
+# Combine the two waffle plots and add overall title
+plot <- plot_grid(waffle_A, waffle_B, ncol = 2, align = "v")
+
+# Add title and subtitle
+title <- ggdraw() + 
+  draw_label("A TOTAL OF 200 SUBJECTS STARTED THE STUDY", fontface = 'bold', size = 16, hjust = 0.5)
+
+subtitle <- ggdraw() +
+  draw_label("End of Study Status", size = 14, hjust = 0.5)
+
+# Arrange the title, subtitle, and the waffle plots together
+final_plot <- plot_grid(title, subtitle, plot, ncol = 1, rel_heights = c(0.1, 0.05, 1))
+
+# Display the final plot
+print(final_plot)
+```
+
+
+
+# Gantt Chart DiagrammeR Package
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# Define the Gantt chart and plot the result (not shown)
+# library(DiagrammeR)
+
+Gantt <- mermaid("
+gantt
+    title Project Timeline
+    dateFormat YYYY-MM-DD
+
+    section Initiation
+    Planning           :a1, 2016-01-01, 10d
+    Data processing    :after a1, 30d
+    Data analysis      :b1, 2016-03-01, 15d
+")
+```
+
+![](./02_Plots/Visualization/FlowChart/Timeline1.png)
+
+
+# Sankey Plot
 
 https://sankey-dev.apps.vahub.lilly.com
 
@@ -370,52 +541,145 @@ ggplot(data = data,
 ```
 
 
-## Individual subjects
 
+[More Explor](https://rpubs.com/techanswers88/sankey-with-own-data-in-ggplot)
 
-![Disposition – Overall](./02_Plots/Visualization/FlowChart/Individual1.jpg)
-![Discontinuation – Overall](./02_Plots/Visualization/FlowChart/Individual2.jpg)
-![Discontinuation – Initial Period](./02_Plots/Visualization/FlowChart/Individual3.jpg)
-![Discontinuation – Maintenance Period](./02_Plots/Visualization/FlowChart/Individual4.jpg)
+## ggalluvial package
 
-**waffle chart**
+A Sankey diagram allows to study flows. Entities (nodes) are represented by rectangles or text. Arrows or arcs are used to show flows between them. In R, the networkD3 package is the best way to build them
 
-1. **Data Definition**: `data_treatment_A` and `data_treatment_B` define the counts for "Discontinued" and "Completed" for each treatment group.
-2. **Color Palette**: The colors for "Discontinued" and "Completed" are set with `colors`.
-3. **Waffle Plots**: `waffle` is used to create individual waffle charts for Treatment A and Treatment B.
-4. **Combining Plots**: `plot_grid` from the `cowplot` package is used to arrange the waffle plots side-by-side and add titles for the overall plot.
+A Sankey Diagram is a visualisation technique that allows to display flows. Several entities (nodes) are represented by rectangles or text. Their links are represented with arrow or arcs that have a width proportional to the importance of the flow.
 
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
-library(waffle) 
-library(cowplot)
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+## https://stackoverflow.com/questions/74903359/sankey-diagram-with-ggplot
+tribble(
+~parm, ~value,
+"b1", 0.009,
+"g1", 0.664,
+"b2", 0.000,
+"ra", 0.000,
+"rc", 0.000,
+"ax", 0.084,
+"cx", 0.086,
+"ex", 0.179,
+"ay", 0.045,
+"cy", 0.043,
+"ey", 0.102
+) -> doc1
 
-# Define the data for each treatment group
-data_treatment_A <- c(`Discontinued` = 28, `Completed` = 72)  # Example counts for Treatment A
-data_treatment_B <- c(`Discontinued` = 30, `Completed` = 70)  # Example counts for Treatment B
+doc2 <- tribble(
+  ~parm, ~value,
+  "b1", 0.181,
+  "g1", 0.289,
+  "b2", 0.181,
+  "ra", 0.000,
+  "rc", 0.000,
+  "ax", 0.001,
+  "cx", 0.001,
+  "ex", 0.002,
+  "ay", 0.001,
+  "cy", 0.001,
+  "ey", 0.002,
+  "re", 0.000,
+  "rf", 0.000,
+  "b3", 0.289
+)
 
-# Set colors for Discontinued and Completed
-colors <- c("Discontinued" = "red", "Completed" = "blue")
+library("metan")
+doc1 <- doc1 %>% mutate(model = "exp")
+doc2 <- doc2 %>% mutate(model = "exp2")
+finalpow <- doc1 %>% full_join(doc2)
+a <- pivot_wider(finalpow, names_from = model, values_from = value)
 
-# Create the waffle plots for Treatment A and Treatment B
-waffle_A <- waffle(data_treatment_A, rows = 10, colors = colors, title = "Treatment A (N=100)")
-waffle_B <- waffle(data_treatment_B, rows = 10, colors = colors, title = "Treatment B (N=100)")
+library("ggalluvial")
 
-# Combine the two waffle plots and add overall title
-plot <- plot_grid(waffle_A, waffle_B, ncol = 2, align = "v")
+## using your data frame a
+finalpow <- a %>% pivot_longer(cols = c(exp, exp2)) %>%
+  ## you need to manually drop all NA, because geom_alluvium won't do that for you
+  drop_na()
+## I'd  create a separate data frame for annotation
+df_lab <- finalpow %>%
+  filter(name == "exp") %>%
+  ## for labelling, you need to manually arrange labels in correct position
+  arrange(desc(parm))
 
-# Add title and subtitle
-title <- ggdraw() + 
-  draw_label("A TOTAL OF 200 SUBJECTS STARTED THE STUDY", fontface = 'bold', size = 16, hjust = 0.5)
-
-subtitle <- ggdraw() +
-  draw_label("End of Study Status", size = 14, hjust = 0.5)
-
-# Arrange the title, subtitle, and the waffle plots together
-final_plot <- plot_grid(title, subtitle, plot, ncol = 1, rel_heights = c(0.1, 0.05, 1))
-
-# Display the final plot
-print(final_plot)
+ggplot(mapping = aes(y = value, x = name)) +
+  geom_alluvium(
+    data = finalpow,
+    aes(fill = parm, alluvium = parm),
+    color = "black", alpha = 1
+  ) +
+  ggrepel::geom_label_repel(
+    data = df_lab,
+    aes(label = parm, y = value),
+    ## you cannot just use the y value, you need to stack
+    position = position_stack(vjust = .5)
+  )
 ```
+
+  
+
+ 
+# Network Chart
+
+## ggnet network visualization
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# devtools::install_github("briatte/ggnet")
+# https://briatte.github.io/ggnet/
+library(ggnet)
+library(sna)
+library(network)
+
+# random graph
+net = rgraph(10, mode = "graph", tprob = 0.5)
+net = network(net, directed = FALSE)
+
+# vertex names
+network.vertex.names(net) = letters[1:10]
+
+ggnet2(net, size = 6, color = "black", edge.size = 1, edge.color = "grey")
+# ggnet2(net, mode = "circle")
+# ggnet2(net, mode = "kamadakawai")
+ggnet2(net, mode = "target", layout.par = list(niter = 100))
+```
+
+## Interactive network customization
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# Libraries
+library("igraph")
+library("networkD3")
+
+# create a dataset:
+data <- data_frame(
+  from=c("A", "A", "B", "D", "C", "D", "E", "B", "C", "D", "K", "A", "M"),
+  to=c("B", "E", "F", "A", "C", "A", "B", "Z", "A", "C", "A", "B", "K")
+)
+
+# Plot
+p <- simpleNetwork(data, height="100px", width="100px",        
+        Source = 1,                 # column number of source
+        Target = 2,                 # column number of target
+        linkDistance = 10,          # distance between node. Increase this value to have more space between nodes
+        charge = -900,                # numeric value indicating either the strength of the node repulsion (negative value) or attraction (positive value)
+        fontSize = 14,               # size of the node names
+        fontFamily = "serif",       # font og node names
+        linkColour = "#666",        # colour of edges, MUST be a common colour for the whole graph
+        nodeColour = "#69b3a2",     # colour of nodes, MUST be a common colour for the whole graph
+        opacity = 0.9,              # opacity of nodes. 0=transparent. 1=no transparency
+        zoom = T                    # Can you zoom on the figure?
+        )
+p
+
+# save the widget
+# library(htmlwidgets)
+# saveWidget(p, file=paste0( getwd(), "/HtmlWidget/networkInteractive2.html"))
+```
+
+ 
+
+
 
 # Reference
 
