@@ -24,7 +24,8 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 # Sys.setlocale("LC_ALL","English")
 
 ## devtools::install_github("kupietz/kableExtra")
-packages<-c("tidyverse", "kableExtra",  
+packages<-c("tidyverse", "kableExtra", "plotly",  
+            "haven",
             "ggpubr","gridExtra","ggtext",
             "corrgram","GGally")
 ipak <- function(pkg){
@@ -136,3 +137,86 @@ corrgram(mtcars,
          main="Car Milage Data (unsorted)")
 ```
  
+ 
+
+## Interactive trellis plot (plotly Package)
+
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# library(plotly)
+
+adsl <- read_xpt("./01_Datasets/adsl.xpt")
+
+pl_colorscale=list(c(0.0, '#19d3f3'),
+                   c(0.333, '#19d3f3'),
+                   c(0.333, '#e763fa'),
+                   c(0.666, '#e763fa'),
+                   c(0.666, '#636efa'),
+                   c(1, '#636efa'))
+
+fig <- adsl %>%
+  plot_ly() 
+fig <- fig %>%
+  add_trace(
+    type = 'splom',
+    dimensions = list(
+      list(label='Age', values=~AGE),
+      list(label='Height', values=~HEIGHTBL),
+      list(label='Weight', values=~WEIGHTBL),
+      list(label='BMI', values=~BMIBL)
+    ),
+    text=~TRT01P,
+    marker = list(
+      color = as.integer(adsl$TRT01PN),
+      colorscale = pl_colorscale,
+      size = 7,
+      line = list(
+        width = 1,
+        color = 'rgb(230,230,230)'
+      )
+    )
+  ) 
+
+fig <- fig %>%
+  layout(
+    title= 'ADSL Data set',
+    plot_bgcolor='rgba(240,240,240, 0.95)'
+  )
+
+fig2 <-  fig %>% style(diagonal = list(visible = F))
+fig2
+# htmlwidgets::saveWidget(as_widget(fig2), "./02_Plots/Visualization/WW Dec2023b.html")
+```
+
+ 
+
+
+## GGally Package
+
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library(GGally)
+
+adsl <- read_xpt("./01_Datasets/adsl.xpt")
+adsl_data <- adsl[, c("AGE", "BMIBL", "HEIGHTBL", "WEIGHTBL","SEX")]
+
+
+# Convert SEX to a factor if it’s not already
+adsl_data$SEX <- as.factor(adsl_data$SEX)
+
+# Create a pair plot with grouping by SEX
+ggpairs(
+  adsl_data,
+  aes(color = SEX, fill = SEX),  # Color by SEX
+  lower = list(continuous = wrap("smooth", alpha = 0.3, size = 0.5)),
+  diag = list(continuous = wrap("densityDiag")),
+  upper = list(continuous = wrap("cor", size = 4, color = "black"))
+) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(size = 10),
+    axis.text = element_text(size = 8)
+  ) +
+  scale_fill_manual(values = c("pink", "lightblue")) +  # Customize colors if desired
+  scale_color_manual(values = c("pink", "lightblue"))
+```

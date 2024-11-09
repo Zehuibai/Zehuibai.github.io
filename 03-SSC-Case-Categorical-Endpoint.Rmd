@@ -1,0 +1,430 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Sample Size Determination for Categorical Endpoint
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+packages<-c("tidyverse", "kableExtra","pwr", "pwrss")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+
+
+# List all files in the directory that start with "ssc" and end with ".R"
+directory <- "./03_Functions/"
+files_to_source <- list.files(path = directory, pattern = "^ssc.*\\.R$", full.names = TRUE)
+# Source each file
+for (file in files_to_source) {
+  source(file)
+}
+```
+
+
+
+# One Proportion Sample
+ 
+
+## Equality based on Wald CI  
+
+$$
+\begin{array}{l}
+H_{0}: p=p_{0} \\
+H_{1}: p \neq p_{0}
+\end{array}
+$$
+Formulas of sample size and power, respectively:
+$$
+\begin{array}{c}
+n=p(1-p)\left(\frac{z_{1-\alpha / 2}+z_{1-\beta}}{p-p_{0}}\right)^{2} \\
+1-\beta=\Phi\left(z-z_{1-\alpha / 2}\right)+\Phi\left(-z-z_{1-\alpha / 2}\right) \quad, \quad z=\frac{p-p_{0}}{\sqrt{\frac{p(1-p)}{n}}}
+\end{array}
+$$
+## Non-Inferiority or Superiority  
+
+$$
+\begin{array}{l}
+H_{0}: p-p_{0} \leq \delta \\
+H_{1}: p-p_{0}>\delta
+\end{array}
+$$
+and $\delta$ is the superiority or non-inferiority margin.
+
+Formulas of sample size and power, respectively:
+$$
+\begin{array}{c}
+n=p(1-p)\left(\frac{z_{1-\alpha}+z_{1-\beta}}{p-p_{0}-\delta}\right)^{2} \\
+1-\beta=\Phi\left(z-z_{1-\alpha}\right)+\Phi\left(-z-z_{1-\alpha}\right) \quad, \quad z=\frac{p-p_{0}-\delta}{\sqrt{\frac{p(1-p)}{n}}}
+\end{array}
+$$
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+p=0.5
+p0=0.3
+delta=-0.1
+alpha=0.05
+beta=0.20
+(n=p*(1-p)*((qnorm(1-alpha)+qnorm(1-beta))/(p-p0-delta))^2)
+ceiling(n) 
+
+z=(p-p0-delta)/sqrt(p*(1-p)/n)
+(Power=pnorm(z-qnorm(1-alpha))+pnorm(-z-qnorm(1-alpha)))
+```
+
+
+## Equivalence  
+
+$$
+\begin{array}{l}
+H_{0}:\left|p-p_{0}\right| \geq \delta \\
+H_{1}:\left|p-p_{0}\right|<\delta
+\end{array}
+$$
+Formulas of sample size and power, respectively:
+$$
+\begin{array}{c}
+n=p(1-p)\left(\frac{z_{1-\alpha}+z_{1-\beta / 2}}{\left|p-p_{0}\right|-\delta}\right)^{2} \\
+1-\beta=2\left[\Phi\left(z-z_{1-\alpha}\right)+\Phi\left(-z-z_{1-\alpha}\right)\right]-1 \quad, \quad z=\frac{\left|p-p_{0}\right|-\delta}{\sqrt{\frac{p(1-p)}{n}}}
+\end{array}
+$$
+<!-- ------------------------  -->
+<!-- ------------------------  -->
+<!-- ------------------------  -->
+
+# Two Proportion Samples
+   
+## Equality 
+
+Random samples of m and n individuals are obtained from these two populations. The data from these samples
+can be displayed in a 2-by-2 contingency table as follows
+
+$$\begin{array}{lccc}\text { Group } & \text { Success } & \text { Failure } & \text { Total } \\ \text { Treatment } & x_{11} & x_{12} & n_{1} \\ \text { Control } & x_{21} & x_{22} & n_{2} \\ \text { Total } & m_{1} & m_{2} & N\end{array}$$
+
+The binomial proportions $p_{1}$ and $p_{2}$ are estimated from these data using the formulae
+$$
+\hat{p}_{1}=\frac{x_{11}}{n_{1}} \text { and } \hat{p}_{2}=\frac{x_{21}}{n_{2}}
+$$
+
+Mathematically, there are three comparison parameters 
+$$
+\begin{array}{ll}
+\underline{\text { Parameter }} & \underline{\text { Computation }} \\
+\text { Difference } & \delta=p_{1}-p_{2} \\
+\text { Risk Ratio } & \phi=p_{1} / p_{2} \\
+\text { Odds Ratio } & \psi=\frac{p_{1} /\left(1-p_{1}\right)}{p_{2} /\left(1-p_{2}\right)}=\frac{p_{1} q_{2}}{p}
+\end{array}
+$$
+The tests analyzed by this routine are for the null case. This refers to the values of the above parameters under the null hypothesis. In the null case, the difference is zero and the ratios are one under the null hypothesis. In the nonnull case, discussed in another chapter, the difference is some value other than zero and the ratios are some value other than one. The non-null case often appears in equivalence and non-inferiority testing.
+
+
+### Chi-Square/Z Test
+
+Although this test is usually expressed directly as a Chi-Square statistic, it is expressed here as a z statistic so that it can be more easily used for one-sided hypothesis testing.
+
+Both pooled and unpooled versions of this test have been discussed in the statistical literature. The pooling refers to the way in which the standard error is estimated. In the pooled version, the two proportions are averaged, and only one proportion is used to estimate the standard error. In the unpooled version, the two proportions are used separately.
+
+The formula for the test statistic is 
+$$
+z_{t}=\frac{\hat{p}_{1}-\hat{p}_{2}}{\hat{\sigma}_{D}}
+$$
+
+**Pooled Version**
+$$
+\hat{\sigma}_{D}=\sqrt{\hat{p}(1-\hat{p})\left(\frac{1}{n_{1}}+\frac{1}{n_{2}}\right)} \\
+\hat{p}=\frac{n_{1} \hat{p}_{1}+n_{2} \hat{p}_{2}}{n_{1}+n_{2}}
+$$
+
+**Unpooled Version**
+$$
+\hat{\sigma}_{D}=\sqrt{\frac{\hat{p}_{1}\left(1-\hat{p}_{1}\right)}{n_{1}}+\frac{\hat{p}_{2}\left(1-\hat{p}_{2}\right)}{n_{2}}}
+$$
+
+**Power**
+
+The power of this test is computed using the enumeration procedure described above. For **large sample sizes**, the following approximation is used as presented in Chow et al. (2008).
+1. Find the critical value (or values in the case of a two-sided test) using the standard normal distribution. The critical value is that value of $\mathrm{z}$ that leaves exactly the target value of alpha in the tail.
+2. Use the normal approximation to binomial distribution to compute binomial probabilities, compute the power for the pooled and unpooled tests, respectively, using
+Pooled: $1-\beta=\operatorname{Pr}\left(Z<\frac{z_{\alpha} \sigma_{D, p}+\left(p_{1}-p_{2}\right)}{\sigma_{D, u}}\right) \quad$ Unpooled: $1-\beta=\operatorname{Pr}\left(Z<\frac{z_{\alpha} \sigma_{D, u}+\left(p_{1}-p_{2}\right)}{\sigma_{D, u}}\right)$
+where
+$$
+\begin{array}{l}
+\sigma_{D, u}=\sqrt{\frac{p_{1} q_{1}}{n_{1}}+\frac{p_{2} q_{2}}{n_{2}}} \quad \text { (unpooled standard error) } \\
+\sigma_{D, p}=\sqrt{\overline{p q}\left(\frac{1}{n_{1}}+\frac{1}{n_{2}}\right)} \quad \text { (pooled standard error) }
+\end{array}
+$$
+with $\bar{p}=\frac{n_{1} p_{1}+n_{2} p_{2}}{n_{1}+n_{2}}$ and $\bar{q}=1-\bar{p}$
+
+**With Continuity Correction**
+
+*When you are approximating a Discrete Random Variable with Continuous Random Variable, such as when we use Normal distribution to approximate a Binomial Distribution, we need to use continuity correction.*
+
+The continuity corrected $\mathrm{z}$-test is
+$$
+z=\frac{\left(\hat{p}_{1}-\hat{p}_{2}\right)+\frac{F}{2}\left(\frac{1}{n_{1}}+\frac{1}{n_{2}}\right)}{\hat{\sigma}_{D}}
+$$
+where $F$ is $-1$ for lower-tailed, 1 for upper-tailed, and both $-1$ and 1 for two-sided hypotheses.
+ 
+ 
+### Fisher’s Exact Test
+
+The test statistic is
+$$
+T=-\ln \left[\frac{\left(\begin{array}{l}
+n_{1} \\
+x_{1}
+\end{array}\right)\left(\begin{array}{l}
+n_{2} \\
+x_{2}
+\end{array}\right)}{\left(\begin{array}{l}
+N \\
+m
+\end{array}\right)}\right]
+$$
+The null distribution of $\mathrm{T}$ is based on the hypergeometric distribution. It is given by
+$$
+\operatorname{Pr}\left(T \geq t \mid m, H_{0}\right)=\sum_{A(m)}\left[\frac{\left(\begin{array}{l}
+n_{1} \\
+x_{1}
+\end{array}\right)\left(\begin{array}{l}
+n_{2} \\
+x_{2}
+\end{array}\right)}{\left(\begin{array}{c}
+N \\
+m
+\end{array}\right)}\right]
+$$
+
+where
+$$
+A(m)=\left\{\text { all pairs } x_{1}, x_{2} \text { such that } x_{1}+x_{2}=m, \text { given } T \geq t\right\}
+$$
+Conditional on $m$, the critical value, $t_{\alpha}$, is the smallest value of $t$ such that
+$$
+\operatorname{Pr}\left(T \geq t_{\alpha} \mid m, H_{0}\right) \leq \alpha
+$$
+The power is defined as
+$$
+1-\beta=\sum_{m=0}^{N} P(m) \operatorname{Pr}\left(T \geq t_{\alpha} \mid m, H_{1}\right)
+$$
+where
+$$
+\operatorname{Pr}\left(T \geq t_{\alpha} \mid m, H_{1}\right)=\sum_{A\left(m, T \geq t_{a}\right)}\left[\frac{b\left(x_{1}, n_{1}, p_{1}\right) b\left(x_{2}, n_{2}, p_{2}\right)}{\sum_{A(m)} b\left(x_{1}, n_{1}, p_{1}\right) b\left(x_{2}, n_{2}, p_{2}\right)}\right]
+$$
+$$
+\begin{aligned}
+P(m) &=\operatorname{Pr}\left(x_{1}+x_{2}=m \mid H_{1}\right) \\
+&=b\left(x_{1}, n_{1}, p_{1}\right) b\left(x_{2}, n_{2}, p_{2}\right)
+\end{aligned}
+$$
+$$
+b(x, n, p)=\left(\begin{array}{l}
+n \\ x
+\end{array}\right) p^{x}(1-p)^{n-x}
+$$
+When the normal approximation is used to compute power, the result is based on the pooled, continuity corrected $Z$ test.
+
+
+
+### Manual Calculation
+
+```
+pA=0.65
+pB=0.85
+kappa=1
+alpha=0.05
+beta=0.20
+(nB=(pA*(1-pA)/kappa+pB*(1-pB))*((qnorm(1-alpha/2)+qnorm(1-beta))/(pA-pB))^2)
+ceiling(nB) 
+
+z=(pA-pB)/sqrt(pA*(1-pA)/nB/kappa+pB*(1-pB)/nB)
+(Power=pnorm(z-qnorm(1-alpha/2))+pnorm(-z-qnorm(1-alpha/2)))
+```
+
+
+
+
+## Non-Inferiority or Superiority  
+
+
+### Hypothesis
+
+$$
+\begin{array}{l}
+H_{0}: p_{A}-p_{B} \leq \delta \\
+H_{1}: p_{A}-p_{B}>\delta
+\end{array}
+$$
+where $\delta$ is the superiority or non-inferiority margin and the ratio between the sample sizes of the two groups is
+$$
+\kappa=\frac{n_{A}}{n_{B}}
+$$
+Formulas of sample size and power, respectively:
+$$
+\begin{array}{c}
+n_{A}=\kappa n_{B} \\ n_{B}=\left(\frac{p_{A}\left(1-p_{A}\right)}{\kappa}+p_{B}\left(1-p_{B}\right)\right)\left(\frac{z_{1-\alpha}+z_{1-\beta}}{p_{A}-p_{B}-\delta}\right)^{2} \\
+1-\beta=\Phi\left(z-z_{1-\alpha / 2}\right)+\Phi\left(-z-z_{1-\alpha / 2}\right) \quad, \quad z=\frac{p_{A}-p_{B}-\delta}{\sqrt{\frac{p_{A}\left(1-p_{A}\right)}{n_{A}}+\frac{p_{B}\left(1-p_{B}\right)}{n_{B}}}}
+\end{array}
+$$
+ 
+### Calculation in R
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+## devtools::install_github("QiHongchao/SampleSize4ClinicalTrials")
+library("SampleSize4ClinicalTrials")
+ssc_propcomp(design = 3L, 
+             ratio = 2, 
+             alpha = 0.05, 
+             power = 0.999984, 
+             p1 = 0.974, 
+             p2 = 0.974, 
+             delta = -0.1) %>%
+  kable(caption = "Sample Size Reproduction for Endpoint Anti-TTd", format = "html") %>%
+  kable_styling(latex_options = "striped")
+```
+
+### Calculation in SAS
+
+The following SAS code will get the same result for ntotal **384 = (128 + 256)**
+
+```SAS
+Proc Power ;
+	TwoSampleFreq
+	Test               = PChi
+	Sides              = U     
+	Alpha              = 0.05
+	NullProportionDiff = -.10 
+	ProportionDiff     = 0.00 
+	RefProportion      = 0.974 
+	Power              = 0.999984
+	Groupweights       = (1 2)
+	Ntotal   	       = .
+	;
+Run ;
+
+```
+
+## Equivalence  
+
+
+$$
+\begin{array}{l}
+H_{0}:\left|p_{A}-p_{B}\right| \geq \delta \\
+H_{1}:\left|p_{A}-p_{B}\right|<\delta
+\end{array}
+$$
+where $\delta$ is the superiority or non-inferiority margin and the ratio between the sample sizes of the two groups is
+$$
+\kappa=\frac{n_{A}}{n_{B}}
+$$
+ 
+This calculator uses the following formulas to compute sample size and power, respectively: 
+$$n_B=\left(\frac{p_A(1-p_A)}{\kappa}+p_B(1-p_B)\right) \left(\frac{z_{1-\alpha}+z_{1-\beta/2}}{|p_A-p_B|-\delta}\right)^2$$
+$$1-\beta= 2\left[\Phi\left(z-z_{1-\alpha}\right)+\Phi\left(-z-z_{1-\alpha}\right)\right]-1 \quad ,\quad z=\frac{|p_A-p_B|-\delta}{\sqrt{\frac{p_A(1-p_A)}{n_A}+\frac{p_B(1-p_B)}{n_B}}}$$ where
+
+* $\kappa=n_A/n_B$ is the matching ratio
+* $\Phi$ is the standard Normal distribution function
+* $\Phi^{-1}$ is the standard Normal quantile function
+* $\alpha$ is Type I error
+* $\beta$ is Type II error, meaning $1-\beta$ is power
+* $\delta$ is the testing margin
+
+
+```{r,echo = T, message = FALSE, error = FALSE, warning = FALSE}
+## Chow S, Shao J, Wang H. 2008. Sample Size Calculations in Clinical Research. 2nd Ed. Chapman & Hall/CRC Biostatistics Series. page 91.
+pA=0.7
+pB=0.7
+delta=0.15
+kappa=1
+alpha=0.05
+beta=0.20
+(nB=(pA*(1-pA)/kappa+pB*(1-pB))*((qnorm(1-alpha)+qnorm(1-beta/2))/(abs(pA-pB)-delta))^2)
+ceiling(nB) # 136
+z=(abs(pA-pB)-delta)/sqrt(pA*(1-pA)/nB/kappa+pB*(1-pB)/nB)
+(Power=2*(pnorm(z-qnorm(1-alpha))+pnorm(-z-qnorm(1-alpha)))-1)
+```
+
+
+### Calculation in R
+
+**Based on z Test**
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# library("pwrss")
+pwrss.z.2props(p1 = 0.70, p2 = 0.70, margin = 0.15,
+               alpha = 0.05, power = 0.8017,
+               alternative = "equivalent",
+               arcsin.trans = FALSE)
+```
+
+
+### Calculation in SAS
+
+The TWOSAMPLEFREQ statement performs power and sample size analyses for tests of two independent proportions. The **Farrington-Manning score**, Pearson’s chi-square, Fisher’s exact, and likelihood ratio chi-square tests are supported.
+  
+  
+<!-- ------------------------  -->
+<!-- ------------------------  -->
+<!-- ------------------------  -->
+  
+  
+# K Proportion Sample
+
+## Chi-square test  
+
+### Hypothesis
+
+Chi-square test is often used to evaluate the relationship between two categorical variables. The typical null hypothesis is independence between variables, and the alternative hypothesis is not independence. The pwr.chisq.test() function can evaluate the power, effect size and required sample size of the chi-square test
+ 
+ 
+### Calculation in R 
+
+| Race | Proportion of promotion | Proportion of non-promotion |
+|----------|----------|--------------|
+| Caucasian | 0.42     | 0.28         |
+| African american | 0.03     | 0.07         |
+| Hispanic | 0.10     | 0.10         | 
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+prob <- matrix(c(0.42, 0.28, 0.03, 0.07, 0.1, 0.1), byrow = TRUE, nrow = 3)
+ES.w2(prob)
+pwr.chisq.test(w =ES.w2(prob), df = 3, sig.level = 0.05, power = 0.9)
+```
+
+
+## Reference
+
+* [TWO INDEPENDENT PROPORTIONS POWER ANALYSIS](https://stats.oarc.ucla.edu/sas/dae/two-independent-proportions-power-analysis/)
+
+ 
+# Reference
+
+* [Statistical Power Analysis Online](https://webpower.psychstat.org/wiki/)
+* [Design and analysis of noninferiority studies](https://support.sas.com/kb/48/616.html)
+* [Equivalence and Noninferiority Testing Using SAS/STAT® Software](https://support.sas.com/resources/papers/proceedings15/SAS1911-2015.pdf)
+

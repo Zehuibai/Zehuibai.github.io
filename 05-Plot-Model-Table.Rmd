@@ -1,0 +1,786 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Clinical Data and Model visualization
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+--- 
+ 
+
+```{r, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+# getwd()
+# Sys.setlocale("LC_ALL","English")
+
+## devtools::install_github("kupietz/kableExtra")
+packages<-c("tidyverse", "kableExtra",  
+            "ggpubr","gridExtra","ggtext",
+            "gt","gtsummary","gtExtras",
+            "sjPlot","DT", "modelsummary")
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+
+## Load Dataset
+data(Orthodont, package = "nlme") 
+Orthodont <- Orthodont %>%
+  mutate(Group=factor(rbinom(n=nrow(Orthodont),size=1,prob=0.55),
+                      levels = c(0, 1),
+                      labels = c("Subgroup A", "Subgroup B")))
+
+## extract factor columns
+Orthodont_factor <- Orthodont[, sapply(Orthodont, is.factor)]
+## extract numeric columns
+Orthodont_numeric <- Orthodont[, sapply(Orthodont, is.numeric)]
+```
+ 
+ 
+ 
+  
+```{r, echo=FALSE, fig.align="center", out.width = '100%',fig.cap="Figure: 4 big families used for table"}
+knitr::include_graphics("./02_Plots/Table_Family.png")
+```
+
+<!-- ------------------------------------------------------- -->
+<!-- ------------------------------------------------------- -->
+<!-- ------------------------------------------------------- -->
+
+## GT
+
+### gt Standard
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library("gt")
+
+# Create a simple data frame
+data1 = data.frame(
+  Country = c("USA", "China", "India", "Brazil"),
+  Capitals = c("Washington D.C.", "Beijing", "New Delhi", "Brasília"),
+  Population = c(331, 1441, 1393, 212),
+  GDP = c(21.43, 14.34, 2.87, 1.49)
+)
+
+# Use the gt function
+data1 %>% gt() %>%
+  tab_header(title = md("What a **nice title**"),
+             subtitle = md("Pretty *cool subtitle* too, `isn't it?`"))%>%
+  tab_footnote(
+    footnote = "Source: James & al., 2020",
+    locations = cells_body(columns = Country, rows = 3)
+  )
+```
+
+### gt Sub-header
+
+The tab_spanner() function lets you group columns into categories.
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+data1 %>%
+  gt() %>%
+  tab_spanner(
+    label = "Number",
+    columns = c(GDP, Population)) %>%
+  tab_spanner(
+    label = "Label",
+    columns = c(Country, Capitals)
+  )
+```
+
+### gt Footer with mutliple references
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+data2 = data.frame(
+  Planet = c("Earth", "Mars", "Jupiter", "Venus"),
+  Moons = c(1, 2, 79, 0),
+  Distance_from_Sun = c(149.6, 227.9, 778.3, 108.2),
+  Diameter = c(12742, 6779, 139822, 12104)
+)
+
+data2 %>%
+  gt() %>%
+    tab_footnote(footnote = md("Measured in **millions** of Km"),
+                 locations = cells_column_labels(columns = Distance_from_Sun)) %>%
+    tab_footnote(footnote = md("Measured in **Km**"),
+                 locations = cells_column_labels(columns = Diameter))
+
+## Change the type of element that indicates the reference
+data2 %>%
+  gt() %>%
+    tab_footnote(footnote = md("Measured in **millions** of Km"),
+                 locations = cells_column_labels(columns = Distance_from_Sun)) %>%
+    tab_footnote(footnote = md("Measured in **Km**"),
+                 locations = cells_column_labels(columns = Diameter)) %>%
+    tab_footnote(footnote = md("The original data are from *Some Organization*")) %>%
+    opt_footnote_marks(marks = "LETTERS")
+```
+
+### gt Customize titles
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+data3 = data.frame(
+  Country = c("USA", "China", "India"),
+  Capitals = c("Washington D.C.", "Beijing", "New Delhi"),
+  Population = c(331, 1441, 1393),
+  GDP = c(21.43, 14.34, 2.87)
+)
+
+# create and display the gt table 
+data3 %>%
+  gt() %>%
+    tab_header(title = html("<span style='color:red;'>A <strong>red</strong> title</span>"),
+               subtitle = md("This text will be *below the title* and is written in `markdown`"))
+```
+
+
+### Reference
+
+* [Creating beautiful tables in R with {gt}](https://gt.albert-rapp.de/getting_started)
+* `citation("gt")`
+
+<!-- ------------------------------------------------------- -->
+<!-- ------------------------------------------------------- -->
+<!-- ------------------------------------------------------- -->
+
+## GTSUMMARY 
+
+gtSummary is a companion package to gt, specifically designed to enhance gt's capabilities in summarizing statistical findings. It bridges the gap between data analysis and table creation, allowing users to seamlessly generate summary tables directly from their analytical outputs.
+
+The gtsummary uses the tbl_summary() to generate the summary table and works well with the %>% symbol.
+
+It automatically detects data type and use it to decides what type of statistics to compute. By default, it’s: - median, 1st and 3rd quartile for numeric columns - number of observations and proportion for categorical columns
+
+### gtsummary Continious Analysis
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# create the general table
+Orthodont %>% select(-Subject) %>% tbl_summary() 
+
+Orthodont %>% dplyr::select(-Subject) %>% 
+  tbl_summary(by = Sex,  
+              type = where(is.numeric) ~ "continuous2",
+              statistic = all_continuous() ~ c("{mean} ({sd})", "{median} ({p25}, {p75})", "{min}, {max}"),
+              label = list(distance = "Distance", age = "Age in years", missing = "no")) %>% 
+  modify_header(label ~ "Variable") %>%
+  modify_spanning_header(c("stat_1", "stat_2") ~ "Gender") %>%
+  bold_labels() %>%
+  # add_n() %>%
+  add_overall() %>%
+  add_p()
+```
+
+
+### gtsummary Categorical Analysis
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+Orthodont %>% dplyr::select(names(Orthodont_factor), -Subject) %>% 
+  tbl_summary(by=Group,
+              type = all_continuous() ~ "continuous2", 
+              label = list(Sex = "Gender", missing = "no")) %>%
+  modify_header(label ~ "Variable") %>%
+  modify_spanning_header(c("stat_1", "stat_2") ~ "Subgroup") %>%
+  bold_labels() %>%
+  add_overall() 
+```
+
+
+### gtsummary Add a column based on a custom function
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# create dataset
+data("iris")
+df = as.data.frame(iris)
+
+my_anova = function(data, variable, by, ...) {
+  result = aov(as.formula(paste(variable, "~", by)), data = data)
+  summary(result)[[1]]$'Pr(>F)'[1] # Extracting the p-value for the group effect
+}
+
+# create the table
+df %>%
+  tbl_summary(by=Species) %>%
+  add_overall() %>%
+  add_p() %>%
+  add_stat(fns = everything() ~ my_anova) %>%
+  modify_header(
+    list(
+      add_stat_1 ~ "**p-value**",
+      all_stat_cols() ~ "**{level}**"
+    )
+  ) %>%
+  modify_footnote(
+    add_stat_1 ~ "ANOVA")
+```
+
+### gtsummary Regression Result
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+data("Titanic")
+df = as.data.frame(Titanic)# create the model
+
+model <- glm(Survived ~ Age + Class + Sex + Freq,
+             family=binomial, data=df)
+
+# generate table 
+model %>%
+  tbl_regression(intercept=TRUE, conf.level=0.9) %>%
+  add_glance_source_note() %>%
+  add_global_p() %>%
+  add_q() 
+```
+
+### gtsummary Compare the Models
+
+One easy way to show the results of 2 different models into a single table is to: - create a first table with the first model (logistic regression) - create a second table with the second model (Cox proportional hazards regression) - merge these tables with tbl_merge() - add a spanner for each model with the tab_spanner argument
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library("survival") 
+data(trial)
+
+model_reglog = glm(response ~ trt + grade, data=trial, family = binomial) %>% 
+  tbl_regression()
+
+model_cox = coxph(Surv(ttdeath, death) ~ trt + grade, data=trial) %>% 
+  tbl_regression()
+
+tbl_merge(
+  list(model_reglog, model_cox),
+  tab_spanner = c("**Tumor Response**", "**Time to Death**")
+)
+```
+
+### Reference
+
+* [Index](https://www.danieldsjoberg.com/gtsummary/reference/index.html)
+* [CHEAT SHEET](file:///C:/Users/baiz/Downloads/gtsummary.pdf)
+* `citation("gtsummary")`
+* `browseVignettes("gtsummary")`
+
+<!-- ------------------------------------------------------- -->
+<!-- ------------------------------------------------------- -->
+<!-- ------------------------------------------------------- -->
+
+## GTEXTRAS
+
+gtExtras augments and expands the functionalities of the gt package. It allows to create even more sophisticated and visually appealing tables.
+
+### gtExtras Data format
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# load the dataset
+data(iris)
+
+
+# create aggregated dataset
+agg_iris = iris %>%
+  group_by(Species) %>%
+  summarize(
+    Sepal.L = list(Sepal.Length),
+    Sepal.W = list(Sepal.Width),
+    Petal.L = list(Petal.Length),
+    Petal.W = list(Petal.Width)
+    )
+
+# display the table with default output with gt package
+agg_iris %>%
+  gt()
+```
+
+
+### gtExtras Change Theme
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+## Excel theme
+head(mtcars) %>%
+  gt() %>%
+  gt_theme_excel()
+
+## FiveThirtyEight theme
+head(mtcars) %>%
+  gt() %>%
+  gt_theme_538()
+
+## ESPN theme
+head(mtcars) %>%
+  gt() %>%
+  gt_theme_espn()
+
+## NY Times theme
+head(mtcars) %>%
+  gt() %>%
+  gt_theme_nytimes()
+
+## Dot matrix theme
+head(mtcars) %>%
+  gt() %>%
+  gt_theme_dot_matrix()
+
+## Dark theme
+head(mtcars) %>%
+  gt() %>%
+  gt_theme_dark()
+
+## PFF theme
+head(mtcars) %>%
+  gt() %>%
+  gt_theme_pff()
+
+## Guardian theme
+head(mtcars) %>%
+  gt() %>%
+  gt_theme_guardian()
+```
+
+
+### gtExtras Chart within Table
+
+* gt_plt_sparkline() creates a line chart in table cells. 
+* gt_plt_dist() creates a distribution chart chart in table cells
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+agg_iris %>%
+  gt() %>%
+  gt_plt_sparkline(Sepal.L) %>%
+  gt_plt_dist(Sepal.W, type = "density") %>%
+  gt_plt_dist(Petal.L, type = "boxplot") %>%
+  gt_plt_dist(Petal.W, type = "histogram")
+```
+
+
+### gtExtras Summary chart
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+iris %>%
+  gt_plt_summary() 
+```
+
+### Referecne
+
+* `citation("gtExtras")` 
+
+
+<!-- ------------------------------------------------------- -->
+<!-- ------------------------------------------------------- -->
+<!-- ------------------------------------------------------- -->
+
+
+## KABLEEXTRA and KABLE
+
+### kableExtra Standard
+
+When used on a HTML table, kable_styling() will automatically apply twitter bootstrap theme to the table. Now it should looks the same as the original pandoc output (the one when you don’t specify format in kable()) but this time, you are controlling it.
+
+* By default, full_width is set to be TRUE for HTML tables
+* Position: align the table to `center`, `left` or `right` side of the page
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+dt <- mtcars[1:5, 1:6]
+
+### Bootstrap theme
+library("naniar")
+airquality %>% 
+  miss_var_summary() %>%
+  kable(caption = "Missing data among variables", format = "html") %>%
+  add_footnote(c("Footnote 1: XXX")) %>%
+  kable_styling(bootstrap_options = "striped", 
+                full_width = F, 
+                position = "center",
+                fixed_thead = T) 
+```
+
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+airquality %>% 
+  miss_var_summary() %>%
+  kable(caption = "Missing data among variables", format = "html") %>%
+  add_footnote(c("Footnote 1: XXX")) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "float_right") 
+```
+
+Becides these three common options, you can also wrap text around the table using the float-left or float-right options.
+
+
+### kableExtra Table Footnote
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+kbl(dt, align = "c") %>%
+  kable_classic(full_width = F) %>%
+  footnote(general = "Here is a general comments of the table. ",
+           number = c("Footnote 1; ", "Footnote 2; "),
+           alphabet = c("Footnote A; ", "Footnote B; "),
+           symbol = c("Footnote Symbol 1; ", "Footnote Symbol 2")
+           )
+```
+
+
+### kableExtra Scroll Box
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+kbl(cbind(mtcars, mtcars)) %>%
+  kable_paper() %>%
+  scroll_box(width = "500px", height = "200px")
+
+kbl(cbind(mtcars, mtcars)) %>%
+  add_header_above(c("a" = 5, "b" = 18)) %>%
+  kable_paper() %>%
+  scroll_box(width = "100%", height = "200px")
+```
+
+
+### kableExtra Change Thema
+
+kableExtra also offers a few in-house alternative HTML table themes other than the default bootstrap theme. Right now there are 6 of them: `kable_paper`, `kable_classic`, `kable_classic_2`, `kable_minimal`, `kable_material` and `kable_material_dark.` These functions are alternatives to kable_styling, which means that you can specify any additional formatting options in kable_styling in these functions too. The only difference is that bootstrap_options (as discussed in the next section) is replaced with lightable_options at the same location with only two choices striped and hover available.
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+head(iris) %>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
+
+head(iris) %>%
+  kbl(caption = "Recreating booktabs style table") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+head(iris) %>%
+  kbl() %>%
+  kable_classic_2(full_width = F)
+
+head(iris) %>%
+  kbl() %>%
+  kable_minimal()
+
+head(iris) %>%
+  kbl() %>%
+  kable_material(c("striped", "hover"))
+
+head(iris) %>%
+  kbl() %>%
+  kable_material_dark()
+```
+
+
+### kableExtra Bootstrap table classes 
+
+Predefined classes, including `striped`, `bordered`, `hover`, `condensed` and `responsive`
+
+* The option condensed can also be handy in many cases when you don’t want your table to be too large. It has slightly shorter row height.
+* Tables with option responsive looks the same with others on a large screen. However, on a small screen like phone, they are horizontally scrollable. Please resize your window to see the result.
+ 
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+kbl(head(iris)) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+kbl(head(iris)) %>%
+  kable_styling(bootstrap_options = c("bordered", "hover"))
+
+kbl(head(iris)) %>%
+  kable_styling(bootstrap_options = c("striped","condensed", "hover"))
+
+kbl(head(iris))%>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+```
+
+
+### kableExtra Column Specification
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+mtcars[1:8, 1:8] %>%
+  kbl() %>%
+  kable_paper(full_width = F) %>%
+  column_spec(2, color = spec_color(mtcars$mpg[1:8]),
+              link = "https://haozhu233.github.io/kableExtra/") %>%
+  column_spec(6, color = "white",
+              background = spec_color(mtcars$drat[1:8], end = 0.7),
+              popover = paste("am:", mtcars$am[1:8]))
+```
+
+
+### kableExtra Insert Images into Columns
+
+kableExtra also provides a few inline plotting tools. Right now, there are spec_hist, spec_boxplot, and spec_plot. One key feature is that by default, the limits of every subplots are fixed so you can compare across rows. Note that in html, you can also use package sparkline to create some jquery based interactive sparklines. Check out the end of this guide for details.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+mpg_list <- split(mtcars$mpg, mtcars$cyl)
+disp_list <- split(mtcars$disp, mtcars$cyl)
+inline_plot <- data.frame(cyl = c(4, 6, 8), mpg_box = "", mpg_hist = "",
+                          mpg_line1 = "", mpg_line2 = "",
+                          mpg_points1 = "", mpg_points2 = "", mpg_poly = "")
+inline_plot %>%
+  kbl(booktabs = TRUE) %>%
+  kable_paper(full_width = FALSE) %>%
+  column_spec(2, image = spec_boxplot(mpg_list)) %>%
+  column_spec(3, image = spec_hist(mpg_list)) %>%
+  column_spec(4, image = spec_plot(mpg_list, same_lim = TRUE)) %>%
+  column_spec(5, image = spec_plot(mpg_list, same_lim = FALSE)) %>%
+  column_spec(6, image = spec_plot(mpg_list, type = "p")) %>%
+  column_spec(7, image = spec_plot(mpg_list, disp_list, type = "p")) %>%
+  column_spec(8, image = spec_plot(mpg_list, polymin = 5))
+```
+
+There is also a spec_pointrange function specifically designed for forest plots in regression tables. Of course, feel free to use it for other purposes.
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+coef_table <- data.frame(
+  Variables = c("var 1", "var 2", "var 3"),
+  Coefficients = c(1.6, 0.2, -2.0),
+  Conf.Lower = c(1.3, -0.4, -2.5),
+  Conf.Higher = c(1.9, 0.6, -1.4)
+) 
+
+data.frame(
+  Variable = coef_table$Variables,
+  Visualization = ""
+) %>%
+  kbl(booktabs = T) %>%
+  kable_classic(full_width = FALSE) %>%
+  column_spec(2, image = spec_pointrange(
+    x = coef_table$Coefficients, 
+    xmin = coef_table$Conf.Lower, 
+    xmax = coef_table$Conf.Higher, 
+    vline = 0)
+    )
+```
+
+
+### kableExtra Row Specification
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+kbl(head(iris)) %>%
+  kable_paper("striped", full_width = F) %>%
+  column_spec(3:4, bold = T) %>%
+  row_spec(3:5, bold = T, color = "white", background = "#D7261E")
+```
+
+### kableExtra Grouped Columns/Rows
+
+Tables with multi-row headers can be very useful to demonstrate grouped data. To do that, you can pipe your kable object into add_header_above(). The header variable is supposed to be a named character with the names as new column names and values as column span. For your convenience, if column span equals to 1, you can ignore the =1 part so the function below can be written as `add_header_above(c(" “,”Group 1" = 2, “Group 2” = 2, “Group 3” = 2)).
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+
+kbl(dt) %>%
+  kable_classic() %>%
+  add_header_above(c(" " = 1, "Group 1" = 2, "Group 2" = 2, "Group 3" = 2))
+
+kbl(dt) %>%
+  kable_paper() %>%
+  add_header_above(c(" ", "Group 1" = 2, "Group 2" = 2, "Group 3" = 2)) %>%
+  add_header_above(c(" ", "Group 4" = 4, "Group 5" = 2)) %>%
+  add_header_above(c(" ", "Group 6" = 6))
+```
+
+**Group rows via labeling**
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+kbl(mtcars[1:10, 1:6], caption = "Group Rows") %>%
+  kable_paper("striped", full_width = F) %>%
+  pack_rows("Group 1", 4, 7) %>%
+  pack_rows("Group 2", 8, 10)
+
+kbl(dt) %>%
+  kable_paper("striped", full_width = F) %>%
+  pack_rows("Group 1", 3, 5, label_row_css = "background-color: #666; color: #fff;")
+```
+
+
+### kableExtra Save HTML Table
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+kbl(mtcars) %>%
+  kable_paper() %>%
+  save_kable(file = "./Check/table_mtcars.html", self_contained = T)
+```
+
+### Referecne
+
+* [Create Awesome HTML Table with knitr::kable and kableExtra](https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html)
+* [kableExtra Documentation](https://haozhu233.github.io/kableExtra/)
+* `citation("kableExtra")`
+* `browseVignettes("kableExtra")`
+
+
+<!-- ------------------------------------------------------- -->
+<!-- ------------------------------------------------------- -->
+<!-- ------------------------------------------------------- -->
+
+## DT
+
+### DT Filtering
+
+By default, DT tables have no filters. However, the datatable() function has a filter argument with very useful properties, depending on the type of data.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+df = data.frame(
+  integer_col = as.integer(c(1, 2, 3)),             # Integer column
+  numeric_col = c(1.1, 2.2, 3.3),                   # Numeric column
+  factor_col = factor(c("level1", "level2", "level3")), # Factor column
+  logical_col = c(TRUE, FALSE, TRUE),                # Logical column
+  character_col = c("a", "b", "c")                 # Character column
+)
+
+
+table = DT::datatable( df, filter = 'top')
+table
+
+# save widget
+library(htmltools)
+saveWidget(table, file="./Check/dt-filtering.html")
+```
+
+### Referecne
+
+* `citation("DT")`
+* `browseVignettes("DT")`
+
+## SJPLOT
+
+### sjPlot Linear Regression
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library(sjmisc)
+library(sjlabelled)
+# sample data
+data("efc")
+efc <- as_factor(efc, c161sex, c172code)
+
+m1 <- lm(barthtot ~ c160age + c12hour + c161sex + c172code, data = efc)
+m2 <- lm(neg_c_7 ~ c160age + c12hour + c161sex + e17age, data = efc)
+
+## Including reference level of categorical predictors
+tab_model(m1,show.reflvl = TRUE,prefix.labels = "varname")
+
+tab_model(m1, m2,show.reflvl = TRUE)
+```
+
+
+### sjPlot Collapsing Columns
+
+With collapse.ci and collapse.se, the columns for confidence intervals and standard errors can be collapsed into one column together with the estimates. Sometimes this table layout is required.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+tab_model(m1, collapse.ci = TRUE)
+tab_model(m1, collapse.se = TRUE)
+```
+
+### sjPlot Adding/Removing Columns
+
+tab_model() has some argument that allow to show or hide specific columns from the output:
+
+* show.est to show/hide the column with model estimates.
+* show.ci to show/hide the column with confidence intervals.
+* show.se to show/hide the column with standard errors.
+* show.std to show/hide the column with standardized estimates (and their standard errors).
+* show.p to show/hide the column with p-values.
+* show.stat to show/hide the column with the coefficients’ test statistics.
+* show.df for linear mixed models, when p-values are based on degrees of freedom with Kenward-Rogers approximation, these degrees of freedom are shown.
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+tab_model(m1, show.se = TRUE, show.std = TRUE, show.stat = TRUE,
+          col.order = c("p", "stat", "est", "std.se", "se", "std.est"))
+
+tab_model(m1, m2, show.ci = FALSE, show.p = FALSE, auto.label = FALSE)
+```
+
+
+### sjPlot Defining own labels
+
+There are different options to change the labels of the column headers or coefficients, e.g. with:
+
+* pred.labels to change the names of the coefficients in the Predictors column. Note that the length of pred.labels must exactly match the amount of predictors in the Predictor column.
+* dv.labels to change the names of the model columns, which are labelled with the variable labels / names from the dependent variables.
+* Further more, there are various string.*-arguments, to change the name of column headings.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+tab_model(
+  m1, m2, 
+  pred.labels = c("Intercept", "Age (Carer)", "Hours per Week", "Gender (Carer)",
+                  "Education: middle (Carer)", "Education: high (Carer)", 
+                  "Age (Older Person)"),
+  dv.labels = c("First Model", "M2"),
+  string.pred = "Coeffcient",
+  string.ci = "Conf. Int (95%)",
+  string.p = "P-Value"
+)
+```
+
+### Referecne
+
+* [Summary of Regression Models as HTML Table ](http://127.0.0.1:18337/library/sjPlot/doc/tab_model_estimates.html)
+* `citation("sjPlot")`
+* `browseVignettes("sjPlot")`
+
+
+## MODELSUMMARY
+
+### modelsummary Data Summaries
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+## Load dataset
+dat <- read.csv("./01_Datasets/Guerry.csv") 
+dat$Small <- dat$Pop1831 > median(dat$Pop1831)
+dat <- dat[, 
+  c("Donations", "Literacy", "Commerce", "Crime_pers", "Crime_prop", "Clergy", "Small")
+]
+
+datasummary_skim(dat)
+
+## by subgroups
+datasummary_balance(~Small, dat,dinm=FALSE)
+
+## Correlation table
+datasummary_correlation(dat)
+
+## Two variables and two statistics, nested in subgroups
+datasummary(Literacy + Commerce ~ Small * (mean + sd), dat)
+```
+
+### modelsummary Model Summaries
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+mod <- lm(Donations ~ Crime_prop, data = dat)
+modelsummary(mod)
+
+## modelsummary(mod, output = "markdown")
+
+## Estimate five regression models, display the results side-by-side, and display the table
+models <- list(
+  "OLS 1"     = lm(Donations ~ Literacy + Clergy, data = dat),
+  "Poisson 1" = glm(Donations ~ Literacy + Commerce, family = poisson, data = dat),
+  "OLS 2"     = lm(Crime_pers ~ Literacy + Clergy, data = dat),
+  "Poisson 2" = glm(Crime_pers ~ Literacy + Commerce, family = poisson, data = dat),
+  "OLS 3"     = lm(Crime_prop ~ Literacy + Clergy, data = dat)
+)
+
+modelsummary(models, stars = TRUE, gof_omit = "IC|Adj|F|RMSE|Log")
+modelsummary(models, output = "./Check/modelsummary-table.docx")
+
+modelplot(models, coef_omit = 'Interc')
+```
+
+### Referecne
+
+* [Data and Model Summaries in R](https://modelsummary.com/)
+* [Model Plots](https://modelsummary.com/vignettes/modelplot.html)
+* `citation("modelsummary")` 
+
+

@@ -484,8 +484,167 @@ risk_plot <- ggplot(data, aes(x = Category, y = RelativeRisk)) +
 grid.arrange(double_dot_plot, risk_plot, ncol = 2)
 
 ```
+ 
+
+
+## Bar Chart - 10 Highest Reported Adverse Events
+
+```{r include=FALSE}
+# library(tidyverse)
+library(openfda)
+library(ggthemes)
+library(gt)
+
+get_adverse <- function(gender, brand_name) {
+  fda_query("/drug/event.json") %>%
+    fda_filter("patient.drug.openfda.brand_name", brand_name) %>% 
+    fda_filter("patient.patientsex", gender) %>% 
+    fda_count("patient.reaction.reactionmeddrapt.exact") %>% 
+    fda_exec()
+}
+
+total_events<- function(brand_name){
+  fda_query("/drug/event.json") %>%
+    fda_filter("patient.drug.openfda.brand_name", brand_name) %>% 
+    fda_count("patient.reaction.reactionmeddrapt.exact") %>% 
+    fda_exec()
+}
+
+serious_events<- function(brand_name){
+  fda_query("/drug/event.json") %>%
+    fda_filter("patient.drug.openfda.brand_name", brand_name) %>% 
+    fda_count("serious") %>% 
+    fda_exec()
+}
+
+drug<- "Keytruda"
+female<-get_adverse(2, drug) %>% mutate(sex = 'female')
+male<-get_adverse(1, drug)%>% mutate(sex = 'male')
+
+all<- total_events(drug) 
+total_count<- sum(all$count)
+serious<-serious_events(drug) %>% filter(term==1) %>% pull(count)
+
+```
+
+ 
+
+```{r echo=FALSE}
+all %>% 
+  top_n(10, count) %>%
+ggplot()+
+  geom_bar(aes(x=reorder(term, count), y=count), stat='identity', fill ="#3686D3")+
+  coord_flip()+ 
+  theme_tufte()+
+  xlab('')+
+  ylab('Events Reported')
+```
+
+
+***
+### Adverse Events By Sex 
+
+
+```{r echo=FALSE}
+rbind(male,female) %>%  
+  mutate(term=str_to_title(term)) %>% 
+  pivot_wider(names_from=sex, values_from=count) %>% 
+  mutate(Total=female+male) %>% 
+  top_n(10, Total) %>% 
+  gt(rowname_col="term") %>% tab_header(
+    title = md("Adverse Events"),
+    subtitle = "The top ten most reported events"
+) %>% tab_source_note("All data queried from openFDA") %>% 
+  tab_stubhead(label= 'Patient Reaction') %>% 
+  tab_spanner(label = "By sex",
+              columns = c(female, male)) %>% 
+  tab_spanner(label= 'Total Cases',
+              columns = Total) %>% 
+    fmt_number(columns = c(female, male, Total), sep_mark = ',', decimals=0) %>% 
+  cols_label(Total = '',
+             female = 'Female',
+             male= 'Male')
+
+```
+
+
+
+# Disease Incidence
+
+## Heatmap
+
+The purpose of creating this visualization is to explore and illustrate patterns in disease incidence across the United States from 1928 to 2000, focusing on diseases like measles, polio, and rubella. The visualization aims to answer key questions: How has the incidence rate of each disease changed over time? How does incidence vary across different states? And, importantly, what impact did vaccination have on disease incidence rates? 
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# library(tidyverse) 
+library(stringr)
+library(lubridate)
+library(gridExtra)
+library(ggpubr)
+library(grid)
+library(plotly)
+library(ggdark)
+
+df <- read.csv("./01_Datasets/US_state_epi_vaccines.csv")
+
+# Records of the year for which each vaccine was introduced
+vac_dat <- data.frame(disease = c("MEASLES", "POLIO", "RUBELLA"), 
+                      Z = c(1963, 1955, 1969))
+
+df %>%
+  na.omit() %>%
+  ggplot() +
+  geom_tile(aes(x = year, y = state, fill = incidence)) +
+  scale_fill_gradient2(trans = "log10", high = "red", low = "blue", 
+                       mid = "white", midpoint = 0, na.value = "white") +
+  scale_x_continuous(expand = c(0.02, 0.02)) +
+  geom_vline(data = vac_dat, aes(xintercept = Z), linewidth = 1.5, color = "darkred") +
+  facet_wrap(~disease, scales = "free") +
+  dark_theme_minimal() +
+  theme(axis.text.y =  element_text(size = 5), 
+        plot.title = element_text(hjust = 0.5, size = 16)) +
+  labs(y = "State", fill = "Log \nIncidence", x = "Year", 
+       title = "Visulaizing Effect of Vaccines",
+       caption = "Dark Red Line Indicates Introduction of Vaccine")
+```
+
+
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library(tidyverse)
+library(ggtext)
+
+inc <- read.csv("./01_Datasets/US_state_epi_vaccines.csv")
+
+measles <- inc %>%
+  filter(disease == "MEASLES") %>%
+  mutate(inc_cat = cut(incidence, c(0, 200, 400, 600, 800, 1000, 1200, Inf))) %>%
+  mutate(inc_fac = factor(inc_cat)) 
+
+ggplot(data=measles) +
+  geom_tile(aes(x=year, y=state, fill=inc_fac), color="gray") +
+  scale_x_continuous("Year", breaks=seq(1930, 2010, by=10), limits = c(1928, 2000)) +
+  scale_y_discrete("State", limits=rev) +
+  geom_vline(xintercept = 1963, size = 1, color = "#d7191c") +
+  scale_fill_brewer("Incidence\nPer\n100,0000\nPopulation", 
+                    labels=c("0-<200", "200-<400", "400-<600", "600-<800", "800-<1000", "1000-<1200", ">=1200"),
+                    na.value = 'white',
+                    na.translate = F) +
+  labs (title ="Incidence of measles in US states declines after <b style='color:#d7191c;'>vaccine approval</b>")+
+  theme_minimal() +
+  theme(legend.title.align = 0.5,
+        axis.text.x = element_text(size = 12, color = "#525252"),
+        axis.text.y = element_text(size = 8, color = "#525252"),
+        axis.line.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major = element_blank(),
+        plot.title = element_markdown())
+```
+
 # Reference
 
 * [Most Frequent AE by Relative Risk/Forest Plot using](https://www.linkedin.com/pulse/most-frequent-ae-relative-risk-using-r-jagadish-katam/?trackingId=GllB04d3RAe%2BIPwtx1czFg%3D%3D)
 * [Adverse Event Data – gRaphically](https://www.lexjansen.com/phuse/2018/dv/DV11.pdf)
 * SIG (2024, Feb. 8). VIS-SIG Blog: Wonderful Wednesdays February 2024. Retrieved from https://graphicsprinciples.github.io/posts/2024-09-01-wonderful-wednesdays-february-2024/
+* SIG (2023, July 12). VIS-SIG Blog: Wonderful Wednesdays July 2023. Retrieved from https://graphicsprinciples.github.io/posts/2023-12-17-wonderful-wednesdays-july-2023/

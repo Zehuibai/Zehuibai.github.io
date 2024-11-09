@@ -360,6 +360,9 @@ div.tocify {
       <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
     </li>
     <li>
+      <a href="03-SSC-Biosimilar-Trials.html">Statistical Considerations for the Design and Analysis of Biosimilar Trials</a>
+    </li>
+    <li>
       <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
     </li>
     <li>
@@ -370,6 +373,24 @@ div.tocify {
     </li>
     <li>
       <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Continuous-Endpoint.html">Sample Size Determination for Continuous Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Categorical-Endpoint.html">Sample Size Determination for Categorical Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Survival-Endpoint.html">Sample Size Determination for Survival Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Repeated-Measures.html">Sample Size Determination for Repeated Measures</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Sequential-Design.html">Statistical Considerations for Group Sequential Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Adaptive-Design.html">Statistical Considerations for Adaptive Design</a>
     </li>
   </ul>
 </li>
@@ -455,6 +476,9 @@ div.tocify {
     </li>
     <li>
       <a href="05-Plot-Correlation.html">Correlation Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Model-Table.html">Clinical Data and Model visualization</a>
     </li>
     <li>
       <a href="05-Plot-ScatterPlot.html">Scatter and Line Plot</a>
@@ -565,8 +589,10 @@ Histogram</p></h1>
 </div>
 
 
+<div id="histogram" class="section level1">
+<h1>Histogram</h1>
 <div id="general-appearance" class="section level2">
-<h2>General appearance</h2>
+<h2>General Appearance</h2>
 <pre class="r"><code>smaller &lt;- diamonds %&gt;% 
   filter(carat &lt; 3)
 p1 &lt;- ggplot(data = smaller, mapping = aes(x = carat, fill=color))+
@@ -610,8 +636,71 @@ data %&gt;%
   theme_bw()</code></pre>
 <p><img src="05-Plot-Histogram_files/figure-html/Change%20Scales-2.png" width="672" /></p>
 </div>
-<div id="density-plot" class="section level2">
-<h2>Density plot</h2>
+<div id="mirror-histogramdensity-chart" class="section level2">
+<h2>Mirror Histogram/Density Chart</h2>
+<pre class="r"><code># library(hrbrthemes)
+
+# Dummy data
+data &lt;- data.frame(
+  var1 = rnorm(1000),
+  var2 = rnorm(1000, mean=2)
+)
+
+
+ggplot(data, aes(x=x) ) +
+  geom_histogram( aes(x = var1, y = ..density..), fill=&quot;#69b3a2&quot; ) +
+  geom_label( aes(x=4.5, y=0.25, label=&quot;variable1&quot;), color=&quot;#69b3a2&quot;) +
+  geom_histogram( aes(x = var2, y = -..density..), fill= &quot;#404080&quot;) +
+  geom_label( aes(x=4.5, y=-0.25, label=&quot;variable2&quot;), color=&quot;#404080&quot;) +
+  theme_ipsum() +
+  xlab(&quot;value of x&quot;)</code></pre>
+<p><img src="05-Plot-Histogram_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data, aes(x=x) ) +
+  # Top
+  geom_density( aes(x = var1, y = ..density..), fill=&quot;#69b3a2&quot; ) +
+  geom_label( aes(x=4.5, y=0.25, label=&quot;variable1&quot;), color=&quot;#69b3a2&quot;) +
+  # Bottom
+  geom_density( aes(x = var2, y = -..density..), fill= &quot;#404080&quot;) +
+  geom_label( aes(x=4.5, y=-0.25, label=&quot;variable2&quot;), color=&quot;#404080&quot;) +
+  theme_ipsum() +
+  xlab(&quot;value of x&quot;) </code></pre>
+<p><img src="05-Plot-Histogram_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+</div>
+<div id="marginal-histogram-boxplot" class="section level2">
+<h2>Marginal Histogram / Boxplot</h2>
+<p>This can be achieved using the ggMarginal() function in the “ggExtra”
+package. In addition to histograms, you can choose to draw marginal box
+plots or density plots by setting the corresponding type options.</p>
+<pre class="r"><code># library(&quot;ggExtra&quot;)
+
+mpg_select &lt;- mpg[mpg$hwy &gt;= 35 &amp; mpg$cty &gt; 27, ]
+g &lt;- ggplot(mpg, aes(cty, hwy)) + 
+  geom_count() + 
+  geom_smooth(method=&quot;lm&quot;, se=F) +
+  theme_bw()
+ 
+ggMarginal(g, type = &quot;histogram&quot;, fill=&quot;transparent&quot;)
+ggMarginal(g, type = &quot;boxplot&quot;,   fill=&quot;transparent&quot;)
+ggMarginal(g, type = &quot;density&quot;,   fill=&quot;transparent&quot;)</code></pre>
+<p><img src="05-Plot-Histogram_files/figure-html/Marginal%20Plot-1.png" width="672" /></p>
+</div>
+<div id="interactive-plot" class="section level2">
+<h2>Interactive Plot</h2>
+<pre class="r"><code>smaller &lt;- diamonds %&gt;% 
+  filter(carat &lt; 3)
+p1 &lt;- ggplot(data = smaller, mapping = aes(x = carat, fill=color))+
+  geom_histogram(binwidth = 0.1, col=&quot;black&quot;, size=.1) +
+  labs(title=&quot;Add Title for Histogram Here...&quot;, 
+       subtitle=&quot;Add Subtitle Here...&quot;)  
+ggplotly(p1) </code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-8dd975f6da74b37c0b45" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-8dd975f6da74b37c0b45">{"x":{"data":[{"orientation":"v","width":[0.099999999999999978,0.10000000000000009,0.10000000000000009,0.10000000000000003,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999867,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645],"base":[683,8739,5246,4453,1938,4575,1509,2281,5516,2449,2485,1016,307,2366,703,599,131,55,1136,397,221,134,69,81,19,15,3],"x":[0.20000000000000001,0.30000000000000004,0.40000000000000002,0.5,0.60000000000000009,0.70000000000000007,0.80000000000000004,0.90000000000000013,1,1.1000000000000001,1.2,1.3,1.4000000000000001,1.5000000000000002,1.6000000000000001,1.7,1.8,1.9000000000000001,2,2.1000000000000001,2.2000000000000002,2.2999999999999998,2.4000000000000004,2.5,2.6000000000000001,2.7000000000000002,2.7999999999999998],"y":[102,1534,985,964,390,674,216,375,742,238,166,47,18,190,35,32,9,2,37,10,4,1,0,0,2,1,0],"text":["count:  102<br />carat: 0.2<br />color: D","count: 1534<br />carat: 0.3<br />color: D","count:  985<br />carat: 0.4<br />color: D","count:  964<br />carat: 0.5<br />color: D","count:  390<br />carat: 0.6<br />color: D","count:  674<br />carat: 0.7<br />color: D","count:  216<br />carat: 0.8<br />color: D","count:  375<br />carat: 0.9<br />color: D","count:  742<br />carat: 1.0<br />color: D","count:  238<br />carat: 1.1<br />color: D","count:  166<br />carat: 1.2<br />color: D","count:   47<br />carat: 1.3<br />color: D","count:   18<br />carat: 1.4<br />color: D","count:  190<br />carat: 1.5<br />color: D","count:   35<br />carat: 1.6<br />color: D","count:   32<br />carat: 1.7<br />color: D","count:    9<br />carat: 1.8<br />color: D","count:    2<br />carat: 1.9<br />color: D","count:   37<br />carat: 2.0<br />color: D","count:   10<br />carat: 2.1<br />color: D","count:    4<br />carat: 2.2<br />color: D","count:    1<br />carat: 2.3<br />color: D","count:    0<br />carat: 2.4<br />color: D","count:    0<br />carat: 2.5<br />color: D","count:    2<br />carat: 2.6<br />color: D","count:    1<br />carat: 2.7<br />color: D","count:    0<br />carat: 2.8<br />color: D"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(68,1,84,1)","line":{"width":0.37795275590551186,"color":"rgba(0,0,0,1)"}},"name":"D","legendgroup":"D","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.099999999999999978,0.10000000000000009,0.10000000000000009,0.10000000000000003,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999867,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645],"base":[382,6624,3836,3129,1402,3490,1176,1814,4443,2131,2269,958,279,2059,638,550,121,53,1063,382,216,133,69,79,18,14,3],"x":[0.20000000000000001,0.30000000000000004,0.40000000000000002,0.5,0.60000000000000009,0.70000000000000007,0.80000000000000004,0.90000000000000013,1,1.1000000000000001,1.2,1.3,1.4000000000000001,1.5000000000000002,1.6000000000000001,1.7,1.8,1.9000000000000001,2,2.1000000000000001,2.2000000000000002,2.2999999999999998,2.4000000000000004,2.5,2.6000000000000001,2.7000000000000002,2.7999999999999998],"y":[301,2115,1410,1324,536,1085,333,467,1073,318,216,58,28,307,65,49,10,2,73,15,5,1,0,2,1,1,0],"text":["count:  301<br />carat: 0.2<br />color: E","count: 2115<br />carat: 0.3<br />color: E","count: 1410<br />carat: 0.4<br />color: E","count: 1324<br />carat: 0.5<br />color: E","count:  536<br />carat: 0.6<br />color: E","count: 1085<br />carat: 0.7<br />color: E","count:  333<br />carat: 0.8<br />color: E","count:  467<br />carat: 0.9<br />color: E","count: 1073<br />carat: 1.0<br />color: E","count:  318<br />carat: 1.1<br />color: E","count:  216<br />carat: 1.2<br />color: E","count:   58<br />carat: 1.3<br />color: E","count:   28<br />carat: 1.4<br />color: E","count:  307<br />carat: 1.5<br />color: E","count:   65<br />carat: 1.6<br />color: E","count:   49<br />carat: 1.7<br />color: E","count:   10<br />carat: 1.8<br />color: E","count:    2<br />carat: 1.9<br />color: E","count:   73<br />carat: 2.0<br />color: E","count:   15<br />carat: 2.1<br />color: E","count:    5<br />carat: 2.2<br />color: E","count:    1<br />carat: 2.3<br />color: E","count:    0<br />carat: 2.4<br />color: E","count:    2<br />carat: 2.5<br />color: E","count:    1<br />carat: 2.6<br />color: E","count:    1<br />carat: 2.7<br />color: E","count:    0<br />carat: 2.8<br />color: E"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(68,58,131,1)","line":{"width":0.37795275590551186,"color":"rgba(0,0,0,1)"}},"name":"E","legendgroup":"E","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.099999999999999978,0.10000000000000009,0.10000000000000009,0.10000000000000003,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999867,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645],"base":[156,4993,2604,2091,932,2371,830,1339,3087,1693,1918,833,230,1714,534,477,107,48,971,350,204,132,67,76,17,13,3],"x":[0.20000000000000001,0.30000000000000004,0.40000000000000002,0.5,0.60000000000000009,0.70000000000000007,0.80000000000000004,0.90000000000000013,1,1.1000000000000001,1.2,1.3,1.4000000000000001,1.5000000000000002,1.6000000000000001,1.7,1.8,1.9000000000000001,2,2.1000000000000001,2.2000000000000002,2.2999999999999998,2.4000000000000004,2.5,2.6000000000000001,2.7000000000000002,2.7999999999999998],"y":[226,1631,1232,1038,470,1119,346,475,1356,438,351,125,49,345,104,73,14,5,92,32,12,1,2,3,1,1,0],"text":["count:  226<br />carat: 0.2<br />color: F","count: 1631<br />carat: 0.3<br />color: F","count: 1232<br />carat: 0.4<br />color: F","count: 1038<br />carat: 0.5<br />color: F","count:  470<br />carat: 0.6<br />color: F","count: 1119<br />carat: 0.7<br />color: F","count:  346<br />carat: 0.8<br />color: F","count:  475<br />carat: 0.9<br />color: F","count: 1356<br />carat: 1.0<br />color: F","count:  438<br />carat: 1.1<br />color: F","count:  351<br />carat: 1.2<br />color: F","count:  125<br />carat: 1.3<br />color: F","count:   49<br />carat: 1.4<br />color: F","count:  345<br />carat: 1.5<br />color: F","count:  104<br />carat: 1.6<br />color: F","count:   73<br />carat: 1.7<br />color: F","count:   14<br />carat: 1.8<br />color: F","count:    5<br />carat: 1.9<br />color: F","count:   92<br />carat: 2.0<br />color: F","count:   32<br />carat: 2.1<br />color: F","count:   12<br />carat: 2.2<br />color: F","count:    1<br />carat: 2.3<br />color: F","count:    2<br />carat: 2.4<br />color: F","count:    3<br />carat: 2.5<br />color: F","count:    1<br />carat: 2.6<br />color: F","count:    1<br />carat: 2.7<br />color: F","count:    0<br />carat: 2.8<br />color: F"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(49,104,142,1)","line":{"width":0.37795275590551186,"color":"rgba(0,0,0,1)"}},"name":"F","legendgroup":"F","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.099999999999999978,0.10000000000000009,0.10000000000000009,0.10000000000000003,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999867,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645],"base":[70,2589,1261,901,450,1453,526,848,1678,1025,1327,580,149,1198,402,366,85,39,804,294,177,119,64,66,15,12,2],"x":[0.20000000000000001,0.30000000000000004,0.40000000000000002,0.5,0.60000000000000009,0.70000000000000007,0.80000000000000004,0.90000000000000013,1,1.1000000000000001,1.2,1.3,1.4000000000000001,1.5000000000000002,1.6000000000000001,1.7,1.8,1.9000000000000001,2,2.1000000000000001,2.2000000000000002,2.2999999999999998,2.4000000000000004,2.5,2.6000000000000001,2.7000000000000002,2.7999999999999998],"y":[86,2404,1343,1190,482,918,304,491,1409,668,591,253,81,516,132,111,22,9,167,56,27,13,3,10,2,1,1],"text":["count:   86<br />carat: 0.2<br />color: G","count: 2404<br />carat: 0.3<br />color: G","count: 1343<br />carat: 0.4<br />color: G","count: 1190<br />carat: 0.5<br />color: G","count:  482<br />carat: 0.6<br />color: G","count:  918<br />carat: 0.7<br />color: G","count:  304<br />carat: 0.8<br />color: G","count:  491<br />carat: 0.9<br />color: G","count: 1409<br />carat: 1.0<br />color: G","count:  668<br />carat: 1.1<br />color: G","count:  591<br />carat: 1.2<br />color: G","count:  253<br />carat: 1.3<br />color: G","count:   81<br />carat: 1.4<br />color: G","count:  516<br />carat: 1.5<br />color: G","count:  132<br />carat: 1.6<br />color: G","count:  111<br />carat: 1.7<br />color: G","count:   22<br />carat: 1.8<br />color: G","count:    9<br />carat: 1.9<br />color: G","count:  167<br />carat: 2.0<br />color: G","count:   56<br />carat: 2.1<br />color: G","count:   27<br />carat: 2.2<br />color: G","count:   13<br />carat: 2.3<br />color: G","count:    3<br />carat: 2.4<br />color: G","count:   10<br />carat: 2.5<br />color: G","count:    2<br />carat: 2.6<br />color: G","count:    1<br />carat: 2.7<br />color: G","count:    1<br />carat: 2.8<br />color: G"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(33,144,140,1)","line":{"width":0.37795275590551186,"color":"rgba(0,0,0,1)"}},"name":"G","legendgroup":"G","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.099999999999999978,0.10000000000000009,0.10000000000000009,0.10000000000000003,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999867,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645],"base":[15,992,646,378,205,794,277,393,683,434,713,343,85,685,244,220,56,20,508,194,127,82,49,42,13,5,1],"x":[0.20000000000000001,0.30000000000000004,0.40000000000000002,0.5,0.60000000000000009,0.70000000000000007,0.80000000000000004,0.90000000000000013,1,1.1000000000000001,1.2,1.3,1.4000000000000001,1.5000000000000002,1.6000000000000001,1.7,1.8,1.9000000000000001,2,2.1000000000000001,2.2000000000000002,2.2999999999999998,2.4000000000000004,2.5,2.6000000000000001,2.7000000000000002,2.7999999999999998],"y":[55,1597,615,523,245,659,249,455,995,591,614,237,64,513,158,146,29,19,296,100,50,37,15,24,2,7,1],"text":["count:   55<br />carat: 0.2<br />color: H","count: 1597<br />carat: 0.3<br />color: H","count:  615<br />carat: 0.4<br />color: H","count:  523<br />carat: 0.5<br />color: H","count:  245<br />carat: 0.6<br />color: H","count:  659<br />carat: 0.7<br />color: H","count:  249<br />carat: 0.8<br />color: H","count:  455<br />carat: 0.9<br />color: H","count:  995<br />carat: 1.0<br />color: H","count:  591<br />carat: 1.1<br />color: H","count:  614<br />carat: 1.2<br />color: H","count:  237<br />carat: 1.3<br />color: H","count:   64<br />carat: 1.4<br />color: H","count:  513<br />carat: 1.5<br />color: H","count:  158<br />carat: 1.6<br />color: H","count:  146<br />carat: 1.7<br />color: H","count:   29<br />carat: 1.8<br />color: H","count:   19<br />carat: 1.9<br />color: H","count:  296<br />carat: 2.0<br />color: H","count:  100<br />carat: 2.1<br />color: H","count:   50<br />carat: 2.2<br />color: H","count:   37<br />carat: 2.3<br />color: H","count:   15<br />carat: 2.4<br />color: H","count:   24<br />carat: 2.5<br />color: H","count:    2<br />carat: 2.6<br />color: H","count:    7<br />carat: 2.7<br />color: H","count:    1<br />carat: 2.8<br />color: H"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(53,183,121,1)","line":{"width":0.37795275590551186,"color":"rgba(0,0,0,1)"}},"name":"H","legendgroup":"H","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.099999999999999978,0.10000000000000009,0.10000000000000009,0.10000000000000003,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999867,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645],"base":[3,193,222,124,65,242,107,127,247,127,271,148,46,255,93,80,24,9,190,68,50,40,33,19,11,4,0],"x":[0.20000000000000001,0.30000000000000004,0.40000000000000002,0.5,0.60000000000000009,0.70000000000000007,0.80000000000000004,0.90000000000000013,1,1.1000000000000001,1.2,1.3,1.4000000000000001,1.5000000000000002,1.6000000000000001,1.7,1.8,1.9000000000000001,2,2.1000000000000001,2.2000000000000002,2.2999999999999998,2.4000000000000004,2.5,2.6000000000000001,2.7000000000000002,2.7999999999999998],"y":[12,799,424,254,140,552,170,266,436,307,442,195,39,430,151,140,32,11,318,126,77,42,16,23,2,1,1],"text":["count:   12<br />carat: 0.2<br />color: I","count:  799<br />carat: 0.3<br />color: I","count:  424<br />carat: 0.4<br />color: I","count:  254<br />carat: 0.5<br />color: I","count:  140<br />carat: 0.6<br />color: I","count:  552<br />carat: 0.7<br />color: I","count:  170<br />carat: 0.8<br />color: I","count:  266<br />carat: 0.9<br />color: I","count:  436<br />carat: 1.0<br />color: I","count:  307<br />carat: 1.1<br />color: I","count:  442<br />carat: 1.2<br />color: I","count:  195<br />carat: 1.3<br />color: I","count:   39<br />carat: 1.4<br />color: I","count:  430<br />carat: 1.5<br />color: I","count:  151<br />carat: 1.6<br />color: I","count:  140<br />carat: 1.7<br />color: I","count:   32<br />carat: 1.8<br />color: I","count:   11<br />carat: 1.9<br />color: I","count:  318<br />carat: 2.0<br />color: I","count:  126<br />carat: 2.1<br />color: I","count:   77<br />carat: 2.2<br />color: I","count:   42<br />carat: 2.3<br />color: I","count:   16<br />carat: 2.4<br />color: I","count:   23<br />carat: 2.5<br />color: I","count:    2<br />carat: 2.6<br />color: I","count:    1<br />carat: 2.7<br />color: I","count:    1<br />carat: 2.8<br />color: I"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(143,215,68,1)","line":{"width":0.37795275590551186,"color":"rgba(0,0,0,1)"}},"name":"I","legendgroup":"I","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.099999999999999978,0.10000000000000009,0.10000000000000009,0.10000000000000003,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999867,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645],"base":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"x":[0.20000000000000001,0.30000000000000004,0.40000000000000002,0.5,0.60000000000000009,0.70000000000000007,0.80000000000000004,0.90000000000000013,1,1.1000000000000001,1.2,1.3,1.4000000000000001,1.5000000000000002,1.6000000000000001,1.7,1.8,1.9000000000000001,2,2.1000000000000001,2.2000000000000002,2.2999999999999998,2.4000000000000004,2.5,2.6000000000000001,2.7000000000000002,2.7999999999999998],"y":[3,193,222,124,65,242,107,127,247,127,271,148,46,255,93,80,24,9,190,68,50,40,33,19,11,4,0],"text":["count:    3<br />carat: 0.2<br />color: J","count:  193<br />carat: 0.3<br />color: J","count:  222<br />carat: 0.4<br />color: J","count:  124<br />carat: 0.5<br />color: J","count:   65<br />carat: 0.6<br />color: J","count:  242<br />carat: 0.7<br />color: J","count:  107<br />carat: 0.8<br />color: J","count:  127<br />carat: 0.9<br />color: J","count:  247<br />carat: 1.0<br />color: J","count:  127<br />carat: 1.1<br />color: J","count:  271<br />carat: 1.2<br />color: J","count:  148<br />carat: 1.3<br />color: J","count:   46<br />carat: 1.4<br />color: J","count:  255<br />carat: 1.5<br />color: J","count:   93<br />carat: 1.6<br />color: J","count:   80<br />carat: 1.7<br />color: J","count:   24<br />carat: 1.8<br />color: J","count:    9<br />carat: 1.9<br />color: J","count:  190<br />carat: 2.0<br />color: J","count:   68<br />carat: 2.1<br />color: J","count:   50<br />carat: 2.2<br />color: J","count:   40<br />carat: 2.3<br />color: J","count:   33<br />carat: 2.4<br />color: J","count:   19<br />carat: 2.5<br />color: J","count:   11<br />carat: 2.6<br />color: J","count:    4<br />carat: 2.7<br />color: J","count:    0<br />carat: 2.8<br />color: J"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(253,231,37,1)","line":{"width":0.37795275590551186,"color":"rgba(0,0,0,1)"}},"name":"J","legendgroup":"J","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.762557077625573,"r":7.3059360730593621,"b":40.182648401826491,"l":54.794520547945211},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"Add Title for Histogram Here...","font":{"color":"rgba(0,0,0,1)","family":"","size":17.534246575342465},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.015000000000000041,2.9849999999999994],"tickmode":"array","ticktext":["1","2"],"tickvals":[1.0000000000000002,2],"categoryorder":"array","categoryarray":["1","2"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"carat","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-513.64999999999998,10786.65],"tickmode":"array","ticktext":["0","2500","5000","7500","10000"],"tickvals":[0,2500,5000,7500,10000],"categoryorder":"array","categoryarray":["0","2500","5000","7500","10000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"count","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"color","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"348c19731c7e":{"x":{},"fill":{},"type":"bar"}},"cur_data":"348c19731c7e","visdat":{"348c19731c7e":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="density-plot" class="section level1">
+<h1>Density plot</h1>
+<div id="general-density-plot" class="section level2">
+<h2>General Density plot</h2>
 <div id="multi-density-chart-using-geom_freqpoly"
 class="section level3">
 <h3>Multi density chart using geom_freqpoly()</h3>
@@ -655,7 +744,7 @@ p2 &lt;- ggplot(data=diamonds, aes(x=price, group=cut, fill=cut)) +
 
  
 grid.arrange(p1, p2, nrow = 1)</code></pre>
-<p><img src="05-Plot-Histogram_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="05-Plot-Histogram_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
 <div id="small-multiple-with-facet_wrap" class="section level3">
 <h3>Small Multiple with facet_wrap()</h3>
@@ -669,7 +758,7 @@ ggplot(data=diamonds, aes(x=price, group=cut, fill=cut)) +
       panel.spacing = unit(0.1, &quot;lines&quot;),
       axis.ticks.x=element_blank()
     )</code></pre>
-<p><img src="05-Plot-Histogram_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="05-Plot-Histogram_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 <div id="stacked-density-chart" class="section level3">
 <h3>Stacked density chart</h3>
@@ -677,7 +766,7 @@ ggplot(data=diamonds, aes(x=price, group=cut, fill=cut)) +
 ggplot(data=diamonds, aes(x=price, group=cut, fill=cut)) +
     geom_density(adjust=1.5, position=&quot;fill&quot;) +
     theme_ipsum()</code></pre>
-<p><img src="05-Plot-Histogram_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="05-Plot-Histogram_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 </div>
 <div id="density-plot-with-annotation" class="section level3">
 <h3>Density plot with annotation</h3>
@@ -709,68 +798,125 @@ data %&gt;%
     ) +
     ylab(&quot;&quot;) +
     xlab(&quot;Assigned Probability (%)&quot;)</code></pre>
-<p><img src="05-Plot-Histogram_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="05-Plot-Histogram_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 </div>
 </div>
-<div id="mirror-histogramdensity-chart" class="section level2">
-<h2>Mirror Histogram/Density Chart</h2>
-<pre class="r"><code># library(hrbrthemes)
+<div id="animated-density-plot" class="section level2">
+<h2>Animated density plot</h2>
+<pre class="r"><code># library(ggplot2)
+# library(dplyr)
+# library(tidyr)
+# library(hsaven)
+# library(emojifont)
+# library(ggtext)
 
-# Dummy data
-data &lt;- data.frame(
-  var1 = rnorm(1000),
-  var2 = rnorm(1000, mean=2)
-)
+adsl &lt;- read_xpt(&quot;./01_Datasets/adsl.xpt&quot;)
+
+adsl2 &lt;- adsl %&gt;%
+  mutate(agegp2 = cut(AGE, quantile(AGE, c(0:6/6)))) %&gt;%
+  group_by(agegp2) %&gt;%
+  arrange(AGE) %&gt;%
+  select(agegp2, BMIBL, SEX, AGE) %&gt;%
+  mutate(id = as.numeric(substr(agegp2,2,3))) %&gt;%
+  drop_na(id)
+
+# Create a vector containing unique values for age group identifier
+id &lt;- adsl2 %&gt;%
+  group_by(id) %&gt;%
+  slice(1) %&gt;%
+  select(id) %&gt;%
+  unlist() %&gt;%
+  as.vector()
+
+for (i in id) {
+  
+  ADSLloop &lt;- adsl2 %&gt;%
+    filter(id == i)
+  
+  plot &lt;- ggplot(ADSLloop, aes(x = BMIBL, colour = SEX)) +
+    geom_density(show.legend = FALSE) +
+    geom_text(aes(x=25, y=0.19, label=&quot;Age Group:&quot;), size=16, color=&quot;#7570b3&quot;) +
+    geom_text(aes(x=28, y=0.19, label=agegp2), size=16, color=&quot;#7570b3&quot;) +
+    scale_x_continuous(&quot;BMI&quot;, limits=c(15, 40)) +
+    scale_y_continuous(&quot;Frequency&quot;, limits=c(0, 0.2)) +
+    scale_color_discrete(type=c(&quot;#1b9e77&quot;, &quot;#d95f02&quot;)) +
+    theme(plot.title = element_markdown(colour = &quot;#636363&quot;,
+                                        size = 50),
+          panel.background=element_rect(fill=&quot;white&quot;),
+          panel.grid.major=element_line(colour = &quot;#f0f0f0&quot;,
+                                        linewidth = 0.5,
+                                        linetype = 1),
+          axis.line=element_line(colour = &quot;#bdbdbd&quot;,
+                                 linewidth = 0.5,
+                                 linetype = 1),
+          axis.text=element_text(
+            colour = &quot;#636363&quot;,
+            size = 28),
+          axis.title=element_text(
+            colour = &quot;#636363&quot;,
+            size = 32)) +
+    labs(title=&quot;&lt;b&gt;Distribution of BMI by Sex (&lt;span style=&#39;color:#1b9e77&#39;&gt;Female&lt;/span&gt; and &lt;span style=&#39;color:#d95f02&#39;&gt;Male&lt;/span&gt;) and  &lt;span style=&#39;color:#7570b3&#39;&gt;Age Group&lt;/span&gt;&lt;/b&gt;&quot;) 
+
+  ggsave(
+    filename = paste0(&quot;02_Plots/Visualization/Histogram/Animated&quot;, sprintf(&quot;%03d&quot;, i) , &quot;.png&quot;),
+    plot = plot,
+    device = &quot;png&quot;,
+    height = 1500,
+    width = 2757,
+    units = &quot;px&quot;
+  )
+}
 
 
-ggplot(data, aes(x=x) ) +
-  geom_histogram( aes(x = var1, y = ..density..), fill=&quot;#69b3a2&quot; ) +
-  geom_label( aes(x=4.5, y=0.25, label=&quot;variable1&quot;), color=&quot;#69b3a2&quot;) +
-  geom_histogram( aes(x = var2, y = -..density..), fill= &quot;#404080&quot;) +
-  geom_label( aes(x=4.5, y=-0.25, label=&quot;variable2&quot;), color=&quot;#404080&quot;) +
-  theme_ipsum() +
-  xlab(&quot;value of x&quot;)</code></pre>
-<p><img src="05-Plot-Histogram_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-<pre class="r"><code>ggplot(data, aes(x=x) ) +
-  # Top
-  geom_density( aes(x = var1, y = ..density..), fill=&quot;#69b3a2&quot; ) +
-  geom_label( aes(x=4.5, y=0.25, label=&quot;variable1&quot;), color=&quot;#69b3a2&quot;) +
-  # Bottom
-  geom_density( aes(x = var2, y = -..density..), fill= &quot;#404080&quot;) +
-  geom_label( aes(x=4.5, y=-0.25, label=&quot;variable2&quot;), color=&quot;#404080&quot;) +
-  theme_ipsum() +
-  xlab(&quot;value of x&quot;) </code></pre>
-<p><img src="05-Plot-Histogram_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+# Additional steps to create animated gif file:
+# 1. Install ImageMagick
+# 2. Open a command line
+# 3. cd to the folder containing the *.png files 
+# 4. Enter the following command:
+#   magick convert -delay 150 -loop 0 *.png -scale 4800x2700 WW_Dec23_SM01.gif</code></pre>
+<p><img src="02_Plots/Visualization/Histogram/Animated.gif" /></p>
 </div>
-<div id="marginal-histogram-boxplot" class="section level2">
-<h2>Marginal Histogram / Boxplot</h2>
-<p>This can be achieved using the ggMarginal() function in the “ggExtra”
-package. In addition to histograms, you can choose to draw marginal box
-plots or density plots by setting the corresponding type options.</p>
-<pre class="r"><code># library(&quot;ggExtra&quot;)
-
-mpg_select &lt;- mpg[mpg$hwy &gt;= 35 &amp; mpg$cty &gt; 27, ]
-g &lt;- ggplot(mpg, aes(cty, hwy)) + 
-  geom_count() + 
-  geom_smooth(method=&quot;lm&quot;, se=F) +
-  theme_bw()
- 
-ggMarginal(g, type = &quot;histogram&quot;, fill=&quot;transparent&quot;)
-ggMarginal(g, type = &quot;boxplot&quot;,   fill=&quot;transparent&quot;)
-ggMarginal(g, type = &quot;density&quot;,   fill=&quot;transparent&quot;)</code></pre>
-<p><img src="05-Plot-Histogram_files/figure-html/Marginal%20Plot-1.png" width="672" /></p>
+<div id="distribution-plot-by-category-i" class="section level2">
+<h2>Distribution plot by category I</h2>
+<p>This graph includes stacked density plots, sometimes known as a
+ridgeline plot. This graph type is useful where there are approximately
+4-8 categories with a natural ordering, which is the case in this
+example. The graph is also showing patient level data as transparent
+dots on the X axis, and reference lines have been added. There is a lot
+of overplotting of the dots, so the opacity of dots is representing the
+data density at each value on the X-axis.</p>
+<p>A title has been added to give a clear interpretation of the overall
+message.</p>
+<p><img src="05-Plot-Histogram_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 </div>
-<div id="interactive-plot" class="section level2">
-<h2>Interactive Plot</h2>
-<pre class="r"><code>smaller &lt;- diamonds %&gt;% 
-  filter(carat &lt; 3)
-p1 &lt;- ggplot(data = smaller, mapping = aes(x = carat, fill=color))+
-  geom_histogram(binwidth = 0.1, col=&quot;black&quot;, size=.1) +
-  labs(title=&quot;Add Title for Histogram Here...&quot;, 
-       subtitle=&quot;Add Subtitle Here...&quot;)  
-ggplotly(p1) </code></pre>
-<div class="plotly html-widget html-fill-item" id="htmlwidget-697ca283b36deb5fb269" style="width:672px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-697ca283b36deb5fb269">{"x":{"data":[{"orientation":"v","width":[0.099999999999999978,0.10000000000000009,0.10000000000000009,0.10000000000000003,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999867,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645],"base":[683,8739,5246,4453,1938,4575,1509,2281,5516,2449,2485,1016,307,2366,703,599,131,55,1136,397,221,134,69,81,19,15,3],"x":[0.20000000000000001,0.30000000000000004,0.40000000000000002,0.5,0.60000000000000009,0.70000000000000007,0.80000000000000004,0.90000000000000013,1,1.1000000000000001,1.2,1.3,1.4000000000000001,1.5000000000000002,1.6000000000000001,1.7,1.8,1.9000000000000001,2,2.1000000000000001,2.2000000000000002,2.2999999999999998,2.4000000000000004,2.5,2.6000000000000001,2.7000000000000002,2.7999999999999998],"y":[102,1534,985,964,390,674,216,375,742,238,166,47,18,190,35,32,9,2,37,10,4,1,0,0,2,1,0],"text":["count:  102<br />carat: 0.2<br />color: D","count: 1534<br />carat: 0.3<br />color: D","count:  985<br />carat: 0.4<br />color: D","count:  964<br />carat: 0.5<br />color: D","count:  390<br />carat: 0.6<br />color: D","count:  674<br />carat: 0.7<br />color: D","count:  216<br />carat: 0.8<br />color: D","count:  375<br />carat: 0.9<br />color: D","count:  742<br />carat: 1.0<br />color: D","count:  238<br />carat: 1.1<br />color: D","count:  166<br />carat: 1.2<br />color: D","count:   47<br />carat: 1.3<br />color: D","count:   18<br />carat: 1.4<br />color: D","count:  190<br />carat: 1.5<br />color: D","count:   35<br />carat: 1.6<br />color: D","count:   32<br />carat: 1.7<br />color: D","count:    9<br />carat: 1.8<br />color: D","count:    2<br />carat: 1.9<br />color: D","count:   37<br />carat: 2.0<br />color: D","count:   10<br />carat: 2.1<br />color: D","count:    4<br />carat: 2.2<br />color: D","count:    1<br />carat: 2.3<br />color: D","count:    0<br />carat: 2.4<br />color: D","count:    0<br />carat: 2.5<br />color: D","count:    2<br />carat: 2.6<br />color: D","count:    1<br />carat: 2.7<br />color: D","count:    0<br />carat: 2.8<br />color: D"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(68,1,84,1)","line":{"width":0.37795275590551186,"color":"rgba(0,0,0,1)"}},"name":"D","legendgroup":"D","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.099999999999999978,0.10000000000000009,0.10000000000000009,0.10000000000000003,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999867,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645],"base":[382,6624,3836,3129,1402,3490,1176,1814,4443,2131,2269,958,279,2059,638,550,121,53,1063,382,216,133,69,79,18,14,3],"x":[0.20000000000000001,0.30000000000000004,0.40000000000000002,0.5,0.60000000000000009,0.70000000000000007,0.80000000000000004,0.90000000000000013,1,1.1000000000000001,1.2,1.3,1.4000000000000001,1.5000000000000002,1.6000000000000001,1.7,1.8,1.9000000000000001,2,2.1000000000000001,2.2000000000000002,2.2999999999999998,2.4000000000000004,2.5,2.6000000000000001,2.7000000000000002,2.7999999999999998],"y":[301,2115,1410,1324,536,1085,333,467,1073,318,216,58,28,307,65,49,10,2,73,15,5,1,0,2,1,1,0],"text":["count:  301<br />carat: 0.2<br />color: E","count: 2115<br />carat: 0.3<br />color: E","count: 1410<br />carat: 0.4<br />color: E","count: 1324<br />carat: 0.5<br />color: E","count:  536<br />carat: 0.6<br />color: E","count: 1085<br />carat: 0.7<br />color: E","count:  333<br />carat: 0.8<br />color: E","count:  467<br />carat: 0.9<br />color: E","count: 1073<br />carat: 1.0<br />color: E","count:  318<br />carat: 1.1<br />color: E","count:  216<br />carat: 1.2<br />color: E","count:   58<br />carat: 1.3<br />color: E","count:   28<br />carat: 1.4<br />color: E","count:  307<br />carat: 1.5<br />color: E","count:   65<br />carat: 1.6<br />color: E","count:   49<br />carat: 1.7<br />color: E","count:   10<br />carat: 1.8<br />color: E","count:    2<br />carat: 1.9<br />color: E","count:   73<br />carat: 2.0<br />color: E","count:   15<br />carat: 2.1<br />color: E","count:    5<br />carat: 2.2<br />color: E","count:    1<br />carat: 2.3<br />color: E","count:    0<br />carat: 2.4<br />color: E","count:    2<br />carat: 2.5<br />color: E","count:    1<br />carat: 2.6<br />color: E","count:    1<br />carat: 2.7<br />color: E","count:    0<br />carat: 2.8<br />color: E"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(68,58,131,1)","line":{"width":0.37795275590551186,"color":"rgba(0,0,0,1)"}},"name":"E","legendgroup":"E","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.099999999999999978,0.10000000000000009,0.10000000000000009,0.10000000000000003,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999867,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645],"base":[156,4993,2604,2091,932,2371,830,1339,3087,1693,1918,833,230,1714,534,477,107,48,971,350,204,132,67,76,17,13,3],"x":[0.20000000000000001,0.30000000000000004,0.40000000000000002,0.5,0.60000000000000009,0.70000000000000007,0.80000000000000004,0.90000000000000013,1,1.1000000000000001,1.2,1.3,1.4000000000000001,1.5000000000000002,1.6000000000000001,1.7,1.8,1.9000000000000001,2,2.1000000000000001,2.2000000000000002,2.2999999999999998,2.4000000000000004,2.5,2.6000000000000001,2.7000000000000002,2.7999999999999998],"y":[226,1631,1232,1038,470,1119,346,475,1356,438,351,125,49,345,104,73,14,5,92,32,12,1,2,3,1,1,0],"text":["count:  226<br />carat: 0.2<br />color: F","count: 1631<br />carat: 0.3<br />color: F","count: 1232<br />carat: 0.4<br />color: F","count: 1038<br />carat: 0.5<br />color: F","count:  470<br />carat: 0.6<br />color: F","count: 1119<br />carat: 0.7<br />color: F","count:  346<br />carat: 0.8<br />color: F","count:  475<br />carat: 0.9<br />color: F","count: 1356<br />carat: 1.0<br />color: F","count:  438<br />carat: 1.1<br />color: F","count:  351<br />carat: 1.2<br />color: F","count:  125<br />carat: 1.3<br />color: F","count:   49<br />carat: 1.4<br />color: F","count:  345<br />carat: 1.5<br />color: F","count:  104<br />carat: 1.6<br />color: F","count:   73<br />carat: 1.7<br />color: F","count:   14<br />carat: 1.8<br />color: F","count:    5<br />carat: 1.9<br />color: F","count:   92<br />carat: 2.0<br />color: F","count:   32<br />carat: 2.1<br />color: F","count:   12<br />carat: 2.2<br />color: F","count:    1<br />carat: 2.3<br />color: F","count:    2<br />carat: 2.4<br />color: F","count:    3<br />carat: 2.5<br />color: F","count:    1<br />carat: 2.6<br />color: F","count:    1<br />carat: 2.7<br />color: F","count:    0<br />carat: 2.8<br />color: F"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(49,104,142,1)","line":{"width":0.37795275590551186,"color":"rgba(0,0,0,1)"}},"name":"F","legendgroup":"F","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.099999999999999978,0.10000000000000009,0.10000000000000009,0.10000000000000003,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999867,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645],"base":[70,2589,1261,901,450,1453,526,848,1678,1025,1327,580,149,1198,402,366,85,39,804,294,177,119,64,66,15,12,2],"x":[0.20000000000000001,0.30000000000000004,0.40000000000000002,0.5,0.60000000000000009,0.70000000000000007,0.80000000000000004,0.90000000000000013,1,1.1000000000000001,1.2,1.3,1.4000000000000001,1.5000000000000002,1.6000000000000001,1.7,1.8,1.9000000000000001,2,2.1000000000000001,2.2000000000000002,2.2999999999999998,2.4000000000000004,2.5,2.6000000000000001,2.7000000000000002,2.7999999999999998],"y":[86,2404,1343,1190,482,918,304,491,1409,668,591,253,81,516,132,111,22,9,167,56,27,13,3,10,2,1,1],"text":["count:   86<br />carat: 0.2<br />color: G","count: 2404<br />carat: 0.3<br />color: G","count: 1343<br />carat: 0.4<br />color: G","count: 1190<br />carat: 0.5<br />color: G","count:  482<br />carat: 0.6<br />color: G","count:  918<br />carat: 0.7<br />color: G","count:  304<br />carat: 0.8<br />color: G","count:  491<br />carat: 0.9<br />color: G","count: 1409<br />carat: 1.0<br />color: G","count:  668<br />carat: 1.1<br />color: G","count:  591<br />carat: 1.2<br />color: G","count:  253<br />carat: 1.3<br />color: G","count:   81<br />carat: 1.4<br />color: G","count:  516<br />carat: 1.5<br />color: G","count:  132<br />carat: 1.6<br />color: G","count:  111<br />carat: 1.7<br />color: G","count:   22<br />carat: 1.8<br />color: G","count:    9<br />carat: 1.9<br />color: G","count:  167<br />carat: 2.0<br />color: G","count:   56<br />carat: 2.1<br />color: G","count:   27<br />carat: 2.2<br />color: G","count:   13<br />carat: 2.3<br />color: G","count:    3<br />carat: 2.4<br />color: G","count:   10<br />carat: 2.5<br />color: G","count:    2<br />carat: 2.6<br />color: G","count:    1<br />carat: 2.7<br />color: G","count:    1<br />carat: 2.8<br />color: G"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(33,144,140,1)","line":{"width":0.37795275590551186,"color":"rgba(0,0,0,1)"}},"name":"G","legendgroup":"G","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.099999999999999978,0.10000000000000009,0.10000000000000009,0.10000000000000003,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999867,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645],"base":[15,992,646,378,205,794,277,393,683,434,713,343,85,685,244,220,56,20,508,194,127,82,49,42,13,5,1],"x":[0.20000000000000001,0.30000000000000004,0.40000000000000002,0.5,0.60000000000000009,0.70000000000000007,0.80000000000000004,0.90000000000000013,1,1.1000000000000001,1.2,1.3,1.4000000000000001,1.5000000000000002,1.6000000000000001,1.7,1.8,1.9000000000000001,2,2.1000000000000001,2.2000000000000002,2.2999999999999998,2.4000000000000004,2.5,2.6000000000000001,2.7000000000000002,2.7999999999999998],"y":[55,1597,615,523,245,659,249,455,995,591,614,237,64,513,158,146,29,19,296,100,50,37,15,24,2,7,1],"text":["count:   55<br />carat: 0.2<br />color: H","count: 1597<br />carat: 0.3<br />color: H","count:  615<br />carat: 0.4<br />color: H","count:  523<br />carat: 0.5<br />color: H","count:  245<br />carat: 0.6<br />color: H","count:  659<br />carat: 0.7<br />color: H","count:  249<br />carat: 0.8<br />color: H","count:  455<br />carat: 0.9<br />color: H","count:  995<br />carat: 1.0<br />color: H","count:  591<br />carat: 1.1<br />color: H","count:  614<br />carat: 1.2<br />color: H","count:  237<br />carat: 1.3<br />color: H","count:   64<br />carat: 1.4<br />color: H","count:  513<br />carat: 1.5<br />color: H","count:  158<br />carat: 1.6<br />color: H","count:  146<br />carat: 1.7<br />color: H","count:   29<br />carat: 1.8<br />color: H","count:   19<br />carat: 1.9<br />color: H","count:  296<br />carat: 2.0<br />color: H","count:  100<br />carat: 2.1<br />color: H","count:   50<br />carat: 2.2<br />color: H","count:   37<br />carat: 2.3<br />color: H","count:   15<br />carat: 2.4<br />color: H","count:   24<br />carat: 2.5<br />color: H","count:    2<br />carat: 2.6<br />color: H","count:    7<br />carat: 2.7<br />color: H","count:    1<br />carat: 2.8<br />color: H"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(53,183,121,1)","line":{"width":0.37795275590551186,"color":"rgba(0,0,0,1)"}},"name":"H","legendgroup":"H","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.099999999999999978,0.10000000000000009,0.10000000000000009,0.10000000000000003,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999867,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645],"base":[3,193,222,124,65,242,107,127,247,127,271,148,46,255,93,80,24,9,190,68,50,40,33,19,11,4,0],"x":[0.20000000000000001,0.30000000000000004,0.40000000000000002,0.5,0.60000000000000009,0.70000000000000007,0.80000000000000004,0.90000000000000013,1,1.1000000000000001,1.2,1.3,1.4000000000000001,1.5000000000000002,1.6000000000000001,1.7,1.8,1.9000000000000001,2,2.1000000000000001,2.2000000000000002,2.2999999999999998,2.4000000000000004,2.5,2.6000000000000001,2.7000000000000002,2.7999999999999998],"y":[12,799,424,254,140,552,170,266,436,307,442,195,39,430,151,140,32,11,318,126,77,42,16,23,2,1,1],"text":["count:   12<br />carat: 0.2<br />color: I","count:  799<br />carat: 0.3<br />color: I","count:  424<br />carat: 0.4<br />color: I","count:  254<br />carat: 0.5<br />color: I","count:  140<br />carat: 0.6<br />color: I","count:  552<br />carat: 0.7<br />color: I","count:  170<br />carat: 0.8<br />color: I","count:  266<br />carat: 0.9<br />color: I","count:  436<br />carat: 1.0<br />color: I","count:  307<br />carat: 1.1<br />color: I","count:  442<br />carat: 1.2<br />color: I","count:  195<br />carat: 1.3<br />color: I","count:   39<br />carat: 1.4<br />color: I","count:  430<br />carat: 1.5<br />color: I","count:  151<br />carat: 1.6<br />color: I","count:  140<br />carat: 1.7<br />color: I","count:   32<br />carat: 1.8<br />color: I","count:   11<br />carat: 1.9<br />color: I","count:  318<br />carat: 2.0<br />color: I","count:  126<br />carat: 2.1<br />color: I","count:   77<br />carat: 2.2<br />color: I","count:   42<br />carat: 2.3<br />color: I","count:   16<br />carat: 2.4<br />color: I","count:   23<br />carat: 2.5<br />color: I","count:    2<br />carat: 2.6<br />color: I","count:    1<br />carat: 2.7<br />color: I","count:    1<br />carat: 2.8<br />color: I"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(143,215,68,1)","line":{"width":0.37795275590551186,"color":"rgba(0,0,0,1)"}},"name":"I","legendgroup":"I","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.099999999999999978,0.10000000000000009,0.10000000000000009,0.10000000000000003,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999645,0.10000000000000009,0.10000000000000009,0.10000000000000009,0.099999999999999867,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645,0.099999999999999645],"base":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"x":[0.20000000000000001,0.30000000000000004,0.40000000000000002,0.5,0.60000000000000009,0.70000000000000007,0.80000000000000004,0.90000000000000013,1,1.1000000000000001,1.2,1.3,1.4000000000000001,1.5000000000000002,1.6000000000000001,1.7,1.8,1.9000000000000001,2,2.1000000000000001,2.2000000000000002,2.2999999999999998,2.4000000000000004,2.5,2.6000000000000001,2.7000000000000002,2.7999999999999998],"y":[3,193,222,124,65,242,107,127,247,127,271,148,46,255,93,80,24,9,190,68,50,40,33,19,11,4,0],"text":["count:    3<br />carat: 0.2<br />color: J","count:  193<br />carat: 0.3<br />color: J","count:  222<br />carat: 0.4<br />color: J","count:  124<br />carat: 0.5<br />color: J","count:   65<br />carat: 0.6<br />color: J","count:  242<br />carat: 0.7<br />color: J","count:  107<br />carat: 0.8<br />color: J","count:  127<br />carat: 0.9<br />color: J","count:  247<br />carat: 1.0<br />color: J","count:  127<br />carat: 1.1<br />color: J","count:  271<br />carat: 1.2<br />color: J","count:  148<br />carat: 1.3<br />color: J","count:   46<br />carat: 1.4<br />color: J","count:  255<br />carat: 1.5<br />color: J","count:   93<br />carat: 1.6<br />color: J","count:   80<br />carat: 1.7<br />color: J","count:   24<br />carat: 1.8<br />color: J","count:    9<br />carat: 1.9<br />color: J","count:  190<br />carat: 2.0<br />color: J","count:   68<br />carat: 2.1<br />color: J","count:   50<br />carat: 2.2<br />color: J","count:   40<br />carat: 2.3<br />color: J","count:   33<br />carat: 2.4<br />color: J","count:   19<br />carat: 2.5<br />color: J","count:   11<br />carat: 2.6<br />color: J","count:    4<br />carat: 2.7<br />color: J","count:    0<br />carat: 2.8<br />color: J"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(253,231,37,1)","line":{"width":0.37795275590551186,"color":"rgba(0,0,0,1)"}},"name":"J","legendgroup":"J","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.762557077625573,"r":7.3059360730593621,"b":40.182648401826491,"l":54.794520547945211},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"Add Title for Histogram Here...","font":{"color":"rgba(0,0,0,1)","family":"","size":17.534246575342465},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.015000000000000041,2.9849999999999994],"tickmode":"array","ticktext":["1","2"],"tickvals":[1.0000000000000002,2],"categoryorder":"array","categoryarray":["1","2"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"carat","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-513.64999999999998,10786.65],"tickmode":"array","ticktext":["0","2500","5000","7500","10000"],"tickvals":[0,2500,5000,7500,10000],"categoryorder":"array","categoryarray":["0","2500","5000","7500","10000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"count","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"color","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"1d7822187229":{"x":{},"fill":{},"type":"bar"}},"cur_data":"1d7822187229","visdat":{"1d7822187229":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="ggally-package" class="section level2">
+<h2>GGally Package</h2>
+<pre class="r"><code>library(GGally)
+
+adsl &lt;- read_xpt(&quot;./01_Datasets/adsl.xpt&quot;)
+adsl_data &lt;- adsl[, c(&quot;AGE&quot;, &quot;BMIBL&quot;, &quot;HEIGHTBL&quot;, &quot;WEIGHTBL&quot;,&quot;SEX&quot;)]
+
+
+# Convert SEX to a factor if it’s not already
+adsl_data$SEX &lt;- as.factor(adsl_data$SEX)
+
+# Create a pair plot with grouping by SEX
+ggpairs(
+  adsl_data,
+  aes(color = SEX, fill = SEX),  # Color by SEX
+  lower = list(continuous = wrap(&quot;smooth&quot;, alpha = 0.3, size = 0.5)),
+  diag = list(continuous = wrap(&quot;densityDiag&quot;)),
+  upper = list(continuous = wrap(&quot;cor&quot;, size = 4, color = &quot;black&quot;))
+) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(size = 10),
+    axis.text = element_text(size = 8)
+  ) +
+  scale_fill_manual(values = c(&quot;pink&quot;, &quot;lightblue&quot;)) +  # Customize colors if desired
+  scale_color_manual(values = c(&quot;pink&quot;, &quot;lightblue&quot;))</code></pre>
+<p><img src="05-Plot-Histogram_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
 </div>
 
 

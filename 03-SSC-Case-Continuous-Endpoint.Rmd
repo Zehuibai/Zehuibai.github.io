@@ -1,0 +1,612 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Sample Size Determination for Continuous Endpoint
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+packages<-c("tidyverse", "kableExtra","pwr", "pwrss")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+
+# List all files in the directory that start with "ssc" and end with ".R"
+directory <- "./03_Functions/"
+files_to_source <- list.files(path = directory, pattern = "^ssc.*\\.R$", full.names = TRUE)
+# Source each file
+for (file in files_to_source) {
+  source(file)
+}
+```
+
+
+
+
+# One Mean Sample
+
+## Equality  
+
+### Hypothesis
+
+The Null and Alternative hypotheses are
+$$
+\begin{array}{l}
+H_{0}: \mu=\mu_{0} \\
+H_{1}: \mu \neq \mu_{0}
+\end{array}
+$$
+Formulas compute sample size and power, respectively:
+$$n=\left(\sigma \frac{z_{1-\alpha / 2}+z_{1-\beta}}{\mu-\mu_{0}}\right)^{2}$$
+$$
+1-\beta=\Phi\left(z-z_{1-\alpha / 2}\right)+\Phi\left(-z-z_{1-\alpha / 2}\right) \quad, \quad z=\frac{\mu-\mu_{0}}{\sigma / \sqrt{n}}
+$$
+
+### Manual Calculation
+
+
+```
+mu=2
+mu0=1.5
+sd=1
+alpha=0.05
+beta=0.20
+(n=(sd*(qnorm(1-alpha/2)+qnorm(1-beta))/(mu-mu0))^2)
+ceiling(n) 
+
+z=(mu-mu0)/sd*sqrt(n)
+(Power=pnorm(z-qnorm(1-alpha/2))+pnorm(-z-qnorm(1-alpha/2)))
+```
+ 
+
+## Non-Inferiority or Superiority  
+
+### Hypothesis
+
+$$
+\begin{array}{l}
+H_{0}: \mu-\mu_{0} \leq \delta \\
+H_{1}: \mu-\mu_{0}>\delta
+\end{array}
+$$
+Sample Size
+$$n=\left(\sigma \frac{z_{1-\alpha}+z_{1-\beta}}{\mu-\mu_{0}-\delta}\right)^{2}$$
+Power
+$$1-\beta=\Phi\left(z-z_{1-\alpha}\right)+\Phi\left(-z-z_{1-\alpha}\right) \quad, \quad z=\frac{\mu-\mu_{0}-\delta}{\sigma / \sqrt{n}}$$
+
+
+## Equivalence  
+
+### Hypothesis
+
+$$
+\begin{array}{l}
+H_{0}:\left|\mu-\mu_{0}\right| \geq \delta \\
+H_{1}:\left|\mu-\mu_{0}\right|<\delta
+\end{array}
+$$
+Sample Size
+$$n=\left(\sigma \frac{z_{1-\alpha}+z_{1-\beta / 2}}{\delta-\left|\mu-\mu_{0}\right|}\right)^{2}$$
+Power
+$$1-\beta=2\left[\Phi\left(z-z_{1-\alpha}\right)+\Phi\left(-z-z_{1-\alpha}\right)\right]-1 \quad, \quad z=\frac{\left|\mu-\mu_{0}\right|-\delta}{\sigma / \sqrt{n}}$$
+
+### Manual Calculation
+
+```
+mu=2
+mu0=2
+delta=0.05
+sd=0.10
+alpha=0.05
+beta=0.20
+(n=(sd*(qnorm(1-alpha)+qnorm(1-beta/2))/(delta-abs(mu-mu0)))^2)
+ceiling(n) 
+
+
+z=(abs(mu-mu0)-delta)/sd*sqrt(n)
+(Power=2*(pnorm(z-qnorm(1-alpha))+pnorm(-z-qnorm(1-alpha)))-1)
+```
+
+
+
+# Two Mean Samples
+
+## Z-Test
+
+### Hypothesis  
+
+#### Equality 
+
+**Two Sided**
+
+$$
+\begin{array}{l}
+H_{0}: \mu_{A}-\mu_{B}=0 \\
+H_{1}: \mu_{A}-\mu_{B} \neq 0
+\end{array}
+$$
+where the ratio between the sample sizes of the two groups is
+$$
+\kappa=\frac{n_{A}}{n_{B}}
+$$
+
+Sample size 
+$$
+n_{A}=\kappa n_{B}
+$$
+$$
+n_{B}=\left(1+\frac{1}{\kappa}\right)\left(\sigma \frac{z_{1-\alpha / 2}+z_{1-\beta}}{\mu_{A}-\mu_{B}}\right)^{2}
+$$
+Power
+$$
+1-\beta=\Phi\left(z-z_{1-\alpha / 2}\right)+\Phi\left(-z-z_{1-\alpha / 2}\right) \quad, \quad z=\frac{\mu_{A}-\mu_{B}}{\sigma \sqrt{\frac{1}{n_{A}}+\frac{1}{n_{B}}}}
+$$
+
+**One Sided**
+
+$$
+\begin{array}{l}
+H_{0}: \mu_{A}=\mu_{B} \\
+H_{1}: \mu_{A}>\mu_{B}
+\end{array}
+$$
+where the ratio between the sample sizes of the two groups is
+$$
+\kappa=\frac{n_{B}}{n_{A}}
+$$
+Sample size and power, respectively:
+$$
+\begin{array}{c}
+n_{A}=\left(\sigma_{A}^{2}+\sigma_{B}^{2} / \kappa\right)\left(\frac{z_{1-\alpha}+z_{1-\beta}}{\mu_{A}-\mu_{B}}\right)^{2} \\
+n_{B}=\kappa n_{A} \\
+1-\beta=\Phi\left(\frac{\left|\mu_{A}-\mu_{B}\right| \sqrt{n_{A}}}{\sqrt{\sigma_{A}^{2}+\sigma_{B}^{2} / \kappa}}-z_{1-\alpha}\right)
+\end{array}
+$$
+
+ 
+#### Non-Inferiority or Superiority
+
+$$
+\begin{array}{l}
+H_{0}: \mu_{A}-\mu_{B} \leq \delta \\
+H_{1}: \mu_{A}-\mu_{B}>\delta
+\end{array}
+$$
+where $\delta$ is the superiority or non-inferiority margin and the ratio between the sample sizes of the two groups is
+$$
+\kappa=\frac{n_{A}}{n_{B}}
+$$
+Formulas of sample size and power, respectively:
+$$
+\begin{array}{c}
+n_{A}=\kappa n_{B} \\
+n_{B}=\left(1+\frac{1}{\kappa}\right)\left(\sigma \frac{z_{1-\alpha}+z_{1-\beta}}{\mu_{A}-\mu_{B}-\delta}\right)^{2} \\
+1-\beta=\Phi\left(z-z_{1-\alpha}\right)+\Phi\left(-z-z_{1-\alpha}\right) \quad, \quad z=\frac{\mu_{A}-\mu_{B}-\delta}{\sigma \sqrt{\frac{1}{n_{A}}+\frac{1}{n_{B}}}}
+\end{array}
+$$
+
+
+#### Equivalence (TOST)
+
+$$
+\begin{array}{l}
+H_{0}:\left|\mu_{A}-\mu_{B}\right| \geq \delta \\
+H_{1}:\left|\mu_{A}-\mu_{B}\right|<\delta
+\end{array}
+$$
+where $\delta$ is the superiority or non-inferiority margin and the ratio between the sample sizes of the two groups is
+$$
+\kappa=\frac{n_{1}}{n_{2}}
+$$
+Formulas of sample size and power, respectively:
+$$
+\begin{array}{c}
+n_{A}=\kappa n_{B} \\
+n_{B}=\left(1+\frac{1}{\kappa}\right)\left(\sigma \frac{z_{1-\alpha}+z_{1-\beta / 2}}{\left|\mu_{A}-\mu_{B}\right|-\delta}\right)^{2} \\
+1-\beta=2\left[\Phi\left(z-z_{1-\alpha}\right)+\Phi\left(-z-z_{1-\alpha}\right)\right]-1 \quad, \quad z=\frac{\left|\mu_{A}-\mu_{B}\right|-\delta}{\sigma \sqrt{\frac{1}{n_{A}}+\frac{1}{n_{B}}}}
+\end{array}
+$$
+
+```
+muA=5
+muB=4
+delta=5
+kappa=1
+sd=10
+alpha=0.05
+beta=0.20
+(nB=(1+1/kappa)*(sd*(qnorm(1-alpha)+qnorm(1-beta/2))/(abs(muA-muB)-delta))^2)
+ceiling(nB)
+
+z=(abs(muA-muB)-delta)/(sd*sqrt((1+1/kappa)/nB))
+(Power=2*(pnorm(z-qnorm(1-alpha))+pnorm(-z-qnorm(1-alpha)))-1)
+```
+
+
+### Calculation in SAS
+
+```
+***********************************************************************
+* This is a program that illustrates the use of PROC POWER to         *
+* calculate sample size when comparing two normal means in an         *
+* equivalence trial.                                                  *
+***********************************************************************;
+
+proc power;
+twosamplemeans dist=normal groupweights=(1 1) alpha=0.05 power=0.9 stddev=0.75 
+   lower=-0.10 upper=0.10 meandiff=0.05 test=equiv_diff ntotal=.;
+plot min=0.1 max=0.9;
+title "Sample Size Calculation for Comparing Two Normal Means (1:1 Allocation)in an Equivalence Trial"; 
+run;
+```
+
+### Calculation in R   
+
+#### Equility (two-sided) 
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+ssc.twosamplemean.ztest(design = 1L, ratio = 1, 
+                        alpha = 0.05, power = 0.8, 
+                        sd = 0.1, theta = 0.2)
+```
+
+#### Equility (one-sided) 
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+ssc.twosamplemean.ztest(design = 1L, ratio = 1,
+                        alpha = 0.025, power = 0.8, 
+                        sd = 0.1, theta = 0.2)
+```
+
+
+#### Superioriry
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+ssc.twosamplemean.ztest(design = 2L, ratio = 1, 
+                        alpha = 0.05, power = 0.8, 
+                        sd = 0.1, theta = 0, delta =  0.05)
+```
+
+#### Non-Inferiority
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+ssc.twosamplemean.ztest(design = 3L, ratio = 1,
+                        alpha = 0.05, power = 0.8, 
+                        sd = 0.1, theta = 0, delta = -0.05)
+```
+
+#### Equivalence
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+ssc.twosamplemean.ztest(design = 4L, ratio = 1, 
+                        alpha = 0.05, power = 0.8, 
+                        sd = 0.1, theta = 0, delta =  0.05)
+```
+
+
+## T-Test
+
+### Calculation in R  
+
+* `pwr.t.test`: Power calculations for t-tests of means (one sample, two samples and paired samples)
+* `pwr.t2n.test`: Power calculations for two samples (different sizes) t-tests of means
+* `pwrss.t.2means`: Difference between Two Means (t or z Test for Independent or Paired Samples)
+
+
+```
+pwr.t.test(n = NULL, d = NULL, sig.level = 0.05, power = NULL, 
+    type = c("two.sample"),
+    alternative = c("two.sided", "less", "greater"))
+    
+pwr.t2n.test(n1 = NULL, n2= NULL, d = NULL, 
+             sig.level = 0.05, power = NULL,
+             alternative = c("two.sided", "less","greater"))
+```
+
+
+#### Equility
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+TTest <- function(alpha,mean,std,power,side){
+  d <- mean/std
+  # d: Effect size (Cohen's d) - difference between the means divided by the pooled standard deviation
+  samplesize <- pwr.t.test(d=d, 
+                           power=power, 
+                           sig.level=alpha, 
+                           type="two.sample",
+                           alternative=side)
+  CI.Left  <- mean-qnorm(1-alpha/2)*std/sqrt(samplesize$n)
+  CI.Right <- mean+qnorm(1-alpha/2)*std/sqrt(samplesize$n)
+  CI <- paste("[",round(CI.Left,3), ",", round(CI.Right,3), "]", 
+              sep = "",collapse = NULL)
+  results <- data.frame(alpha = alpha,
+                      mean = mean,
+                      sd = std,
+                      power = samplesize$power,
+                      side = samplesize$alternative,
+                      n = samplesize$n,
+                      CI = CI)
+  return(results)
+}
+
+TTest(alpha = 0.05, mean = 0.42, std = 0.7, power = 0.8, side = "two.sided")
+
+pwr.t.test(d=0.42/0.7, 
+           power=0.8, 
+           sig.level=0.05, 
+           type="two.sample", 
+           alternative="two.sided")
+
+## 0.7 is pooled variance
+## pwrss.t.2means
+ssc.twosamplemean.ttest(mu1 = 29.42, mu2 = 29, sd1 = 0.7, kappa = 1,
+                        power = .80, alpha = 0.05,
+                        alternative = "not equal")
+
+## 0.42/0.7 as Cohen'd
+## pwrss.t.2means
+ssc.twosamplemean.ttest(mu1 = 0.42/0.7, kappa = 1,
+                        power = .80, alpha = 0.05,
+                        alternative = "not equal")
+
+## pwrss.t.2means
+ssc.twosamplemean.ttest(mu1 = 29.42, mu2 = 29, sd1 = 0.7, kappa = 1,
+                        power = .80, alpha = 0.025,
+                        alternative = "greater")
+```
+
+ 
+
+#### Superioriry
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+## Cohen'd = 0.10
+pwrss.t.2means(mu1 = 0.25, mu2 = 0.15,
+                margin = 0.05, power = 0.80,
+                alternative = "superior")
+```
+
+#### Non-Inferiority
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+## Cohen'd = 0.10
+pwrss.t.2means(mu1 = 0.25, mu2 = 0.15,
+                margin = -0.05, power = 0.80,
+                alternative = "non-inferior")
+```
+
+#### Equivalence
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+## Cohen'd = 0
+pwrss.t.2means(mu1 = 0.25, mu2 = 0.25,
+                margin = 0.05, power = 0.80,
+                alternative = "equivalent")
+```
+
+## T-Test (paired)
+
+```
+pwr.t.test(n = NULL, d = NULL, sig.level = 0.05, power = NULL, 
+    type = c("paired"),
+    alternative = c("two.sided", "less", "greater"))
+```
+ 
+ 
+ 
+## Non-Inferiority for Ratio of Two Means  
+
+### Hypothesis
+
+Suppose you are designing a study hoping to show that a new (less expensive) manufacturing process does not produce appreciably more pollution than the current process. Quantifying "appreciably worse" as $10 \%$, you seek to show that the mean pollutant level from the new process is less than $110 \%$ of that from the current process. In standard hypothesis testing notation, you seek to reject
+$$
+H_0: \frac{\mu_{\text {new }}}{\mu_{\text {current }}} \geq 1.10
+$$
+in favor of
+$$
+H_A: \frac{\mu_{\text {new }}}{\mu_{\text {current }}}<1.10
+$$
+
+An appropriate test for this situation is the common two-group $t$ test on log-transformed data. The hypotheses become
+$$
+\begin{aligned}
+H_0: \log \left(\mu_{\text {new }}\right)-\log \left(\mu_{\text {current }}\right) & \geq \log (1.10) \\
+H_A: \log \left(\mu_{\text {new }}\right)-\log \left(\mu_{\text {current }}\right) & <\log (1.10)
+\end{aligned}
+$$
+Measurements of the pollutant level will be taken by using laboratory models of the two processes and will be treated as independent lognormal observations with a coefficient of variation $(\sigma / \mu)$ between 0.5 and 0.6 for both processes. You will end up with 300 measurements for the current process and 180 for the new one. It is important to avoid a Type I error here, so you set the Type I error rate to 0.01 . Your theoretical work suggests that the new process will actually reduce the pollutant by about $10 \%$ (to $90 \%$ of current), but you need to compute and graph the power of the study if the new levels are actually between $70 \%$ and $120 \%$ of current levels.
+
+
+### Calculation in SAS
+
+[reference document](https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_power_examples04.htm)
+
+```SAS
+ods graphics on;
+
+proc power;
+   twosamplemeans test=ratio
+      meanratio = 0.7 to 1.2 by 0.1
+      nullratio = 1.10
+      sides     = L
+      alpha     = 0.01
+      cv        = 0.5 0.6
+      groupns   = (300 180)
+      power     = .;
+   plot x=effect step=0.05;
+run;
+
+ods graphics off;
+```
+ 
+## Cross Over Design
+
+
+**Supported Designs of Package PowerTOST**
+
+```{r, echo = FALSE}
+library("PowerTOST")
+## browseVignettes("PowerTOST")
+designs <- known.designs()
+print(designs[, c(2, 9, 3)], row.names = FALSE) %>% 
+  kable(caption = "Designs: Codes of designs follow this pattern: treatments x sequences x periods", format = "html")%>%
+  kableExtra::kable_styling()
+```
+
+For various methods power can be *calculated* based on
+
+  - nominal *α*, coefficient of variation (*CV*), deviation of test from reference (*θ*~0~), acceptance limits {*θ*~1~, *θ*~2~}, sample size (*n*), and design.
+
+For all methods the sample size can be *estimated* based on
+
+  - nominal *α*, coefficient of variation (*CV*), deviation of test from reference (*θ*~0~), acceptance limits {*θ*~1~, *θ*~2~}, target (*i.e.*, desired) power, and design.
+  
+**By Defaults**
+
+| Parameter | Argument | Purpose | Default |
+|-|-----|---------------|-------|
+| $\small{\alpha}$ | `alpha` | Nominal level of the test | `0.05` |
+| $\small{\pi}$ | `targetpower` | <span title="typically 0.80 – 0.90">Minimum desired power</span> | `0.80` |
+| logscale | `logscale` | Analysis on log-transformed or original scale? | `TRUE` |
+| $\small{\theta_0}$ | `theta0` | ‘True’ or assumed deviation of T from R | see below |
+| $\small{\theta_1}$ | `theta1` | Lower BE limit | see below |
+| $\small{\theta_2}$ | `theta2` | Upper BE limit | see below |
+| *CV* | `CV` | CV | none |
+| design | `design` | Planned design | `"2x2"` |
+| method | `method` | Algorithm | `"exact"` |
+| robust | `robust` | ‘Robust’ evaluation (Senn’s basic estimator) | `FALSE` |
+| print | `print` | Show information in the console? | `TRUE` |
+| details | `details` | Show details of the sample size search? | `FALSE` |
+| imax | `imax` | Maximum number of iterations | `100` |
+
+Defaults depending on the argument `logscale`:
+
+| Parameter | Argument | `logscale = TRUE` | `logscale = FALSE` |
+|-|----|:--------:|:--------:|
+| $\small{\theta_0}$ | `theta0` | `0.95` | `+0.05` |
+| $\small{\theta_1}$ | `theta1` | `0.80` | `−0.20` |
+| $\small{\theta_2}$ | `theta2` | `1.25` | `+0.20` |
+
+  
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+power.TOST(CV = 0.35, n = c(52, 49), design = "parallel")
+sampleN.TOST(CV = 0.30, details = FALSE, print = FALSE)[["Sample size"]]
+```
+
+Note that sampleN.TOST() is not vectorized. If we are interested in combinations of assumed values:
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+sampleN.TOST.vectorized <- function(CVs, theta0s, ...) {
+  n <- power <- matrix(ncol = length(CVs), nrow = length(theta0s))
+  for (i in seq_along(theta0s)) {
+    for (j in seq_along(CVs)) {
+      tmp         <- sampleN.TOST(CV = CVs[j], theta0 = theta0s[i], ...)
+      n[i, j]     <- tmp[["Sample size"]]
+      power[i, j] <- tmp[["Achieved power"]]
+    }
+  }
+  DecPlaces <- function(x) match(TRUE, round(x, 1:15) == x)
+  fmt.col <- paste0("CV %.",    max(sapply(CVs, FUN = DecPlaces),
+                                    na.rm = TRUE), "f")
+  fmt.row <- paste0("theta %.", max(sapply(theta0s, FUN = DecPlaces),
+                                    na.rm = TRUE), "f")
+  colnames(power) <- colnames(n) <- sprintf(fmt.col, CVs)
+  rownames(power) <- rownames(n) <- sprintf(fmt.row, theta0s)
+  res <- list(n = n, power = power)
+  return(res)
+}
+CVs     <- seq(0.20, 0.40, 0.05)
+theta0s <- seq(0.90, 0.95, 0.01)
+x       <- sampleN.TOST.vectorized(CV = CVs, theta0 = theta0s,
+                                   details = FALSE, print = FALSE)
+cat("Sample size\n"); print(x$n); cat("Achieved power\n"); print(signif(x$power, digits = 5))
+```
+
+ 
+# k Mean Samples
+
+## One-Way ANOVA  
+
+### Hypothesis
+
+**One-Way ANOVA Pairwise, 2-Sided Equality using Bonferroni Adjustment**
+
+In more general terms, we may have $k$ groups, meaning there are a total of $K \equiv\left(\begin{array}{c}k \\ 2\end{array}\right)=k(k-1) / 2$ possible pairwise comparisons. When we test $\tau \leq K$ of these pairwise comparisons, we have $\tau$ hypotheses of the form
+$$
+\begin{array}{l}
+H_{0}: \mu_{A}=\mu_{B} \\
+H_{1}: \mu_{A} \neq \mu_{B}
+\end{array}
+$$
+where $\mu_{A}$ and $\mu_{B}$ represent the means of two of the $k$ groups, groups 'A' and 'B'. We'll compute the required sample size for each of the $\tau$ comparisons, and total sample size needed is the largest of these. In the formula below, $n$ represents the sample size in any one of these $\tau$ comparisons; that is, there are $n / 2$ people in the 'A' group, and $n / 2$ people in the 'B' group.
+
+Formulas to compute sample size and power, respectively:
+$$
+\begin{array}{c}
+n=2\left(\sigma \frac{z_{1-\alpha /(2 \tau)}+z_{1-\beta}}{\mu_{A}-\mu_{B}}\right)^{2} \\
+1-\beta=\Phi\left(z-z_{1-\alpha /(2 \tau)}\right)+\Phi\left(-z-z_{1-\alpha /(2 \tau)}\right) \quad, \quad z=\frac{\mu_{A}-\mu_{B}}{\sigma \sqrt{\frac{2}{n}}}
+\end{array}
+$$
+
+See more under multiple tests.
+
+### Calculation in R
+
+Perform power analysis on balanced one-way analysis of variance, where k is the number of groups, and n is the sample size in each group.
+
+Now do a one-way analysis of variance for the five groups to achieve a power of 0.8, an **effect value** of 0.25, and a significance level of 0.05 to calculate the sample size required for each group
+
+Where **effect value** is calculated using $$f=\sqrt{\frac{\sum_{i=1}^k p_i \times (\mu_i - \mu)^2}{\sigma^2}}$$
+
+```{r Anova test,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+pwr.anova.test(k = 5, f = 0.25, sig.level = 0.05, power = 0.8)
+
+# Sample sizes for detecting significant effects in a One-Way ANOVA
+
+es <- seq(0.1, 0.5, 0.01)
+nes <- length(es)
+samsize <- NULL
+for (i in 1:nes) {
+    result <- pwr.anova.test(k = 5, f = es[i], 
+        sig.level = 0.05, 
+        power = 0.9)
+    samsize[i] <- ceiling(result$n)
+}
+plot(samsize, es, type = "l", lwd = 2, col = "red", 
+    ylab = "Effect Size", xlab = "Sample Size (per cell)", 
+    main = "One Way ANOVA with Power=.90 and Alpha=.05")
+```
+ 
+ 
+ 
+# Reference
+
+* [Statistical Power Analysis Online](https://webpower.psychstat.org/wiki/)
+* [Design and analysis of noninferiority studies](https://support.sas.com/kb/48/616.html)
+* [Equivalence and Noninferiority Testing Using SAS/STAT® Software](https://support.sas.com/resources/papers/proceedings15/SAS1911-2015.pdf)
+
+

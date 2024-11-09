@@ -1,0 +1,274 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Sample Size Determination for Repeated Measures
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+packages<-c("tidyverse", "kableExtra")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+```
+
+
+
+# Repeated Measures
+
+## Repeated Measures ANOVA  
+
+Description: this tests if at least one mean is different among groups, where the groups are repeated measures (more than two) for a normally distributed variable. Repeated Measures ANOVA is the extension of the Paired T-test for more than two groups.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# library("WebPower")
+# https://github.com/johnnyzhz/WebPower/blob/master/R/webpower.R
+source("./03_Functions/webpower.R")
+wp.rmanova(n=NULL, ng=1, nm=4, f=0.608, nscor=1, alpha=0.05, power=0.80, type=1)
+```
+
+## Power Calculations for Mixed Models 
+
+### Power Calculations
+
+Reference: SAS for Mixed Models, Chapter 12: Power Calculations for Mixed Models
+
+Power calculations for mixed models are more difficult due to their more complex covariance structure (Helms 1992, Stroup 2002, Tempelman 2006, Rosa, Steibel, and Tempelman 2006). Assuming the hypothesis test of interest is formed as a linear combination $\mathbf{K}^{\prime} \boldsymbol{\beta}$, recall that our general $t$ - and $F$-statistics can be written using the variance matrix $\mathbf{K}^{\prime}\left[\mathbf{X}^{\prime} \mathbf{V}^{-1} \mathbf{X}\right]^{-1} \mathbf{K}$. So the power associated with such tests is a function of the following:
+- the magnitude of $\mathbf{K}^{\prime} \boldsymbol{\beta}$, also known as the effect size
+- the design matrix $\mathbf{X}$, including the number of its rows (the sample size) and the structure of its columns (from the fixed effects)
+- the values of the variance and covariance parameters in $\mathbf{V}$
+- the test size, commonly known as $\alpha$, the probability of a Type I error, or one minus the specificity of the test
+
+Several authors (Helms 1992, Stroup 2002, Tempelman 2005, Rosa, Steibel, and Tempelman  2005) have shown how to compute a simple approximation to the power of an F-test by using  an observed F-statistic to compute the noncentrality parameter needed for the power calculation. Consider the mice experiment example below as a pilot study:
+
+| Obs | cage | condition | diet     | gain |
+|-----|------|-----------|----------|------|
+| 1   | 1    | 1         | normal   | 58   |
+| 2   | 1    | 1         | restrict | 58   |
+| 3   | 1    | 1         | suppleme | 58   |
+| 4   | 1    | 2         | normal   | 54   |
+| 5   | 1    | 2         | restrict | 46   |
+| 6   | 1    | 2         | suppleme | 57   |
+| ... | ...  | ...       | ...      | ...  |
+| 31  | 6    | 3         | normal   | 65   |
+| 32  | 6    | 3         | restrict | 64   |
+| 33  | 6    | 3         | suppleme | 54   |
+| 34  | 6    | 4         | normal   | 59   |
+| 35  | 6    | 4         | restrict | 47   |
+| 36  | 6    | 4         | suppleme | 73   |
+
+```
+proc mixed data=mice nobound cl;
+ class cage condition diet;
+ model gain= condition|diet / solution ddfm=satterth;
+ random cage cage*condition;
+ ods output tests3=t3;
+run;
+data f_power;
+ set t3;
+ Noncen = NumDF*FValue;
+ Alpha = 0.05;
+ FCrit = finv(1-Alpha,NumDF,DenDF,0);
+ Power = 1 - probf(FCrit,NumDF,DenDF,Noncen);
+run;
+proc print data=f_power;
+run; 
+```
+
+```{r, echo=FALSE, fig.align="center", out.width = '75%',fig.cap="Figure: Results for Power Calculations for the Mice Experiment"}
+knitr::include_graphics("./02_Plots/SSC/SSC_Output_12.1.png") 
+```
+
+**Interpretation**
+
+Consider the test for the interaction between condition and diet. The power value of 0.42796 indicates that for a data set having the following characteristics, the probability of observing a CONDITION $\times$ DIET $F$-test $p$-value less than $\alpha=0.05$ is approximately 0.42796 :
+- exactly the same $\mathbf{X}$ matrix as the present one
+- exactly the same $\boldsymbol{\beta}$ vector with values equal to those in the "Solution for Fixed Effects" table
+- exactly the same $\mathbf{V}$ matrix with values equal to the unbounded REML estimates as shown in the "Covariance Parameter Estimates table"
+
+We now ask: what would the power for each $F$-test be if we had doubled the number of cages in the study, assuming the fixed effects and covariance parameter estimates stay the same?
+
+Our strategy for computing these new powers is to run the same code as before but to increase the denominator degrees of freedom for each $F$-test by an appropriate amount. A convenient way to calculate these degrees of freedom is to run PROC MIXED on a doubled data set as follows.
+
+```
+data mice1;
+ set mice;
+ cage = cage + 6;
+data mice2;
+ set mice mice1;
+run;
+proc mixed data=mice2 nobound cl;
+ class cage condition diet;
+ model gain=condition|diet / ddfm=satterth;
+ random cage cage*condition;
+run; 
+```
+| Effect         | Num DF | Den DF | F Value | Pr > F |
+|----------------|--------|--------|---------|--------|
+| condition      | 3      | 11.9   | 13.91   | 0.0003 |
+| diet           | 2      | 40     | 2.06    | 0.1405 |
+| condition*diet | 6      | 40     | 3.81    | 0.0043 |
+
+The denominator degrees of freedom for the CONDITION main effect have increased from  4.72 to 11.9, and those for DIET and CONDITION × DIET have increased from 16 to 40.
+
+We do not perform the power calculations using the doubled data set because the covariance  parameter estimates are no longer the same as the original one. Instead, we rerun the code on  the original pilot data and specify the new denominator degrees of freedom using the DDF=  option as follows
+
+```
+proc mixed data=mice nobound cl;
+ class cage condition diet;
+ model gain = condition|diet / ddf=11.9,40,40;
+ random cage cage*condition;
+ ods output tests3=t3;
+run;
+data f_power2;
+ set t3;
+ Alpha = 0.05;
+ Noncen = NumDF*FValue;
+ FCrit = finv(1-Alpha,NumDF,DenDF,0);
+ Power = 1 - probf(FCrit,NumDF,DenDF,Noncen);
+run;
+proc print data=f_power2;
+run; 
+```
+
+| Obs | Effect         | NumDF | DenDF | FValue | ProbF  | Alpha | Noncen  | FCrit   | Power   |
+|-----|----------------|-------|-------|--------|--------|-------|---------|---------|---------|
+| 1   | condition      | 3     | 11.9  | 5.16   | 0.0162 | 0.05  | 15.4900 | 3.49914 | 0.80776 |
+| 2   | diet           | 2     | 40    | 0.82   | 0.4456 | 0.05  | 1.6496  | 3.23173 | 0.18124 |
+| 3   | condition*diet | 6     | 40    | 1.52   | 0.1956 | 0.05  | 9.1388  | 2.33585 | 0.52161 |
+
+**Interpretation**
+
+The approximate power for the CONDITION × DIET F-test has increased from 0.427 to 0.521. The power for CONDITION has increased even more, from 0.579 to 0.807, while that for DIET increased from 0.166 to only 0.181 due to its small F-statistic
+
+### Power Curves
+
+An analytical approximation to power makes it feasible to quickly compute entire power curves.  While several different kinds of curves can be constructed by holding all but two variables  fixed, a classical power curve plots effect size along the horizontal axis and power along the  vertical axis. To facilitate this kind of calculation, we move from an F-distribution to a tdistribution in order to be able to specify a range of effect sizes in the numerator of the tdistribution noncentrality parameters.  The following SAS macro computes the power for an arbitrary set of ESTIMATE statements  via the noncentral t-distribution. The GPLOT code following the macro plots the power curves
+
+* InData specifies the exemplary input data set.
+* ProcMixedStatements provides PROC MIXED statements, enclosed within %str(). The statements must contain one or more ESTIMATE statements corresponding to the single-degree-of-freedom contrasts for which you want to compute power curves.
+* ProcMixedOptions specifies options for the PROC MIXED statement.
+* AlphaValues specifies a list of alpha values over which to compute distinct power curves.
+* EffectSizes specifies a list of effect sizes that form the X-axis values of the power curve plots.
+* OutPath specifies the directory to which output should be written. 
+
+```
+%macro MixedTPower;
+ * run proc mixed;
+ proc mixed data=&InData &ProcMixedOptions;
+ &ProcMixedStatements
+ ods output estimates=ests;
+ run;
+ libname OutLib "&OutPath";
+ * compute power curves for each difference
+ using a noncentral t-distribution;
+ data OutLib.MixedPower;
+ set ests;
+ do alpha = &AlphaValues;
+ do effectsize = &EffectSizes;
+ tcrit = tinv(1-alpha/2,df);
+ noncen = effectsize/stderr;
+ power = sum(1, -cdf("t", tcrit,df,noncen),
+ cdf("t",-tcrit,df,noncen));
+ output;
+ end;
+ end;
+ run;
+ * create JMP scripting code;
+ filename jslfile "&OutPath.mixedtpower.jsl";
+ data _null_;
+ file jslfile;
+ put "%str(data=open(%".\MixedPower.sas7bdat%");)";
+ put " ";
+ put "Overlay Plot(X( :effectsize), Y( :power),
+ Grouping( :Label, :alpha),";
+ put "Connect Thru Missing(1));";
+ run;
+%mend MixedTPower; 
+
+%let InData = mice;
+%let ProcMixedStatements=
+%str(
+ class cage condition diet;
+ model gain = condition|diet / ddfm=satterth;
+ random cage cage*condition;
+ estimate "est1: condition 2-1" condition -1 1 0 0;
+ estimate "est2: diet restrict-normal" diet -1 1 0;
+ estimate "est3: condition*diet 1 restr-nor"
+ diet -1 1 0
+ condition*diet -1 1 0 0 0 0 0 0 0 0 0 0;
+);
+%let ProcMixedOptions = nobound;
+%let AlphaValues = 0.05;
+%let EffectSizes = 0 to 10 by 0.5;
+%let OutPath = C:\temp\;
+%MixedTPower;
+data power; set outlib.mixedpower;
+ symbol = substr(label,4,1)+0;
+run;
+goptions reset=all hsize=9in vsize=8in;
+symbol1 color=black value=none i=join l=1 r=1 w=2;
+symbol2 color=black value=none i=join l=2 r=1 w=2;
+symbol3 color=black value=none i=join l=21 r=1 w=2;
+axis1 minor =none
+ order =(0 to 1 by 0.1)
+ label =(font='Arial Black' Height=1.5 angle=90 'Power')
+ offset=(0.3in,0.3in)
+ value =(font='Arial Black' Height=1.3);
+axis2 minor =none
+ order =(-2 to 12 by 2)
+ label =(font='Arial Black' Height=1.5 'Effect Size')
+ offset=(0.3in,0.3in)
+ value =(font='Arial Black' Height=1.3);
+legend1 across =1
+ cborder =black
+ mode =protect
+ position=(top left inside)
+ label = none
+ value =(font='Arial Black' Height=2
+ 'Condition 2-1'
+ 'Diet restrict-normal'
+ 'Condition*diet 1 restr-nor');
+proc gplot data=power;
+ plot power*effectsize=symbol /
+ noframe
+ vaxis=axis1 haxis=axis2
+ legend=legend1;
+run;
+quit; 
+```
+
+This code constructs three different power curves corresponding to the main effect contrasts for  CONDITION and DIET and one interaction contrast for CONDITION × DIET. In contrast to earlier examples that used the F-distribution, this macro does not use the estimate  of β during the power calculations because you specify effect sizes directly. So the response  variable GAIN is used only to compute values of the covariance parameters. You can  alternatively use a PARMS / HOLD= statement in order to directly specify the covariance  parameters, in which case the response variable is not used at all in the power calculations. 
+
+```{r, echo=FALSE, fig.align="center", out.width = '75%',fig.cap="Figure: Power Curves for Selected Estimates from the Mice Experiment Pilot Study"}
+knitr::include_graphics("./02_Plots/SSC/SSC_Mixed_Power_Plot.png") 
+```
+ 
+ 
+ 
+# Reference
+
+* [Statistical Power Analysis Online](https://webpower.psychstat.org/wiki/)
