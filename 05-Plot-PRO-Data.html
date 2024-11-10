@@ -352,6 +352,9 @@ div.tocify {
       <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
     </li>
     <li>
+      <a href="03-SSC-Biosimilar-Trials.html">Statistical Considerations for the Design and Analysis of Biosimilar Trials</a>
+    </li>
+    <li>
       <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
     </li>
     <li>
@@ -362,6 +365,24 @@ div.tocify {
     </li>
     <li>
       <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Continuous-Endpoint.html">Sample Size Determination for Continuous Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Categorical-Endpoint.html">Sample Size Determination for Categorical Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Survival-Endpoint.html">Sample Size Determination for Survival Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Repeated-Measures.html">Sample Size Determination for Repeated Measures</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Sequential-Design.html">Statistical Considerations for Group Sequential Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Adaptive-Design.html">Statistical Considerations for Adaptive Design</a>
     </li>
   </ul>
 </li>
@@ -447,6 +468,9 @@ div.tocify {
     </li>
     <li>
       <a href="05-Plot-Correlation.html">Correlation Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Model-Table.html">Clinical Data and Model visualization</a>
     </li>
     <li>
       <a href="05-Plot-ScatterPlot.html">Scatter and Line Plot</a>
@@ -621,7 +645,265 @@ potentially guiding more detailed statistical tests or reporting
 insights.</li>
 </ul></li>
 </ol>
-<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-1-1.png" width="960" /><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-1-2.png" width="960" /><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-1-3.png" width="960" /></p>
+<div id="general" class="section level3">
+<h3>General</h3>
+<pre class="r"><code>data &lt;- data.frame(
+  Group = c(rep(&quot;Active Treatment&quot;, 200), rep(&quot;Placebo&quot;, 200)),
+  Time = c(rep(&quot;Baseline&quot;, 100), rep(&quot;Week 16&quot;, 100), rep(&quot;Baseline&quot;, 100), rep(&quot;Week 16&quot;, 100)),
+  DLQI_Score = c(sample(0:30, 100, replace = TRUE), sample(0:30, 100, replace = TRUE),
+                 sample(0:30, 100, replace = TRUE), sample(0:30, 100, replace = TRUE))
+)
+ 
+
+# Create the plot
+plot1 &lt;- ggplot(data, aes(x = DLQI_Score, fill = Time)) +
+  geom_histogram(stat = &quot;count&quot;, binwidth = 1, position = position_dodge(width = 0.9)) +
+  facet_wrap(~ Group, scales = &quot;free_y&quot;) +
+  labs(
+    title = &quot;Improved Quality of life after 16 weeks of treatment&quot;,
+    x = &quot;Total DLQI Score&quot;,
+    y = &quot;Patients&quot;
+  ) +
+  scale_fill_brewer(palette = &quot;Set1&quot;, labels = c(&quot;Baseline&quot;, &quot;Week 16&quot;)) +
+  theme_minimal() +
+  theme(
+    legend.title = element_blank(),
+    plot.title = element_text(hjust = 0.5)
+  )
+# Print the plot
+print(plot1)</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-1-1.png" width="960" /></p>
+<pre class="r"><code>plot2 &lt;- ggplot(data, aes(x = DLQI_Score, fill = Time)) +
+  geom_histogram(stat = &quot;count&quot;, binwidth = 1, position = position_dodge(width = 0.9)) +
+  facet_grid(Group ~ ., scales = &quot;free_y&quot;, space = &quot;free_y&quot;) +
+  labs(
+    title = &quot;Improved Quality of life after 16 weeks of treatment&quot;,
+    x = &quot;Total DLQI Score&quot;,
+    y = &quot;Patients&quot;
+  ) +
+  scale_fill_brewer(palette = &quot;Set1&quot;, labels = c(&quot;Baseline&quot;, &quot;Week 16&quot;)) +
+  theme_minimal() +
+  theme(
+    legend.title = element_blank(),
+    plot.title = element_text(hjust = 0.5),
+    strip.background = element_blank(),
+    strip.text = element_text(face = &quot;bold&quot;)
+  )
+
+# Print the plot
+print(plot2)</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-1-2.png" width="960" /></p>
+<pre class="r"><code>plot3 &lt;- ggplot(data, aes(x = DLQI_Score, fill = Time)) +
+  geom_histogram(stat = &quot;count&quot;, binwidth = 1, position = position_dodge(width = 0.9)) +
+  facet_grid(Time ~ Group, scales = &quot;free_y&quot;, space = &quot;free&quot;) +  # Adjust faceting
+  labs(
+    title = &quot;Improved Quality of life after 16 weeks of treatment&quot;,
+    x = &quot;Total DLQI Score&quot;,
+    y = &quot;Patients&quot;
+  ) +
+  scale_fill_brewer(palette = &quot;Set1&quot;, labels = c(&quot;Baseline&quot;, &quot;Week 16&quot;)) +
+  theme_minimal() +
+  theme(
+    legend.title = element_blank(),
+    plot.title = element_text(hjust = 0.5),
+    strip.background = element_rect(fill = &quot;gray90&quot;),
+    strip.text = element_text(face = &quot;bold&quot;)
+  )
+
+# Print the plot
+print(plot3)</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-1-3.png" width="960" /></p>
+</div>
+<div id="clean-design-1" class="section level3">
+<h3>Clean Design 1</h3>
+<pre class="r"><code>dql &lt;- read.csv(&quot;./01_Datasets/ww2020_dlqi.csv&quot;)
+
+attach(dql)
+# View(dql)
+# summary(dql)
+
+# Load Library 
+library(ggthemes)
+library(ggcharts)
+
+# Select relevant variables
+dql_renamed &lt;-
+  dql %&gt;%
+  select(
+    TRT, VISIT, DLQI_SCORE
+    )
+
+# Rename treatment levels
+dql_renamed$TRT[dql_renamed$TRT==&quot;A&quot;] &lt;- &quot;Placebo&quot;
+dql_renamed$TRT[dql_renamed$TRT==&quot;B&quot;] &lt;- &quot;Active Treatment&quot;
+
+# Seperate visits
+
+# Baseline visit
+totalbaseline &lt;- 
+  dql_renamed %&gt;% 
+  filter(VISIT==&quot;Baseline&quot;)
+
+# Construct a histogram for each treatment arm at baseline visit
+(d &lt;- 
+  ggplot(
+    data = totalbaseline,
+    aes(
+      x = DLQI_SCORE
+      ))
+  + geom_histogram(
+    binwidth = 1.5,
+    color = &quot;grey&quot;,
+    fill = &quot;deeppink3&quot;
+    ) +
+  facet_grid(~ TRT)
+  + theme_ng(grid = &quot;X&quot;)
+  + labs(
+    x = &quot;DLQI Score&quot;,
+    y = &quot;Count&quot;,
+    title = &quot;Total DLQI Score&quot;,
+    subtitle = &quot;At Baseline&quot;,
+    caption = &quot;Samah Abdelaal&quot;)
+  + theme(
+    axis.title.x = element_blank(),
+    plot.title = element_text(size = 20,
+                              face = &quot;bold&quot;),
+    plot.subtitle = element_text(size = 18),
+    plot.caption = element_text(size = 15,
+                                face = &quot;bold.italic&quot;)
+    ))</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-2-1.png" width="960" /></p>
+<pre class="r"><code># Week 16 visit
+totalweek16 &lt;- 
+  dql_renamed %&gt;% 
+  filter(VISIT==&quot;Week 16&quot;)
+
+(e &lt;- 
+  ggplot(
+    data = totalweek16,
+    aes(
+      x = DLQI_SCORE
+      )
+    )
+  + geom_histogram(
+    binwidth = 1.5,
+    color = &quot;grey&quot;,
+    fill = &quot;deeppink3&quot;
+    ) +
+  facet_grid(~ TRT)
+  + theme_ng(grid = &quot;X&quot;)
+  + labs(
+    x = &quot;DLQI Score&quot;,
+    y = &quot;Count&quot;,
+    subtitle = &quot;At Week 16&quot;
+    ) +
+  theme(
+    plot.subtitle = element_text(size = 18)
+    ))</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-2-2.png" width="960" /></p>
+<pre class="r"><code># Compine plots
+library(gridExtra)
+
+gridExtra::grid.arrange(d, e, nrow = 2)</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-2-3.png" width="960" /></p>
+</div>
+<div id="clean-design-2" class="section level3">
+<h3>Clean Design 2</h3>
+<pre class="r"><code>dql &lt;- read.csv(&quot;./01_Datasets/ww2020_dlqi.csv&quot;)
+
+attach(dql)
+# View(dql)
+# summary(dql)
+
+# Load Library
+# library(tidyverse)
+# library(ggplot2)
+library(ggthemes)
+library(ggcharts)
+
+# Select relevant variables
+dql_renamed &lt;-
+  dql %&gt;%
+  select(
+    TRT, VISIT, DLQI_SCORE
+    )
+
+# Rename treatment levels
+dql_renamed$TRT[dql_renamed$TRT==&quot;A&quot;] &lt;- &quot;Placebo&quot;
+dql_renamed$TRT[dql_renamed$TRT==&quot;B&quot;] &lt;- &quot;Active Treatment&quot;
+
+# Seperate treatments
+
+# Active
+totalB &lt;- 
+  dql_renamed %&gt;% 
+  filter(TRT==&quot;Active Treatment&quot;)
+
+# Construct a histogram for each treatment arm at baseline visit
+(d &lt;- 
+  ggplot(
+    data = totalB,
+    aes(
+      x = DLQI_SCORE
+      ))
+  + geom_histogram(
+    binwidth = 1,
+    color = &quot;grey&quot;,
+    fill = &quot;deeppink3&quot;
+    ) +
+  facet_grid(~ VISIT)
+  + theme_ng(grid = &quot;X&quot;)
+  + labs(
+    x = &quot;Total DLQI Score&quot;,
+    y = &quot;Patients&quot;,
+    title = &quot;Improved Quality of life after 16 weeks of treatment&quot;,
+    subtitle = &quot;Active Treatment&quot;)
+  + theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    plot.title = element_text(size = 17,
+                              face = &quot;bold&quot;),
+    plot.subtitle = element_text(size = 15, color = &quot;deeppink3&quot;)
+    ))</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-3-1.png" width="960" /></p>
+<pre class="r"><code># Week 16 visit
+totalA &lt;- 
+  dql_renamed %&gt;% 
+  filter(TRT==&quot;Placebo&quot;)
+
+(e &lt;- 
+  ggplot(
+    data = totalA,
+    aes(
+      x = DLQI_SCORE
+      )
+    )
+  + geom_histogram(
+    binwidth = 1,
+    color = &quot;grey&quot;,
+    fill = &quot;green4&quot;
+    ) +
+  facet_grid(~ VISIT)
+  + theme_ng(grid = &quot;X&quot;)
+  + labs(
+    x = &quot;Total DLQI Score&quot;,
+    y = &quot;Patients&quot;,
+    subtitle = &quot;Placebo&quot;,
+    caption = &quot;Lower score equals better quality of life&quot;
+    ) +
+  theme(
+    strip.text.x = element_blank(),
+    plot.subtitle = element_text(size = 15, color = &quot;green4&quot;),
+    plot.caption = element_text(size = 12,
+                                face = &quot;italic&quot;)
+    ))</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-3-2.png" width="960" /></p>
+<pre class="r"><code># Compine plots
+library(gridExtra)
+
+gridExtra::grid.arrange(d, e, nrow = 2, heights = c(1.5,1))</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-3-3.png" width="960" /></p>
+</div>
 </div>
 <div id="slope-plots" class="section level2">
 <h2>Slope Plots</h2>
@@ -635,15 +917,615 @@ data for Site 4 looks like it belongs with the Control data from the
 other sites and likewise the Contorl data for Site 4 looks like it
 belo9ngs with the Active data from the other sites. Color and a useful
 title are used to highlight the difference.</em></p>
-<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-2-1.png" width="960" /></p>
+<pre class="r"><code>PROdata.vert &lt;- read.csv(&quot;./01_Datasets/PROdata.csv&quot;)
+
+PROdata.slopes &lt;- PROdata.vert %&gt;%
+  mutate(total=Q1+Q2+Q3+Q4) %&gt;%
+  group_by(SITE, TRT) %&gt;%
+  summarise(total.score = sum(total, na.rm = TRUE)) %&gt;%
+  ungroup()
+
+## apply a plot to a data set where this works
+
+library(ggrepel)
+
+p &lt;- ggplot(PROdata.slopes, aes(
+  x = TRT,
+  y = total.score,
+  group = SITE 
+)) +
+  geom_line(
+    size = 0.75,
+    color = &quot;grey&quot; 
+  ) +
+  geom_point(
+    size = 2.5,
+    #color = unhcr_pal(n = 1, &quot;pal_blue&quot;)
+    color = &quot;grey&quot; 
+  ) +
+  labs(
+    title = &quot;Total Scores By Site&quot;,
+    caption = &quot;Site 04 is Visual Outlier&quot;
+  ) +
+  geom_text_repel(
+    data = PROdata.slopes |&gt; filter(TRT==&quot;Active&quot;),
+    aes(label = paste(SITE, TRT,&quot;=&quot;, total.score)),
+    size = 8 / .pt,
+    hjust = 1,
+    direction = &quot;y&quot;,
+    nudge_x = -0.3,
+  ) + 
+  geom_text_repel(
+    data = PROdata.slopes |&gt; filter(TRT==&quot;Control&quot;),
+    aes(label = paste(SITE, TRT,&quot;=&quot;, total.score)),
+    size = 8 / .pt,
+    hjust = 1,
+    direction = &quot;y&quot;,
+    nudge_x = 0.5,
+  ) +
+ ## Make Site 04 appear in blue
+  geom_line(
+    data=PROdata.slopes |&gt; filter(SITE==&quot;SITE04&quot;),
+    size = 0.75,
+    color = &quot;blue&quot; 
+  ) +
+  geom_point(
+    data=PROdata.slopes |&gt; filter(SITE==&quot;SITE04&quot;),
+    size = 2.5,
+    #color = unhcr_pal(n = 1, &quot;pal_blue&quot;)
+    color = &quot;blue&quot; 
+  ) + 
+  xlab(&quot;Treatment&quot;) + ylab(&quot;Total Scores (Q1 + Q2 + Q3 + Q4)&quot;)
+
+p</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-4-1.png" width="960" /></p>
+<pre class="r"><code># ggsave(plot=p, ofile(&quot;slopes.png&quot;))</code></pre>
+</div>
+<div id="barplot-for-cgi-s" class="section level2">
+<h2>Barplot for CGI-S</h2>
+<p>The clinical global impression – severity scale (CGI-S) is a 7-point
+scale that requires the clinician to rate the severity of the patient’s
+illness at the time of assessment, relative to the clinician’s past
+experience with patients who have the same diagnosis. The challenge was
+to provide data visualisations to show this data and also to provide
+comparisons between the different groups (e.g. based on response
+differences or odds ratios for the different response categories) using
+Clinical Global Impression Data.</p>
+<pre class="r"><code>plot.fun &lt;- function(dat, name, v.just = 1.5, gci.s = &quot;&lt;=3&quot;, y.max = 100,
+                     title.text = &quot;The &lt;span style = &#39;color: #08519C&#39;&gt;Active&lt;/span&gt; and
+         &lt;span style = &#39;color: #BDD7E7&#39;&gt;Comparator&lt;/span&gt; result in similar clinical global impression&quot;,
+                     col.ann = c(rep(c(&quot;black&quot;, &quot;black&quot;, &quot;white&quot;), 2)),
+                     title.h.just = 0.6) {
+  require(ggplot2)
+  require(ggtext)
+  require(RColorBrewer)
+  ggplot(dat, aes(y=Value, x=VISITNUM, fill=Treatment)) + 
+    geom_bar(position=&quot;dodge&quot;, stat=&quot;identity&quot;) +
+    ylab(&quot;&quot;) + xlab (&quot;&quot;) +
+    ylim(-12, y.max) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+          panel.background = element_blank(), axis.line = element_blank(),
+          axis.ticks = element_blank(),# axis.text = element_text(size = 12),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          plot.subtitle = element_text(size = 15, color = &quot;grey40&quot;, hjust = 0.14),
+          plot.caption = element_text(color = &quot;grey60&quot;, size = 12, hjust = 0.85),
+          plot.title = element_markdown(color = &quot;grey40&quot;, size = 20,
+                                        face = &quot;bold&quot;, hjust = title.h.just),
+          plot.margin = margin(0.3, 0.2, -0.38, -0.2, &quot;in&quot;)) +
+    annotate(&quot;text&quot;, x=1, y=-4, label= &quot;Week 12&quot;, size = 4.25, color = &quot;grey40&quot;) +
+    annotate(&quot;text&quot;, x=2, y=-4, label= &quot;Week 52&quot;, size = 4.25, color = &quot;grey40&quot;) +
+    # annotate(&quot;text&quot;, x=3, y=-4, label= &quot;Week 24&quot;, size = 4.25, color = &quot;grey40&quot;) +
+    # annotate(&quot;text&quot;, x=2.27, y=-12,
+    #          label= &quot;Good glycemic control is defined as Glucose values within a range of 72 and 140 mg/dL.&quot;,
+    #          size = 3.5, color = &quot;grey60&quot;) +
+    scale_fill_manual(breaks = c(&quot;Active&quot;, &quot;Comparator&quot;, &quot;Placebo&quot;),
+                      values = c(brewer.pal(n = 5, name = &quot;Blues&quot;)[c(5, 2)], &quot;grey90&quot;)) +
+    geom_text(aes(label=val.t), vjust = v.just, size = 4, position = position_dodge(.9),
+              col = col.ann) +
+    labs(title = title.text,
+         subtitle = paste0(&quot;Bars show the relative frequency of subjects with CGI-S&quot;, gci.s))#,
+  # caption = &quot;Good glycemic control is defined as Glucose values within a range of 72 and 140 mg/dL.&quot;)
+  # ggsave(name, width = 12, height = 6, units = &quot;in&quot;, dpi = 150)
+}
+
+dat &lt;- read.csv(&quot;./01_Datasets/CGI_S_3_groups_csv.csv&quot;)
+dat$X1 &lt;- (dat$X1 + dat$X2 + dat$X3) / dat$Total.sample.size * 100
+# dat$X1 &lt;- (dat$X1) / dat$Total.sample.size * 100
+dat &lt;- dat[, 1:3]
+names(dat) &lt;- c(&quot;VISITNUM&quot;, &quot;Treatment&quot;, &quot;Value&quot;)
+dat$val.t &lt;- paste(format(round(dat$Value, 1), nsmall = 1), &quot;%&quot;)
+dat$VISITNUM &lt;- as.factor(dat$VISITNUM)
+plot.fun(dat, &quot;barplot_3.png&quot;)</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-5-1.png" width="960" /></p>
+<pre class="r"><code>dat &lt;- read.csv(&quot;./01_Datasets/CGI_S_3_groups_csv.csv&quot;)
+dat$X1 &lt;- (dat$X1 + dat$X2) / dat$Total.sample.size * 100
+# dat$X1 &lt;- (dat$X1) / dat$Total.sample.size * 100
+dat &lt;- dat[, 1:3]
+names(dat) &lt;- c(&quot;VISITNUM&quot;, &quot;Treatment&quot;, &quot;Value&quot;)
+dat$val.t &lt;- paste(format(round(dat$Value, 1), nsmall = 1), &quot;%&quot;)
+dat$VISITNUM &lt;- as.factor(dat$VISITNUM)
+plot.fun(dat, &quot;barplot_2.png&quot;, gci.s = &quot;&lt;=2&quot;, y.max = 70,
+         title.text = &quot;The &lt;span style = &#39;color: #08519C&#39;&gt;Active&lt;/span&gt; results
+         in better clinical global impression than the
+         &lt;span style = &#39;color: #BDD7E7&#39;&gt;Comparator&lt;/span&gt;&quot;,
+         title.h.just = 1.25)</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-5-2.png" width="960" /></p>
+<pre class="r"><code>dat &lt;- read.csv(&quot;./01_Datasets/CGI_S_3_groups_csv.csv&quot;)
+dat$X1 &lt;- (dat$X1) / dat$Total.sample.size * 100
+# dat$X1 &lt;- (dat$X1) / dat$Total.sample.size * 100
+dat &lt;- dat[, 1:3]
+names(dat) &lt;- c(&quot;VISITNUM&quot;, &quot;Treatment&quot;, &quot;Value&quot;)
+dat$val.t &lt;- paste(format(round(dat$Value, 1), nsmall = 1), &quot;%&quot;)
+dat$VISITNUM &lt;- as.factor(dat$VISITNUM)
+plot.fun(dat, &quot;barplot_1.png&quot;, v.just = -0.5, gci.s = &quot;=1&quot;, y.max = 50,
+         title.text = &quot;The &lt;span style = &#39;color: #08519C&#39;&gt;Active&lt;/span&gt; results
+         in better clinical global impression than the
+         &lt;span style = &#39;color: #BDD7E7&#39;&gt;Comparator&lt;/span&gt;&quot;,
+         col.ann = c(rep(c(&quot;black&quot;, &quot;black&quot;, &quot;black&quot;), 2)),
+         title.h.just = 1.25)</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-5-3.png" width="960" /></p>
+</div>
+<div id="stacked-bar-chart" class="section level2">
+<h2>Stacked Bar Chart</h2>
+<p><em>Annotation (circling Site 4 in red) and sorting (Site 4 in the
+upper left hand corner) to make clear that Site 4 is a visual outlier.
+The visual idiom is a stacked bar chart, one color for each
+questionnaire. Stacked barcharts are limited when comparing any of the
+components except the one on the bottom. For the purpose of this data
+viz challenge, it was only necessary to compare the totals, ie the
+heights of the stacked bars. This is easy to do for the stacked bars
+from a visual perception point of view. But the colors for the different
+components (Q1, Q2, Q3 and Q4) can be distracting.</em></p>
+<pre class="r"><code>data &lt;- read.csv(&quot;./01_Datasets/PROdata.csv&quot;)
+
+# Convert data to long format for easier plotting with ggplot2
+data_long &lt;- data %&gt;%
+  pivot_longer(cols = starts_with(&quot;Q&quot;), names_to = &quot;Question&quot;, values_to = &quot;Score&quot;)
+
+# Calculate average scores by SITE, TRT, and Question
+avg_scores &lt;- data_long %&gt;%
+  group_by(SITE, TRT, Question) %&gt;%
+  summarise(Average_Score = mean(Score, na.rm = TRUE)) %&gt;%
+  ungroup()
+
+# Plot
+ggplot(avg_scores, aes(x = TRT, y = Average_Score, fill = Question)) +
+  geom_bar(stat = &quot;identity&quot;, position = &quot;stack&quot;) +
+  facet_wrap(~ SITE, ncol = 2) +
+  labs(
+    title = &quot;Average Scores by Site and Treatment Group&quot;,
+    subtitle = &quot;Site 04 is the only site with lower average scores for active and higher for control across all PROs&quot;,
+    x = &quot;Treatment Group&quot;,
+    y = &quot;Average Score&quot;,
+    fill = &quot;PRO&quot;
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
+</div>
+<div id="line-graphs" class="section level2">
+<h2>Line graphs</h2>
+<div id="cgi" class="section level3">
+<h3>CGI</h3>
+<p><img src="02_Plots/Visualization/PRO/Line.png" /> ### EORTC
+QLQ-C30</p>
+<p>The EORTC QLQ-C30 is a 30-item questionnaire that has been designed
+for use in a wide range of cancer patient populations and is a reliable
+and valid measure of the quality of life in cancer patients. It includes
+a number of different scales, but this challenge is focussed on the
+global health and quality of life scale (QL).</p>
+<pre class="r"><code>library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(forcats)
+library(scales)
+
+d0 &lt;- read.csv2(&quot;./01_Datasets/ww eortc qlq-c30 missing.csv&quot;, sep=&quot;,&quot;) %&gt;%
+  as_tibble() 
+# d0
+d1 &lt;- d0 %&gt;%
+  pivot_longer(cols=starts_with(&quot;WEEK&quot;), names_to = &quot;AVISIT&quot;, values_to = &quot;AVAL&quot;) %&gt;%
+  mutate(AVAL=as.numeric(AVAL)) %&gt;%
+  select(USUBJID, ARM, LASTVIS, AGE:AVAL)
+# d1  
+
+d2 &lt;- d1 %&gt;%
+  group_by(ARM, LASTVIS, AVISIT) %&gt;%
+  summarize(AVAL = mean(AVAL, na.rm=TRUE)) %&gt;%
+  mutate(LASTVISC=as.factor(paste(&quot;Week&quot;, sprintf(&quot;%02.f&quot;, LASTVIS))),
+         AVISITN = as.numeric(gsub(&quot;WEEK&quot;,&quot;&quot;,AVISIT))) %&gt;%
+  mutate(LASTVISC=fct_reorder(LASTVISC, LASTVIS))
+
+
+cc &lt;- scales::seq_gradient_pal(&quot;yellow&quot;, &quot;blue&quot;, &quot;Lab&quot;)(seq(0,1,length.out=14))
+show_col(cc)</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-7-1.png" width="960" /></p>
+<pre class="r"><code>breaks &lt;- sort(names(table(d2$LASTVISC)))
+labels &lt;- breaks
+
+ggplot(data=d2, aes(x=AVISITN, y=AVAL, group=LASTVISC, color=LASTVISC)) +
+  geom_line() +
+  geom_point() +
+  scale_y_continuous(breaks = round(seq(0, 100, 8.333333333),2),
+                     limits = c(0, 100)) +
+  scale_x_continuous(breaks = seq(0, 48, 3), labels = paste(&quot;Wk&quot;, seq(0, 48, 3))) +
+
+  scale_color_manual(values = cc, labels=labels, breaks=breaks) +
+  facet_grid(cols=vars(ARM)) +
+  labs(title = &quot;Dropout is associated with worsening in quality of life&quot;,
+     y = &quot;EORTC QLQ-C30 QL [0-100]&quot;,
+     x = &quot;Week on treatment&quot;) +
+  theme(plot.background = element_rect(fill=&quot;black&quot;),
+        panel.background = element_rect(fill=&quot;black&quot;),
+        legend.background = element_rect(fill=&quot;black&quot;),
+        legend.box.background = element_rect(fill=&quot;black&quot;),
+        legend.key = element_blank(),
+        legend.text = element_text(colour=&quot;grey&quot;),
+        panel.grid = element_line(colour=&quot;grey5&quot;),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        plot.title=element_text(colour = &quot;grey&quot;, size = 14, face = &quot;bold&quot;),
+        strip.text = element_text(colour = &quot;grey50&quot;, size = 10),
+        axis.text = element_text(angle = 90))</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-7-2.png" width="960" /></p>
+<pre class="r"><code># ggsave(filename = &quot;line_plot.png&quot;, device = &quot;png&quot;, width = 12, height = 6)</code></pre>
+</div>
+</div>
+<div id="missing-patter" class="section level2">
+<h2>Missing Patter</h2>
+<div id="eortc-qlq-c30" class="section level3">
+<h3>EORTC QLQ-C30</h3>
+<p><img src="02_Plots/Visualization/PRO/Missing1.png" /></p>
+<pre class="r"><code>library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(forcats)
+library(scales)
+library(ggalluvial)
+library(RColorBrewer)
+
+df &lt;- read.csv2(&quot;./01_Datasets/ww eortc qlq-c30 missing.csv&quot;, sep=&quot;,&quot;)  %&gt;%
+  as_tibble() 
+# df
+df_1 &lt;- df %&gt;%
+  pivot_longer(cols=starts_with(&quot;WEEK&quot;), names_to = &quot;AVISIT&quot;, values_to = &quot;AVAL&quot;) %&gt;%
+  select(USUBJID, ARM, LASTVIS, AGE:AVAL) %&gt;%
+  mutate(AVAL=as.factor(if_else(AVAL==&quot;&quot;, &quot;Missing&quot;, AVAL)))
+# df_1  
+levels(df_1$AVAL) &lt;- c(as.character(rev(round(seq(0, 100, 8.333333333), 1))), &quot;Missing&quot;)
+
+cc &lt;- scales::div_gradient_pal(low = &quot;#a50026&quot;, mid=&quot;#ffffbf&quot;, high = &quot;#313695&quot;, &quot;Lab&quot;)(seq(0,1,length.out=13))
+
+colors &lt;- c(cc, &quot;#D3D3D3&quot;)
+show_col(colors)</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-8-1.png" width="960" /></p>
+<pre class="r"><code>ggplot(df_1,
+       aes(
+         x = AVISIT,
+         stratum = AVAL,
+         alluvium = USUBJID,
+         fill = AVAL,
+         label = AVAL
+       )) +
+  scale_fill_manual(values = colors) +
+  scale_x_discrete(labels = paste(&quot;Wk&quot;, seq(0, 48, 3))) +
+
+  geom_flow(stat = &quot;alluvium&quot;, 
+            lode.guidance = &quot;frontback&quot;,
+            color = &quot;darkgray&quot;) +
+  geom_stratum() +
+  labs(title = &quot;Quality of Life - Missing data depends on age and treatment received&quot;) +
+  facet_wrap(AGEGR~ARM, nrow = 4, scales = &quot;free_y&quot;, strip.position = c(&quot;left&quot;)) +
+  # facet_grid(cols = vars(ARM), rows = vars(AGEGR), scales = &quot;free&quot;) +
+  theme_bw() +
+  guides(fill = guide_legend(nrow = 1, reverse = T)) +
+  theme(
+    #panel.background = element_blank(),
+    #axis.text.y = element_blank(),
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    legend.position = &quot;bottom&quot;,
+    strip.text = element_text(size = 12),
+    axis.text = element_text(angle = 90),
+    legend.direction = &quot;horizontal&quot;
+  ) </code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-8-2.png" width="960" /></p>
+<pre class="r"><code># ggsave(filename = &quot;sankey_chart.png&quot;, device = &quot;png&quot;, width = 16, height = 9)</code></pre>
+</div>
+</div>
+<div id="cumulative-distribution-plot" class="section level2">
+<h2>Cumulative distribution plot</h2>
+<p><img src="02_Plots/Visualization/PRO/Cumulative1.png" /></p>
+<p><img src="02_Plots/Visualization/PRO/Cumulative2.png" /></p>
+</div>
+<div id="lollipopforest-plot" class="section level2">
+<h2>Lollipop/forest plot</h2>
+<pre class="r"><code># dat &lt;- read.csv(&quot;./01_Datasets/CGI_S_3_groups_csv.csv&quot;)
+
+library(RCurl)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggrepel)
+library(cowplot)
+library(ggtext)
+
+y &lt;- read.csv(&quot;./01_Datasets/CGI_S_3_groups_csv.csv&quot;) %&gt;%
+   rename(Group = CGI)
+
+l &lt;- y %&gt;%
+  pivot_longer(cols = X1:X7,
+               names_to = &quot;Category&quot;,
+               values_to = &quot;n&quot;) %&gt;%
+  mutate(Category = as.numeric(gsub(&quot;X&quot;, &quot;&quot;, Category))) %&gt;%
+  group_by(Week, Group) %&gt;%
+  arrange(Category) %&gt;%
+  mutate(
+    CumN = cumsum(n),
+    Week = paste(&quot;Week&quot;, Week),
+    CumFreq = CumN / Total.sample.size,
+    Freq = n / Total.sample.size,
+    `Cumulative %` = round(CumFreq * 100, 1),
+    `%` = round(Freq * 100, 1)
+  ) %&gt;%
+  ungroup() %&gt;%
+  group_by(Week, Category) %&gt;%
+  arrange(Group, .by_group = T) %&gt;%
+  mutate(
+    Odds = CumFreq / (1 - CumFreq),
+    OR = ifelse(Group == &quot;Active&quot;, round(Odds / Odds[2], 2), NA),
+    selogOR = ifelse(Group == &quot;Active&quot;, sqrt(
+      1 / CumN + 1 / (Total.sample.size - CumN) + 1 / CumN[2] + 1 / (Total.sample.size[2] -
+                                                                       CumN[2])
+    ), NA),
+    ORlower95CI = ifelse(Group == &quot;Active&quot;, round(exp(log(OR) - 1.96 * selogOR), 2), NA),
+    ORupper95CI = ifelse(Group == &quot;Active&quot;, round(exp(log(OR) + 1.96 * selogOR), 2), NA)
+  )
+l</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Week"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Group"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Total.sample.size"],"name":[3],"type":["int"],"align":["right"]},{"label":["Category"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["n"],"name":[5],"type":["int"],"align":["right"]},{"label":["CumN"],"name":[6],"type":["int"],"align":["right"]},{"label":["CumFreq"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["Freq"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["Cumulative %"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["%"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["Odds"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["OR"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["selogOR"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["ORlower95CI"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["ORupper95CI"],"name":[15],"type":["dbl"],"align":["right"]}],"data":[{"1":"Week 12","2":"Active","3":"108","4":"1","5":"18","6":"18","7":"0.16666667","8":"0.166666667","9":"16.7","10":"16.7","11":"0.20000000","12":"1.98","13":"0.4204375","14":"0.87","15":"4.51"},{"1":"Week 12","2":"Comparator","3":"109","4":"1","5":"10","6":"10","7":"0.09174312","8":"0.091743119","9":"9.2","10":"9.2","11":"0.10101010","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 12","2":"Placebo","3":"108","4":"1","5":"2","6":"2","7":"0.01851852","8":"0.018518519","9":"1.9","10":"1.9","11":"0.01886792","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 12","2":"Active","3":"108","4":"2","5":"32","6":"50","7":"0.46296296","8":"0.296296296","9":"46.3","10":"29.6","11":"0.86206897","12":"1.49","13":"0.2770093","14":"0.87","15":"2.56"},{"1":"Week 12","2":"Comparator","3":"109","4":"2","5":"30","6":"40","7":"0.36697248","8":"0.275229358","9":"36.7","10":"27.5","11":"0.57971014","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 12","2":"Placebo","3":"108","4":"2","5":"5","6":"7","7":"0.06481481","8":"0.046296296","9":"6.5","10":"4.6","11":"0.06930693","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 12","2":"Active","3":"108","4":"3","5":"44","6":"94","7":"0.87037037","8":"0.407407407","9":"87.0","10":"40.7","11":"6.71428571","12":"0.68","13":"0.4383696","14":"0.29","15":"1.61"},{"1":"Week 12","2":"Comparator","3":"109","4":"3","5":"59","6":"99","7":"0.90825688","8":"0.541284404","9":"90.8","10":"54.1","11":"9.90000000","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 12","2":"Placebo","3":"108","4":"3","5":"30","6":"37","7":"0.34259259","8":"0.277777778","9":"34.3","10":"27.8","11":"0.52112676","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 12","2":"Active","3":"108","4":"4","5":"10","6":"104","7":"0.96296296","8":"0.092592593","9":"96.3","10":"9.3","11":"26.00000000","12":"0.49","13":"0.8769043","14":"0.09","15":"2.73"},{"1":"Week 12","2":"Comparator","3":"109","4":"4","5":"8","6":"107","7":"0.98165138","8":"0.073394495","9":"98.2","10":"7.3","11":"53.50000000","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 12","2":"Placebo","3":"108","4":"4","5":"50","6":"87","7":"0.80555556","8":"0.462962963","9":"80.6","10":"46.3","11":"4.14285714","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 12","2":"Active","3":"108","4":"5","5":"3","6":"107","7":"0.99074074","8":"0.027777778","9":"99.1","10":"2.8","11":"107.00000000","12":"0.00","13":"Inf","14":"0.00","15":"NaN"},{"1":"Week 12","2":"Comparator","3":"109","4":"5","5":"2","6":"109","7":"1.00000000","8":"0.018348624","9":"100.0","10":"1.8","11":"Inf","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 12","2":"Placebo","3":"108","4":"5","5":"15","6":"102","7":"0.94444444","8":"0.138888889","9":"94.4","10":"13.9","11":"17.00000000","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 12","2":"Active","3":"108","4":"6","5":"1","6":"108","7":"1.00000000","8":"0.009259259","9":"100.0","10":"0.9","11":"Inf","12":"NaN","13":"Inf","14":"NaN","15":"NaN"},{"1":"Week 12","2":"Comparator","3":"109","4":"6","5":"0","6":"109","7":"1.00000000","8":"0.000000000","9":"100.0","10":"0.0","11":"Inf","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 12","2":"Placebo","3":"108","4":"6","5":"4","6":"106","7":"0.98148148","8":"0.037037037","9":"98.1","10":"3.7","11":"53.00000000","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 12","2":"Active","3":"108","4":"7","5":"0","6":"108","7":"1.00000000","8":"0.000000000","9":"100.0","10":"0.0","11":"Inf","12":"NaN","13":"Inf","14":"NaN","15":"NaN"},{"1":"Week 12","2":"Comparator","3":"109","4":"7","5":"0","6":"109","7":"1.00000000","8":"0.000000000","9":"100.0","10":"0.0","11":"Inf","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 12","2":"Placebo","3":"108","4":"7","5":"2","6":"108","7":"1.00000000","8":"0.018518519","9":"100.0","10":"1.9","11":"Inf","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 52","2":"Active","3":"108","4":"1","5":"35","6":"35","7":"0.32407407","8":"0.324074074","9":"32.4","10":"32.4","11":"0.47945205","12":"3.00","13":"0.3457962","14":"1.52","15":"5.91"},{"1":"Week 52","2":"Comparator","3":"109","4":"1","5":"15","6":"15","7":"0.13761468","8":"0.137614679","9":"13.8","10":"13.8","11":"0.15957447","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 52","2":"Placebo","3":"108","4":"1","5":"5","6":"5","7":"0.04629630","8":"0.046296296","9":"4.6","10":"4.6","11":"0.04854369","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 52","2":"Active","3":"108","4":"2","5":"29","6":"64","7":"0.59259259","8":"0.268518519","9":"59.3","10":"26.9","11":"1.45454545","12":"1.85","13":"0.2749164","14":"1.08","15":"3.17"},{"1":"Week 52","2":"Comparator","3":"109","4":"2","5":"33","6":"48","7":"0.44036697","8":"0.302752294","9":"44.0","10":"30.3","11":"0.78688525","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 52","2":"Placebo","3":"108","4":"2","5":"9","6":"14","7":"0.12962963","8":"0.083333333","9":"13.0","10":"8.3","11":"0.14893617","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 52","2":"Active","3":"108","4":"3","5":"35","6":"99","7":"0.91666667","8":"0.324074074","9":"91.7","10":"32.4","11":"11.00000000","12":"1.23","13":"0.4715138","14":"0.49","15":"3.10"},{"1":"Week 52","2":"Comparator","3":"109","4":"3","5":"50","6":"98","7":"0.89908257","8":"0.458715596","9":"89.9","10":"45.9","11":"8.90909091","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 52","2":"Placebo","3":"108","4":"3","5":"30","6":"44","7":"0.40740741","8":"0.277777778","9":"40.7","10":"27.8","11":"0.68750000","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 52","2":"Active","3":"108","4":"4","5":"5","6":"104","7":"0.96296296","8":"0.046296296","9":"96.3","10":"4.6","11":"26.00000000","12":"0.49","13":"0.8769043","14":"0.09","15":"2.73"},{"1":"Week 52","2":"Comparator","3":"109","4":"4","5":"9","6":"107","7":"0.98165138","8":"0.082568807","9":"98.2","10":"8.3","11":"53.50000000","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 52","2":"Placebo","3":"108","4":"4","5":"45","6":"89","7":"0.82407407","8":"0.416666667","9":"82.4","10":"41.7","11":"4.68421053","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 52","2":"Active","3":"108","4":"5","5":"3","6":"107","7":"0.99074074","8":"0.027777778","9":"99.1","10":"2.8","11":"107.00000000","12":"0.99","13":"1.4207762","14":"0.06","15":"16.03"},{"1":"Week 52","2":"Comparator","3":"109","4":"5","5":"1","6":"108","7":"0.99082569","8":"0.009174312","9":"99.1","10":"0.9","11":"108.00000000","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 52","2":"Placebo","3":"108","4":"5","5":"10","6":"99","7":"0.91666667","8":"0.092592593","9":"91.7","10":"9.3","11":"11.00000000","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 52","2":"Active","3":"108","4":"6","5":"1","6":"108","7":"1.00000000","8":"0.009259259","9":"100.0","10":"0.9","11":"Inf","12":"NaN","13":"Inf","14":"NaN","15":"NaN"},{"1":"Week 52","2":"Comparator","3":"109","4":"6","5":"1","6":"109","7":"1.00000000","8":"0.009174312","9":"100.0","10":"0.9","11":"Inf","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 52","2":"Placebo","3":"108","4":"6","5":"4","6":"103","7":"0.95370370","8":"0.037037037","9":"95.4","10":"3.7","11":"20.60000000","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 52","2":"Active","3":"108","4":"7","5":"0","6":"108","7":"1.00000000","8":"0.000000000","9":"100.0","10":"0.0","11":"Inf","12":"NaN","13":"Inf","14":"NaN","15":"NaN"},{"1":"Week 52","2":"Comparator","3":"109","4":"7","5":"0","6":"109","7":"1.00000000","8":"0.000000000","9":"100.0","10":"0.0","11":"Inf","12":"NA","13":"NA","14":"NA","15":"NA"},{"1":"Week 52","2":"Placebo","3":"108","4":"7","5":"5","6":"108","7":"1.00000000","8":"0.046296296","9":"100.0","10":"4.6","11":"Inf","12":"NA","13":"NA","14":"NA","15":"NA"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>k = 3
+labs &lt;- c(&quot;Normal, not at all ill -   1&quot;,
+          &quot;Normal to borderline ill - &lt;=2&quot;,
+          &quot;Normal to mildly ill - &lt;=3&quot;)
+
+p1 &lt;-
+  ggplot(data = l[l$Category &lt;= k,], aes(x = `Cumulative %`, y = Category, col =
+                                           Group)) +
+  geom_point(size = 5) +
+  facet_grid(rows = vars(Week)) +
+  labs(title = &quot;Cumulative percentage of response&quot;, y = &quot;&quot;, x = &quot;&quot;) +
+  scale_y_continuous(breaks = 1:k, labels = labs) +
+  scale_x_continuous(limits = c(0, 100)) +
+  theme_bw() +
+  theme(legend.position = &quot;none&quot;,
+        strip.text = element_blank()) +
+  geom_text_repel(aes(label = paste(sprintf(
+    &quot;%.1f&quot;, `Cumulative %`
+  ), &quot;%&quot;)),
+  nudge_y = 0.1)
+p1</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-9-1.png" width="960" /></p>
+<pre class="r"><code>legend_b &lt;- get_legend(p1 +
+                         guides(color = guide_legend(nrow = 1)) +
+                         theme(legend.position = &quot;bottom&quot;,
+                               legend.title = element_blank(),
+                               legend.text = element_text(size = 12)))
+p2 &lt;-
+  ggplot(data = l[l$Category &lt;= k &amp;
+                    !is.na(l$OR),], aes(x = OR, y = Category)) +
+  geom_point(size = 3, pch = 15) +
+  geom_linerange(aes(xmin = ORlower95CI, xmax = ORupper95CI)) +
+  geom_vline(xintercept = 1, linetype = 3) +
+  facet_grid(rows = vars(Week)) +
+  scale_y_continuous(breaks = 1:k, labels = labs) +
+  scale_x_continuous(limits = c(0, 6)) +
+  theme_bw() +
+  theme(legend.position = &quot;none&quot;,
+        axis.text.y = element_blank()) +
+  labs(x = &quot;&quot;, y=&quot;&quot;, title = &quot;OR (Active vs. Comparator)&quot;) +
+  geom_text_repel(aes(label = sprintf(&quot;%.2f&quot;, OR)),
+                  nudge_y = 0.1) +
+  theme(strip.text = element_text(size=12))
+p2</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-9-2.png" width="960" /></p>
+<pre class="r"><code>plot_row &lt;- plot_grid(p1, p2, nrow = 1, rel_widths = c(2, 1))
+
+title &lt;- ggdraw() +
+  draw_label(
+    &quot;Active treatment is more effective than comparator at Week 52&quot;,
+    fontface = &#39;bold&#39;,
+    x = 0,
+    hjust = 0,
+    size = 24,
+  ) +
+  theme(plot.margin = margin(0, 0, 0, 7))
+
+p &lt;- plot_grid(title,
+               plot_row,
+               legend_b,
+               ncol = 1,
+               rel_heights = c(0.1, 1, 0.05))
+p</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-9-3.png" width="960" /></p>
+</div>
+<div id="distribution-plot-by-category-i" class="section level2">
+<h2>Distribution plot by Category I</h2>
+<p>This graph includes stacked density plots, sometimes known as a
+ridgeline plot. This graph type is useful where there are approximately
+4-8 categories with a natural ordering, which is the case in this
+example. The graph is also showing patient level data as transparent
+dots on the X axis, and reference lines have been added. There is a lot
+of overplotting of the dots, so the opacity of dots is representing the
+data density at each value on the X-axis.</p>
+<p>A title has been added to give a clear interpretation of the overall
+message.</p>
+<pre class="r"><code>WW_data &lt;- read.csv(&quot;./01_Datasets/WWW_example_minimal_clinical_improvement.csv&quot;)
+
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(ggridges)
+library(gt)
+library(psych)
+
+#####
+#1 - calculate SEM 
+#The Standard Error of Measurement (SEM) quantifies 
+#the precision of the individual measurements 
+#and gives an indication of the absolute reliability
+
+#2 - calculate SDC
+#The SEM can be used to calculate the Minimal Detectable Change (MDC)
+#which is the minimal amount of change that a measurement 
+#must show to be greater than the within subject variability
+#and measurement error, also referred to as the sensitivity to change
+
+pre_post &lt;- WW_data[,c(1:2)]
+sd_baseline &lt;- sd(WW_data$total.score.baseline, na.rm = T)
+
+icc &lt;- ICC(pre_post)#0.032 - reliability for SEM
+
+sem_baseline &lt;- psychometric::SE.Meas(sd_baseline, 0.032)
+
+#Smallest detectable change(SDC)/Minimal detectable change (MDC)
+#SEM*1.92*sqrt(2)
+sdc &lt;- sem_baseline*1.96*sqrt(2)
+sdc_comp &lt;- sdc*-1
+
+WW_data &lt;- rename(WW_data, baseline = total.score.baseline, followup = total.score.follow.up, CGI = CGI.I)
+WW_data &lt;- within(WW_data, CHG &lt;- followup-baseline)
+WW_data &lt;- within(WW_data, {
+            CGI_cat &lt;- NA
+            CGI_cat[CGI==1] &lt;- &quot;Very much improved&quot;
+            CGI_cat[CGI==2] &lt;- &quot;Much improved&quot;
+            CGI_cat[CGI==3] &lt;- &quot;Minimally improved&quot;
+            CGI_cat[CGI==4] &lt;- &quot;No change&quot;
+            CGI_cat[CGI==5] &lt;- &quot;Minimally worse&quot;
+            CGI_cat[CGI==6] &lt;- &quot;Much worse&quot;
+            CGI_cat[CGI==7] &lt;- &quot;Very much worse&quot;
+            })
+
+WW_data &lt;- WW_data &lt;- WW_data %&gt;% 
+  filter(!is.na(CGI_cat))
+
+WW_data$CGI_cat &lt;- factor(WW_data$CGI_cat, levels = c(&quot;Very much improved&quot;,
+                                   &quot;Much improved&quot;,
+                                   &quot;Minimally improved&quot;,
+                                   &quot;No change&quot;,
+                                   &quot;Minimally worse&quot;,
+                                   &quot;Much worse&quot;,
+                                   &quot;Very much worse&quot;
+                                   ))
+
+gg &lt;- ggplot(WW_data, aes(x = CHG, 
+                    y = CGI_cat)) +
+  stat_density_ridges(
+    geom = &quot;density_ridges_gradient&quot;,
+    quantile_lines = TRUE,
+    quantiles = 2, scale = 1, rel_min_height = 0.01,
+    jittered_points = TRUE) +
+  scale_x_continuous(breaks=seq(-40,40,10),
+                     limits = c(-40,40)) +
+  ylab(&quot;CGI-I Response&quot;) + xlab(&quot;Change in PRO Score&quot;) +
+  labs(title = &quot;Minimally Improved &amp; Minimally Worse CGI-I Categories\nAre Not Differentiated From No change&quot;,
+       subtitle = &quot;Smoothed Distributions with Individual Patients (dots) and Means (|) \nReference Lines Display Smallest Detectable Change of PRO Score&quot;,
+       caption = &quot;Smallest Detectable Change defined by Standard Error of Measurement of PRO Score at Baseline&quot;) +
+  theme(
+    plot.title = element_text(color = &quot;black&quot;, size = 15),
+    plot.subtitle = element_text(color = &quot;black&quot;, size = 10),
+    plot.caption = element_text(color = &quot;black&quot;, size = 8)
+  )
+
+#theme_ridges(font_size = 12)
+
+#Build ggplot and extract data
+d &lt;- ggplot_build(gg)$data[[1]]
+
+# Add geom_ribbon for shaded area
+rcc &lt;- gg +
+  geom_ribbon(
+    data = transform(subset(d, x &gt;= sdc), CGI_cat = group),
+    aes(x, ymin = ymin, ymax = ymax, group = group),
+    fill = &quot;red&quot;,
+    alpha = 0.2, 
+    show.legend = TRUE) +
+  geom_ribbon(
+    data = transform(subset(d, x &lt;= sdc_comp), CGI_cat = group),
+    aes(x, ymin = ymin, ymax = ymax, group = group),
+    fill = &quot;green&quot;,
+    alpha = 0.2,
+    show.legend = TRUE) +
+  geom_vline(xintercept =sdc, linetype=&quot;dashed&quot;) +
+  geom_vline(xintercept =sdc_comp, linetype=&quot;dashed&quot;)+
+  annotate(&quot;segment&quot;, x = -15, xend = -35, y = 0.7, yend = 0.7, colour = &quot;black&quot;, size=0.5, arrow=arrow(length = unit(0.03, &quot;npc&quot;))) +
+  annotate(&quot;segment&quot;, x = 15, xend = 35, y = 0.7, yend = 0.7, colour = &quot;black&quot;, size=0.5, arrow=arrow(length = unit(0.03, &quot;npc&quot;))) +
+  geom_text(aes(x = -30, y = 0.45, label = &quot;Improvement&quot;), 
+             hjust = 0, 
+             vjust = 0,
+             colour = &quot;black&quot;, 
+             size = 2.5) +
+  geom_text(aes(x = 20, y = 0.45, label = &quot;Deterioration&quot;), 
+            hjust = 0, 
+            vjust = 0,
+            colour = &quot;black&quot;, 
+            size = 2.5) + 
+  ylab(&quot;CGI-I Response&quot;) + xlab(&quot;Change in PRO Score&quot;)
+  
+rcc</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-10-1.png" width="960" /></p>
+<pre class="r"><code># ggsave(&quot;reliable_clinical_change_plot_red_green_v0_2.png&quot;, plot = rcc, device = png)</code></pre>
+</div>
+<div id="dumbbell-plot" class="section level2">
+<h2>Dumbbell Plot</h2>
+<p><img src="02_Plots/Visualization/PRO/Dumbbell1.png" /></p>
+<p><img src="02_Plots/Visualization/PRO/Dumbbell2.png" /></p>
+<pre class="r"><code>data &lt;- read.csv(&quot;./01_Datasets/MAI.csv&quot;)</code></pre>
+</div>
+<div id="scatter-plot" class="section level2">
+<h2>Scatter Plot</h2>
+<p><img src="02_Plots/Visualization/PRO/Scatter.png" /></p>
+<pre class="r"><code>data &lt;- read.csv(&quot;./01_Datasets/MAI.csv&quot;)
+
+# Scatter plot with regression lines and confidence intervals
+ggplot(data, aes(x = base.mai, y = mai, color = gr)) +
+  geom_point(size = 2) +  # Add points
+  geom_smooth(method = &quot;lm&quot;, se = TRUE) +  # Add linear regression lines with confidence intervals
+  geom_abline(intercept = 0, slope = 1, linetype = &quot;dashed&quot;, color = &quot;black&quot;) +  # Reference line
+  labs(title = &quot;Scatter Plot&quot;,
+       x = &quot;MAI Score at Baseline&quot;,
+       y = &quot;MAI Score After 1 Year&quot;,
+       color = &quot;Group&quot;) +
+  theme_minimal() +
+  theme(legend.position = &quot;top&quot;)</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-12-1.png" width="960" /></p>
 </div>
 </div>
 <div id="reference" class="section level1">
 <h1>Reference</h1>
-<p>SIG（2023 年 10 月 11 日）。VIS-SIG 博客：2023 年 10
-月精彩星期三。取自 <a
-href="https://graphicsprinciples.github.io/posts/2023-12-17-wonderful-wednesdays-october-2023/"
-class="uri">https://graphicsprinciples.github.io/posts/2023-12-17-wonderful-wednesdays-october-2023/</a></p>
+<p>SIG (2023, Sept. 13). VIS-SIG Blog: Wonderful Wednesdays September
+2023. Retrieved from <a
+href="https://graphicsprinciples.github.io/posts/2023-12-17-wonderful-wednesdays-september-2023/"
+class="uri">https://graphicsprinciples.github.io/posts/2023-12-17-wonderful-wednesdays-september-2023/</a></p>
+<p>SIG (2023, June 11). VIS-SIG Blog: Visualisation SIG Showcase.
+Retrieved from <a
+href="https://graphicsprinciples.github.io/posts/2023-05-14-visualisation-sig-showcase/"
+class="uri">https://graphicsprinciples.github.io/posts/2023-05-14-visualisation-sig-showcase/</a></p>
+<p>SIG (2023, May 10). VIS-SIG Blog: Wonderful Wednesdays May 2023.
+Retrieved from <a
+href="https://graphicsprinciples.github.io/posts/2023-05-29-wonderful-wednesdays-may-2023/"
+class="uri">https://graphicsprinciples.github.io/posts/2023-05-29-wonderful-wednesdays-may-2023/</a></p>
+<p>SIG (2022, Nov. 9). VIS-SIG Blog: Wonderful Wednesdays November 2022.
+Retrieved from <a
+href="https://graphicsprinciples.github.io/posts/2023-04-09-wonderful-wednesdays-november-2022/"
+class="uri">https://graphicsprinciples.github.io/posts/2023-04-09-wonderful-wednesdays-november-2022/</a></p>
 </div>
 
 
