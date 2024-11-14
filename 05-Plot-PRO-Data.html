@@ -581,8 +581,6 @@ Patient Reported Outcome Visualization</p></h1>
 </div>
 
 
-<div id="introduction" class="section level1">
-<h1>Introduction</h1>
 <div id="histogram" class="section level2">
 <h2>Histogram</h2>
 <p>In data analysis, especially when dealing with questionnaire data,
@@ -1507,9 +1505,186 @@ ggplot(data, aes(x = base.mai, y = mai, color = gr)) +
   theme(legend.position = &quot;top&quot;)</code></pre>
 <p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-12-1.png" width="960" /></p>
 </div>
+<div id="ediary-data" class="section level2">
+<h2>eDiary Data</h2>
+<pre class="r"><code>pacman::p_load(tidyverse, rio, labelled)
+pacman::p_load(ggfittext)
+pacman::p_load(ggh4x)
+pacman::p_load(ggtext)  
+ 
+
+WWWDiary &lt;- import(&quot;./01_Datasets/WWWDiary.Rds&quot;)
+
+# transform
+diary   &lt;- WWWDiary %&gt;% 
+   relocate(AVALC, .after = AVAL) %&gt;% 
+   mutate(AVAL = as.numeric(AVAL)) %&gt;% 
+   mutate(AVALC = factor(AVALC,
+                         levels = c(&#39;None&#39;,&#39;Minor&#39;,&#39;Moderate&#39;,&#39;Extreme&#39;)) %&gt;% fct_rev() )
+
+# NEST T-TEST
+diary_nest &lt;- diary %&gt;%
+   nest_by(ADY, PARAM, PARAMN) %&gt;% 
+   mutate(t.test = list( t.test(AVAL ~ TRT, data = data) %&gt;% 
+                            broom::tidy() ) ) %&gt;% 
+   select(-data) %&gt;% 
+   unnest(cols = c(t.test))
+
+# Differences
+diary_d &lt;- diary_nest %&gt;%
+   ungroup() %&gt;% 
+   nest_by(PARAM, PARAMN) %&gt;% 
+   mutate(gg_d = list( 
+      data %&gt;% 
+         ggplot(aes(y = I(-1*ADY), x = estimate) ) +
+         geom_vline(xintercept = 0, color = &#39;gray50&#39;) +
+         geom_pointrange( aes(xmin = conf.low, xmax = conf.high), 
+                          size = 0.1,
+                          alpha = .5) +
+         geom_smooth(orientation = &#39;y&#39;, formula = y ~ x,
+                     se = FALSE,  color = &#39;black&#39;, span = 0.35 ) +
+         scale_y_continuous(name = NULL,
+                            expand = c(0.005, 0.005),
+                            labels = abs,
+                            breaks = -1*c(1, 25, 50, 75, 100),
+                            sec.axis = dup_axis() ) +
+         scale_x_continuous(name = NULL,
+                            limits = c(-2.0, 2.0),
+                            expand = c(0, 0),
+                            breaks = seq(-2, 2, 1) ) +
+         
+         annotate(&#39;segment&#39;, 
+                  arrow = arrow(angle = 20,
+                                length = unit(0.05,&quot;native&quot;),
+                                type = &#39;closed&#39;),
+                  x = -1, xend = -1.9,
+                  y = -3, yend = -3) +
+         
+         annotate(&#39;segment&#39;, 
+                  arrow = arrow(angle = 20,
+                                length = unit(0.05,&quot;native&quot;),
+                                type = &#39;closed&#39;),
+                  x = 1, xend = 1.9,
+                  y = -3, yend = -3) +
+         
+         annotate(&#39;text&#39;, 
+                  label = &#39;Improvement&#39;, size = 1.85,
+                  x = -1.5,
+                  y = -6) +
+         
+         annotate(&#39;text&#39;, 
+                  label = &#39;Deterioration&#39;, size = 1.85,
+                  x = 1.5,
+                  y = -6) +
+         
+         theme_light() +
+         
+         theme( panel.grid.minor = element_blank(),
+                strip.background.y = element_blank(),
+                strip.text.y = element_blank() ) 
+      ) )
+
+# Histogram (day)
+diary_h &lt;- diary %&gt;% 
+   nest_by(PARAM, PARAMN, TRT) %&gt;% 
+   mutate(data = list( data %&gt;% mutate(PARAM = PARAM,
+                                       TRT = TRT) ) ) %&gt;% 
+   mutate(gg_h = list( 
+      ggplot(data = data,
+             aes(y = I(-1*ADY), fill = AVALC)) +
+         geom_histogram(binwidth  = 1, position = &#39;fill&#39;) +
+         
+         facet_wrap(str_glue(&quot;{PARAM} {str_to_upper(TRT)}&quot;) ~ .,
+                    strip.position = ifelse(TRT == &#39;Active&#39;, &quot;left&quot;, &quot;right&quot;) ) +
+         
+         scale_x_continuous(name = NULL,
+                            expand = c(0, 0),
+                            labels = scales::percent,
+                            trans = ifelse(TRT==&#39;Active&#39;,&#39;identity&#39;,&#39;reverse&#39;)) +
+         scale_y_continuous(name = NULL,
+                            expand = c(0, 0),
+                            labels = abs,
+                            breaks = -1*c(1, 25, 50, 75, 100),
+                            position = ifelse(TRT == &#39;Active&#39;, &#39;right&#39;, &#39;left&#39;) ) +
+         scale_color_brewer(name = NULL,
+                            palette = &#39;Reds&#39;,
+                            direction = -1,
+                            aesthetics = c(&quot;colour&quot;, &quot;fill&quot;) ) +
+         theme_light() +
+         theme(panel.grid    = element_blank(),
+               axis.text.y   = element_blank(), 
+               legend.position = &quot;none&quot;,
+               strip.text = element_text(color = &quot;black&quot;,
+                                         face = &#39;bold&#39;) ) )
+   ) %&gt;% 
+   mutate(gg_h2 = list( 
+      ggplot(data = data,
+             aes(y = 1, fill = AVALC, label = AVALC) ) +
+         
+         geom_histogram(binwidth  = 1, position = &#39;fill&#39;) +
+         
+         geom_fit_text(stat=&quot;bin&quot;, binwidth  = 1, position=&quot;fill&quot;, fontface = &#39;bold&#39;, grow = TRUE) +
+         
+         scale_x_continuous(expand = c(0.04, 0.07),
+                            trans = ifelse(TRT==&#39;Active&#39;,&#39;identity&#39;,&#39;reverse&#39;)) +
+         
+         scale_y_continuous(expand = c(0, 0)) +
+         
+         scale_color_brewer(name = NULL,
+                            palette = &#39;Reds&#39;,
+                            direction = -1,
+                            aesthetics = c(&quot;colour&quot;, &quot;fill&quot;) ) +
+         
+         theme_void() +
+         
+         theme(legend.position = &quot;none&quot;) ) )
+
+# COMBINE
+pacman::p_load(patchwork)
+
+f1 &lt;- (diary_h$gg_h[[1]] + diary_d$gg_d[[1]] + diary_h$gg_h[[2]]) / 
+   (diary_h$gg_h2[[1]] + plot_spacer() + diary_h$gg_h2[[2]]) + plot_layout(heights = c(20, 1) ) 
+
+f2 &lt;- (diary_h$gg_h[[3]] + diary_d$gg_d[[2]] + diary_h$gg_h[[4]]) /
+   (diary_h$gg_h2[[3]] + plot_spacer() + diary_h$gg_h2[[4]])  + plot_layout(heights = c(20, 1) )
+
+f3 &lt;- (diary_h$gg_h[[5]] + diary_d$gg_d[[3]] + diary_h$gg_h[[6]]) /
+   (diary_h$gg_h2[[5]] + plot_spacer() + diary_h$gg_h2[[6]])  + plot_layout(heights = c(20, 1) )
+
+f4 &lt;- (diary_h$gg_h[[7]] + diary_d$gg_d[[4]] + diary_h$gg_h[[8]]) /
+   (diary_h$gg_h2[[7]] + plot_spacer() + diary_h$gg_h2[[8]])  + plot_layout(heights = c(20, 1) )
+
+f5 &lt;- (diary_h$gg_h[[9]] + diary_d$gg_d[[5]] + diary_h$gg_h[[10]]) /
+   (diary_h$gg_h2[[9]] + plot_spacer() + diary_h$gg_h2[[10]])  + plot_layout(heights = c(20, 1) )
+
+f6 &lt;- (diary_h$gg_h[[11]] + diary_d$gg_d[[6]] + diary_h$gg_h[[12]]) /
+   (diary_h$gg_h2[[11]] + plot_spacer() + diary_h$gg_h2[[12]])  + plot_layout(heights = c(20, 1) )
+
+# EXPORT
+ggsave(filename = &#39;./02_Plots/Visualization/PRO/WWWDiary.pdf&#39;,
+       plot = (f1  | f2 | f3 ) / (f4 | f5 | f6) &amp; theme( plot.margin = margin(6, 6, 6, 6, &quot;pt&quot;) ),
+       width = 24, height = 10)
+
+# One subscale
+f1 +
+plot_annotation(
+   title = &#39;&lt;span style = &quot;font-size:12pt&quot;&gt; Results for the &lt;b&gt;Aching&lt;/b&gt; subscale&lt;/span&gt;&lt;br&gt;
+               **Top left** Histogram showing the distribution of symptom scores (x-axis) under the ACTIVE arm (n=200) across 100 days (y-axis)
+               &lt;br&gt; **Center panel** Daily difference (w 95% CI) of ACTIVE vs PLACEBO, with Loess line overlayed overtime (negative --&gt; reduction ACTIVE arm) 
+               &lt;br&gt; **Top right** Mirrored histogram of the symptom scores (x-axis) under the PLACEBO Arm (n=100) across 100 days (y-axis). 
+               &lt;br&gt; **Bottom left/right** stacked bar charts for ACTIVE (left) and PLACEBO (right) groups during the 100 days&#39;,
+   caption  = &#39;Symptoms on a 4-point scale (0 = None, 1 = Minor, 2 = Moderate, 3 = Extreme) each day, for 100 days.&#39;) &amp; 
+   theme( plot.margin = margin(2, 2, 2, 2, &quot;pt&quot;),
+          plot.title = element_markdown(size = 9,
+                                           fill = &#39;gray85&#39;,
+                                           padding = margin(5, 5, 5, 5),
+                                           r = grid::unit(8, &quot;pt&quot;) ) )</code></pre>
+<p><img src="05-Plot-PRO-Data_files/figure-html/unnamed-chunk-13-1.png" width="960" /></p>
+<pre class="r"><code>ggsave(filename = &#39;WWWDiary_Aching.pdf&#39;,
+       width = 8, height = 5)</code></pre>
 </div>
-<div id="reference" class="section level1">
-<h1>Reference</h1>
+<div id="reference" class="section level2">
+<h2>Reference</h2>
 <p>SIG (2023, Sept. 13). VIS-SIG Blog: Wonderful Wednesdays September
 2023. Retrieved from <a
 href="https://graphicsprinciples.github.io/posts/2023-12-17-wonderful-wednesdays-september-2023/"
