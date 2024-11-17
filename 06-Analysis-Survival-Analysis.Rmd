@@ -2,16 +2,12 @@
 title: |
   ![](logo.png){width=3in}  
   Survival Analysis
-author: "Zehui Bai"
-date: 'Stand: `r format(Sys.time(), "%F %H:%M Uhr")`'
 output:
   html_document:
     df_print: paged
-    number_sections: yes
+    number_sections: No
     toc: yes
     toc_float: yes
-    theme: yeti # <!-- https://bootswatch.com/3/  -->
-    highlight: tango
   word_document:
     toc: yes
 fontsize: 10pt
@@ -19,6 +15,7 @@ editor_options:
   chunk_output_type: console
 colorlinks: yes
 ---
+ 
 
 ```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -47,81 +44,6 @@ ipak(packages)
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 getwd()
 Sys.setlocale("LC_ALL","English")
-
-# convert backslash to forward slash in R
-# gsub('"', "", gsub("\\\\", "/", readClipboard()))
-
-## get the path
-# rstudioapi::getSourceEditorContext()$path
-# dirname(rstudioapi::getSourceEditorContext()$path)
-
-## set working directory
-# getwd()
-# setwd("c:/Users/zbai/Desktop")
-# Sys.setlocale("LC_ALL","English")
-
-## get the R Version
-# paste(R.Version()[c("major", "minor")], collapse = ".")
-
-## convert backslash to forward slash 
-# scan("clipboard",what="string")
-# gsub('"', "", gsub("\\\\", "/", readClipboard())) 
-
-# Load all r functions
-# The directory where all source code files are saved.
-source_code_dir <- "C:/Users/baiz/Downloads/Data-Analyst-with-R/Function/ZB Function/"  
-file_path_vec <- list.files(source_code_dir, full.names = T)
-for(f_path in file_path_vec){source(f_path)}
-
-# <!-- ---------------------------------------------------------------------- -->
-# <!--                         3. Import the datasets                         -->
-# <!-- ---------------------------------------------------------------------- -->
-
-# <!-- ---------------------------- -->
-# <!-- --3.1 Import csv data ------ -->
-# <!-- ---------------------------- -->
-
-# pfad <- "~/Desktop/SASUniversityEdition/myfolders/Daten"
-# mydata1 <- read.csv(file.path(pfad, "yourcsv_data.csv"), 
-#                     sep=";", 
-#                     header=TRUE)   
-
-# Import all csv data from folder
-# list_csv_files <- list.files(path = "./csvfolder/")
-# do.call(rbind, lapply(list_csv_files, function(x) read.csv(x, stringsAsFactors = FALSE)))
-
-# <!-- ---------------------------- -->
-# <!-- --3.2 Import xlsx data ----- -->
-# <!-- ---------------------------- -->
-
-# library(readxl)
-# mydata2 <- read_excel("C:/Users/zbai/Documents/GitHub/R-Projects/SAS/Yimeng/results-text.xlsx")
-
-# <!-- ---------------------------- -->
-# <!-- --3.3 Import sas7dbat data - -->
-# <!-- ---------------------------- -->
-
-# library(sas7bdat)
-# mydata3 <- read.sas7bdat("~/Desktop/SASUniversityEdition/myfolders/Daten/uis.sas7bdat")
-
-# Import all sas7dbat data from SASfolder
-# ZB.import.sas.folder("./SASfolder/")
-
-# <!-- ---------------------------- -->
-# <!-- --3.4 Import from copyboard --->
-# <!-- ---------------------------- -->
-# copdat <- read.delim("clipboard")
-# Data_D01 <- copdat
-
-# <!-- ---------------------------------------------------------------------- -->
-# <!--                           4. Some Tools                                -->
-# <!-- ---------------------------------------------------------------------- -->
-
-# To check out vignettes for one specific package
-# browseVignettes("sjPlot")      # sjPlot for Models Summary
-# browseVignettes("kableExtra")
-# browseVignettes("gtsummary")
-# <!-- ---------------------------------------------------------------------- -->
 ```
 
  
@@ -1999,3 +1921,117 @@ It is the latter which is of specific interest here, and the subject of observab
 To address the problem of heterogeneity in a population resulting from unobserved covariates, Vaupel et al. (1979) suggested a random effects model for durations. They introduced the notion of frailty and applied it to population data. The classical and mostly applied frailty model assumes a proportional hazards model that is conditional on the random effect (frailty). To be more specific, the hazard of an individual depends additionally on an unobservable, age-independent random variable Z, which acts multiplicatively on the baseline hazard function λ0, where λ(t, Z) = Zλ0(t)
 
 Here, Z is considered as a random mixture variable, varying across the population. Note that a scale factor common to all subjects in the population maybe absorbed into the baseline hazard function λ0(t), so that frailty distributions are standardized to EZ = 1. The variance parameter σ 2 = V(Z) is interpretable as a measure of heterogeneity across the population in baseline risk. When σ 2 is small, then the values of Z are closely concentrated around one. If σ 2 is large, then values of Z are more dispersed, inducing greater heterogeneity in the individual hazards Zλ0(t). Frailty increases the individual risk and is sometimes called liability or susceptibility in other settings. All individuals, apart from an individual constant Z are assumed to follow the same mortality pattern. What may be observed in a population is not the individual hazard, but the net result for a number of individuals with different values of the random variable Z.
+
+
+
+
+# Restricted Mean Survival Time
+
+## Overview
+
+Restricted mean survival time (RMST) is a useful statistical measure in survival analysis, particularly when dealing with censored data, which is common in clinical trials and other medical studies.  
+
+1. **Definition**: RMST represents the average expected survival time up to a specified time point, \( t \), known as the truncation or horizon time. It is calculated as the area under the survival curve from the beginning of observation until time \( t \).
+
+2. **Calculation**: Mathematically, RMST is defined as:
+   \[
+   \text{RMST}(t) = \int_0^t S(u) \, du
+   \]
+   where \( S(u) \) is the survival function at time \( u \). This integral represents the expected time a subject remains in the study up to time \( t \), without experiencing the event of interest (like death or disease recurrence).
+
+3. **Usefulness**: RMST is particularly helpful when the proportional hazards assumption in a Cox model does not hold, providing a straightforward and easily interpretable summary of the survival experience of a cohort. It effectively compares the average survival times between different treatment groups up to time \( t \), making it a direct measure of the "life years gained" due to a treatment in a clinical setting.
+
+4. **Advantages**:
+   - RMST is valid under any of the time-to-event distributions
+   - It's a measure of survival time (easier to interpret)
+   - Non-dependency on PH: RMST does not rely on the PH assumption and is valid under any survival distribution.
+   - Provides a more direct interpretation relative to hazard ratios, as it can be expressed in units of time.
+
+5. **Applications**: RMST can be used to:
+   - Compare the effectiveness of different treatments.
+   - Estimate the impact of covariates on survival time.
+   - Provide a summary measure of survival data in health economic evaluations.
+
+
+## Problems with Proportional Hazards (PH)
+
+**Background on Hazard Ratio (HR)**
+
+- **Definition**: HR is commonly used in RCTs to compare the hazard functions between a treatment and a control group, aiming for values less than 1 to signify beneficial treatment effects.
+- **Assumption**: For HR to be valid, it assumes that the PH condition holds, meaning the ratio of the hazards (risk of an event per time unit) between two groups remains constant over time.
+- **Issues**: When PH is violated, such as in cases where treatments have different short-term and long-term effects (e.g., surgical vs. medical treatment), HR can become a misleading indicator of treatment effect. This is because it might not accurately represent the change in risk over the entire period of observation.
+
+
+**Problems with Proportional Hazards (PH)**
+
+- **Violation of PH**: In real-world scenarios, such as in cancer trials or those involving advanced therapeutics, the assumption of constant hazard ratios over time often fails. This can be due to varying biological responses to treatments or differing subpopulations within the study.
+- **Implications**: When PH is violated, using HR can lead to incorrect interpretations and decisions, potentially impacting clinical recommendations and patient care.
+
+**Advocating for RMST**
+
+- **Concept**: RMST measures the expected time until an event within a specified time frame, integrating the survival curve up to a truncation time point, \( t^* \). This can provide a direct measure of the "life expectancy" impact of a treatment.
+- **Benefits**:
+  - **Non-dependency on PH**: RMST does not rely on the PH assumption and is valid under any survival distribution.
+  - **Interpretability**: It gives a straightforward, time-based measure of treatment effect, which can be more clinically meaningful than HR.
+  - **Flexibility**: It accommodates varying survival distributions, making it suitable for complex clinical scenarios.
+  
+
+The uploaded content appears to define and discuss the Restricted Mean Survival Time (RMST) and its related concepts in detail. Let's break it down for clearer understanding:
+
+## Definition and Calculation 
+
+### RMST
+
+1. **Restricted Mean Survival Time (RMST)**:
+   - **Definition**: RMST is the mean survival time of a random variable \( T \) up to a specified time \( t^* \). It represents the expected value of the survival times truncated at \( t^* \), which is mathematically expressed as the area under the survival curve \( S(t) \) from time 0 to \( t^* \).
+   - **Formula**:
+     \[
+     \mu = E(X) = E[\min(T, t^*)] = \int_0^{t^*} S(t) dt
+     \]
+   - This concept provides a practical measure of life expectancy up to \( t^* \), accounting for all subjects as if their survival times were censored at \( t^* \).
+
+2. **Difference in RMST (\( \Delta \))**:
+   - When comparing two groups (e.g., a treatment group and a control group with survival functions \( S_1(t) \) and \( S_0(t) \)), the difference in RMST between the groups is represented by:
+     \[
+     \Delta = \int_0^{t^*} (S_1(t) - S_0(t)) dt
+     \]
+   - This difference \( \Delta \) can be interpreted as the area between the two survival curves over the interval from 0 to \( t^* \), effectively quantifying the treatment effect in terms of survival time.
+
+### Restricted Standard Deviation of Survival Time (RSDST)
+
+1. **Calculation of RSDST**:
+   - **Variance of Restricted Survival Time \( X \)**: The variance, denoted as \( \text{var}(X) \), is necessary to compute the standard error of the difference in RMST. It is derived from the second moment of \( X \):
+     \[
+     E(X^2) = t^*{}^2 [1 - S(t^*)] - 2 \int_0^{t^*} t [1 - S(t)] dt + 2 \int_0^{t^*} t S(t) dt
+     \]
+   - **Formula for Variance**:
+     \[
+     \text{var}(X) = E(X^2) - [E(X)]^2 = 2 \int_0^{t^*} t S(t) dt - \left(\int_0^{t^*} S(t) dt \right)^2
+     \]
+   - **Restricted Standard Deviation (RSDST)**: It is the square root of the variance:
+     \[
+     \text{RSDST} = \sqrt{\text{var}(X)}
+     \]
+
+## Integrating RMST into Analysis
+
+
+1. **Transition from HR to RMST**:
+   - Instead of relying solely on the HR as the summary statistic, which may not adequately represent the trial results under non-proportional hazards, RMST offers a more comprehensive measure. RMST directly quantifies the average survival time up to a specified time point \( t^* \), making it a more tangible measure of treatment effect.
+
+2. **Sample Size Calculation and Results Presentation**:
+   - Traditional ART sample size calculations are based on expected differences in HRs tested via the logrank test. By incorporating RMST, the sample size calculation can focus on detecting a significant difference in the mean survival times between the arms up to \( t^* \).
+
+3. **Defining Time Horizon \( t^* \)**:
+   - A critical component of using RMST is defining a suitable time horizon \( t^* \) for evaluating the treatment effect. This horizon should be chosen based on clinical relevance and expected treatment dynamics over time.
+
+4. **Flexibility in Trial Design**:
+   - RMST allows for greater flexibility in addressing varied survival distributions and accommodating trials where the proportional hazards assumption does not hold.
+
+5. **Improved Interpretability**:
+   - RMST provides results that are easily interpretable by clinicians and policymakers, offering a clear measure of how long, on average, patients benefit from the treatment up to \( t^* \), which can be more meaningful than the proportional risk reduction implied by HR.
+
+
+# Reference
+
+Royston, P., Parmar, M.K. Restricted mean survival time: an alternative to the hazard ratio for the design and analysis of randomized trials with a time-to-event outcome. BMC Med Res Methodol 13, 152 (2013). https://doi.org/10.1186/1471-2288-13-152
