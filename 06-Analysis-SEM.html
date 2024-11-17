@@ -1,0 +1,3116 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Structural Equation Modeling</title>
+
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Biosimilar-Trials.html">Statistical Considerations for the Design and Analysis of Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Alternatives-to-Power.html">Bayesian methods - Alternatives to Power</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Continuous-Endpoint.html">Sample Size Determination for Continuous Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Categorical-Endpoint.html">Sample Size Determination for Categorical Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Survival-Endpoint.html">Sample Size Determination for Survival Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Repeated-Measures.html">Sample Size Determination for Repeated Measures</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Sequential-Design.html">Statistical Considerations for Group Sequential Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Adaptive-Design.html">Statistical Considerations for Adaptive Design</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-Estimands.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot-Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Time-To-Event.html">Time to Event Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-PRO-Data.html">Patient Reported Outcome Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-SSC-and-Power-Calculation.html">Sample Size and Power Calculations Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Correlation.html">Correlation Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Model-Table.html">Clinical Data and Model visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-ScatterPlot.html">Scatter and Line Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-BarPlot.html">Bar Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-PieChart.html">Pie Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-BoxPlot.html">Box Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Histogram.html">Histogram</a>
+    </li>
+    <li>
+      <a href="05-Plot-Forest-Plot.html">Forest Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Flow-Chart.html">Flow Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Linear-Regression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Time-Series-Analysis.html">Time Series Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-SEM.html">Structural Equation Modeling</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Factor-Analysis.html">Factor Analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="07-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Structural Equation Modeling</p></h1>
+
+</div>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Structural Equation Modeling (SEM) is a comprehensive statistical
+approach that is used for testing hypotheses about the relationships
+among observed and latent (unobserved) variables. It combines elements
+of factor analysis and multiple regression analysis, allowing
+researchers to explore the structure of complex relationships that may
+exist between variables in social science, behavioral science, and other
+fields. Structural equation modeling is a linear model framework that
+models both simultaneous regression equations with latent variables.
+Models such as linear regression, multivariate regression, path
+analysis, confirmatory factor analysis, and structural regression can be
+thought of as special cases of SEM. The following relationships are
+possible in SEM:</p>
+<ul>
+<li>observed to observed variables ( <span
+class="math inline">\(\gamma\)</span>, e.g., regression)</li>
+<li>latent to observed variables ( <span
+class="math inline">\(\lambda\)</span>, e.g., confirmatory factor
+analysis)</li>
+<li>latent to latent variables ( <span class="math inline">\(\gamma,
+\beta\)</span> e.g., structural regression)</li>
+</ul>
+<p>The core components of SEM include:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Measurement Model</strong>: This part of SEM deals with
+the relationship between latent variables and their observed indicators.
+It is akin to factor analysis, where the focus is on validating the
+structure and loadings of observed data on latent constructs.</p></li>
+<li><p><strong>Structural Model</strong>: This represents the
+relationships between latent variables. It specifies how latent
+variables influence one another and can be thought of as similar to
+multiple regression analysis but at the level of latent
+constructs.</p></li>
+</ol>
+<p>SEM is carried out in several steps:</p>
+<ul>
+<li><strong>Model Specification</strong>: Defining the model structure,
+including the latent and observed variables and the hypothesized
+relationships between them.</li>
+<li><strong>Model Identification</strong>: Ensuring that the model has
+enough data to estimate the relationships.</li>
+<li><strong>Model Estimation</strong>: Using statistical software to
+estimate the parameters of the model (e.g., the strengths of the
+relationships between variables).</li>
+<li><strong>Model Evaluation</strong>: Assessing the fit of the model to
+the data through various fit indices and tests (e.g., RMSEA, CFI).</li>
+<li><strong>Model Modification</strong>: Based on the evaluation, the
+model may need adjustments to better fit the data.</li>
+<li><strong>Interpretation and Reporting</strong>: Interpreting the
+results in the context of the research questions and reporting the
+findings.</li>
+</ul>
+<p>SEM is powerful because it allows for the modeling of complex
+relationships, including mediation and moderation effects, and can
+handle measurement error more effectively than traditional regression
+analysis. It requires a large sample size and is conducted using
+specialized software, such as R’s <code>lavaan</code> package.</p>
+<div id="broad-framework-of-sem" class="section level2">
+<h2>Broad Framework of SEM</h2>
+<p>SEM includes a range of linear models:</p>
+<ul>
+<li><strong>Linear Regression</strong>: A basic form of statistical
+modeling that predicts the outcome of a dependent variable based on one
+or more independent variables.</li>
+<li><strong>Multivariate Regression</strong>: An extension of linear
+regression that predicts multiple dependent variables from a set of
+independent variables.</li>
+<li><strong>Path Analysis</strong>: Examines the directional
+relationships between observed variables.</li>
+<li><strong>Confirmatory Factor Analysis (CFA)</strong>: A specialized
+form of factor analysis used to test if the data fit a hypothesized
+measurement model.</li>
+<li><strong>Structural Regression</strong>: Combines features of
+regression and factor analysis to model relationships between latent
+constructs.</li>
+</ul>
+<p><strong>The LISREL Framework</strong>: Developed by Karl Joreskög,
+the LISREL (linear structural relations) framework is foundational to
+SEM. It provides a rigorous way to parameterize these models using
+matrices.</p>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<ul>
+<li><strong>Path Analysis</strong>: It’s appropriate only for observed
+variables since it doesn’t include latent constructs.</li>
+<li><strong>Structural Regression</strong>: It predicts relationships
+between latent constructs and can include observed endogenous variables
+as single indicator measurement models with constraints.</li>
+</ul>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_semflow.png" width="75%" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="path-analysis-model" class="section level1">
+<h1>Path Analysis Model</h1>
+<div id="introduction-1" class="section level2">
+<h2>Introduction</h2>
+<p>Path Analysis as a Subset of SEM: Path analysis is considered a
+specific instance of structural equation modeling. While both techniques
+are used to analyze relationships between variables, SEM encompasses a
+wider range of models, including those with latent variables (variables
+that are not directly observed but are inferred from other
+variables).</p>
+<p><strong>Assumption of Randomness</strong>: A fundamental assumption
+in SEM and, by extension, path analysis, is that all variables in the
+analysis are treated as random. This contrasts with some analytical
+approaches that might treat certain variables as fixed.</p>
+<p>A simple linear regression model can be viewed as a single path
+model, as represented by the following simple path diagram: <span
+class="math display">\[
+x \longrightarrow y \leftarrow \epsilon
+\]</span></p>
+<p>Often, the error term for an outcome (or endogenous) variable is
+omitted for clarity so that the following representation is equivalent:
+<span class="math display">\[
+x \longrightarrow y
+\]</span></p>
+<p>Treating <span class="math inline">\(y\)</span> and <span
+class="math inline">\(x\)</span> as random variables, we can write the
+simple linear regression model as: <span class="math display">\[
+y=\beta_0+\beta_1 x+\epsilon
+\]</span></p>
+<p>An implied structured covariance matrix is derived as: <span
+class="math display">\[
+\Sigma(\theta)=\left(\begin{array}{cc}
+\beta_1^2 \sigma_x^2+\sigma^2 &amp; \beta_1 \sigma_x^2 \\
+\beta_1 \sigma_x^2 &amp; \sigma_x^2
+\end{array}\right)
+\]</span> where <span class="math inline">\(\theta=\left(\beta_1,
+\sigma^2, \sigma_x^2\right)^{\prime}\)</span> is the parameter vector
+for the structured covariance matrix <span
+class="math inline">\(\Sigma(\theta)\)</span>.</p>
+<p><strong>What Does It Mean by Modeling a Covariance
+Structure?</strong></p>
+<p>In covariance structure analysis or structural equation modeling, the
+null hypothesis is usually of the following form: <span
+class="math display">\[
+H_0: \Sigma=\Sigma(\theta)
+\]</span></p>
+<p>In common words, the equality hypothesis of the unstructured and
+structured population covariance matrices states that the variances and
+covariances of the analysis variables are exactly prescribed as
+functions of θ. Because the structured covariance matrix is usually
+derived or implied from a model, in practice this null hypothesis is
+equivalent to asserting that the hypothesized model is exactly true in
+the population.</p>
+<p><strong>Note</strong>: The purpose of SEM is to reproduce the
+variance-covariance matrix using parameters <span
+class="math inline">\(\theta\)</span> we hypothesize will account for
+either the measurement or structural relations between variables. If the
+model perfectly reproduces the variance-covariance matrix then <span
+class="math inline">\(\Sigma=\Sigma(\theta)\)</span>.</p>
+<p><strong>Hypothetical-Deductive Sequence</strong></p>
+<p>The passage outlines a hypothetical-deductive sequence in a stepwise
+manner to demonstrate how SEM operates from hypothesis to data analysis:
+1. Hypothesize a Model: Begin with a theoretical model that accounts for
+the relationships between variables. 2. Derive a Structured Covariance
+Matrix: From this model, derive a structured covariance matrix, <span
+class="math inline">\(\Sigma(\theta)\)</span>, that is hypothesized to
+represent the population covariance matrix. 3. Numerical Evaluation:
+Evaluate this structured covariance matrix using known parameter values
+to see if it matches the theoretical population covariance matrix.</p>
+<p><strong>Empirical Application</strong></p>
+<p>The empirical application of this sequence effectively reverses the
+steps, starting from observed data to test the hypothesized model: 1.
+Compute Sample Covariance Matrix (S): Represents the unstructured
+covariance matrix in the population. 2. Estimate Parameters ( <span
+class="math inline">\({ }^{\wedge} \theta\)</span> ): Find the best
+estimates for the model parameters such that the hypothesized covariance
+structure, <span class="math inline">\(\Sigma\left({ }^{\wedge}
+\theta\right)\)</span>, matches the sample covariance matrix as closely
+as possible. 3. Model Assessment: Compare the hypothesized structured
+covariance matrix with the sample covariance matrix to assess the fit of
+the hypothesized model.</p>
+</div>
+<div id="path-diagram" class="section level2">
+<h2>Path Diagram</h2>
+<p><strong>Definitions</strong></p>
+<ul>
+<li>observed variable: a variable that exists in the data, a.k.a item or
+manifest variable</li>
+<li>latent variable: a variable that is constructed and does not exist
+in the data</li>
+<li>exogenous variable: an independent variable either observed (x) or
+latent (<span class="math inline">\(\xi\)</span>) that explains an
+endogenous variable</li>
+<li>endogenous variable: a dependent variable, either observed (y) or
+latent (<span class="math inline">\(\eta\)</span>) that has a causal
+path leading to it</li>
+<li>measurement model: a model that links observed variables with latent
+variables</li>
+<li>indicator: an observed variable in a measurement model (can be
+exogenous or endogenous)</li>
+<li>factor: a latent variable defined by its indicators (can be
+exogenous or endogenous)</li>
+<li>loading: a path between an indicator and a factor</li>
+<li>structural model: a model that specifies causal relationships among
+exogenous variables to endogenous variables (can be observed or
+latent)</li>
+<li>regression path: a path between exogenous and endogenous variables
+(can be observed or latent)</li>
+</ul>
+<p>To facilitate understanding of the matrix equations (which can be a
+bit intimidating), a path diagram will be presented with every matrix
+formulation as it is a symbolic one-to-one visualization. Before we
+present the actual path diagram, the table below defines the symbols we
+will be using. Circles represent latent variables, squares represent
+observed indicators, triangles represent intercepts or means, one-way
+arrows represent paths and two-way arrows represent either variances or
+covariances.</p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_pathlegend1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>For example in the figure below, the diagram on the left depicts the
+regression of a factor on an item (contained in a measurement model) and
+the diagram on the right depicts the variance of the factor (a two-way
+arrow pointing to a the factor itself).</p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_pathlegend2.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>The following is a path diagram of all the types of variables and
+relationships</p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_pathlegend3.png" width="75%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="discrepancy-functions" class="section level2">
+<h2>Discrepancy Functions</h2>
+<p>Discrepancy functions play a critical role in parameter estimation
+and model fitting in structural equation modeling (SEM). They are used
+to measure the extent to which the sample covariance matrix <span
+class="math inline">\((S\)</span> ) deviates from the model-implied
+covariance matrix <span class="math inline">\((\Sigma(\theta)\)</span>
+), with <span class="math inline">\(\theta\)</span> representing the
+model parameters. The goal is to find the parameter values that minimize
+this discrepancy, indicating a good fit between the model and the
+observed data.</p>
+<p><strong>Understanding Discrepancy Functions</strong></p>
+<p>Discrepancy functions are essentially objective functions <span
+class="math inline">\((F(S, \Sigma(\theta))\)</span> ) used in SEM to
+quantify the “distance” or “discrepancy” between the observed data
+covariance matrix and the covariance matrix predicted by the model under
+certain parameter values. The process involves: - Estimation: Starting
+with the observed covariance matrix <span
+class="math inline">\((S)\)</span> and the hypothesized model structure
+<span class="math inline">\((\Sigma(\theta))\)</span>, the model
+parameters <span class="math inline">\((\theta)\)</span> are estimated
+such that the discrepancy function is minimized. - Model Support:
+Ideally, a small minimum discrepancy function value <span
+class="math inline">\(\left(F_{\min }\right.\)</span> ) supports the
+hypothesized model, indicating that the model-implied covariance matrix
+can closely reproduce the observed covariance matrix.</p>
+<p><strong>Common Discrepancy Functions</strong></p>
+<ol style="list-style-type: decimal">
+<li>Maximum Likelihood (ML) Discrepancy Function:</li>
+</ol>
+<ul>
+<li><span class="math inline">\(F_{M L}(S, \Sigma(\theta))=\log
+|\Sigma(\theta)|-\log |S|+\operatorname{trace}\left(S
+\Sigma^{-1}(\theta)\right)-p\)</span></li>
+<li>Derived from the likelihood of the data under the assumption of
+multivariate normality.</li>
+<li>It includes terms for the determinants of <span
+class="math inline">\(S\)</span> and <span
+class="math inline">\(\Sigma(\theta)\)</span>, and the trace of the
+product of <span class="math inline">\(S\)</span> and the inverse of
+<span class="math inline">\(\Sigma(\theta)\)</span>, adjusted by the
+dimension <span class="math inline">\(p\)</span>.</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Normal-Theory Generalized Least Squares (NTGLS) or GLS:</li>
+</ol>
+<ul>
+<li><span class="math inline">\(F_{G L S}(S, \Sigma(\theta))=\frac{1}{2}
+\operatorname{trace}\left[(S-\Sigma(\theta))^2\right]\)</span></li>
+<li>Assumes multivariate normality and focuses on minimizing the squared
+difference between <span class="math inline">\(S\)</span> and <span
+class="math inline">\(\Sigma(\theta)\)</span>.</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>Asymptotically Distribution-Free (ADF) or Weighted Least Squares
+(WLS):</li>
+</ol>
+<ul>
+<li><span class="math inline">\(F_{A D F}(S,
+\Sigma(\theta))=\operatorname{vecs}(S-\Sigma(\theta))^{\prime} W
+\operatorname{vecs}(S-\Sigma(\theta))\)</span></li>
+<li>Suitable for any distribution, it minimizes the weighted squared
+difference, using a vector of the differences between <span
+class="math inline">\(S\)</span> and <span
+class="math inline">\(\Sigma(\theta)\)</span>, and a weight matrix <span
+class="math inline">\(W\)</span>.</li>
+</ul>
+<p><strong>Choosing a Discrepancy Function</strong></p>
+<ul>
+<li><strong>Model Assumptions</strong>: The choice often depends on the
+distributional assumptions about the data. ML and GLS assume
+multivariate normality, while ADF/WLS does not.</li>
+<li><strong>Sample Size</strong>: ADF/WLS is theoretically applicable to
+any distribution but requires a large sample size to achieve reliable
+estimates.</li>
+<li><strong>Popularity and Application</strong>: Despite its
+assumptions, ML remains the most popular due to its balance of
+efficiency and robustness in practical applications.</li>
+</ul>
+</div>
+<div
+id="evaluation-of-the-structural-model-and-goodness-of-fit-statistics"
+class="section level2">
+<h2>Evaluation of the Structural Model and Goodness-of-Fit
+Statistics</h2>
+<p>After the estimation of model parameters, we want to make some
+inferential statements about the hypothesized model. There are several
+goodness-of-fit statistics, which are all computed after the model
+estimation.</p>
+<p><strong>In Summary</strong>, When evaluating the fit of a statistical
+model, especially in the context of Structural Equation Modeling (SEM),
+it’s crucial to use multiple goodness-of-fit indices because each index
+measures different aspects of model fit.</p>
+<ol style="list-style-type: decimal">
+<li>Chi-Square <span class="math inline">\(\left(X^2\right)\)</span>
+Statistic</li>
+</ol>
+<ul>
+<li>Purpose: Tests the null hypothesis that the model fits the data
+perfectly.</li>
+<li>Usage: A significant <span
+class="math inline">\(\mathrm{X}^2\)</span> indicates a poor fit, but it
+is sensitive to sample size, leading to its frequent supplementation
+with other indices.</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Root Mean Square Error of Approximation (RMSEA)</li>
+</ol>
+<ul>
+<li>Purpose: Assesses the absolute fit of the model, indicating how well
+the model, with unknown but optimally chosen parameter estimates, would
+fit the population’s covariance matrix.</li>
+<li>Usage: Incorporates model complexity by considering degrees of
+freedom. Values <span class="math inline">\(\leq 0.05\)</span> indicate
+a close fit, values up to 0.08 represent a reasonable error of
+approximation, and the <span class="math inline">\(90 \%\)</span>
+confidence interval provides additional context.</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>Standardized Root Mean Square Residual (SRMR)</li>
+</ol>
+<ul>
+<li>Purpose: Another measure of absolute fit, representing the standard
+deviation of the residuals between the observed and the model-implied
+covariance matrices.</li>
+<li>Usage: Values less than 0.08 are generally considered good,
+indicating small residuals on average.</li>
+</ul>
+<ol start="4" style="list-style-type: decimal">
+<li>Comparative Fit Index (CFI)</li>
+</ol>
+<ul>
+<li>Purpose: Measures the incremental fit of the model compared to a
+baseline model, typically one of independence among variables.</li>
+<li>Usage: Values above 0.90 (or some suggest 0.95 for a stricter
+criterion) indicate a good fit to the data, considering the improvement
+over the null model.</li>
+</ul>
+<ol start="5" style="list-style-type: decimal">
+<li>Tucker-Lewis Index (TLI)</li>
+</ol>
+<ul>
+<li>Purpose: Also an incremental fit index like CFI but includes a
+penalty for adding parameters (model complexity).</li>
+<li>Usage: Similar to <span class="math inline">\(\mathrm{CFI}\)</span>,
+values above 0.90 or 0.95 suggest a good fit.</li>
+</ul>
+<ol start="6" style="list-style-type: decimal">
+<li>Akaike Information Criterion (AIC) and Bayesian Information
+Criterion (BIC)</li>
+</ol>
+<ul>
+<li>Purpose: Provide a means for model selection among a set of models,
+considering the goodness of fit and the number of parameters.</li>
+<li>Usage: They do not offer conventional cutoffs for good fit; instead,
+the model with the lowest AIC or BIC value among a set of models is
+preferred, balancing fit and complexity.</li>
+</ul>
+<div id="incremental-versus-absolute-fit-index" class="section level3">
+<h3>Incremental versus absolute fit index</h3>
+<p>For over-identified models, there are many types of fit indexes
+available to the researcher. Historically, model chi-square was the only
+measure of fit but in practice the null hypothesis was often rejected
+due to the chi-square’s heightened sensitivity under large samples. To
+resolve this problem, approximate fit indexes that were not based on
+accepting or rejecting the null hypothesis were developed. Approximate
+fit indexes can be further classified into a) absolute and b)
+incremental or relative fit indexes. An incremental fit index (a.k.a.
+relative fit index) assesses the ratio of the deviation of the user
+model from the worst fitting model (a.k.a. the baseline model) against
+the deviation of the saturated model from the baseline model.
+Conceptually, if the deviation of the user model is the same as the
+deviation of the saturated model (a.k.a best fitting model), then the
+ratio should be 1. Alternatively, the more discrepant the two
+deviations, the closer the ratio is to 0 (see figure below). Examples of
+incremental fit indexes are the CFI and TLI.</p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SME_fit1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>An absolute fit index on the other hand, does not compare the user
+model against a baseline model, but instead compares it to the observed
+data. An example of an absolute fit index is the RMSEA (see flowchart
+below).</p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SME_fit2.png" width="75%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="chi2-test-of-model-fit" class="section level3">
+<h3><span class="math inline">\(\chi^2\)</span> Test of Model Fit</h3>
+<p>The chi-square <span
+class="math inline">\(\left(\chi^2\right)\)</span> statistic is computed
+as the product of the sample size and the minimized discrepancy function
+- that is <span class="math inline">\(\chi^2=N \times F_{\min
+}\)</span>. Some software might use <span
+class="math inline">\((N-1)\)</span> in the product when only covariance
+structures are fitted. Recall that the null hypothesis being tested is
+<span class="math inline">\(H_0: \Sigma=\Sigma(\theta)\)</span>. The
+chi-square statistic is being used to determine whether the sample
+presents evidence against the null hypothesis. Under the null hypothesis
+of a true null model, the chi-square statistic is distributed as a <span
+class="math inline">\(\chi^2\)</span> variate with specific model
+degrees of freedom. When the observed <span
+class="math inline">\(p\)</span>-value of the chi-square statistic is
+very small (e.g., less than a conventional <span
+class="math inline">\(\alpha\)</span>-level of 0.05), the data present
+an extreme event under <span class="math inline">\(H_0\)</span>. Such an
+extreme event (associated with a small <span
+class="math inline">\(p\)</span> value) suggests that the null
+hypothesis <span class="math inline">\(H_0\)</span> might not be tenable
+and should be rejected. Conversely, the higher the <span
+class="math inline">\(p\)</span>-value associated with the observed
+<span class="math inline">\(\chi^2\)</span> value, the closer the fit
+between the hypothesized model (under <span
+class="math inline">\(H_0\)</span> ) and the perfect fit (Bollen,
+1989).</p>
+<p><strong>However, the chi-square test statistic is sensitive to sample
+size</strong>. Because the <span class="math inline">\(\chi^2\)</span>
+statistic equals <span class="math inline">\(N \times F_{\min
+}\)</span>, this value tends to be substantial when the model does not
+hold (even minimally) and the sample size is large (Jöreskog and Sörbom,
+1993). The conundrum here, however, is that the analysis of covariance
+structures is grounded in large sample theory. As such, large samples
+are critical to obtaining precise parameter estimates, as well as to the
+tenability of asymptotic distributional approximations (MacCallum et
+al., 1996).</p>
+<p>Findings of well-fitting hypothesized models, where the <span
+class="math inline">\(\chi^2\)</span> value approximates the degrees of
+freedom, have proven to be unrealistic in most SEM empirical research.
+That is, despite relatively negligible difference between a population
+covariance matrix <span class="math inline">\((\Sigma)\)</span> and a
+hypothesized model with population structured covariance matrix <span
+class="math inline">\(\Sigma(\theta)\)</span>, it is not unusual that
+the hypothesized model would be rejected by the <span
+class="math inline">\(\chi^2\)</span> test statistic with a practically
+large enough sample size.</p>
+<p>Hence, the <span class="math inline">\(\chi^2\)</span>-testing scheme
+of the sharp null hypothesis <span
+class="math inline">\(\Sigma=\Sigma(\theta)\)</span> in practical
+structural equation modeling has been deemphasized in favor of the use
+of various fit indices, which measures how good (or bad) the structural
+model approximates the truth as reflected by the unstructured model. The
+next few sections describe some of these popular fit indices and their
+conventional uses.</p>
+</div>
+<div id="loglikelihood" class="section level3">
+<h3>Loglikelihood</h3>
+<p>Two loglikelihood values are usually reported in SEM software, one
+for the hypothesized model (under <span
+class="math inline">\(H_0\)</span> ) and the other for the saturated (or
+unrestricted) model (under <span class="math inline">\(H_1\)</span> ).
+Some software packages might also display the loglikelihood value of the
+so-called baseline model-usually the uncorrelatedness model, which
+assumes covariances among all observed variables are zeros. Although the
+magnitudes of these loglikelihood values are not indicative of model
+fit, they are often computed because they are the basis of other fit
+indices such as the Information Criteria that are described in Section
+1.3.4.6. Moreover, under multivariate normality, the <span
+class="math inline">\(\chi^2\)</span> statistic for model fit test is -2
+times of the difference between the loglikelihood values under <span
+class="math inline">\(H_0\)</span> and <span
+class="math inline">\(H_1\)</span>.</p>
+</div>
+<div
+id="root-mean-square-error-of-approximation-rmsea-steiger-and-lind-1980-and-the-standardized-root-mean-square-residual-srmr"
+class="section level3">
+<h3>Root Mean Square Error of Approximation (RMSEA) (Steiger and Lind,
+1980) and the Standardized Root Mean Square Residual (SRMR)</h3>
+<p>They belong to the category of absolute indices of fit. However,
+Browne et al. (2002) have termed them, more specifically, as “absolute
+misfit indices” (p. 405).</p>
+<p>By convention, RMSEA <span class="math inline">\(\leq 0.05\)</span>
+indicates a good fit, and RMSEA values as high as 0.08 represents
+reasonable errors of approximation in the population (Browne and Cudeck,
+1993). In elaborating on these cutpoints, RMSEA values ranging from 0.08
+to 0.10 indicate mediocre fit, and those <span
+class="math inline">\(&gt;0.10\)</span> indicate poor fit.</p>
+<p>The Root Mean Square Residual (RMR) represents the average residual
+value derived from the fitting of the variance-covariance matrix for the
+hypothesized model <span class="math inline">\(\Sigma(\theta)\)</span>
+to the variance-covariance matrix of the sample data <span
+class="math inline">\((S)\)</span>. However, because these residuals are
+relative to the sizes of the observed variances and covariances, they
+are difficult to interpret. Thus, they are best interpreted in the
+metric of the correlation matrix ( <span
+class="math inline">\(\mathrm{Hu}\)</span> and Bentler; Jöreskog and
+Sörbom, 1989), which is represented by its standardized version, the
+Standardized Root Mean Square Residual (SRMR).</p>
+<p>The SRMR represents the average value across all standardized
+residuals and ranges from 0.00 to 1.00 . In a well-fitting model, this
+value <strong>should be small</strong> (say, . 05 or less).</p>
+</div>
+<div id="comparative-fit-index-cfi-bentler-1995" class="section level3">
+<h3>Comparative Fit Index (CFI) (Bentler, 1995)</h3>
+<p>As an alternative index in model fitting, CFI is normed in the sense
+that it ranges from 0.00 to 1.00 , <strong>with values close to 1.00
+being indicative of a wellfitting model. A cutoff value close to 0.95
+has more recently been advised</strong> (Hu and Bentler, 1999).
+Computation of the CFI is as follows: <span class="math display">\[
+\mathrm{CFI}=1-\frac{\chi_H^2-d f_H}{\chi_B^2-d f_B}
+\]</span> where <span class="math inline">\(H=\)</span> the hypothesized
+model, and <span class="math inline">\(B=\)</span> the baseline model.
+Usually, the baseline model refers to the uncorrelatedness model, in
+which the structured covariance matrix is a diagonal matrix in the
+population- that is, covariances among all observed variables are
+zeros.</p>
+</div>
+<div id="tucker-lewis-fit-index-tli-tucker-and-lewis-1973"
+class="section level3">
+<h3>Tucker-Lewis Fit Index (TLI) (Tucker and Lewis, 1973)</h3>
+<p>In contrast to the CFI, the TLI is a nonnormed index, which means
+that its values can extend outside the range of <span
+class="math inline">\(0.00-1.00\)</span>. This index is also known as
+Bentler’s non-normed fit index (Bentler and Bonett, 1980) in some
+software packages. Its values are interpreted in the same way as for the
+CFI, with values close to 1.00 being indicative of a well-fitting model.
+Computation of the TLI is as follows: <span class="math display">\[
+\mathrm{TLI}=\frac{\left(\frac{\chi_B^2}{d f_B}-\frac{\chi_H^2}{d
+f_H}\right)}{\left(\frac{\chi_B^2}{d f_B}-1\right)}
+\]</span></p>
+</div>
+<div
+id="the-akaikes-information-criterion-aic-akaike-1987-and-the-bayesian-information-criterion-bic-raftery-1993-schwarz-1978"
+class="section level3">
+<h3>The Akaike’s Information Criterion (AIC) (Akaike, 1987) and the
+Bayesian Information Criterion (BIC) (Raftery, 1993; Schwarz, 1978)</h3>
+<p>The AIC and BIC are computed by the following formulas: <span
+class="math display">\[
+\begin{aligned}
+&amp; \mathrm{AIC}=-2(\log \text {-likelihood })+2 k \\
+&amp; \mathrm{BIC}=-2(\log \text {-likelihood })+\ln (N) k
+\end{aligned}
+\]</span> where <span class="math inline">\(\log\)</span>-likelihood is
+computed under the hypothesized model <span
+class="math inline">\(H_0\)</span> and <span
+class="math inline">\(k\)</span> is the number of independent parameters
+in the model. Unlike various fit indices described previously (such as
+RMSEA, SRMR, CFI, and TLI), AIC and BIC are not used directly for
+assessing the absolute fit of a hypothesized model. Instead, AIC and BIC
+are mainly used for model selection.</p>
+<p>Suppose that there are several competing models that are considered
+to be reasonable for explaining the data. These models can have
+different numbers of parameters, and they can be nested or nonnested
+within each other. The <span class="math inline">\(\mathrm{AIC}\)</span>
+and BIC values are computed for each of these computing models. You
+would then select the best model, which has the smallest AIC or BIC
+value.</p>
+<p>As can be seen from either formula for AIC and BIC, the first term (
+-2 times of the loglikelihood) is a measure of model misfit and the
+second term (a multiple of the number of parameters in a model) is a
+measure of model complexity. Because you can always reduce, or at least
+never increase, model misfit (that is - minimize the first term) by
+increasing the model complexity with additional parameters, we can
+interpret AIC or BIC as a criterion that selects the best model based on
+the optimal balance between model fit (or misfit) and model complexity.
+The two information criteria differ in that the <strong>BIC assigns a
+greater penalty of model complexity than the AIC (say, whenever <span
+class="math inline">\(N \geq 8\)</span> ), and is more apt to select
+parsimonious models</strong> (Arbuckle, 2007).</p>
+</div>
+</div>
+<div id="r-lavaan-implementation" class="section level2">
+<h2>R lavaan Implementation</h2>
+<ol style="list-style-type: decimal">
+<li>Load Data</li>
+<li>Simple regression (Model 1A)</li>
+</ol>
+<table class="table" style="color: black; margin-left: auto; margin-right: auto;border-bottom: 0;">
+<caption>
+Covariance Matrix
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+motiv
+</th>
+<th style="text-align:right;">
+harm
+</th>
+<th style="text-align:right;">
+stabi
+</th>
+<th style="text-align:right;">
+ppsych
+</th>
+<th style="text-align:right;">
+ses
+</th>
+<th style="text-align:right;">
+verbal
+</th>
+<th style="text-align:right;">
+read
+</th>
+<th style="text-align:right;">
+arith
+</th>
+<th style="text-align:right;">
+spell
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+motiv
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+77
+</td>
+<td style="text-align:right;">
+59
+</td>
+<td style="text-align:right;">
+-25.00000
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+32
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:right;">
+60
+</td>
+<td style="text-align:right;">
+59
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+harm
+</td>
+<td style="text-align:right;">
+77
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+-25.00000
+</td>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:right;">
+44
+</td>
+<td style="text-align:right;">
+45
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+stabi
+</td>
+<td style="text-align:right;">
+59
+</td>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+-16.00000
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+36
+</td>
+<td style="text-align:right;">
+38
+</td>
+<td style="text-align:right;">
+38
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ppsych
+</td>
+<td style="text-align:right;">
+-25
+</td>
+<td style="text-align:right;">
+-25
+</td>
+<td style="text-align:right;">
+-16
+</td>
+<td style="text-align:right;">
+99.99999
+</td>
+<td style="text-align:right;">
+-42
+</td>
+<td style="text-align:right;">
+-40
+</td>
+<td style="text-align:right;">
+-39
+</td>
+<td style="text-align:right;">
+-24
+</td>
+<td style="text-align:right;">
+-31
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ses
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+-42.00000
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+43
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:right;">
+33
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+verbal
+</td>
+<td style="text-align:right;">
+32
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+-40.00000
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+56
+</td>
+<td style="text-align:right;">
+49
+</td>
+<td style="text-align:right;">
+48
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+read
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:right;">
+36
+</td>
+<td style="text-align:right;">
+-39.00000
+</td>
+<td style="text-align:right;">
+43
+</td>
+<td style="text-align:right;">
+56
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+73
+</td>
+<td style="text-align:right;">
+87
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+arith
+</td>
+<td style="text-align:right;">
+60
+</td>
+<td style="text-align:right;">
+44
+</td>
+<td style="text-align:right;">
+38
+</td>
+<td style="text-align:right;">
+-24.00000
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:right;">
+49
+</td>
+<td style="text-align:right;">
+73
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+72
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+spell
+</td>
+<td style="text-align:right;">
+59
+</td>
+<td style="text-align:right;">
+45
+</td>
+<td style="text-align:right;">
+38
+</td>
+<td style="text-align:right;">
+-31.00000
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:right;">
+48
+</td>
+<td style="text-align:right;">
+87
+</td>
+<td style="text-align:right;">
+72
+</td>
+<td style="text-align:right;">
+100
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<span style="font-style: italic;">Note: </span>
+</td>
+</tr>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<sup></sup> positive covariance means that as one item increases the
+other increases, a negative covariance means that as one item increases
+the other item decreases. The covariance of motiv and ppsych is -25
+which means that as negative parental psychology increases student
+motivation decreases.
+</td>
+</tr>
+</tfoot>
+</table>
+<p><img src="06-Analysis-SEM_files/figure-html/unnamed-chunk-7-1.png" width="960" /></p>
+<div id="simple-regression" class="section level3">
+<h3>Simple Regression</h3>
+<p>Simple regression models the relationship of an observed exogenous
+variable on a single observed endogenous variable. For a single subject,
+the simple linear regression equation is most commonly defined as:</p>
+<p><span class="math display">\[
+y_1=b_0+b_1 x_1+\epsilon_1
+\]</span></p>
+<p>where <span class="math inline">\(b_0\)</span> is the intercept and
+<span class="math inline">\(b_1\)</span> is the coefficient and <span
+class="math inline">\(x\)</span> is an observed predictor and <span
+class="math inline">\(\epsilon\)</span> is the residual. Karl Joreskög,
+the originator of LISREL (linear structural relations), developed a
+special notation for the exact same model for a single observation:</p>
+<p><span class="math display">\[
+y_1=\alpha+\gamma x_1+\zeta_1
+\]</span></p>
+<p>Definitions - <span class="math inline">\(x_1\)</span> single
+exogenous variable - <span class="math inline">\(y_1\)</span> single
+endogenous variable - <span class="math inline">\(b_0, \alpha_1\)</span>
+intercept of <span class="math inline">\(y_1\)</span>, “alpha” - <span
+class="math inline">\(b_1, \gamma_1\)</span> regression coefficient,
+“gamma” - <span class="math inline">\(\epsilon_1, \zeta_1\)</span>
+residual of <span class="math inline">\(y_1\)</span>, “epsilon” and
+“zeta” - <span class="math inline">\(\phi\)</span>, variance or
+covariance of the exogenous variable, “phi” - <span
+class="math inline">\(\psi\)</span> residual variance or covariance of
+the endogenous variable, “psi”</p>
+<p>To see the matrix visually, we can use a path diagram (Model 1A):</p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_m1a.png" width="75%" style="display: block; margin: auto;" /></p>
+<pre><code>## 
+## Call:
+## lm(formula = read ~ motiv, data = dat)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -26.0995  -6.1109   0.2342   5.2237  24.0183 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -1.232e-07  3.796e-01    0.00        1    
+## motiv        5.300e-01  3.800e-02   13.95   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 8.488 on 498 degrees of freedom
+## Multiple R-squared:  0.2809, Adjusted R-squared:  0.2795 
+## F-statistic: 194.5 on 1 and 498 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre><code>## lavaan 0.6-19 ended normally after 8 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                         5
+## 
+##   Number of observations                           500
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                 0.000
+##   Degrees of freedom                                 0
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   read ~                                              
+##     motiv             0.530    0.038   13.975    0.000
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .read             -0.000    0.379   -0.000    1.000
+##     motiv             0.000    0.447    0.000    1.000
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     motiv            99.800    6.312   15.811    0.000
+##    .read             71.766    4.539   15.811    0.000</code></pre>
+<pre><code>## [1] 2.4e-07</code></pre>
+<pre><code>## [1] 100</code></pre>
+<p><strong>Intercept and Regression Coefficient</strong></p>
+<ul>
+<li><em>Intercept of .read (-0.000)</em>: The notation .read signifies
+an endogenous variable when discussing intercepts in lavaan output. An
+endogenous variable is one that is influenced within the model by other
+variables. The intercept being -0.000 (with a small rounding error)
+suggests that when all predictors are at zero, the expected value of
+.read is essentially zero. This is consistent with linear regression
+models where the intercept represents the expected value of the
+dependent variable when all independent variables are zero.</li>
+<li><em>Regression coefficient of read ~ motiv (0.530)</em>: This
+coefficient represents the expected change in read (reading ability,
+presumably) for a one-unit increase in motiv (motivation), holding all
+other variables constant. The positive value suggests a positive
+relationship between motivation and reading ability.</li>
+</ul>
+<p><strong>Exogenous Mean and Variance</strong></p>
+<ul>
+<li><em>Intercept for motiv (0.000)</em>: The absence of a dot (.)
+before motiv indicates it’s treated as an exogenous variable, meaning
+it’s assumed to influence other variables within the model but is not
+influenced by them. The zero intercept, after centering variables at
+zero, means the model assumes the average motivation level to be at this
+centered point.</li>
+<li><em>Variance for motiv (99.800)</em>: This closely matches the
+expected variance of 100, demonstrating the variability of motivation
+around its mean. Centering does not change variance, so this remains
+close to the univariate variance calculated directly from the data.</li>
+</ul>
+<p><strong>Maximum likelihood vs. least squares</strong></p>
+<p>The estimates of the regression coefficients are equivalent between
+the two methods but the variance differs. For least squares, the
+estimate of the residual variance is: <span class="math display">\[
+\hat{\sigma}_{L S}^2=\frac{\sum_{i=1}^N \hat{\zeta}_i^2}{N-k}
+\]</span> where <span class="math inline">\(N\)</span> is the sample
+size, and <span class="math inline">\(k\)</span> is the number of
+predictors +1 (intercept) For maximum likelihood the estimate of the
+residual variance is: <span class="math display">\[
+\hat{\sigma}_{M L}^2=\frac{\sum_{i=1}^N \hat{\zeta}_i^2}{N}
+\]</span></p>
+<p>To convert from the least squares residual variance to maximum
+likelihood: <span class="math display">\[
+\hat{\sigma}_{M L}^2=\left(\frac{N-k}{n}\right) \hat{\sigma}_{L S}^2
+\]</span></p>
+<ul>
+<li><strong>lm() output</strong>: Residual standard error: 8.488 on 498
+degrees of freedom</li>
+<li>So the least square variance is <span
+class="math inline">\(8.488^2=72.046\)</span>. To convert the variance
+to maximum likelihood, since <span class="math inline">\(k=2\)</span> we
+have <span class="math inline">\(498 / 500(72.046)=71.76\)</span>.</li>
+</ul>
+<pre><code>## [1] 71.76618</code></pre>
+</div>
+<div id="multiple-regression" class="section level3">
+<h3>Multiple Regression</h3>
+<p>Simple regression is limited to just a single exogenous variable. In
+practice, a researcher may be interested in how a group of exogenous
+variable predict an outcome. Suppose we still have one endogenous
+outcome but two exogenous predictors; this is known as multiple
+regression (not to be confused with multivariate regression). Matrix
+form allows us to concisely represent the equation for all observations
+<span class="math display">\[
+y_1=\alpha_1+\mathbf{x} \gamma+\zeta_1
+\]</span></p>
+<p>Definitions - <span class="math inline">\(y_1\)</span> single
+endogenous variable - <span class="math inline">\(\alpha_1\)</span>
+intercept for <span class="math inline">\(y_1\)</span> - <span
+class="math inline">\(\mathbf{x}\)</span> vector <span
+class="math inline">\((1 \times q)\)</span> of exogenous variables -
+<span class="math inline">\(\gamma\)</span> vector <span
+class="math inline">\((q \times 1)\)</span> of regression coefficients
+where <span class="math inline">\(q\)</span> is the total number of
+exogenous variables - <span class="math inline">\(\zeta_1\)</span>
+residual of <span class="math inline">\(y_1\)</span>, pronounced “zeta”.
+- <span class="math inline">\(\phi\)</span>, variance or covariance of
+the exogenous variable - <span class="math inline">\(\psi\)</span>
+residual variance or covariance of the endogenous variable</p>
+<p>Assumptions - <span class="math inline">\(E(\zeta)=0\)</span> the
+mean of the residuals is zero - <span
+class="math inline">\(\zeta\)</span> is uncorrelated with <span
+class="math inline">\(\mathbf{x}\)</span></p>
+<p>Suppose we have two exogenous variables <span
+class="math inline">\(x_1, x_2\)</span> predicting a single endogenous
+variable <span class="math inline">\(y_1\)</span>. The path diagram for
+this multiple regression is:</p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_m2.png" width="75%" style="display: block; margin: auto;" /></p>
+<pre><code>## lavaan 0.6-19 ended normally after 1 iteration
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                         4
+## 
+##   Number of observations                           500
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                 0.000
+##   Degrees of freedom                                 0
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   read ~                                              
+##     ppsych           -0.275    0.037   -7.385    0.000
+##     motiv             0.461    0.037   12.404    0.000
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .read             -0.000    0.360   -0.000    1.000
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .read             64.708    4.092   15.811    0.000</code></pre>
+</div>
+<div id="multivariate-regression" class="section level3">
+<h3>Multivariate Regression</h3>
+<p>Simple and multiple regression model one outcome <span
+class="math inline">\((y)\)</span> at a time. In multivariate or
+simultaneous linear regression, multiple outcomes <span
+class="math inline">\(y_1, y_2, \ldots, y_p\)</span> are modeled
+simultaneously, where <span class="math inline">\(q\)</span> is the
+number of outcomes. The General Multivariate Linear Model is defined as
+<span class="math display">\[
+\mathbf{y}=\alpha+\mathbf{\Gamma} \mathbf{x}+\zeta
+\]</span></p>
+<p>To see the matrix formulation more clearly, consider two (i.e.,
+bivariate) endogenous variables <span class="math inline">\(\left(y_1,
+y_2\right)\)</span> predicted by two exogenous predictors <span
+class="math inline">\(x_1, x_2\)</span>. <span class="math display">\[
+\left(\begin{array}{l}
+y_1 \\
+y_2
+\end{array}\right)=\left(\begin{array}{l}
+\alpha_1 \\
+\alpha_2
+\end{array}\right)+\left(\begin{array}{cc}
+\gamma_{11} &amp; \gamma_{12} \\
+0 &amp; \gamma_{22}
+\end{array}\right)\left(\begin{array}{l}
+x_1 \\
+x_2
+\end{array}\right)+\left(\begin{array}{l}
+\zeta_1 \\
+\zeta_2
+\end{array}\right)
+\]</span></p>
+<p><span class="math inline">\(\Gamma\)</span> here is known as a
+structural parameter and defines the relationship of exogenous to
+endogenous variables.</p>
+<p>Definitions - <span class="math inline">\(\mathbf{y}=\left(y_1,
+\cdots, y_p\right)^{\prime}\)</span> vector of <span
+class="math inline">\(p\)</span> endogenous variables (not the number of
+observations!) - <span class="math inline">\(\mathbf{x}=\left(x_1,
+\cdots, x_q\right)^{\prime}\)</span> vector of <span
+class="math inline">\(q\)</span> exogenous variables - <span
+class="math inline">\(\alpha\)</span> vector of <span
+class="math inline">\(p\)</span> intercepts - <span
+class="math inline">\(\Gamma\)</span> matrix of regression coefficients
+<span class="math inline">\((p \times q)\)</span> linking endogenous to
+exogenous variables whose <span class="math inline">\(i\)</span> th row
+indicates the endogenous variable and <span
+class="math inline">\(j\)</span>-th column indicates the exogenous
+variable - <span class="math inline">\(\zeta=\left(\zeta_1, \cdots,
+\zeta_p\right)^{\prime}\)</span> vector of <span
+class="math inline">\(p\)</span> residuals (for the number of endogenous
+variables not observations)</p>
+<p><strong>Multivariate regression with default covariance</strong></p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_m3a.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>Here <span class="math inline">\(x_1\)</span> ppsych and <span
+class="math inline">\(x_2\)</span> motiv predict <span
+class="math inline">\(y_1\)</span> read and only <span
+class="math inline">\(x_2\)</span> motiv predicts <span
+class="math inline">\(y_2\)</span> arith. The parameters <span
+class="math inline">\(\phi_{11}, \phi_{22}\)</span> represent the
+variance of the two exogenous variables respectively and <span
+class="math inline">\(\phi_{12}\)</span> is the covariance. Note that
+these parameters are modeled implicitly and not depicted in lavaan
+output. The parameters <span class="math inline">\(\zeta_1,
+\zeta_2\)</span> refer to the residuals of read and arith. Finally <span
+class="math inline">\(\psi_{11}, \psi_{22}\)</span> represent the
+residual variances of read and arith and <span
+class="math inline">\(\psi_{12}\)</span> is its covariance. You can
+identify residual terms lavaan by noting a . before the term in the
+output.</p>
+<p><strong>Note: multivariate regression is not the same as running two
+separate linear regressions</strong></p>
+<p><strong>By default, lavaan correlates the residual variance of the
+endogenous variables. To make it equivalent, constrain this covariance
+to zero.</strong></p>
+<pre><code>## lavaan 0.6-19 ended normally after 17 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                         6
+## 
+##   Number of observations                           500
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                 6.796
+##   Degrees of freedom                                 1
+##   P-value (Chi-square)                           0.009
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   read ~                                              
+##     ppsych           -0.216    0.030   -7.289    0.000
+##     motiv             0.476    0.037   12.918    0.000
+##   arith ~                                             
+##     motiv             0.600    0.036   16.771    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##  .read ~~                                             
+##    .arith            39.179    3.373   11.615    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .read             65.032    4.113   15.811    0.000
+##    .arith            63.872    4.040   15.811    0.000</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = read ~ ppsych + motiv, data = dat)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -21.7734  -5.5633   0.1389   5.3662  25.8209 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -1.336e-07  3.608e-01   0.000        1    
+## ppsych      -2.747e-01  3.730e-02  -7.363 7.51e-13 ***
+## motiv        4.613e-01  3.730e-02  12.367  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 8.068 on 497 degrees of freedom
+## Multiple R-squared:  0.3516, Adjusted R-squared:  0.349 
+## F-statistic: 134.8 on 2 and 497 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = arith ~ motiv, data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -23.633  -5.341  -0.214   5.106  21.271 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -5.400e-08  3.581e-01    0.00        1    
+## motiv        6.000e-01  3.585e-02   16.74   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 8.008 on 498 degrees of freedom
+## Multiple R-squared:   0.36,  Adjusted R-squared:  0.3587 
+## F-statistic: 280.1 on 1 and 498 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p><strong>Multivariate regression removing default
+covariances</strong></p>
+<p>There are two facets to the question above. We already know
+previously that <span class="math inline">\(1m()\)</span> uses the least
+squares estimator but lavaan uses maximum likelihood, hence the
+difference in residual variance estimates. However, regardless of which
+of the two estimators used, the regression coefficients should be
+unbiased so there must be something else accounting for the difference
+in coefficients. The answer lies in the implicit fact that lavaan by
+default will covary residual variances of endogenous variables . read .
+arith. <strong>Removing the default residual covariances</strong>, we
+see in the path diagram</p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_m3b.png" width="75%" style="display: block; margin: auto;" /></p>
+<pre><code>## lavaan 0.6-19 ended normally after 2 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                         5
+## 
+##   Number of observations                           500
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                               234.960
+##   Degrees of freedom                                 2
+##   P-value (Chi-square)                           0.000
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   read ~                                              
+##     ppsych           -0.275    0.037   -7.385    0.000
+##     motiv             0.461    0.037   12.404    0.000
+##   arith ~                                             
+##     motiv             0.600    0.036   16.771    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##  .read ~~                                             
+##    .arith             0.000                           
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .read             64.708    4.092   15.811    0.000
+##    .arith            63.872    4.040   15.811    0.000</code></pre>
+<p><strong>Fully saturated Multivariate Regression</strong></p>
+<p>Both simple regression and multiple regression are saturated models
+which means that all parameters are fully estimated and there are no
+degrees of freedom. This is not necessarily true for multivariate
+regression models as Models 3A and 3B had degrees of freedom of 1 and 2
+respectively.</p>
+<p>we understand that adding a single path of <span
+class="math inline">\(\gamma_{21}\)</span> turns Model 3A into a
+just-identified or fully saturated model which we call Model 3E.</p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_m3c.png" width="75%" style="display: block; margin: auto;" /></p>
+<pre><code>## lavaan 0.6-19 ended normally after 39 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        10
+## 
+##   Number of observations                           500
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                 0.000
+##   Degrees of freedom                                 0
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   read ~                                              
+##     ppsych           -0.275    0.037   -7.385    0.000
+##     motiv             0.461    0.037   12.404    0.000
+##   arith ~                                             
+##     ppsych           -0.096    0.037   -2.616    0.009
+##     motiv             0.576    0.037   15.695    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   ppsych ~~                                           
+##     motiv           -24.950    4.601   -5.423    0.000
+##  .read ~~                                             
+##    .arith            38.651    3.338   11.579    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     ppsych           99.800    6.312   15.811    0.000
+##     motiv            99.800    6.312   15.811    0.000
+##    .read             64.708    4.092   15.811    0.000
+##    .arith            63.010    3.985   15.811    0.000</code></pre>
+</div>
+<div id="path-analysis" class="section level3">
+<h3>Path Analysis</h3>
+<p>Multivariate regression is a special case of path analysis where only
+exogenous variables predict endogenous variables. Path analysis is a
+more general model where all variables are still manifest but endogenous
+variables are allowed to explain other endogenous variables. Since <span
+class="math inline">\(\Gamma\)</span> specifies relations between an
+endogenous <span class="math inline">\((y)\)</span> and exogenous <span
+class="math inline">\((x)\)</span> variable, we need to create a new
+matrix <span class="math inline">\(B\)</span> that specifies the
+relationship between two endogenous <span
+class="math inline">\((y)\)</span> variables.</p>
+<p><span class="math display">\[
+\mathbf{y}=\alpha+\mathbf{\Gamma x}+\mathbf{B y}+\zeta
+\]</span></p>
+<p>The matrix <span class="math inline">\(B\)</span> is a <span
+class="math inline">\(p \times p\)</span> matrix that is not necessarily
+symmetric. The rows of this matrix specify which <span
+class="math inline">\(y\)</span> variable is being predicted and the
+columns specify which <span class="math inline">\(y\)</span> ’s are
+predicting. For example, <span class="math inline">\(\beta_{21}\)</span>
+is in the second row meaning <span class="math inline">\(y_2\)</span> is
+being predicted and first column meaning <span
+class="math inline">\(y_1\)</span> is predicting.</p>
+<p>Extend our previous multivariate regression Model 3A so that we
+believe read which is an endogenous variable also predicts arith</p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_m4a.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>To see the matrix formulation for Model 4A, we have: <span
+class="math display">\[
+\left(\begin{array}{l}
+y_1 \\
+y_2
+\end{array}\right)=\left(\begin{array}{l}
+\alpha_1 \\
+\alpha_2
+\end{array}\right)+\left(\begin{array}{cc}
+\gamma_{11} &amp; \gamma_{12} \\
+0 &amp; \gamma_{22}
+\end{array}\right)\left(\begin{array}{l}
+x_1 \\
+x_2
+\end{array}\right)+\left(\begin{array}{cc}
+0 &amp; 0 \\
+\beta_{21} &amp; 0
+\end{array}\right)\left(\begin{array}{l}
+y_1 \\
+y_2
+\end{array}\right)+\left(\begin{array}{l}
+\zeta_1 \\
+\zeta_2
+\end{array}\right)
+\]</span></p>
+<p>Definitions - <span class="math inline">\(\mathbf{y}=\left(y_1,
+\cdots, y_p\right)^{\prime}\)</span> vector of <span
+class="math inline">\(p\)</span> endogenous variables - <span
+class="math inline">\(\mathbf{x}=\left(x_1, \cdots,
+x_q\right)^{\prime}\)</span> vector of <span
+class="math inline">\(q\)</span> exogenous variables - <span
+class="math inline">\(\alpha\)</span> vector of <span
+class="math inline">\(p\)</span> intercepts - <span
+class="math inline">\(\boldsymbol{\Gamma}\)</span> matrix of regression
+coefficients <span class="math inline">\((p \times q)\)</span> of
+exogenous to endogenous variables whose <span
+class="math inline">\(i\)</span>-th row indicates the endogenous
+variable and <span class="math inline">\(j\)</span>-th column indicates
+the exogenous variable - B matrix of regression coefficients <span
+class="math inline">\((p \times p)\)</span> of endogenous to endogenous
+variables whose <span class="math inline">\(i\)</span>-th row indicates
+the source variable and <span class="math inline">\(j\)</span>-th column
+indicates the target variable - <span
+class="math inline">\(\zeta=\left(\zeta_1, \cdots,
+\zeta_p\right)^{\prime}\)</span> vector of residuals</p>
+<p>Assumptions - <span class="math inline">\(E(\zeta)=0\)</span> the
+mean of the residuals is zero - <span
+class="math inline">\(\zeta\)</span> is uncorrelated with <span
+class="math inline">\(x\)</span> - <span
+class="math inline">\((I-B)\)</span> is invertible (for example <span
+class="math inline">\(B \neq I\)</span> )</p>
+<pre><code>## lavaan 0.6-19 ended normally after 1 iteration
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                         6
+## 
+##   Number of observations                           500
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                 4.870
+##   Degrees of freedom                                 1
+##   P-value (Chi-square)                           0.027
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   read ~                                              
+##     ppsych           -0.275    0.037   -7.385    0.000
+##     motiv             0.461    0.037   12.404    0.000
+##   arith ~                                             
+##     motiv             0.296    0.034    8.841    0.000
+##     read              0.573    0.034   17.093    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .read             64.708    4.092   15.811    0.000
+##    .arith            40.314    2.550   15.811    0.000</code></pre>
+<pre><code>## lavaan 0.6-19 ended normally after 1 iteration
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                         6
+## 
+##   Number of observations                           500
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                 4.870
+##   Degrees of freedom                                 1
+##   P-value (Chi-square)                           0.027
+## 
+## Model Test Baseline Model:
+## 
+##   Test statistic                               674.748
+##   Degrees of freedom                                 5
+##   P-value                                        0.000
+## 
+## User Model versus Baseline Model:
+## 
+##   Comparative Fit Index (CFI)                    0.994
+##   Tucker-Lewis Index (TLI)                       0.971
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)              -3385.584
+##   Loglikelihood unrestricted model (H1)      -3383.149
+##                                                       
+##   Akaike (AIC)                                6783.168
+##   Bayesian (BIC)                              6808.456
+##   Sample-size adjusted Bayesian (SABIC)       6789.411
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.088
+##   90 Percent confidence interval - lower         0.024
+##   90 Percent confidence interval - upper         0.172
+##   P-value H_0: RMSEA &lt;= 0.050                    0.139
+##   P-value H_0: RMSEA &gt;= 0.080                    0.662
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.018
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   read ~                                              
+##     ppsych           -0.275    0.037   -7.385    0.000
+##     motiv             0.461    0.037   12.404    0.000
+##   arith ~                                             
+##     motiv             0.296    0.034    8.841    0.000
+##     read              0.573    0.034   17.093    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .read             64.708    4.092   15.811    0.000
+##    .arith            40.314    2.550   15.811    0.000</code></pre>
+<pre><code>## [1] 0.0273275</code></pre>
+</div>
+<div id="path-analysis-after-modification" class="section level3">
+<h3>Path Analysis after Modification</h3>
+<p><strong>Modification index</strong></p>
+<p>We see that the path analysis Model 4A as well as the multivariate
+regressions are over-identified models which means that their degrees of
+freedom is greater than zero.</p>
+<p>Adding either of these parameters results in a fully saturated model.
+Without a strong a priori hypothesis, it may be difficult ascertain the
+best parameter to estimate. One solution is to use the modification
+index, which is a one degree of freedom chi-square test that assesses
+how the model chi-square will change as a result of including the
+parameter in the model. The higher the chi-square change, the bigger the
+impact of adding the additional parameter. To implement the modification
+index in lavaan, we must input into the modindices function a previously
+estimated lavaan model, which in this case is fit4a . The option
+sort=TRUE requests the most impactful parameters be placed first based
+on the change in chi-square.</p>
+<p>Not all modifications to the model make sense. For example, the
+covariance of residuals is often times seen as an “easy” way to improve
+fit without changing the model. However, by adding residual covariances,
+you are modeling unexplained covariance between variables that by
+definition are not modeled by your hypothesized model. Although modeling
+these covariances artificially improves fit, they say nothing about the
+causal mechanisms your model hypothesizes.</p>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["lhs"],"name":[1],"type":["chr"],"align":["left"]},{"label":["op"],"name":[2],"type":["chr"],"align":["left"]},{"label":["rhs"],"name":[3],"type":["chr"],"align":["left"]},{"label":["mi"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["epc"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["sepc.lv"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["sepc.all"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["sepc.nox"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"motiv","2":"~","3":"arith","4":"6.807288e+01","5":"8.874189e+00","6":"8.874189e+00","7":"8.874189e+00","8":"8.874189e+00","_rn_":"17"},{"1":"read","2":"~~","3":"arith","4":"4.846735e+00","5":"1.603427e+01","6":"1.603427e+01","7":"3.139371e-01","8":"3.139371e-01","_rn_":"10"},{"1":"read","2":"~","3":"arith","4":"4.846735e+00","5":"3.977332e-01","6":"3.977332e-01","7":"3.977332e-01","8":"3.977332e-01","_rn_":"11"},{"1":"arith","2":"~","3":"ppsych","4":"4.846735e+00","5":"6.806119e-02","6":"6.806119e-02","7":"6.806119e-02","8":"6.812935e-03","_rn_":"12"},{"1":"ppsych","2":"~","3":"arith","4":"2.188450e+00","5":"7.132326e-02","6":"7.132326e-02","7":"7.132326e-02","8":"7.132326e-02","_rn_":"14"},{"1":"motiv","2":"~","3":"read","4":"9.424382e-29","5":"2.624619e-15","6":"2.624619e-15","7":"2.624619e-15","8":"2.624619e-15","_rn_":"16"},{"1":"ppsych","2":"~","3":"read","4":"7.081997e-30","5":"4.427819e-16","6":"4.427819e-16","7":"4.427819e-16","8":"4.427819e-16","_rn_":"13"},{"1":"motiv","2":"~","3":"ppsych","4":"8.955528e-31","5":"8.604184e-17","6":"8.604184e-17","7":"8.604184e-17","8":"8.612801e-18","_rn_":"18"},{"1":"ppsych","2":"~~","3":"motiv","4":"2.276132e-31","5":"2.276132e-31","6":"2.276132e-31","7":"NA","8":"2.276132e-31","_rn_":"8"},{"1":"ppsych","2":"~","3":"motiv","4":"2.718381e-33","5":"2.718381e-33","6":"2.718381e-33","7":"2.718381e-33","8":"2.721104e-34","_rn_":"15"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_m4b.png" width="75%" style="display: block; margin: auto;" /></p>
+<pre><code>## lavaan 0.6-19 ended normally after 1 iteration
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                         7
+## 
+##   Number of observations                           500
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                 0.000
+##   Degrees of freedom                                 0
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   read ~                                              
+##     ppsych           -0.275    0.037   -7.385    0.000
+##     motiv             0.461    0.037   12.404    0.000
+##   arith ~                                             
+##     motiv             0.300    0.033    8.993    0.000
+##     read              0.597    0.035   17.004    0.000
+##     ppsych            0.068    0.031    2.212    0.027
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .read             64.708    4.092   15.811    0.000
+##    .arith            39.923    2.525   15.811    0.000</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["lhs"],"name":[1],"type":["chr"],"align":["left"]},{"label":["op"],"name":[2],"type":["chr"],"align":["left"]},{"label":["rhs"],"name":[3],"type":["chr"],"align":["left"]},{"label":["mi"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["epc"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["sepc.lv"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["sepc.all"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["sepc.nox"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="baseline-model" class="section level3">
+<h3>Baseline model</h3>
+<p>The baseline model can be thought of as the “worst-fitting” model and
+simply assumes that there is absolutely no covariance between variables.
+Suppose we modified Model 4A to become a baseline model, we would take
+out all paths and covariances; essentially estimating only the
+variances. Since there is are no regression paths, there are no
+endogenous variables in our model and we would only have x’s and <span
+class="math inline">\(\phi\)</span>’s.</p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_m4c.png" width="75%" style="display: block; margin: auto;" /></p>
+<pre><code>## lavaan 0.6-19 ended normally after 8 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                         4
+## 
+##   Number of observations                           500
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                               707.017
+##   Degrees of freedom                                 6
+##   P-value (Chi-square)                           0.000
+## 
+## Model Test Baseline Model:
+## 
+##   Test statistic                               707.017
+##   Degrees of freedom                                 6
+##   P-value                                        0.000
+## 
+## User Model versus Baseline Model:
+## 
+##   Comparative Fit Index (CFI)                    0.000
+##   Tucker-Lewis Index (TLI)                       0.000
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)              -7441.045
+##   Loglikelihood unrestricted model (H1)      -7087.537
+##                                                       
+##   Akaike (AIC)                               14890.091
+##   Bayesian (BIC)                             14906.949
+##   Sample-size adjusted Bayesian (SABIC)      14894.253
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.483
+##   90 Percent confidence interval - lower         0.454
+##   90 Percent confidence interval - upper         0.514
+##   P-value H_0: RMSEA &lt;= 0.050                    0.000
+##   P-value H_0: RMSEA &gt;= 0.080                    1.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.380
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     read             99.800    6.312   15.811    0.000
+##     ppsych           99.800    6.312   15.811    0.000
+##     motiv            99.800    6.312   15.811    0.000
+##     arith            99.800    6.312   15.811    0.000</code></pre>
+</div>
+</div>
+</div>
+<div id="structural-model" class="section level1">
+<h1>Structural Model</h1>
+<div id="measurement-model" class="section level2">
+<h2>Measurement Model</h2>
+<p>We have talked so far about how to model structural relationships
+between observed variables. A measurement model is essentially a
+multivariate regression model where the predictor is an exogenous or
+endogenous latent variable (a.k.a factor). The model is defined as</p>
+<p><span class="math display">\[
+\mathbf{x}=\tau_{\mathbf{x}}+\boldsymbol{\Lambda}_{\mathbf{x}}
+\xi+\delta
+\]</span></p>
+<p>Definitions - <span class="math inline">\(\mathbf{x}=\left(x_1,
+\cdots, x_q\right)^{\prime}\)</span> vector of <span
+class="math inline">\(x\)</span>-side indicators - <span
+class="math inline">\(\tau_{\mathbf{x}}\)</span> vector of <span
+class="math inline">\(q\)</span> intercepts for <span
+class="math inline">\(x\)</span>-side indicators - <span
+class="math inline">\(\xi\)</span> vector of <span
+class="math inline">\(n\)</span> latent exogenous variables - <span
+class="math inline">\(\delta=\left(\delta_1, \cdots,
+\delta_q\right)^{\prime}\)</span> vector of residuals for <span
+class="math inline">\(x\)</span>-side indicators - <span
+class="math inline">\(\boldsymbol{\Lambda}_{\mathbf{x}}\)</span> matrix
+of loadings <span class="math inline">\((q \times n)\)</span>
+corresponding to the latent exogenous variables - <span
+class="math inline">\(\theta_\delta\)</span> variance or covariance of
+residuals for <span class="math inline">\(x\)</span>-side indicators</p>
+<p>The term <span class="math inline">\(\tau_{x_1}\)</span> means the
+Intercept of the flrst Item, and <span
+class="math inline">\(\lambda_2^x\)</span> Is the loading of the second
+Item wilth the factor and <span
+class="math inline">\(\epsilon_3\)</span> Is the residual of the third
+Item, after accounting for the only factor.</p>
+<p>Suppose we have three outcomes or <span
+class="math inline">\(x\)</span>-slde Indlcators <span
+class="math inline">\(\left(x_1, x_2, x_3\right)\)</span> measured by a
+slngle latent exogenous varlable <span
+class="math inline">\(\xi\)</span>. Then the path dlagram (Model 5A) for
+our factor model looks llke the following. Take note that the Intercepts
+<span class="math inline">\(\tau_{\mathbf{x}}\)</span> are not shown but
+stlll modeled, and that the measurement arrows are polnting to the
+left.</p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_m5a.png" width="75%" style="display: block; margin: auto;" /></p>
+<ul>
+<li><span class="math inline">\(\xi\)</span> are latent exogenous
+variables which do not have residuals hence no residual covariances</li>
+<li><span class="math inline">\(x_i\)</span>’s are manifest exogenous
+variables but in fact are explained by the latent exogenous variable,
+therefore it has a residual term and residual variance (unexplained
+variance), most notably <span
+class="math inline">\(\theta_{\delta}\)</span></li>
+</ul>
+<div id="exogenous-factor-analysis" class="section level3">
+<h3>Exogenous Factor Analysis</h3>
+<p>Identlficatlon of the one factor model wlth three Items Is necessary
+due to the fact that we have 7 parameters from the modelImplled
+covarlance matrlx <span class="math inline">\(\Sigma(\theta)\)</span>
+(e.g., three factor loadings, three resldual varlances and one factor
+varlance) but only <span class="math inline">\(3(4) / 2=6\)</span> known
+values to work with. The extra parameter comes from the fact that we do
+not observe the factor but are estlmating Its varlance. In order to
+Identlfy a factor model with three or more Items, there are two optlons
+known as the marker method and the varlance standardization method.
+The</p>
+<ol style="list-style-type: decimal">
+<li>marker method fixes the first loading of each factor to 1 ,</li>
+<li>variance standardization method fixes the variance of each factor to
+1 but freely estimates all loadings.</li>
+</ol>
+<pre><code>## lavaan 0.6-19 ended normally after 37 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                         9
+## 
+##   Number of observations                           500
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                 0.000
+##   Degrees of freedom                                 0
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##   risk =~                                                               
+##     verbal            1.000                               6.166    0.617
+##     ses               1.050    0.126    8.358    0.000    6.474    0.648
+##     ppsych           -1.050    0.126   -8.358    0.000   -6.474   -0.648
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##    .verbal            0.000    0.447    0.000    1.000    0.000    0.000
+##    .ses              -0.000    0.447   -0.000    1.000   -0.000   -0.000
+##    .ppsych           -0.000    0.447   -0.000    1.000   -0.000   -0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##    .verbal           61.781    5.810   10.634    0.000   61.781    0.619
+##    .ses              57.884    5.989    9.664    0.000   57.884    0.580
+##    .ppsych           57.884    5.989    9.664    0.000   57.884    0.580
+##     risk             38.019    6.562    5.794    0.000    1.000    1.000</code></pre>
+</div>
+<div id="endogenous-measurement-models" class="section level3">
+<h3>Endogenous Measurement Models</h3>
+<p>Not all latent variables are exogenous. If In the case that the
+latent variables Is endogenous we will rename the factor <span
+class="math inline">\(\eta\)</span>.</p>
+<p>Suppose again that we have three Items except now they are labeled
+<span class="math inline">\(\left(y_1, y_2, y_3\right)\)</span>. For a
+latent endogenous variable, the structure of the measurement model
+remains the same except now the parameters are re-labeled as <span
+class="math inline">\(y\)</span>-side variables The path diagram for
+Model 5B Is shown below (note, Intercepts <span
+class="math inline">\(\tau_{\mathbf{y}}\)</span> are not shown but still
+Implicitly modeled):</p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_m5b.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>In SEM, latent variables are categorized as either exogenous or
+endogenous:</p>
+<ul>
+<li><p><strong>Exogenous Latent Variables (<span
+class="math inline">\(x\)</span>-side)</strong>: These are the
+independent variables that are not influenced by other variables within
+the scope of the model. They can be thought of as the predictors or
+causes in the model. In LISREL notation, which is a software for SEM,
+measurement arrows for exogenous variables point to the left.</p></li>
+<li><p><strong>Endogenous Latent Variables (<span
+class="math inline">\(y\)</span>-side)</strong>: These are the dependent
+variables that are influenced by other variables in the model. They can
+be outcomes or effects. In LISREL notation, measurement arrows for
+endogenous variables point to the right.</p></li>
+</ul>
+<p><span class="math display">\[
+\mathbf{y}=\tau_{\mathbf{y}}+\mathbf{\Lambda}_{\mathbf{y}} \eta+\epsilon
+\]</span></p>
+<p>Definitions - <span class="math inline">\(\mathbf{y}=\left(y_1,
+\cdots, y_p\right)^{\prime}\)</span> vector of <span
+class="math inline">\(y\)</span>-side indicators - <span
+class="math inline">\(\tau_{\mathbf{y}}\)</span> vector of <span
+class="math inline">\(p\)</span> intercepts for <span
+class="math inline">\(y\)</span>-side indicators - <span
+class="math inline">\(\eta\)</span> vector of <span
+class="math inline">\(m\)</span> latent endogenous variables - <span
+class="math inline">\(\epsilon=\left(\epsilon_1, \cdots,
+\epsilon_p\right)^{\prime}\)</span> vector of residuals for <span
+class="math inline">\(y\)</span>-side indicators - <span
+class="math inline">\(\boldsymbol{\Lambda}_{\mathbf{y}}\)</span> matrix
+of loadings <span class="math inline">\((m \times q)\)</span>
+corresponding to the latent endogenous variables - <span
+class="math inline">\(\theta_\epsilon\)</span> variance or covariance of
+residuals for <span class="math inline">\(y\)</span>-side indicators</p>
+<p><strong>Differences Between Models 5A and 5B</strong></p>
+<ul>
+<li><p><strong>Model 5A (Exogenous Latent Factor Analysis)</strong>:
+This model analyzes latent factors that are not influenced by other
+variables within the model—essentially, it’s a factor analysis model
+with latent variables acting as exogenous factors.</p></li>
+<li><p><strong>Model 5B (Endogenous Latent Factor Analysis)</strong>:
+This model extends Model 5A by including latent variables that act as
+endogenous factors, meaning they are predicted by other latent
+variables. This is more complex as it includes direct and indirect
+effects within the SEM framework.</p></li>
+<li><p>Arrows pointing to the left indicate the measurement model for
+exogenous latent variables.</p></li>
+<li><p>Arrows pointing to the right indicate the measurement model for
+endogenous latent variables.</p></li>
+</ul>
+</div>
+</div>
+<div id="structural-regression-model" class="section level2">
+<h2>Structural Regression Model</h2>
+<p>So far we have discussed all the individual components that make up
+the structural regression model. Recall that multivariate regression
+involves regression with simultaneous endogenous variables and path
+analysis allows for explanatory endogenous variables. Confirmatory
+factor analysis is a measurement model that links latent variables to
+indicators. Finally, structural regression unifies the measurement and
+structural models to allow for explanatory latent variables, whether
+endogenous or exogenous.</p>
+<p><span class="math display">\[
+\begin{gathered}
+\mathbf{x}=\tau_{\mathbf{x}}+\boldsymbol{\Lambda}_{\mathbf{x}}
+\xi+\delta \\
+\mathbf{y}=\tau_{\mathbf{y}}+\boldsymbol{\Lambda}_{\mathbf{y}}
+\eta+\epsilon \\
+\eta=\alpha+\mathbf{B} \eta+\mathbf{\Gamma} \xi+\zeta
+\end{gathered}
+\]</span></p>
+<p>Definitions Measurement variables - <span
+class="math inline">\(\mathbf{x}=\left(x_1, \cdots,
+x_q\right)^{\prime}\)</span> vector of <span
+class="math inline">\(x\)</span>-side indicators - <span
+class="math inline">\(\mathbf{y}=\left(y_1, \cdots,
+y_p\right)^{\prime}\)</span> vector of <span
+class="math inline">\(y\)</span>-side indicators - <span
+class="math inline">\(\tau_{\mathbf{x}}\)</span> vector of <span
+class="math inline">\(q\)</span> intercept terms for <span
+class="math inline">\(x\)</span>-side indicators - <span
+class="math inline">\(\tau_{\mathbf{y}}\)</span> vector of <span
+class="math inline">\(p\)</span> intercept terms for <span
+class="math inline">\(y\)</span>-side indicators - <span
+class="math inline">\(\xi\)</span> vector of <span
+class="math inline">\(n\)</span> latent exogenous variables - <span
+class="math inline">\(\eta\)</span> vector of <span
+class="math inline">\(m\)</span> latent endogenous variables - <span
+class="math inline">\(\delta=\left(\delta_1, \cdots,
+\delta_q\right)^{\prime}\)</span> vector of residuals for <span
+class="math inline">\(x\)</span>-side indicators - <span
+class="math inline">\(\epsilon=\left(\epsilon_1, \cdots,
+\epsilon_p\right)^{\prime}\)</span> vector of residuals for <span
+class="math inline">\(y\)</span>-side indicators - <span
+class="math inline">\(\boldsymbol{\Lambda}_{\mathbf{x}}\)</span> matrix
+of loadings <span class="math inline">\((q \times n)\)</span>
+corresponding to the latent exogenous variables - <span
+class="math inline">\(\mathbf{\Lambda}_{\mathbf{y}}\)</span> matrix of
+loadings <span class="math inline">\((p \times m)\)</span> corresponding
+to the latent endogenous variables - <span
+class="math inline">\(\theta_\delta\)</span> variance or covariance of
+residuals for <span class="math inline">\(x\)</span>-side indicators -
+<span class="math inline">\(\theta_\epsilon\)</span> variance or
+covariance of residuals for <span class="math inline">\(y\)</span>-side
+indicators</p>
+<p>Structural variables - <span class="math inline">\(\alpha\)</span> a
+vector of <span class="math inline">\(m\)</span> intercepts - <span
+class="math inline">\(\Gamma\)</span> a matrix of regression
+coefficients <span class="math inline">\((m \times n)\)</span> of latent
+exogenous to latent endogenous variables whose <span
+class="math inline">\(i\)</span>-th row indicates the latent endogenous
+variable and <span class="math inline">\(j\)</span>-th column indicates
+the latent exogenous variable - <span class="math inline">\(B\)</span> a
+matrix of regression coefficients <span class="math inline">\((m \times
+m)\)</span> of latent endogenous to latent endogenous variables whose
+<span class="math inline">\(i\)</span>-th row indicates the target
+endogenous variable and <span class="math inline">\(j\)</span>-th column
+indicates the source endogenous variable. - <span
+class="math inline">\(\zeta=\left(\zeta_1, \cdots,
+\zeta_m\right)^{\prime}\)</span> vector of residuals for the latent
+endogenous variable</p>
+<p>Assumptlons - <span class="math inline">\(\eta\)</span> and <span
+class="math inline">\(\xi\)</span> are not observed - <span
+class="math inline">\(\epsilon\)</span> and <span
+class="math inline">\(\delta\)</span> are errors of measurement for
+<span class="math inline">\(y\)</span> and <span
+class="math inline">\(x\)</span> respectively - <span
+class="math inline">\(\epsilon\)</span> is uncorrelated with <span
+class="math inline">\(\delta\)</span></p>
+<div id="structural-regression-with-one-endogenous-variable"
+class="section level3">
+<h3>Structural regression with one endogenous variable</h3>
+<p>Just as the structural model In multivarlate regression and path
+analysls speclfles relatlonshlps among observed varlables, structural
+regresslon speclfles the relatlonshlp between latent varlables. In Model
+6A, we have two latent exogenous varlables ( <span
+class="math inline">\(\xi_1, \xi_2\)</span> ) predlctlng one latent
+endogenous varlable <span
+class="math inline">\(\left(\eta_1\right)\)</span>.</p>
+<p><span class="math display">\[
+\eta_1=\alpha_1+\left(\begin{array}{cc}
+\gamma_{11} &amp; \gamma_{12}
+\end{array}\right)\left(\begin{array}{l}
+\xi_1 \\
+\xi_2
+\end{array}\right)+0 \cdot \eta_1+\zeta_1
+\]</span></p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_m6a.png" width="75%" style="display: block; margin: auto;" /></p>
+<pre><code>## lavaan 0.6-19 ended normally after 130 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        21
+## 
+##   Number of observations                           500
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                               148.982
+##   Degrees of freedom                                24
+##   P-value (Chi-square)                           0.000
+## 
+## Model Test Baseline Model:
+## 
+##   Test statistic                              2597.972
+##   Degrees of freedom                                36
+##   P-value                                        0.000
+## 
+## User Model versus Baseline Model:
+## 
+##   Comparative Fit Index (CFI)                    0.951
+##   Tucker-Lewis Index (TLI)                       0.927
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -15517.857
+##   Loglikelihood unrestricted model (H1)     -15443.366
+##                                                       
+##   Akaike (AIC)                               31077.713
+##   Bayesian (BIC)                             31166.220
+##   Sample-size adjusted Bayesian (SABIC)      31099.565
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.102
+##   90 Percent confidence interval - lower         0.087
+##   90 Percent confidence interval - upper         0.118
+##   P-value H_0: RMSEA &lt;= 0.050                    0.000
+##   P-value H_0: RMSEA &gt;= 0.080                    0.990
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.041
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##   adjust =~                                                             
+##     motiv             1.000                               9.324    0.933
+##     harm              0.884    0.041   21.774    0.000    8.246    0.825
+##     stabi             0.695    0.043   15.987    0.000    6.478    0.648
+##   risk =~                                                               
+##     verbal            1.000                               7.319    0.733
+##     ppsych           -0.770    0.075  -10.223    0.000   -5.636   -0.564
+##     ses               0.807    0.076   10.607    0.000    5.906    0.591
+##   achieve =~                                                            
+##     read              1.000                               9.404    0.941
+##     arith             0.837    0.034   24.437    0.000    7.873    0.788
+##     spell             0.976    0.028   34.338    0.000    9.178    0.919
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##   achieve ~                                                             
+##     adjust            0.375    0.046    8.085    0.000    0.372    0.372
+##     risk              0.724    0.078    9.253    0.000    0.564    0.564
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##   adjust ~~                                                             
+##     risk             32.098    4.320    7.431    0.000    0.470    0.470
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##    .motiv            12.870    2.852    4.512    0.000   12.870    0.129
+##    .harm             31.805    2.973   10.698    0.000   31.805    0.319
+##    .stabi            57.836    3.990   14.494    0.000   57.836    0.580
+##    .verbal           46.239    4.788    9.658    0.000   46.239    0.463
+##    .ppsych           68.033    5.068   13.425    0.000   68.033    0.682
+##    .ses              64.916    4.975   13.048    0.000   64.916    0.650
+##    .read             11.372    1.608    7.074    0.000   11.372    0.114
+##    .arith            37.818    2.680   14.109    0.000   37.818    0.379
+##    .spell            15.560    1.699    9.160    0.000   15.560    0.156
+##     adjust           86.930    6.830   12.727    0.000    1.000    1.000
+##     risk             53.561    6.757    7.927    0.000    1.000    1.000
+##    .achieve          30.685    3.449    8.896    0.000    0.347    0.347</code></pre>
+</div>
+<div id="structural-regression-with-two-endogenous-variables"
+class="section level3">
+<h3>Structural regression with two endogenous variables</h3>
+<p>Suppose we want to conslder a single exogenous latent varlable <span
+class="math inline">\(\xi_1\)</span> predlcting two endogenous latent
+varlables <span class="math inline">\(\eta_1, \eta_2\)</span> and
+additlonally that one of the endogenous varlables predicts another. What
+addltional matrlx do you think we need? SInce we have already
+establlshed the measurement model In <span class="math inline">\(6
+\mathrm{~A}\)</span> we can re-use the speciflcation, making note that
+the measurement model now has one <span
+class="math inline">\(x\)</span>-slde model and two <span
+class="math inline">\(y\)</span>-slde models. However, not only do we
+need <span class="math inline">\(\Gamma\)</span> to model the
+relatlonshlp of the exogenous varlable to the two endogenous varlables,
+we need the <span class="math inline">\(B\)</span> matrlx to specify the
+relatlonshlp of the flrst endogenous varlable to the other.</p>
+<p><span class="math display">\[
+\left(\begin{array}{l}
+\eta_1 \\
+\eta_2
+\end{array}\right)=\left(\begin{array}{l}
+\alpha_1 \\
+\alpha_2
+\end{array}\right)+\left(\begin{array}{l}
+\gamma_{11} \\
+\gamma_{21}
+\end{array}\right) \xi_1+\left(\begin{array}{cc}
+0 &amp; 0 \\
+\beta_{21} &amp; 0
+\end{array}\right)\left(\begin{array}{l}
+\eta_1 \\
+\eta_2
+\end{array}\right)+\left(\begin{array}{l}
+\zeta_1 \\
+\zeta_2
+\end{array}\right)
+\]</span></p>
+<p>WrItIng out the equatlons we get: <span class="math display">\[
+\begin{gathered}
+\eta_1=\alpha_1+\gamma_{11} \xi_1+\zeta_1 \\
+\eta_2=\alpha_2+\gamma_{21} \xi_1+\beta_{21} \eta_1+\zeta_2
+\end{gathered}
+\]</span></p>
+<p>The flrst equatlon speclfles that the flrst endogenous varlable is
+belng predlcted only by the exogenous varlable whereas the second
+equatlon speclfles that the second endogenous varlable is belng
+predicted by both the exogenous varlable and flrst endogenous
+varlable.</p>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_m6a.png" width="75%" style="display: block; margin: auto;" /></p>
+<pre><code>## lavaan 0.6-19 ended normally after 112 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        21
+## 
+##   Number of observations                           500
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                               148.982
+##   Degrees of freedom                                24
+##   P-value (Chi-square)                           0.000
+## 
+## Model Test Baseline Model:
+## 
+##   Test statistic                              2597.972
+##   Degrees of freedom                                36
+##   P-value                                        0.000
+## 
+## User Model versus Baseline Model:
+## 
+##   Comparative Fit Index (CFI)                    0.951
+##   Tucker-Lewis Index (TLI)                       0.927
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -15517.857
+##   Loglikelihood unrestricted model (H1)     -15443.366
+##                                                       
+##   Akaike (AIC)                               31077.713
+##   Bayesian (BIC)                             31166.220
+##   Sample-size adjusted Bayesian (SABIC)      31099.565
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.102
+##   90 Percent confidence interval - lower         0.087
+##   90 Percent confidence interval - upper         0.118
+##   P-value H_0: RMSEA &lt;= 0.050                    0.000
+##   P-value H_0: RMSEA &gt;= 0.080                    0.990
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.041
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##   adjust =~                                                             
+##     motiv             1.000                               9.324    0.933
+##     harm              0.884    0.041   21.774    0.000    8.246    0.825
+##     stabi             0.695    0.043   15.987    0.000    6.478    0.648
+##   risk =~                                                               
+##     verbal            1.000                               7.319    0.733
+##     ses               0.807    0.076   10.607    0.000    5.906    0.591
+##     ppsych           -0.770    0.075  -10.223    0.000   -5.636   -0.564
+##   achieve =~                                                            
+##     read              1.000                               9.404    0.941
+##     arith             0.837    0.034   24.437    0.000    7.873    0.788
+##     spell             0.976    0.028   34.338    0.000    9.178    0.919
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##   adjust ~                                                              
+##     risk              0.599    0.076    7.837    0.000    0.470    0.470
+##   achieve ~                                                             
+##     adjust            0.375    0.046    8.085    0.000    0.372    0.372
+##     risk              0.724    0.078    9.253    0.000    0.564    0.564
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##    .motiv            12.870    2.852    4.512    0.000   12.870    0.129
+##    .harm             31.805    2.973   10.698    0.000   31.805    0.319
+##    .stabi            57.836    3.990   14.494    0.000   57.836    0.580
+##    .verbal           46.239    4.788    9.658    0.000   46.239    0.463
+##    .ses              64.916    4.975   13.048    0.000   64.916    0.650
+##    .ppsych           68.033    5.068   13.425    0.000   68.033    0.682
+##    .read             11.372    1.608    7.074    0.000   11.372    0.114
+##    .arith            37.818    2.680   14.109    0.000   37.818    0.379
+##    .spell            15.560    1.699    9.160    0.000   15.560    0.156
+##    .adjust           67.694    6.066   11.160    0.000    0.779    0.779
+##     risk             53.561    6.757    7.927    0.000    1.000    1.000
+##    .achieve          30.685    3.449    8.896    0.000    0.347    0.347</code></pre>
+</div>
+<div id="structural-regression-with-an-observed-endogenous-variable"
+class="section level3">
+<h3>Structural regression with an observed endogenous variable</h3>
+<p>See more under <a
+href="https://stats.oarc.ucla.edu/r/seminars/rsem/">INTRODUCTION TO
+STRUCTURAL EQUATION MODELING (SEM) IN R WITH LAVAAN</a></p>
+</div>
+</div>
+</div>
+<div id="confirmatory-factor-analysis" class="section level1">
+<h1>Confirmatory Factor Analysis</h1>
+<div id="introduction-2" class="section level2">
+<h2>Introduction</h2>
+<p>The CFA model commonly used for this data is the three correlated
+latent variables (or factors), each with three indicators as graphically
+described in Figure below. As seen from Figure below, these three latent
+factors are as follows:</p>
+<ul>
+<li>Visual factor measured by three items: x1, x2 and x3.<br />
+</li>
+<li>Textual factor measured by three items: x4, x5 and x6.<br />
+</li>
+<li>Speed factor measured by three items: x7, x8 and x9.</li>
+</ul>
+<p><img src="02_Plots/Structural%20Equation%20Modeling/SEM_CFA_01.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>The functional relationships between the variables and the factors
+are prescribed by the following equations in the CFA model:</p>
+<p><span class="math display">\[
+\begin{aligned}
+&amp; \mathrm{x} 1=b_1 \times \text { Visual }+e_1 \\
+&amp; \mathrm{x} 2=b_2 \times \text { Visual }+e_2 \\
+&amp; \mathrm{x} 3=b_3 \times \text { Visual }+e_3 \\
+&amp; \mathrm{x} 4=b_4 \times \text { Textual }+e_4 \\
+&amp; \mathrm{x} 5=b_5 \times \text { Textual }+e_5 \\
+&amp; \mathrm{x} 6=b_6 \times \text { Textual }+e_6 \\
+&amp; \mathrm{x} 7=b_7 \times \text { Speed }+e_7 \\
+&amp; \mathrm{x} 8=b_8 \times \text { Speed }+e_8 \\
+&amp; \mathrm{x} 9=b_9 \times \text { Speed }+e_9
+\end{aligned}
+\]</span></p>
+<ul>
+<li><p>In a CFA, all observed variables are endogenous, meaning that
+they are being explained by other variables in the system of equations.
+In the model equations, all observed variables appear on the left side
+of the equal signs. In the path diagram, all observed variables are
+being pointed to by latent factors and their corresponding error
+terms.</p></li>
+<li><p>In a CFA, all latent factors are exogenous, meaning that they
+serve as explanatory variables of the outcome variables in the system of
+equations. In the model equations, all latent factors appear on the
+right side of the equal signs. In the path diagram, all latent factors
+are never being pointed to.</p></li>
+</ul>
+<p>Followed from these two distinctions are two important conceptions
+about a CFA:</p>
+<ul>
+<li>In a CFA, the observed variables and latent factors have distinct
+roles. The latent factors explain the variance and covariances of the
+observed variables while the observed variables reflect or measure the
+latent factors. This is why a CFA is also referred to as a measurement
+model (of latent factors).<br />
+</li>
+<li>In a CFA, the explanatory variables are latent (unobserved) in the
+set of linear equations so that the usual least-squares regression
+formulas (as described in Chapter 1) cannot be applied to estimate the
+factor loadings (or slope parameters). Instead, a CFA model is usually
+fitted by using covariance structure analysis techniques.</li>
+</ul>
+<p>Two common methods to fix the scale of latent factors are:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Fixing Factor Variances to 1:</strong> This approach sets
+the variance of each latent factor to a constant (usually 1), which
+standardizes the scale of these factors.</p></li>
+<li><p><strong>Fixing One Loading per Factor to 1:</strong>
+Alternatively, one factor loading for each latent factor can be fixed to
+1, establishing a reference point or scale for each factor.</p></li>
+</ol>
+</div>
+<div id="parameter-estimation" class="section level2">
+<h2>Parameter Estimation</h2>
+<p>The parameters of a CFA model are consolidated into a parameter
+vector θ, which includes:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Factor Loadings (<code>bik</code>):</strong> These
+parameters are arranged in the factor loading matrix <span
+class="math inline">\(B\)</span>. The indexing denotes that <span
+class="math inline">\(i\)</span> refers to observed variables (rows of
+<span class="math inline">\(B\)</span>) and <span
+class="math inline">\(k\)</span> to latent factors (columns of <span
+class="math inline">\(B\)</span>). These loadings indicate the extent to
+which each observed variable is associated with each latent
+factor.</p></li>
+<li><p><strong>Factor Variances and Covariances
+(<code>ϕkl</code>):</strong> These parameters are captured in the factor
+covariance matrix <span class="math inline">\(\Phi\)</span>. They
+represent the variance within each latent factor and the covariance
+between pairs of latent factors, illustrating the relationships and
+shared variance among them.</p></li>
+<li><p><strong>Error Variances (<span
+class="math inline">\(σ^2_{ei}\)</span>):</strong> The variances
+associated with measurement errors for each observed variable are the
+diagonal elements of the error covariance matrix <span
+class="math inline">\(\Psi\)</span>. These variances account for the
+part of observed variables’ variances not explained by the latent
+factors.</p></li>
+</ol>
+$$
+<span class="math display">\[\begin{aligned}
+B &amp; =\left(\begin{array}{ccc}
+b_1 &amp; 0 &amp; 0 \\
+b_2 &amp; 0 &amp; 0 \\
+b_3 &amp; 0 &amp; 0 \\
+0 &amp; b_4 &amp; 0 \\
+0 &amp; b_5 &amp; 0 \\
+0 &amp; b_6 &amp; 0 \\
+0 &amp; 0 &amp; b_7 \\
+0 &amp; 0 &amp; b_8 \\
+0 &amp; 0 &amp; b_9
+\end{array}\right) \\
+\Phi &amp; =\left(\begin{array}{lll}
+\phi_{11} &amp; \phi_{12} &amp; \phi_{13} \\
+\phi_{21} &amp; \phi_{22} &amp; \phi_{23} \\
+\phi_{31} &amp; \phi_{32} &amp; \phi_{33}
+\end{array}\right)
+\end{aligned}\]</span>
+<p>\</p>
+=(
+<span class="math display">\[\begin{array}{ccccccccc}
+\sigma_{e_1}^2 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0
+&amp; 0 \\
+0 &amp; \sigma_{e_2}^2 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0
+&amp; 0 \\
+0 &amp; 0 &amp; \sigma_{e_3}^2 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0
+&amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; \sigma_{e_4}^2 &amp; 0 &amp; 0 &amp; 0 &amp; 0
+&amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; \sigma_{e_5}^2 &amp; 0 &amp; 0 &amp; 0
+&amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \sigma_{e_6}^2 &amp; 0 &amp; 0
+&amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \sigma_{e_7}^2 &amp; 0
+&amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \sigma_{e_8}^2
+&amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp;
+\sigma_{e_9}^2
+\end{array}\]</span>
+<p>) $$</p>
+<p>For the CFA model, <span
+class="math inline">\(\Sigma(\theta)\)</span> can be written explicitly
+as a matrix expression so that the null hypothesis becomes: <span
+class="math display">\[
+H_0: \quad \Sigma=B \Phi B^{\prime}+\Psi
+\]</span></p>
+</div>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<p>Chen, D.-G., &amp; Yung, Y.-F. (2023). Structural Equation Modeling
+Using R/SAS: A Step-by-Step Approach with Real Data Analysis (1st ed.).
+Chapman and Hall/CRC. <a href="https://doi.org/10.1201/9781003365860"
+class="uri">https://doi.org/10.1201/9781003365860</a></p>
+<p>Jöreskog, K. G., Olsson, U. H., &amp; Wallentin, F. Y. (2016).
+Multivariate analysis with LISREL. Basel, Switzerland: Springer.</p>
+<p>Kline, R. B. (2016). Principles and practice of structural equation
+modeling (4th ed.). Guilford publications.</p>
+<p>Yves Rosseel (2012). lavaan: An R Package for Structural Equation
+Modeling. Journal of Statistical Software, 48(2), 1-36. <a
+href="https://doi.org/10.18637/jss.v048.i02"
+class="uri">https://doi.org/10.18637/jss.v048.i02</a></p>
+<p><a href="https://stats.oarc.ucla.edu/r/seminars/rsem/">INTRODUCTION
+TO STRUCTURAL EQUATION MODELING (SEM) IN R WITH LAVAAN</a></p>
+</div>
+<div id="session-info" class="section level1">
+<h1>Session Info</h1>
+<div class="figure" style="text-align: center">
+<img src="logo.png" alt=" " width="25%" />
+<p class="caption">
+</p>
+</div>
+<pre><code>## R version 4.4.2 (2024-10-31 ucrt)
+## Platform: x86_64-w64-mingw32/x64
+## Running under: Windows 10 x64 (build 19045)
+## 
+## Matrix products: default
+## 
+## 
+## locale:
+## [1] LC_COLLATE=English_United States.1252 
+## [2] LC_CTYPE=English_United States.1252   
+## [3] LC_MONETARY=English_United States.1252
+## [4] LC_NUMERIC=C                          
+## [5] LC_TIME=English_United States.1252    
+## system code page: 65001
+## 
+## time zone: Europe/Berlin
+## tzcode source: internal
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+##  [1] reshape2_1.4.4           lavaan_0.6-19            clinUtils_0.2.0         
+##  [4] htmltools_0.5.8.1        Hmisc_5.1-3              inTextSummaryTable_3.3.3
+##  [7] gtsummary_2.0.3          kableExtra_1.4.0         lubridate_1.9.3         
+## [10] forcats_1.0.0            stringr_1.5.1            dplyr_1.1.4             
+## [13] purrr_1.0.2              readr_2.1.5              tidyr_1.3.1             
+## [16] tibble_3.2.1             ggplot2_3.5.1            tidyverse_2.0.0         
+## 
+## loaded via a namespace (and not attached):
+##  [1] tidyselect_1.2.1        viridisLite_0.4.2       farver_2.1.2           
+##  [4] fastmap_1.2.0           fontquiver_0.2.1        digest_0.6.35          
+##  [7] rpart_4.1.23            timechange_0.3.0        lifecycle_1.0.4        
+## [10] cluster_2.1.6           magrittr_2.0.3          compiler_4.4.2         
+## [13] rlang_1.1.4             sass_0.4.9              tools_4.4.2            
+## [16] utf8_1.2.4              yaml_2.3.10             data.table_1.16.2      
+## [19] knitr_1.48              labeling_0.4.3          askpass_1.2.1          
+## [22] htmlwidgets_1.6.4       mnormt_2.1.1            plyr_1.8.9             
+## [25] xml2_1.3.6              withr_3.0.2             foreign_0.8-87         
+## [28] stats4_4.4.2            nnet_7.3-19             grid_4.4.2             
+## [31] fansi_1.0.6             gdtools_0.4.0           colorspace_2.1-1       
+## [34] MASS_7.3-61             scales_1.3.0            cli_3.6.3              
+## [37] rmarkdown_2.28          ragg_1.3.3              generics_0.1.3         
+## [40] rstudioapi_0.17.1       tzdb_0.4.0              cachem_1.1.0           
+## [43] parallel_4.4.2          base64enc_0.1-3         vctrs_0.6.5            
+## [46] jsonlite_1.8.9          fontBitstreamVera_0.1.1 hms_1.1.3              
+## [49] ggrepel_0.9.6           Formula_1.2-5           htmlTable_2.4.3        
+## [52] systemfonts_1.1.0       crosstalk_1.2.1         jquerylib_0.1.4        
+## [55] glue_1.8.0              cowplot_1.1.3           DT_0.33                
+## [58] stringi_1.8.4           flextable_0.9.7         gtable_0.3.6           
+## [61] quadprog_1.5-8          munsell_0.5.1           pillar_1.9.0           
+## [64] openssl_2.2.2           R6_2.5.1                textshaping_0.4.0      
+## [67] pbivnorm_0.6.0          evaluate_1.0.1          highr_0.11             
+## [70] haven_2.5.4             backports_1.5.0         fontLiberation_0.1.0   
+## [73] bslib_0.8.0             Rcpp_1.0.13             zip_2.3.1              
+## [76] uuid_1.2-1              svglite_2.1.3           gridExtra_2.3          
+## [79] checkmate_2.3.2         officer_0.6.7           xfun_0.48              
+## [82] pkgconfig_2.0.3</code></pre>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -16,7 +16,7 @@ editor_options:
 colorlinks: yes
 ---
  
-# Correlation
+# Correlation Analysis
 
 The correlation measures the strength of a linear relationship. 
 
@@ -68,7 +68,7 @@ The Kendall rank correlation coefficient is a measure of ordinal association, su
 where \({n \choose 2} = \frac{n(n-1)}{2}\) represents the number of ways to choose two items from \( n \) items.
  
 
-### Intraclass Correlation Coefficient (ICC)
+## Intraclass Correlation Coefficient (ICC)
 
 When measuring quantitative characteristics in units organized into groups, the intraclass correlation coefficient (ICC) describes how similar units within the same group are to each other. Unlike most correlation measures, ICC operates on group-structured data rather than paired observations. ICC is commonly used to assess the similarity of quantitative attributes among individuals with specific familial relationships or to evaluate the consistency or reliability of measurement methods or raters for the same quantitative outcome.
 
@@ -99,7 +99,7 @@ r_{xy} = \frac{\sum_{i=1}^{n} \left( x_i - \bar{x} \right) \left( y_i - \bar{y} 
 \]
 
 
-### Visualize the correlation in R
+## Visualize Correlation in R
 
 ```{r Corrplot,echo = T,message = FALSE, error = FALSE, warning = FALSE}
 bank<- data.frame(
@@ -138,7 +138,7 @@ ggcorrplot(corr, hc.order = TRUE,
 ```
 
 
-# Ordinary least squares (OLS) 
+# Ordinary Least Squares (OLS) 
 
 ## Assumpions
 
@@ -150,7 +150,7 @@ $${\displaystyle \mathbf {y} =\mathbf {X} {\boldsymbol {\beta }}+{\boldsymbol {\
 4. $\operatorname{cov}\left(\varepsilon_{i}, \varepsilon_{j}\right)=0$
 5. $\varepsilon_{i} \sim$ Normal Distribution
 
-### Interpretation
+**Interpretation**
 
 - **Linearity**: The relationship between the predictor and response variables should be linear. If this relationship isn’t clearly linear, **data transformations** (e.g., logarithmic, polynomial, or exponential transformations) can be applied to the variables X or Y to achieve linearity.
 
@@ -162,7 +162,7 @@ $${\displaystyle \mathbf {y} =\mathbf {X} {\boldsymbol {\beta }}+{\boldsymbol {\
 
 - **Outliers**: Outliers can severely impact parameter estimation. Ideally, outliers should be removed before fitting a model using linear regression.
 
-### Matrix Solution
+**Matrix Solution**
 
 Least squares method minimum $J\left(\theta_{0}, \theta_{1}\right)$ and find out the smallest $\theta_{0}$ and $\theta_{1}$
 
@@ -179,7 +179,7 @@ $$\mathbf{X^{T}X\theta} = \mathbf{X^{T}Y}$$
 $$\mathbf{\theta} = (\mathbf{X^{T}X})^{-1}\mathbf{X^{T}Y}$$
 
 
-### Gauss-Markov Theorem
+**Gauss-Markov Theorem**
 
 The Gauss-Markov Theorem establishes that the Ordinary Least Squares (OLS) method has particularly desirable properties. Specifically, when the mean of the error terms is zero, the OLS estimator \(\hat{\beta}\) is **unbiased**. If the error terms also have constant variance, then OLS provides the **Best Linear Unbiased Estimator (BLUE)**. Additionally, if the error terms in a linear regression model are uncorrelated, the OLS estimator has the lowest sampling variance among linear unbiased estimators. While \(\hat{\beta}\) is a reasonable estimator, there are other options. However, OLS is preferred for three key reasons:
 
@@ -190,7 +190,7 @@ The Gauss-Markov Theorem establishes that the Ordinary Least Squares (OLS) metho
 3. **Gauss-Markov Theorem**: The theorem confirms that OLS provides the **best linear unbiased estimate (BLUE)**, ensuring minimum variance within the class of linear unbiased estimators.
 
 
-### limitation
+**limitation**
 
 **Limitations of Ordinary Least Squares (OLS):**
 
@@ -205,7 +205,7 @@ The Gauss-Markov Theorem establishes that the Ordinary Least Squares (OLS) metho
 
 ## Model Statistics
 
-### Residuals Standard Error
+**Residuals Standard Error**
 
 ```
 ## Build Model
@@ -222,9 +222,8 @@ n <- length(model$residuals)
 Residual_Standard_Error <- sqrt(SSE/(n-(1+k)))
 ```
 
-### R-Squared and Adjusted R-Squared
-
-**R-Squared Calculation**
+**R-Squared**
+ 
 
 R^2^ is a statistic that will give some information about the goodness of fit of a model. In regression, the R^2^ coefficient of determination is a statistical measure of how well the regression predictions approximate the real data points. An R^2^ of 1 indicates that the regression predictions perfectly fit the data.
 
@@ -266,7 +265,7 @@ SSyy <- sum((y-mean(y))**2)
 1-(SSE/SSyy)*(n-1)/(n-(k+1))
 ```
 
-### T Statistic  
+**T Statistic** 
 
 Null Hypothesis is that the coefficients associated with the variables is equal to zero. The alternate hypothesis is that the coefficients are not equal to zero (i.e. there exists a relationship between the independent variable in question and the dependent variable).
 
@@ -276,7 +275,7 @@ Pr(>|t|) or p-value is the probability that you get a t-value as high or higher 
 
 $$t−Statistic = {β−coefficient \over Std.Error}$$
 
-### F Statistic
+**F Statistic**
 
 $\mathrm{H}_{0}: \beta_{1}=\ldots \beta_{\mathrm{p}-1}=0$
 
@@ -338,7 +337,7 @@ anova (g2, g)
 ```
 
 
-### Confidence Intervals 
+**Confidence Intervals**
 
 **Confidence Intervals for $\beta$**
 
@@ -372,7 +371,7 @@ In these formulas:
 - \( \hat{\sigma} \) is the standard error of the estimate.
 
 
-### Likelihood-ratio test
+**Likelihood-ratio test**
 
 likelihood-ratio test assesses the goodness of fit of two competing statistical models based on the ratio of their likelihoods, specifically one found by maximization over the entire parameter space and another found after imposing some constraint. If the constraint (i.e., the null hypothesis) is supported by the observed data, the two likelihoods should not differ by more than sampling error.
 
@@ -391,7 +390,7 @@ $${\displaystyle \ell ({\hat {\theta }})\equiv \ln \left[~\sup _{\theta \in \The
 
 
 
-### Accuracy
+**Accuracy**
 
 **Accuracy**: A simple correlation between the actuals and predicted values can be used as a form of accuracy measure. A higher correlation accuracy implies that the actuals and predicted values have similar directional movement, i.e. when the actuals values increase the predicteds also increase and vice-versa.
 $$\text{Min Max Accuracy} = mean \left( \frac{min\left(actuals, predicteds\right)}{max\left(actuals, predicteds \right)} \right)$$
@@ -443,9 +442,9 @@ The estimation and inference of the regression model depend on several assumptio
 not fit the model. These few observations might change the
 choice and fit of the model.
 
-### Checking Error Assumptions
+### 1. Checking Error Assumptions {-}
 
-**1. Constant Variance (Residuals vs. fitted plots)**
+**Constant Variance (Residuals vs. fitted plots)**
 
 There are two approaches to dealing with nonconstant variance. Use of **weighted least squares** is appropriate when the form of the **nonconstant variance** is either known exactly or there is some known parametric form. Alternatively, one can transform the variables.
 
@@ -470,7 +469,7 @@ knitr::include_graphics("./02_Plots/LR_Residums.png")
 
 Here’s a practical example using the built-in `cars` dataset in R, which contains data on car speeds and stopping distances. This example will walk you through scatter plots, box plots, density plots, and a bubble plot. 
 
-### 1. Scatter Plot with Best Fit Line
+#### a. Scatter Plot with Best Fit Line {-}
 
 This scatter plot visualizes the relationship between car speed and stopping distance. The `scatter.smooth()` function will plot the data along with a smoothed line to help visualize the trend.
 
@@ -480,7 +479,7 @@ scatter.smooth(x = cars$speed, y = cars$dist, main = "Stopping Distance vs Speed
                xlab = "Speed (mph)", ylab = "Stopping Distance (ft)")
 ```
 
-### 2. Box Plot to Check for Outliers
+#### b. Box Plot to Check for Outliers {-}
 
 Box plots help identify any outliers in the `speed` and `distance` variables.
 
@@ -497,7 +496,7 @@ boxplot(cars$dist, main = "Box Plot for Distance",
         sub = paste("Outliers:", paste(boxplot.stats(cars$dist)$out, collapse = ", ")))
 ```
 
-### 3. Density Plot to Visualize Distribution
+#### c. Density Plot to Visualize Distribution {-}
 
 Density plots are useful for checking the distribution of variables. Here, we use the `e1071` package to calculate skewness and visualize the density of `speed` and `distance`.
 
@@ -519,7 +518,7 @@ plot(density(cars$dist), main = "Density Plot: Distance", xlab = "Distance",
 polygon(density(cars$dist), col = "blue", border = "black")
 ```
 
-### 4. Bubble Plot to Add a Third Dimension
+#### d. Bubble Plot to Add a Third Dimension {-}
 
 A bubble plot is a scatter plot where the size of the bubbles represents a third variable. Here, we use `speed` for bubble size to illustrate its relationship with `distance`.
 
@@ -537,8 +536,7 @@ The residuals can be assessed for normality using a Q–Q plot
 
 When the errors are not normal, least squares estimates may not be optimal. They will still be best linear unbiased estimates, but other robust estimators may be more effective. Also tests and confidence intervals are not exact. However, only long-tailed distributions cause large inaccuracies. Mild nonnormality can safely be ignored and the larger the sample size the less troublesome the nonnormality. For short-tailed distributions, the consequences of nonnormality are not serious and can reasonably 
 
-<!-- 当误差不正常时，最小二乘估计可能不是最佳的。 它们仍将是最佳的线性无偏估计，但其他稳健的估计量可能更有效。 同样，测试和置信区间也不精确。 但是，只有长尾分布会导致较大的误差。 轻度的非正常现象可以安全地忽略，样本量越大，非正常现象的麻烦就越小。对于短尾分布，非正态性的后果并不严重，并且可以合理地进行。 -->
-
+ 
 The Shapiro-Wilk test is a formal test for normality, The null hypothesis is that the the residuals are normal.: 
 
 ```
@@ -554,13 +552,9 @@ $$
 D W=\frac{\sum_{i=2}^{n}\left(\hat{\varepsilon}_{i}-\hat{\varepsilon}_{i-1}\right)^{2}}{\sum_{i=1}^{n} \hat{\varepsilon}_{i}^{2}}
 $$
 
+### 2. Finding Unusual Observations
 
-### Finding Unusual Observations
-
-
-## Finding Unusual Observations
-
-### Studentized Residuals
+#### Studentized Residuals {-}
 
 The **studentized residual** \( r_i \) is given by:
 \[
@@ -570,7 +564,7 @@ where \( \hat{\varepsilon}_i \) is the residual for observation \( i \), \( \hat
 
 If the model assumptions hold, the variance \( \operatorname{var}(r_i) = 1 \), and the correlation \( \operatorname{corr}(r_i, r_j) \) tends to be small. Studentized residuals are often preferred in residual plots because they are standardized to have equal variance, correcting the natural non-constant variance of residuals under constant error variance assumptions. However, if heteroscedasticity is present, studentization alone cannot correct for it.
 
-### Outlier
+#### Outlier {-}
 
 An **outlier** is an observation that doesn’t fit the model well, often having a large residual. In linear regression, an outlier is defined as an observation whose value on the dependent variable is unusual given its predictor values. It may indicate a unique sample property or possibly a data entry error.
 
@@ -592,7 +586,7 @@ t_{i} = \frac{\hat{\varepsilon}_{i}}{\hat{\sigma}_{(i)} \sqrt{1 - h_{i}}} = r_{i
 \]
 allowing us to avoid performing \( n \) separate regressions. Since \( t_i \sim t_{n - p - 1} \), we can use it to test if case \( i \) is an outlier.
 
-### Leverage
+#### Leverage {-}
 
 An observation has **high leverage** if its predictor values are far from the mean, meaning it can exert significant influence on the regression coefficients. The leverage value \( h_i = H_{ii} \) is useful for diagnostics. Since
 \[
@@ -600,7 +594,7 @@ An observation has **high leverage** if its predictor values are far from the me
 \]
 a high leverage \( h_i \) will reduce \( \operatorname{var}(\hat{\varepsilon}_{i}) \), indicating that observation \( i \) has a significant influence on the model.
 
-### Influence
+#### Influence {-}
 
 An observation is **influential** if its removal significantly changes the estimated regression coefficients. Influence is often seen as a product of leverage and residual size.
 
@@ -612,7 +606,7 @@ where \( p \) is the number of predictors in the model, and \( r_i \) and \( h_i
 
 
 
-### Checking the Structure of the Model
+### 3. Checking the Structure of the Model
 
 We can look at plots of $\hat{\varepsilon}$ against $\hat{y}$ and $x_{i}$ to reveal problems
 or just simply look at plots of $y$ against each $x_{i} .$ 
@@ -627,223 +621,7 @@ $$
 
 
 
-
-
-
-
-## SAS implementation Proc Reg
-
-### Options
-
-Here's an overview of various options used in regression analysis and diagnostic plotting, along with their descriptions:
-
-| Options                  | Description                                                                 |
-|--------------------------|-----------------------------------------------------------------------------|
-| **STB**                  | Outputs the standardized partial regression coefficient matrix.             |
-| **CORRB**                | Outputs the parameter estimation matrix.                                    |
-| **COLLINOINT**           | Performs multicollinearity analysis on predictor variables.                 |
-| **P**                    | Outputs individual observations, predicted values, and residuals.           |
-| **R**                    | Outputs each individual observation, residuals, and standard errors.        |
-| **CLM**                  | Outputs the 95% confidence interval limits for the mean of the dependent variable. |
-| **CLI**                  | Outputs the 95% confidence interval limits for each predicted value.        |
-| **MSE**                  | Requests the variance of the random disturbance term to be output.          |
-| **VIF**                  | Outputs the Variance Inflation Factor (VIF), which measures multicollinearity. Higher VIF indicates greater variance due to multicollinearity. |
-| **TOL**                  | Outputs the tolerance level for multicollinearity. A smaller TOL suggests that more of the variable's variance is explained by other predictors, indicating potential multicollinearity. |
-| **DW**                   | Outputs the Durbin-Watson statistic to check for autocorrelation.           |
-| **Influence**            | Diagnoses outliers by outputting statistics for each observation. Cook's D > 50% or defits/debetas > 2 suggests a significant influence of the point. |
-
-### Plot Options
-
-| Plot Options             | Description                                                                 |
-|--------------------------|-----------------------------------------------------------------------------|
-| **FITPLOT**              | Scatter plot with regression line and confidence prediction bands.          |
-| **RESIDUALS**            | Residuals of the independent variable.                                      |
-| **DIAGNOSTICS**          | Diagnostic plots (includes the following plots).                            |
-| **COOKSD**               | Plot of Cook's D statistic for influence diagnostics.                       |
-| **OBSERVEDBYPREDICTED**  | Plot of the observed dependent variable against predicted values.           |
-| **QQPLOT**               | Q-Q plot to test for normality of residuals.                                |
-| **RESIDUALBYPREDICTED**  | Plot of residuals versus predicted values.                                  |
-| **RESIDUALHISTOGRAM**    | Histogram of residuals.                                                     |
-| **RFPLOT**               | Residuals vs Fitted values plot.                                            |
-| **RSTUDENTBYLEVERAGE**   | Plot of studentized residuals versus leverage.                              |
-| **RSTUDENTBYPREDICTED**  | Plot of studentized residuals versus predicted values.                      |
-
-These options and plots are valuable for evaluating model fit, diagnosing potential issues such as multicollinearity, identifying outliers, and checking assumptions like normality and homoscedasticity of residuals.
-
-### Diagnose
-
-**Hat matrix diagonal SAS**
-
-The hat matrix diagonal measure is used to identify unusual values of the explanatory variables. The hat matrix depends only on the explanatory values and not on the dependent y values. The interpretation, then, is that the hat matrix is a measure of leverage among the independent, explanatory variables only. In contrast, a plot of residuals identifies observations that are unusual in terms of their Y values that we wish to explain. The hat matrix diagonal measure is used to identify unusual values of the explanatory variables.
-
-The "U" shape is a shape common to most hat matrix diagrams. We can think that the highest and lowest observed values of the explanatory variables are also the furthest away from the data center and will have the greatest impact. Observations close to the data center should have the least influence.
-
-<!-- 
-帽子矩阵仅取决于解释性值，而不取决于相关的y值。 因此，解释是帽子矩阵仅是独立，解释性变量之间杠杆作用的量度。 相比之下，残差图可标识出我们希望解释的，在Y值方面不寻常的观察结果。
-
-“ U”形是大多数帽子矩阵图所共有的形状。我们可以认为，解释变量的最高和
-最低观测值也离数据中心最远，并且将产生最大的影响。靠近数据中心的观测
-值应具有最小的影响力。
--->
-
-
-```
-proc reg data=cold;
-    model maxt = lat long alt / p r influence ;
-    output out=inf h=h p=p r=r;
-    run;
-proc gplot data=inf;
-    plot h * p;
-run;
-```
-
-**Jackknife Diagnostics SAS**
-
-The jackknife measures how much the fitted model changes when one observation is deleted and the model is refitted. If an observation is deleted from the data set, and the new fit is very different from the original model based on the complete data set, the observation is considered to have an impact on the fit
-
-```
-proc reg data=cold;
-title2 ’Explain max Jan temperature’;
-model maxt = lat long alt / p influence partial;
-ods output OutputStatistics = diag;
-run;
-title2 ’Examine diagnostic data set’;
-proc print data=diag;
-run;
-```
-
-**Partial Regression Plots SAS**
-
-One way to solve the problem of the individual contribution of each explanatory variable is to use partial correlation and partial regression plots. These are obtained using the /partial option in proc reg.
-
-```
-proc reg data=lowbw;
-    model birthwt = headcirc length gestage momage toxemia
-    / partial influence p r pcorr1 pcorr2;
-    ods output OutputStatistics = diag;
-run;
-```
-
-
-
-## R implementation 
-
-
-Here's a summary of commonly used functions in R for model diagnostics and checking assumptions, particularly useful when working with linear models (`lm` objects). These functions help evaluate model fit, detect heteroscedasticity, multicollinearity, and autocorrelation, and identify high leverage or influential points.
-
-| Title                  | Function                                      |
-|------------------------|-----------------------------------------------|
-| **Predicted Values**   | `fitted(bank.lm)`                             |
-| **Model Coefficients** | `coef(bank.lm)`                               |
-| **Residual Sum of Squares** | `deviance(bank.lm)`                    |
-| **Residuals**          | `residuals(bank.lm)`                          |
-| **ANOVA Table**        | `anova(bank.lm)`                              |
-| **Confidence Interval**| `confint(bank.lm, level = 0.95)`              |
-|                        |                                               |
-| **Heteroscedasticity Test** | `library(car)` then `ncvTest(bank.lm)`   |
-| **Multicollinearity Check (VIF > 10)** | `vif(bank.lm)`                |
-| **Autocorrelation Test** | `durbinWatsonTest(bank.lm)`                |
-| **High Leverage Points (greater than 2–3 times mean)** | `hatvalues(bank.lm)` |
-| **Influential Points** | `cooks.distance(bank.lm)`                     |
-| **Outliers, High Leverage, and Influential Points** | `influence.measures(bank.lm)` |
-| **Influence Plot**     | `influencePlot(bank.lm)`                      |
-
-These functions can be run on an `lm` model object (e.g., `bank.lm`) to examine various diagnostic aspects and validate model assumptions.
-
-
-## Model Selection
-
-Here's an overview of three popular model selection methods in regression analysis: forward stepwise selection, backward stepwise regression, and best subset regression. Each approach can be used to choose the most appropriate predictors in a model.
-
-### 1. Forward Stepwise Selection
-
-Forward stepwise selection starts with a model that has no features and adds one feature at a time. At each step, the feature that most reduces the residual sum of squares (RSS) is added, aiming to improve the model’s R-squared. However, adding a feature does not always improve model fit and interpretability.
-
-**Example Code in SAS:**
-```sas
-title2 'Forward stepwise selection';
-proc reg;
-    model birthwt = headcirc length gestage momage toxemia / selection=f;
-run;
-```
-
-### 2. Backward Stepwise Regression
-
-Backward stepwise regression begins with a model that includes all features, then removes the least significant feature one by one. A mixed approach can combine forward and backward selection to refine the model further, adding features initially and then removing those that no longer contribute to the model fit.
-
-**Example Code in SAS:**
-```sas
-proc reg;
-    model birthwt = headcirc length gestage momage toxemia / selection=b;
-run;
-```
-
-### 3. Best Subset Regression
-
-Best subset regression fits all possible models and allows the analyst to choose the best one based on criteria such as adjusted R-squared, Mallow’s \( C_p \), and Bayesian Information Criterion (BIC). This method becomes computationally intensive as the number of predictors increases, making it less practical for very large datasets.
-
-**Example Code in SAS:**
-```sas
-title2 'Selecting the best of all possible regression models';
-proc reg;
-    model birthwt = headcirc length gestage momage toxemia / selection=cp adjrsq r best=5;
-run;
-```
-The `/ selection = cp adjrsq r` option directs SAS to use Mallow’s \( C_p \) criterion to rank models, displaying both adjusted and unadjusted R-squared statistics. `best=5` specifies that SAS should display the top 5 models.
-
-**Example Code in R:**
-```R
-# Load necessary libraries
-library(leaps) 
-library(alr3)
-
-# Load data
-data(water)
-socal.water <- water[ ,-1]  # Remove the first column if not needed
-
-# Fit the full model
-fit <- lm(BSAAM ~ ., data = socal.water)
-summary(fit)
-
-# Perform best subset regression
-sub.fit <- regsubsets(BSAAM ~ ., data = socal.water)
-best.summary <- summary(sub.fit)
-print(best.summary)
-
-# Identifying models with minimum or maximum values
-which.min(best.summary$rss)   # Minimum RSS
-which.min(best.summary$bic)   # Minimum BIC
-which.max(best.summary$adjr2) # Maximum Adjusted R-squared
-
-# Plot model evaluation
-par(mfrow = c(1, 2))
-plot(best.summary$cp, xlab = "Number of features", ylab = "Cp")
-plot(sub.fit, scale = "Cp")
-```
-
-This R code performs best subset regression on the `water` dataset. The `regsubsets()` function from the `leaps` package evaluates all possible subsets, and the `summary()` provides metrics like RSS, BIC, and adjusted R-squared, which you can use to choose the best model. The `which.min()` and `which.max()` functions help identify the subset with the best criterion value.
-
-
-### k-Fold Cross-Validation
-
-**Background:**  
-Professor Tappi from Wright State University highlights the importance of testing regression models rigorously for predicting future observations. When a model is trained and tested on the same dataset, it can lead to overly optimistic conclusions about the model’s predictive performance, as it may not generalize well to new data. For a more unbiased assessment of prediction accuracy, a common approach is to hold back one observation, fit the model on the remaining data, and then use the held-out observation to test the prediction. This leave-one-out method reduces bias in evaluating model performance.
-
-**Purpose of k-Fold Cross-Validation:**
-
-While splitting the data into training and test sets (e.g., 80/20 split) might provide an initial performance estimate, it doesn’t guarantee consistent results on other subsets. **k-Fold Cross-Validation** provides a more robust test by building multiple models on different portions of the data, ensuring the model's performance is not overly dependent on one specific train-test split.
-
-**Procedure for k-Fold Cross-Validation:**
-
-1. Divide the data into **k** mutually exclusive, random portions.
-2. Use each portion as a test set while training the model on the remaining **k-1** portions.
-3. Calculate the mean squared error (MSE) for each fold.
-4. Average the MSEs across all **k** folds to obtain a cross-validated error estimate.
-
-This cross-validated error estimate can then be used to compare models and helps determine which model generalizes best to new data.
-
-
-### Practical Difficulties Using OLS
+## Practical Difficulties Using OLS
 
 When using Ordinary Least Squares (OLS) regression, several practical challenges can limit the reliability and interpretability of the results:
 
@@ -898,8 +676,216 @@ vif(g)
 
 
 
+# SAS implementation using Proc Reg
 
-### Basic Transformations for Skewed Data
+## Options
+
+Here's an overview of various options used in regression analysis and diagnostic plotting, along with their descriptions:
+
+| Options                  | Description                                                                 |
+|--------------------------|-----------------------------------------------------------------------------|
+| **STB**                  | Outputs the standardized partial regression coefficient matrix.             |
+| **CORRB**                | Outputs the parameter estimation matrix.                                    |
+| **COLLINOINT**           | Performs multicollinearity analysis on predictor variables.                 |
+| **P**                    | Outputs individual observations, predicted values, and residuals.           |
+| **R**                    | Outputs each individual observation, residuals, and standard errors.        |
+| **CLM**                  | Outputs the 95% confidence interval limits for the mean of the dependent variable. |
+| **CLI**                  | Outputs the 95% confidence interval limits for each predicted value.        |
+| **MSE**                  | Requests the variance of the random disturbance term to be output.          |
+| **VIF**                  | Outputs the Variance Inflation Factor (VIF), which measures multicollinearity. Higher VIF indicates greater variance due to multicollinearity. |
+| **TOL**                  | Outputs the tolerance level for multicollinearity. A smaller TOL suggests that more of the variable's variance is explained by other predictors, indicating potential multicollinearity. |
+| **DW**                   | Outputs the Durbin-Watson statistic to check for autocorrelation.           |
+| **Influence**            | Diagnoses outliers by outputting statistics for each observation. Cook's D > 50% or defits/debetas > 2 suggests a significant influence of the point. |
+
+## Plot Options
+
+| Plot Options             | Description                                                                 |
+|--------------------------|-----------------------------------------------------------------------------|
+| **FITPLOT**              | Scatter plot with regression line and confidence prediction bands.          |
+| **RESIDUALS**            | Residuals of the independent variable.                                      |
+| **DIAGNOSTICS**          | Diagnostic plots (includes the following plots).                            |
+| **COOKSD**               | Plot of Cook's D statistic for influence diagnostics.                       |
+| **OBSERVEDBYPREDICTED**  | Plot of the observed dependent variable against predicted values.           |
+| **QQPLOT**               | Q-Q plot to test for normality of residuals.                                |
+| **RESIDUALBYPREDICTED**  | Plot of residuals versus predicted values.                                  |
+| **RESIDUALHISTOGRAM**    | Histogram of residuals.                                                     |
+| **RFPLOT**               | Residuals vs Fitted values plot.                                            |
+| **RSTUDENTBYLEVERAGE**   | Plot of studentized residuals versus leverage.                              |
+| **RSTUDENTBYPREDICTED**  | Plot of studentized residuals versus predicted values.                      |
+
+These options and plots are valuable for evaluating model fit, diagnosing potential issues such as multicollinearity, identifying outliers, and checking assumptions like normality and homoscedasticity of residuals.
+
+## Diagnose
+
+**Hat matrix diagonal SAS**
+
+The hat matrix diagonal measure is used to identify unusual values of the explanatory variables. The hat matrix depends only on the explanatory values and not on the dependent y values. The interpretation, then, is that the hat matrix is a measure of leverage among the independent, explanatory variables only. In contrast, a plot of residuals identifies observations that are unusual in terms of their Y values that we wish to explain. The hat matrix diagonal measure is used to identify unusual values of the explanatory variables.
+
+The "U" shape is a shape common to most hat matrix diagrams. We can think that the highest and lowest observed values of the explanatory variables are also the furthest away from the data center and will have the greatest impact. Observations close to the data center should have the least influence.
+
+```
+proc reg data=cold;
+    model maxt = lat long alt / p r influence ;
+    output out=inf h=h p=p r=r;
+    run;
+proc gplot data=inf;
+    plot h * p;
+run;
+```
+
+**Jackknife Diagnostics SAS**
+
+The jackknife measures how much the fitted model changes when one observation is deleted and the model is refitted. If an observation is deleted from the data set, and the new fit is very different from the original model based on the complete data set, the observation is considered to have an impact on the fit
+
+```
+proc reg data=cold;
+title2 ’Explain max Jan temperature’;
+model maxt = lat long alt / p influence partial;
+ods output OutputStatistics = diag;
+run;
+title2 ’Examine diagnostic data set’;
+proc print data=diag;
+run;
+```
+
+**Partial Regression Plots SAS**
+
+One way to solve the problem of the individual contribution of each explanatory variable is to use partial correlation and partial regression plots. These are obtained using the /partial option in proc reg.
+
+```
+proc reg data=lowbw;
+    model birthwt = headcirc length gestage momage toxemia
+    / partial influence p r pcorr1 pcorr2;
+    ods output OutputStatistics = diag;
+run;
+```
+
+
+
+# R implementation 
+
+
+Here's a summary of commonly used functions in R for model diagnostics and checking assumptions, particularly useful when working with linear models (`lm` objects). These functions help evaluate model fit, detect heteroscedasticity, multicollinearity, and autocorrelation, and identify high leverage or influential points.
+
+| Title                  | Function                                      |
+|------------------------|-----------------------------------------------|
+| **Predicted Values**   | `fitted(bank.lm)`                             |
+| **Model Coefficients** | `coef(bank.lm)`                               |
+| **Residual Sum of Squares** | `deviance(bank.lm)`                    |
+| **Residuals**          | `residuals(bank.lm)`                          |
+| **ANOVA Table**        | `anova(bank.lm)`                              |
+| **Confidence Interval**| `confint(bank.lm, level = 0.95)`              |
+|                        |                                               |
+| **Heteroscedasticity Test** | `library(car)` then `ncvTest(bank.lm)`   |
+| **Multicollinearity Check (VIF > 10)** | `vif(bank.lm)`                |
+| **Autocorrelation Test** | `durbinWatsonTest(bank.lm)`                |
+| **High Leverage Points (greater than 2–3 times mean)** | `hatvalues(bank.lm)` |
+| **Influential Points** | `cooks.distance(bank.lm)`                     |
+| **Outliers, High Leverage, and Influential Points** | `influence.measures(bank.lm)` |
+| **Influence Plot**     | `influencePlot(bank.lm)`                      |
+
+These functions can be run on an `lm` model object (e.g., `bank.lm`) to examine various diagnostic aspects and validate model assumptions.
+
+
+# Model Selection
+
+Here's an overview of three popular model selection methods in regression analysis: forward stepwise selection, backward stepwise regression, and best subset regression. Each approach can be used to choose the most appropriate predictors in a model.
+
+## 1. Forward Stepwise Selection
+
+Forward stepwise selection starts with a model that has no features and adds one feature at a time. At each step, the feature that most reduces the residual sum of squares (RSS) is added, aiming to improve the model’s R-squared. However, adding a feature does not always improve model fit and interpretability.
+
+**Example Code in SAS:**
+```sas
+title2 'Forward stepwise selection';
+proc reg;
+    model birthwt = headcirc length gestage momage toxemia / selection=f;
+run;
+```
+
+## 2. Backward Stepwise Regression
+
+Backward stepwise regression begins with a model that includes all features, then removes the least significant feature one by one. A mixed approach can combine forward and backward selection to refine the model further, adding features initially and then removing those that no longer contribute to the model fit.
+
+**Example Code in SAS:**
+```sas
+proc reg;
+    model birthwt = headcirc length gestage momage toxemia / selection=b;
+run;
+```
+
+## 3. Best Subset Regression
+
+Best subset regression fits all possible models and allows the analyst to choose the best one based on criteria such as adjusted R-squared, Mallow’s \( C_p \), and Bayesian Information Criterion (BIC). This method becomes computationally intensive as the number of predictors increases, making it less practical for very large datasets.
+
+**Example Code in SAS:**
+```sas
+title2 'Selecting the best of all possible regression models';
+proc reg;
+    model birthwt = headcirc length gestage momage toxemia / selection=cp adjrsq r best=5;
+run;
+```
+The `/ selection = cp adjrsq r` option directs SAS to use Mallow’s \( C_p \) criterion to rank models, displaying both adjusted and unadjusted R-squared statistics. `best=5` specifies that SAS should display the top 5 models.
+
+**Example Code in R:**
+```R
+# Load necessary libraries
+library(leaps) 
+library(alr3)
+
+# Load data
+data(water)
+socal.water <- water[ ,-1]  # Remove the first column if not needed
+
+# Fit the full model
+fit <- lm(BSAAM ~ ., data = socal.water)
+summary(fit)
+
+# Perform best subset regression
+sub.fit <- regsubsets(BSAAM ~ ., data = socal.water)
+best.summary <- summary(sub.fit)
+print(best.summary)
+
+# Identifying models with minimum or maximum values
+which.min(best.summary$rss)   # Minimum RSS
+which.min(best.summary$bic)   # Minimum BIC
+which.max(best.summary$adjr2) # Maximum Adjusted R-squared
+
+# Plot model evaluation
+par(mfrow = c(1, 2))
+plot(best.summary$cp, xlab = "Number of features", ylab = "Cp")
+plot(sub.fit, scale = "Cp")
+```
+
+This R code performs best subset regression on the `water` dataset. The `regsubsets()` function from the `leaps` package evaluates all possible subsets, and the `summary()` provides metrics like RSS, BIC, and adjusted R-squared, which you can use to choose the best model. The `which.min()` and `which.max()` functions help identify the subset with the best criterion value.
+
+
+## k-Fold Cross-Validation
+
+**Background:**  
+Professor Tappi from Wright State University highlights the importance of testing regression models rigorously for predicting future observations. When a model is trained and tested on the same dataset, it can lead to overly optimistic conclusions about the model’s predictive performance, as it may not generalize well to new data. For a more unbiased assessment of prediction accuracy, a common approach is to hold back one observation, fit the model on the remaining data, and then use the held-out observation to test the prediction. This leave-one-out method reduces bias in evaluating model performance.
+
+**Purpose of k-Fold Cross-Validation:**
+
+While splitting the data into training and test sets (e.g., 80/20 split) might provide an initial performance estimate, it doesn’t guarantee consistent results on other subsets. **k-Fold Cross-Validation** provides a more robust test by building multiple models on different portions of the data, ensuring the model's performance is not overly dependent on one specific train-test split.
+
+**Procedure for k-Fold Cross-Validation:**
+
+1. Divide the data into **k** mutually exclusive, random portions.
+2. Use each portion as a test set while training the model on the remaining **k-1** portions.
+3. Calculate the mean squared error (MSE) for each fold.
+4. Average the MSEs across all **k** folds to obtain a cross-validated error estimate.
+
+This cross-validated error estimate can then be used to compare models and helps determine which model generalizes best to new data.
+
+
+
+
+
+
+# Skewness
+
+## Basic Transformations for Skewed Data
 
 Transformations can be applied to data to address skewness and better meet model assumptions, particularly when dealing with positively or negatively skewed distributions. Here are some commonly used transformations:
 
@@ -917,7 +903,7 @@ Transformations can be applied to data to address skewness and better meet model
    - For **positively skewed** data: \( \frac{1}{x} \)
    - For **negatively skewed** data: \( \frac{1}{\text{max}(x + 1) - x} \)
 
-### Attention
+**Attention*
 
 When data does not meet the normality assumption, consider running statistical tests (e.g., t-tests or ANOVA) on both transformed and untransformed data to assess if there are significant differences in results. If both tests lead to the same conclusion, you may opt to avoid transformation and proceed with the original data for simplicity.
 
@@ -925,7 +911,7 @@ Be aware that transformations can complicate analysis. For instance, after trans
 
 ---
 
-### Additional Approaches for Skewed Data
+## Additional Approaches for Skewed Data
 
 If the response variable \( y \) is continuous, positive, and has a right-skewed histogram (long right tail), consider these modeling options:
 
@@ -964,14 +950,14 @@ Here's the table in Markdown format:
 | [1.5, 2.5]                      | 2                         | \( \frac{1}{2} (y^2 - 1) \)                           | Square                      |
 
 
-### Fitted Model for Transformed Response
 
 The fitted model for the transformed response \( \tilde{y} \) can be represented as:
 \[
 \widehat{\mathbb{E}}(\tilde{y}) = \widehat{\mathbb{E}}\left(\frac{y^{\lambda} - 1}{\lambda}\right) = \widehat{\beta}_{0} + \widehat{\beta}_{1} x_{1} + \cdots + \widehat{\beta}_{k} x_{k}
 \]
 
-### Interpretation of Estimated Regression Coefficients
+
+*Interpretation of Estimated Regression Coefficients**
 
 - For a continuous predictor \( x_{1} \), the estimated coefficient \( \widehat{\beta}_{1} \) represents the change in the mean of the transformed response \( \widehat{\mathbb{E}}(\tilde{y}) \) for a one-unit increase in \( x_{1} \), assuming other predictors remain constant.
 - If \( x_{1} \) is an indicator variable, \( \widehat{\beta}_{1} \) represents the difference in the mean of the transformed response \( \widehat{\mathbb{E}}(\tilde{y}) \) between \( x_{1} = 1 \) and \( x_{1} = 0 \), with other predictors unchanged.
@@ -979,13 +965,7 @@ The fitted model for the transformed response \( \tilde{y} \) can be represented
 
 
 
-# Scaling
-
-Changing the units of measurement can help improve interpretability but does not affect parameter estimates. When predictor variables are on similar scales, the numerical stability of estimates increases.
-
-A comprehensive approach to scaling is to use the `scale()` function, which standardizes all variables to have a mean of 0 and a variance of 1. This approach has the advantage of placing all predictors and responses on a comparable scale, making comparisons easier. It also avoids potential numerical issues that can arise when variables are on vastly different scales. 
-
-However, the downside to this scaling approach is that the regression coefficients now represent the effect of a one-standard-unit increase in a predictor on the response variable in standard units, which may not always be easy to interpret.
+# Interaction Analysis
 
 ## Simple Slopes Analysis
 
@@ -1111,11 +1091,11 @@ interact_plot(model_3, pred = x_2, modx = w, data = data_2, linearity.check = TR
 
 These examples illustrate various ways to use `interact_plot` for visualizing interaction effects, adding data points, adjusting labels, and checking the linearity assumption.
 
-## Collinearity
+# Collinearity
 
 When some predictors are linear combinations of others, the matrix \( X^{T} X \) becomes singular, leading to exact collinearity. In this case, there is no unique least squares estimate of \( \beta \). If \( X^{T} X \) is nearly singular, this results in collinearity (often called multicollinearity), which can cause serious issues with estimating \( \beta \), interpreting the model, and assessing associated quantities.
 
-### Detecting Collinearity
+## Detecting Collinearity
 
 There are several ways to detect collinearity:
 
@@ -1124,6 +1104,7 @@ There are several ways to detect collinearity:
 2. **Regression of Each Predictor**: Regress each predictor \( x_i \) on all other predictors and compute \( R_i^2 \). Repeat for all predictors. An \( R_i^2 \) close to 1 suggests issues, as it indicates a strong linear relationship with other predictors.
 
 3. **Eigenvalues of \( X^{T} X \)**: Compute the eigenvalues of \( X^{T} X \), where \( \lambda_1 \) is the largest eigenvalue and others decrease. Small eigenvalues signal potential collinearity problems.
+ 
  
 # Problems with the Error
 
@@ -1221,3 +1202,26 @@ E(\hat{\beta} - \beta)^2 = (E(\hat{\beta} - \beta))^2 + E(\hat{\beta} - E\hat{\b
 where the MSE is the sum of the squared bias and variance. Increasing bias can decrease variance, and if this reduces the overall MSE, it may be preferable. Ridge regression leverages this trade-off by introducing a bias to achieve a lower variance.
 
 Frank and Friedman (1993) compared PCR, PLS, and ridge regression, finding that ridge regression performed best in their study. However, the effectiveness of each method varies with the data, making it hard to identify a universally superior technique.
+
+# Automatic Regression Modeling
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library(autoReg)
+
+fit=lm(mpg~wt*hp*am,data=mtcars)
+autoReg(fit) %>% myft()
+
+iris1=iris
+set.seed=123
+no=sample(1:150,50,replace=FALSE)
+iris1$Sepal.Width[no]=NA
+fit1=lm(Sepal.Length~Sepal.Width+Species,data=iris1)
+modelPlot(fit1,imputed=TRUE)
+```
+
+## Reference
+
+* [Automatic Regression Modeling](https://cran.r-project.org/web/packages/autoReg/vignettes/Automatic_Regression_Modeling.html)
+* [Bootstrap Simulation for model prediction](https://cran.r-project.org/web/packages/autoReg/vignettes/Bootstrap_Prediction.html)
+* [Statistical tests in gaze](https://cran.r-project.org/web/packages/autoReg/vignettes/Statiastical_test_in_gaze.html)
+* [Survival Analysis](https://cran.r-project.org/web/packages/autoReg/vignettes/Survival.html)

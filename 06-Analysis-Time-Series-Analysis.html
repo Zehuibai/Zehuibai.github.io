@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Time Series Analysis</title>
+
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Biosimilar-Trials.html">Statistical Considerations for the Design and Analysis of Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Alternatives-to-Power.html">Bayesian methods - Alternatives to Power</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Continuous-Endpoint.html">Sample Size Determination for Continuous Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Categorical-Endpoint.html">Sample Size Determination for Categorical Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Survival-Endpoint.html">Sample Size Determination for Survival Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Repeated-Measures.html">Sample Size Determination for Repeated Measures</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Sequential-Design.html">Statistical Considerations for Group Sequential Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Adaptive-Design.html">Statistical Considerations for Adaptive Design</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-Estimands.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot-Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Time-To-Event.html">Time to Event Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-PRO-Data.html">Patient Reported Outcome Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-SSC-and-Power-Calculation.html">Sample Size and Power Calculations Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Correlation.html">Correlation Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Model-Table.html">Clinical Data and Model visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-ScatterPlot.html">Scatter and Line Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-BarPlot.html">Bar Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-PieChart.html">Pie Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-BoxPlot.html">Box Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Histogram.html">Histogram</a>
+    </li>
+    <li>
+      <a href="05-Plot-Forest-Plot.html">Forest Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Flow-Chart.html">Flow Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Linear-Regression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Time-Series-Analysis.html">Time Series Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-SEM.html">Structural Equation Modeling</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Factor-Analysis.html">Factor Analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="07-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Time Series Analysis</p></h1>
+
+</div>
+
+
+<div id="fundational-concepts" class="section level2">
+<h2>Fundational Concepts</h2>
+<p>The purpose of time series analysis is generally twofold: to
+understand or model the stochastic mechanism that gives rise to an
+observed series and to predict or forecast the future values of a series
+based on the history of that series and, possibly, other related series
+or factors.</p>
+<div id="means-variances-and-covariances" class="section level3">
+<h3>Means, Variances, and Covariances</h3>
+<p>For a stochastic process <span class="math display">\[\left\{Y_{t}:
+t=0, \pm 1, \pm 2, \pm 3, \ldots\right\},\]</span></p>
+<p>The <strong>autocovariance function</strong>, <span
+class="math inline">\(\gamma_{t, s}\)</span>, is defined as</p>
+<p><span class="math display">\[
+\gamma_{t, s}=\operatorname{Cov}\left(Y_{t}, Y_{s}\right) \quad \text {
+for } t, s=0, \pm 1, \pm 2, \ldots
+\]</span></p>
+<p>where <span class="math display">\[\operatorname{Cov}\left(Y_{t},
+Y_{s}\right)=E\left[\left(Y_{t}-\mu_{t}\right)\left(Y_{s}-\mu_{s}\right)\right]=E\left(Y_{t}
+Y_{s}\right)-\mu_{t} \mu_{s}\]</span></p>
+<p>The <strong>autocorrelation function,</strong> <span
+class="math inline">\(\rho_{t, s}\)</span>, is given by</p>
+<p><span class="math display">\[
+\rho_{t, s}=\operatorname{Corr}\left(Y_{t}, Y_{s}\right) \quad \text {
+for } t, s=0, \pm 1, \pm 2, \ldots
+\]</span></p>
+<p>where</p>
+<p><span class="math display">\[
+\operatorname{Corr}\left(Y_{t},
+Y_{s}\right)=\frac{\operatorname{Cov}\left(Y_{t},
+Y_{s}\right)}{\sqrt{\operatorname{Var}\left(Y_{t}\right)
+\operatorname{Var}\left(Y_{s}\right)}}=\frac{\gamma_{t,
+s}}{\sqrt{\gamma_{t, t} \gamma_{s, s}}}
+\]</span></p>
+<p>The following important properties follow from known results and our
+definitions:</p>
+<p><span class="math display">\[
+\left.\begin{array}{ll}
+\gamma_{t, t}=\operatorname{Var}\left(Y_{t}\right) &amp; \rho_{t, t}=1
+\\
+\gamma_{t, s}=\gamma_{s, t} &amp; \rho_{t, s}=\rho_{s, t} \\
+\left|\gamma_{t, s}\right| \leq \sqrt{\gamma_{t, t} \gamma_{s, s}} &amp;
+\left|\rho_{t, s}\right| \leq 1
+\end{array}\right\}
+\]</span></p>
+<p>Values of <span class="math inline">\(\rho_{t, s}\)</span> near <span
+class="math inline">\(\pm 1\)</span> indicate strong (linear)
+dependence, whereas values near zero indicate weak (linear) dependence.
+If <span class="math inline">\(\rho_{t, s}=0\)</span>, we say that <span
+class="math inline">\(Y_{t}\)</span> and <span
+class="math inline">\(Y_{s}\)</span> are uncorrelated.</p>
+</div>
+<div id="properties-of-covariance" class="section level3">
+<h3>Properties of covariance</h3>
+<p>To investigate the covariance properties of various time series
+models, the following result will be used repeatedly: If <span
+class="math inline">\(c_{1}, c_{2}, \ldots, c_{m}\)</span> and <span
+class="math inline">\(d_{1}, d_{2}, \ldots, d_{n}\)</span> are constants
+and <span class="math inline">\(t_{1}\)</span>, <span
+class="math inline">\(t_{2}, \ldots, t_{m}\)</span>$ and $<span
+class="math inline">\(s_{1}, s_{2}, \ldots, s_{n}\)</span> are time
+points, then</p>
+<p><span class="math display">\[
+\operatorname{Cov}\left[\sum_{i=1}^{m} c_{i} Y_{t_{i}}, \sum_{j=1}^{n}
+d_{j} Y_{s_{j}}\right]=\sum_{i=1}^{m} \sum_{j=1}^{n} c_{i} d_{j}
+\operatorname{Cov}\left(Y_{t_{i}}, Y_{s_{j}}\right)
+\]</span></p>
+<p>As a special case, we obtain the well-known result</p>
+<p><span class="math display">\[
+\operatorname{Var}\left[\sum_{i=1}^{n} c_{i}
+Y_{t_{i}}\right]=\sum_{i=1}^{n} c_{i}^{2}
+\operatorname{Var}\left(Y_{t_{i}}\right)+2 \sum_{i=2}^{n}
+\sum_{j=1}^{i-1} c_{i} c_{j} \operatorname{Cov}\left(Y_{t_{i}},
+Y_{t_{j}}\right)
+\]</span> Forthermore:</p>
+<p><span class="math display">\[
+\begin{array}{c}
+\operatorname{Cov}(a+b X, c+d Y)=b d \operatorname{Cov}(X, Y) \\
+\operatorname{Var}(X+Y)=\operatorname{Var}(X)+\operatorname{Var}(Y)+2
+\operatorname{Cov}(X, Y) \\
+\operatorname{Cov}(X+Y, Z)=\operatorname{Cov}(X,
+Z)+\operatorname{Cov}(Y, Z) \\
+\operatorname{Cov}(X, X)=\operatorname{Var}(X) \\
+\operatorname{Cov}(X, Y)=\operatorname{Cov}(Y, X)
+\end{array}
+\]</span></p>
+<p>If <span class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span> are independent,</p>
+<p><span class="math display">\[
+\operatorname{Cov}(X, Y)=0
+\]</span></p>
+<p>The correlation coefficient of <span class="math inline">\(X\)</span>
+and <span class="math inline">\(Y\)</span>, denoted by <span
+class="math inline">\(\operatorname{Cor}(X, Y)\)</span> or <span
+class="math inline">\(\rho\)</span>, is defined as</p>
+<p><span class="math display">\[
+\rho=\operatorname{Corr}(X, Y)=\frac{\operatorname{Cov}(X,
+Y)}{\sqrt{\operatorname{Var}(X) \operatorname{Var}(Y)}}
+\]</span></p>
+<p>Alternatively, if <span class="math inline">\(X^{*}\)</span> is a
+standardized <span class="math inline">\(X\)</span> and <span
+class="math inline">\(Y^{*}\)</span> is a standardized <span
+class="math inline">\(Y\)</span>, then <span
+class="math inline">\(\rho=E\left(X^{*} Y^{*}\right) .\)</span></p>
+</div>
+<div id="properties-of-expectation" class="section level3">
+<h3>Properties of Expectation</h3>
+<p>If <span class="math inline">\(h(x)\)</span> is a function such that
+<span class="math inline">\(\int_{-\infty}^{\infty}|h(x)| f(x) d
+x&lt;\infty\)</span>, it may be shown that</p>
+<p><span class="math display">\[
+E[h(X)]=\int_{-\infty}^{\infty} h(x) f(x) d x
+\]</span></p>
+<p>Similarly, if <span class="math inline">\(\int_{-\infty}^{\infty}
+\int_{-\infty}^{\infty}|h(x, y)| f(x, y) d x d y&lt;\infty\)</span>, it
+may be shown that</p>
+<p><span class="math display">\[
+E[h(X, Y)]=\int_{-\infty}^{\infty} \int_{-\infty}^{\infty} h(x, y) f(x,
+y) d x d y
+\]</span></p>
+<p>As a corollary, we easily obtain the important result</p>
+<p><span class="math display">\[
+E(a X+b Y+c)=a E(X)+b E(Y)+c
+\]</span></p>
+<p>We also have</p>
+<p><span class="math display">\[
+E(X Y)=\int_{-\infty}^{\infty} \int_{-\infty}^{\infty} x y f(x, y) d x d
+y
+\]</span></p>
+<p>The variance of a random variable <span
+class="math inline">\(X\)</span> is defined as</p>
+<p><span class="math display">\[
+\operatorname{Var}(X)=E\left\{[X-E(X)]^{2}\right\}
+\]</span></p>
+<p>(provided <span class="math inline">\(E\left(X^{2}\right)\)</span>
+exists). The variance of <span class="math inline">\(X\)</span> is often
+denoted by <span class="math inline">\(\sigma^{2}\)</span> or <span
+class="math inline">\(\sigma_{X}^{2}\)</span></p>
+</div>
+<div id="properties-of-variance" class="section level3">
+<h3>Properties of Variance</h3>
+<p><span class="math display">\[
+\begin{array}{c}
+\operatorname{Var}(X) \geq 0 \\
+\operatorname{Var}(a+b X)=b^{2} \operatorname{Var}(X)
+\end{array}
+\]</span></p>
+<p>If <span class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span> are independent, then</p>
+<p><span class="math display">\[
+\operatorname{Var}(X+Y)=\operatorname{Var}(X)+\operatorname{Var}(Y)
+\]</span></p>
+<p>In general, it may be shown that</p>
+<p><span class="math display">\[
+\operatorname{Var}(X)=E\left(X^{2}\right)-[E(X)]^{2}
+\]</span></p>
+<p>The positive square root of the variance of <span
+class="math inline">\(X\)</span> is called the standard deviation of
+<span class="math inline">\(X\)</span> and is often denoted by <span
+class="math inline">\(\sigma\)</span> or <span
+class="math inline">\(\sigma_{X}\)</span>. The random variable <span
+class="math inline">\(\left(X-\mu_{X}\right) / \sigma_{X}\)</span> is
+called the standardized version of <span class="math inline">\(X
+.\)</span> The mean and standard deviation of a standardized variable
+are always zero and one, respectively. The covariance of <span
+class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span> is defined as <span
+class="math inline">\(\operatorname{Cov}(X,
+Y)=E\left[\left(X-\mu_{X}\right)\left(Y-\mu_{Y}\right)\right]\)</span>.</p>
+</div>
+<div id="the-random-walk" class="section level3">
+<h3>The Random Walk</h3>
+<p>Let <span class="math inline">\(e_{1}, e_{2}, \ldots\)</span> be a
+sequence of independent, identically distributed random variables each
+with zero mean and variance <span class="math inline">\(\sigma_{e}^{2}
+.\)</span> The observed time series, <span
+class="math inline">\(\left\{Y_{t}: t=1,2, \ldots\right\}\)</span>, is
+constructed as follows:</p>
+<p><span class="math display">\[
+\left.\begin{array}{rl}
+Y_{1} &amp; =e_{1} \\
+Y_{2} &amp; =e_{1}+e_{2} \\
+&amp; \vdots \\
+Y_{t} &amp; =e_{1}+e_{2}+\cdots+e_{t}
+\end{array}\right\}
+\]</span></p>
+<p>Alternatively, we can write</p>
+<p><span class="math display">\[
+Y_{t}=Y_{t-1}+e_{t}
+\]</span></p>
+<p>with “initial condition” <span class="math inline">\(Y_{1}=e_{1}
+.\)</span></p>
+<div id="the-mean-function-is" class="section level4">
+<h4>The mean function is</h4>
+<p><span class="math display">\[
+\begin{aligned}
+\mu_{t}
+&amp;=E\left(Y_{t}\right)=E\left(e_{1}+e_{2}+\cdots+e_{t}\right)=E\left(e_{1}\right)+E\left(e_{2}\right)+\cdots+E\left(e_{t}\right)
+\\
+&amp;=0+0+\cdots+0
+\end{aligned}
+\]</span></p>
+<p>so that</p>
+<p><span class="math display">\[
+\mu_{t}=0 \quad \text { for all } t
+\]</span></p>
+</div>
+<div id="the-variance-function-is" class="section level4">
+<h4>The variance function is</h4>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{Var}\left(Y_{t}\right)
+&amp;=\operatorname{Var}\left(e_{1}+e_{2}+\cdots+e_{t}\right)=\operatorname{Var}\left(e_{1}\right)+\operatorname{Var}\left(e_{2}\right)+\cdots+\operatorname{Var}\left(e_{t}\right)
+\\
+&amp;=\sigma_{e}^{2}+\sigma_{e}^{2}+\cdots+\sigma_{e}^{2}
+\end{aligned}
+\]</span></p>
+<p>so that</p>
+<p><span class="math display">\[
+\operatorname{Var}\left(Y_{t}\right)=t \sigma_{e}^{2}
+\]</span></p>
+</div>
+<div id="the-covariance-function-is" class="section level4">
+<h4>The covariance function is</h4>
+<p>Notice that the process variance increases linearly with time. To
+investigate the covariance function, suppose that <span
+class="math inline">\(1 \leq t \leq s .\)</span> Then we have</p>
+<p><span class="math display">\[
+\gamma_{t, s}=\operatorname{Cov}\left(Y_{t},
+Y_{s}\right)=\operatorname{Cov}\left(e_{1}+e_{2}+\cdots+e_{t},
+e_{1}+e_{2}+\cdots+e_{t}+e_{t+1}+\cdots+e_{s}\right)
+\]</span></p>
+<p>From Equation above, we have</p>
+<p><span class="math display">\[
+\gamma_{t, s}=\sum_{i=1}^{s} \sum_{j=1}^{t}
+\operatorname{Cov}\left(e_{i}, e_{j}\right)
+\]</span></p>
+<p>However, these covariances are zero unless <span
+class="math inline">\(i=j\)</span>, in which case they equal <span
+class="math inline">\(\operatorname{Var}\left(e_{i}\right)=\sigma_{e}^{2}\)</span>.
+There are exactly <span class="math inline">\(t\)</span> of these so
+that <span class="math inline">\(\gamma_{t, s}=t
+\sigma_{e}^{2}\)</span>.</p>
+</div>
+<div id="the-autocorrelation-function" class="section level4">
+<h4>The autocorrelation function</h4>
+<p>Since <span class="math inline">\(\gamma_{t, s}=\gamma_{s,
+t}\)</span>, this specifies the autocovariance function for all time
+points <span class="math inline">\(t\)</span> and <span
+class="math inline">\(s\)</span> and we can write</p>
+<p><span class="math display">\[
+\gamma_{t, s}=t \sigma_{e}^{2}
+\]</span></p>
+<p>for <span class="math inline">\(1 \leq t \leq s\)</span> The
+autocorrelation function for the random walk is now easily obtained
+as</p>
+<p><span class="math display">\[
+\rho_{t, s}=\frac{\gamma_{t, s}}{\sqrt{\gamma_{t, t} \gamma_{s,
+s}}}=\sqrt{\frac{t}{s}}
+\]</span></p>
+</div>
+</div>
+<div id="a-moving-average" class="section level3">
+<h3>A Moving Average</h3>
+<p>As a second example, suppose that <span
+class="math inline">\(\left\{Y_{t}\right\}\)</span> is constructed
+as</p>
+<p><span class="math display">\[
+Y_{t}=\frac{e_{t}+e_{t-1}}{2}
+\]</span></p>
+<p>where (as always throughout this book) the <span
+class="math display">\[e\]</span> ’s are assumed to be independent and
+identically distributed with zero mean and variance <span
+class="math inline">\(\sigma_{e}^{2} .\)</span> Here</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mu_{t}
+&amp;=E\left(Y_{t}\right)=E\left\{\frac{e_{t}+e_{t-1}}{2}\right\}=\frac{E\left(e_{t}\right)+E\left(e_{t-1}\right)}{2}
+=0
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{Var}\left(Y_{t}\right)
+&amp;=\operatorname{Var}\left\{\frac{e_{t}+e_{t-1}}{2}\right\}=\frac{\operatorname{Var}\left(e_{t}\right)+\operatorname{Var}\left(e_{t-1}\right)}{4}
+\\
+&amp;=0.5 \sigma_{e}^{2}
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{Cov}\left(Y_{t}, Y_{t-1}\right)=&amp;
+\operatorname{Cov}\left\{\frac{e_{t}+e_{t-1}}{2},
+\frac{e_{t-1}+e_{t-2}}{2}\right\} \\
+=&amp; \frac{\operatorname{Cov}\left(e_{t},
+e_{t-1}\right)+\operatorname{Cov}\left(e_{t},
+e_{t-2}\right)+\operatorname{Cov}\left(e_{t-1}, e_{t-1}\right)}{4}
++\frac{\operatorname{Cov}\left(e_{t-1}, e_{t-2}\right)}{4} \\
+=&amp; \frac{\operatorname{Cov}\left(e_{t-1}, e_{t-1}\right)}{4} \quad
+\text { (as all the other covariances are zero) } \\
+=&amp; 0.25 \sigma_{e}^{2}
+\end{aligned}
+\]</span></p>
+<p>Or</p>
+<p><span class="math display">\[
+\gamma_{t, t-1}=0.25 \sigma_{e}^{2}
+\]</span></p>
+<p>for all <span class="math inline">\(t\)</span>. Furthermore,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{Cov}\left(Y_{t}, Y_{t-2}\right)
+&amp;=\operatorname{Cov}\left\{\frac{e_{t}+e_{t-1}}{2},
+\frac{e_{t-2}+e_{t-3}}{2}\right\} \\
+&amp;=0 \quad \text { since the } e^{\prime} \text { s are independent }
+\end{aligned}
+\]</span></p>
+<p>Similarly, <span class="math inline">\(\operatorname{Cov}\left(Y_{t},
+Y_{t-k}\right)=0\)</span> for <span
+class="math inline">\(k&gt;1\)</span>, so we may write</p>
+<p><span class="math display">\[
+\gamma_{t, s}=\left\{\begin{array}{cc}
+0.5 \sigma_{e}^{2} &amp; \text { for }|t-s|=0 \\
+0.25 \sigma_{e}^{2} &amp; \text { for }|t-s|=1 \\
+0 &amp; \text { for }|t-s|&gt;1
+\end{array}\right.
+\]</span></p>
+</div>
+<div id="strictly-stationarity" class="section level3">
+<h3>Strictly Stationarity</h3>
+<p>一般而言，时间序列被看作一个随机过程<span
+class="math inline">\({X_t}\)</span>，是一列随机变量</p>
+<ul>
+<li>严平稳：多元分布保持不变。（X1,X2,X3)是个三维随机变量，（X3,X4,X5)也是个三维随机变量，严格平稳表示任何形如（Xn-1,Xn,Xn+1)的三维随机变量分布都是一样的。当然不仅仅是三维，而是任何维的随机变量分布不变。严平稳表示的分布不随时间的改变而改变。我研究第1到第n个随机变量跟第2到第n+1个随机变量性质是一样的。最简单的例子，白噪声（正态），无论怎么取，都是期望为0，方差为1，协方差都为0的n维正态分布。</li>
+<li>弱平稳：首先要有个平稳的改变但是没有任何趋势，所以任何一点t，Xt的期望是常数（通常我们让他为0），弱平稳没有分布不于时间无关这个性质（<strong>分布不随时间的改变而改变</strong>），但是弱平稳抓住了另一个不变性——<strong>相关系数</strong>。这说明什么，X1于X3的相关系数，
+X2与X4的相关系数都是一样的，也就是
+说相关系数取决于时间间隔而非时间起始点。这是非常重要的，因为回归是研究Y依赖于X的关系，可是单一时间序列只有X没有Y，未来某时刻的t的值Xt就要依赖于它的过去信息，如果没有依赖性将无法建立模型。
+通常情况下时间序列分析讨论的是弱平稳序列。</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li>时间序列预处理：拿到一个观察值序列后，首先要对它的纯随机性和平稳性进行检验，这两个检验过程称之为序列的预处理。白噪声序列是没有信息可提取的平稳序列，没有进行序列分析的必要。</li>
+</ol>
+<ul>
+<li>平稳性检验: <strong>平稳即代表没有明显趋势且波动范围有限</strong>,
+定义：如果时间序列在某一常数附近波动且波动范围有限，即有常数均值和常数方差，并且延迟k期的序列变量的自协方差和自相关系数是相等的或者说延迟k期的序列变量之间的影响程度是一样的，则称该序列为平稳序列。</li>
+<li>检验方法：
+<ul>
+<li>时序图检验：根据平稳时间序列的均值和方差都为常数的性质，平稳序列的时序图显示该序列值始终在一个常数附近随机波动，而且波动的范围有界；如果有明显的趋势性或者周期性，那它通常不是平稳序列</li>
+<li>自相关图检验：平稳序列具有短期相关性，这个性质表明对平稳序列而言通常只有近期的序列值对现时值得影响比较明显，间隔越远的过去值对现时值得影响越小。随着延迟期数k的增加，平稳序列的自相关系数会比较快的衰减趋向于零，并在零附近随机波动，而非平稳序列的自相关系数衰减的速度比较慢。</li>
+<li>单位根检验。指的是是否存在单位根，如果存在单位根，即为非平稳时间序列</li>
+</ul></li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>按照下图进行判断</li>
+</ol>
+<p><img src="02_Plots/Time%20Series/TS_TimeProcess.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>assumption is that of stationarity. The basic idea of stationarity is
+that the probability laws that govern the behavior of the process do not
+change over time. In a sense, the process is in statistical equilibrium.
+Specifically, a process <span
+class="math inline">\(\left\{Y_{t}\right\}\)</span> is said to be
+strictly stationary if the joint distribution of <span
+class="math inline">\(Y_{t_{1}}, Y_{t_{2}}, \ldots, Y_{t_{n}}\)</span>
+is the same as the joint distribution of <span
+class="math inline">\(Y_{t_{1}-k} Y_{t_{2}-k}, \ldots,
+Y_{t_{n}-k}\)</span> for all choices of time points <span
+class="math inline">\(t_{1}, t_{2}, \ldots, t_{n}\)</span> and all
+choices of time lag <span class="math inline">\(k\)</span>.</p>
+<p>Thus, when <span class="math inline">\(n=1\)</span> the (univariate)
+distribution of <span class="math inline">\(Y_{t}\)</span> is the same
+as that of <span class="math inline">\(Y_{t-k}\)</span> for all <span
+class="math inline">\(t\)</span> and <span
+class="math inline">\(k\)</span>; in other words, the <span
+class="math inline">\(Y\)</span> ’s are (marginally) identically
+distributed. It then follows that <span
+class="math inline">\(E\left(Y_{t}\right)=E\left(Y_{t-k}\right)\)</span>
+for all <span class="math inline">\(t\)</span> and <span
+class="math inline">\(k\)</span> so that the mean function is constant
+for all time. Additionally, <span
+class="math inline">\(\operatorname{Var}\left(Y_{t}\right)=\operatorname{Var}\left(Y_{t-k}\right)\)</span>
+for all <span class="math inline">\(t\)</span> and <span
+class="math inline">\(k\)</span> so that the variance is also constant
+over time.</p>
+<!-- 
+平稳性的基本思想是，控制流程行为的概率定律不会随时间变化。从某种意义上说，这个过程处于统计平衡状态。具体来说，如果的联合分布与所有时间点t1，t2，…，tn以及所有时滞k的选择的联合分布相同，则说过程{Yt}是严格平稳的。 
+
+因此，当n = 1时，对于所有t和k，Yt的（单变量）分布与Yt-k的分布相同；换句话说，Y的边际分布是相同的。然后得出，对于所有t和k，E（Yt）=E（Yt-k），因此均值函数在所有时间内都是恒定的。另外，对于所有t和k，Var（Yt）= Var（Yt − k），因此方差随时间变化也是恒定的。 
+
+在平稳性定义中设置 $n=2$ 我们看到 $Y_{t}$ 和 $Y_{s}$ 的二元分布必须与 $Y_{tk}$ 和 $Y_{sk}$ 的二元分布相同
+-->
+<p>Setting <span class="math inline">\(n=2\)</span> in the stationarity
+definition we see that the bivariate distribution of <span
+class="math inline">\(Y_{t}\)</span> and <span
+class="math inline">\(Y_{s}\)</span> must be the same as that of <span
+class="math inline">\(Y_{t-k}\)</span> and <span
+class="math inline">\(Y_{s-k}\)</span> from which it follows that <span
+class="math inline">\(\operatorname{Cov}\left(Y_{t},
+Y_{s}\right)\)</span> <span
+class="math inline">\(=\operatorname{Cov}\left(Y_{t-k},
+Y_{s-k}\right)\)</span> for all <span class="math inline">\(t,
+s\)</span>, and <span class="math inline">\(k\)</span>. Putting <span
+class="math inline">\(k=s\)</span> and then <span
+class="math inline">\(k=t\)</span>, we obtain <span
+class="math display">\[
+\begin{aligned}
+\gamma_{t, s} &amp;=\operatorname{Cov}\left(Y_{t-s}, Y_{0}\right) \\
+&amp;=\operatorname{Cov}\left(Y_{0}, Y_{s-t}\right) \\
+&amp;=\operatorname{Cov}\left(Y_{0}, Y_{|t-s|}\right) \\
+&amp;=\gamma_{0,|t-s|}
+\end{aligned}
+\]</span></p>
+<p>That is, the covariance between <span
+class="math inline">\(Y_{t}\)</span> and <span
+class="math inline">\(Y_{s}\)</span> depends on time only through the
+time difference <span class="math inline">\(|t-s|\)</span> and not
+otherwise on the actual times <span class="math inline">\(t\)</span> and
+<span class="math inline">\(s\)</span>. Thus, for a stationary process,
+we can simplify our notation and write <span class="math display">\[
+\gamma_{k}=\operatorname{Cov}\left(Y_{t}, Y_{t-k}\right) \quad \text {
+and } \quad \rho_{k}=\operatorname{Corr}\left(Y_{t}, Y_{t-k}\right)
+\]</span> Note also that <span class="math display">\[
+\rho_{k}=\frac{\gamma_{k}}{\gamma_{0}}
+\]</span> The general properties given in Equation now become <span
+class="math display">\[
+\left.\begin{array}{ll}
+\gamma_{0}=\operatorname{Var}\left(Y_{t}\right) &amp; \rho_{0}=1 \\
+\gamma_{k}=\gamma_{-k} &amp; \rho_{k}=\rho_{-k} \\
+\left|\gamma_{k}\right| \leq \gamma_{0} &amp; \left|\rho_{k}\right| \leq
+1
+\end{array}\right\}
+\]</span> If a process is strictly stationary and has finite variance,
+then the <strong>covariance function must depend only on the time
+lag.</strong></p>
+</div>
+<div id="weakly-or-second-order-stationary" class="section level3">
+<h3>Weakly (or second-order) stationary</h3>
+<p>A stochastic process <span
+class="math display">\[\left\{Y_{t}\right\}\]</span>** is said to be
+weakly (or second-order) stationary if</p>
+<ol style="list-style-type: decimal">
+<li><strong>The mean function is constant over time, and</strong></li>
+<li><strong>for all time <span class="math display">\[t\]</span> and lag
+<span class="math inline">\(k\)</span></strong></li>
+</ol>
+<p><span class="math display">\[
+\gamma_{t, t-k}=\gamma_{0, k}
+\]</span></p>
+</div>
+<div id="white-noise" class="section level3">
+<h3>White Noise</h3>
+<!-- 白噪声过程定义为一系列独立的，均匀分布的随机变量. 定义为一系列独立的，均匀分布的随机变量{et}。 -->
+<p>A very important example of a stationary process is the so-called
+white noise process, which is defined as a sequence of independent,
+identically distributed random variables <span
+class="math inline">\(\left\{e_{t}\right\}\)</span>. Its importance
+stems not from the fact that it is an interesting model itself but from
+the fact that many useful processes can be constructed from white noise.
+The fact that <span class="math inline">\(\left\{e_{t}\right\}\)</span>
+is strictly stationary is easy to see since</p>
+<p><span class="math inline">\(\operatorname{Pr}\left(e_{t_{1}} \leq
+x_{1}, e_{t_{2}} \leq x_{2}, \ldots, e_{t_{n}} \leq
+x_{n}\right)\)</span> <span
+class="math inline">\(=\operatorname{Pr}\left(e_{t_{1}} \leq
+x_{1}\right) \operatorname{Pr}\left(e_{t_{2}} \leq x_{2}\right) \cdots
+\operatorname{Pr}\left(e_{t_{n}} \leq x_{n}\right) \quad\)</span> (by
+independence) <span
+class="math inline">\(=\operatorname{Pr}\left(e_{t_{1}-k} \leq
+x_{1}\right) \operatorname{Pr}\left(e_{t_{2}-k} \leq x_{2}\right) \cdots
+\operatorname{Pr}\left(e_{t_{n}-k} \leq x_{n}\right)\)</span> <span
+class="math inline">\(=\operatorname{Pr}\left(e_{t_{1}-k} \leq x_{1},
+e_{t_{2}-k} \leq x_{2}, \ldots, e_{t_{n}-k} \leq x_{n}\right)\)</span>
+(identical distributions) (by independence)</p>
+<p>as required. Also, <span
+class="math inline">\(\mu_{t}=E\left(e_{t}\right)\)</span> is constant
+and <span class="math display">\[
+\gamma_{k}=\left\{\begin{array}{cl}
+\operatorname{Var}\left(e_{t}\right) &amp; \text { for } k=0 \\
+0 &amp; \text { for } k \neq 0
+\end{array}\right.
+\]</span> Alternatively, we can write <span class="math display">\[
+\rho_{k}=\left\{\begin{array}{ll}
+1 &amp; \text { for } k=0 \\
+0 &amp; \text { for } k \neq 0
+\end{array}\right.
+\]</span> The term white noise arises from the fact that a frequency
+analysis of the model shows that, in analogy with white light, all
+frequencies enter equally. We usually assume that the white noise
+process has mean zero and denote <span
+class="math inline">\(\operatorname{Var}\left(e_{t}\right)\)</span> by
+<span class="math inline">\(\sigma_{e}^{2}\)</span>.</p>
+<p>The moving average example, <span
+class="math inline">\(Y_{t}=\left(e_{t}+e_{t-1}\right) / 2\)</span>, is
+another example of a stationary process constructed from white noise. In
+our new notation, we have for the moving average process that <span
+class="math display">\[
+\rho_{k}=\left\{\begin{array}{ll}
+1 &amp; \text { for } k=0 \\
+0.5 &amp; \text { for }|k|=1 \\
+0 &amp; \text { for }|k| \geq 2
+\end{array}\right.
+\]</span></p>
+</div>
+<div id="deterministic-versus-stochastic-trends" class="section level3">
+<h3>Deterministic Versus Stochastic Trends</h3>
+<p>In a general time series, the mean function is a totally arbitrary
+function of time. In a stationary time series, the mean function must be
+constant in time. Frequently we need to take the middle ground and
+consider mean functions that are relatively simple (but not constant)
+functions of time.</p>
+<!-- 在一般的时间序列中，均值函数是一个完全任意的时间函数。 在平稳时间序列中，均值函数在时间上必须是常数。 我们经常需要采取中间立场并考虑相对简单（但不是常数）的时间函数的均值函数。 -->
+<p>We might assume that <span class="math inline">\(X_{t}\)</span>, the
+unobserved variation around <span
+class="math inline">\(\mu_{t}\)</span>, has zero mean for all <span
+class="math inline">\(t\)</span> so that indeed <span
+class="math inline">\(\mu_{t}\)</span> is the mean function for the
+observed series <span class="math inline">\(Y_{t} .\)</span> We could
+describe this model as having a deterministic trend as opposed to the
+stochastic trend considered earlier. In other situations we might
+hypothesize a deterministic trend that is linear in time (that is, <span
+class="math inline">\(\left.\mu_{t}=\beta_{0}+\beta_{1}
+t\right)\)</span> or perhaps a quadratic time trend, <span
+class="math inline">\(\mu_{t}=\beta_{0}+\beta_{1} t+\beta_{2}
+t^{2}\)</span>. Note that an implication of the model <span
+class="math inline">\(Y_{t}=\mu_{t}+X_{t}\)</span> with <span
+class="math inline">\(E\left(X_{t}\right)=0\)</span> for all <span
+class="math inline">\(t\)</span> is that the deterministic trend <span
+class="math inline">\(\mu_{t}\)</span> applies for all time. Thus, if
+<span class="math inline">\(\mu_{t}=\beta_{0}+\beta_{1} t\)</span>, we
+are assuming that the same linear time trend applies forever. We should
+therefore have good reasons for assuming such a model-not just because
+the series looks somewhat linear over the time period observed.</p>
+<!-- 
+μt 周围未观察到的变化，对于所有 t 的均值为零，因此 μt 实际上是观察到的序列 Yt 的均值函数。我们可以将此模型描述为具有确定性趋势，而不是之前考虑的随机趋势。在其他情况下，我们可能假设一个确定性趋势在时间上是线性的（即 μt = β0 + β1t）或者可能是二次时间趋势 μt = β0 + β1t + β2t
+请注意，模型的含义 Yt = μt 对于所有 t，E(Xt ) = 0 的 Xt 是确定性趋势 μt 适用于所有时间。因此，如果 μt = β0 + β1t，我们假设相同的线性时间趋势永远适用。因此，我们应该有充分的理由来假设这样一个模型——不仅仅是因为该系列在观察到的时间段内看起来有些线性。 -->
+</div>
+</div>
+<div id="arma-models" class="section level2">
+<h2>ARMA models</h2>
+<blockquote>
+<p>MODELS FOR STATIONARY TIME SERIES</p>
+</blockquote>
+<div id="general-linear-processes" class="section level3">
+<h3>General Linear Processes</h3>
+<p>A general linear process, <span
+class="math inline">\(\left\{Y_{t}\right\}\)</span>, is one that can be
+represented as a weighted linear combination of present and past white
+noise terms as <span class="math display">\[
+Y_{t}=e_{t}+\psi_{1} e_{t-1}+\psi_{2} e_{t-2}+\cdots
+\]</span> If the right-hand side of this expression is truly an infinite
+series, then certain conditions must be placed on the <span
+class="math inline">\(\psi\)</span>-weights for the right-hand side to
+be meaningful mathematically. For our purposes, it suffices to assume
+that <span class="math display">\[
+\sum_{i=1}^{\infty} \psi_{i}^{2}&lt;\infty
+\]</span> We should also note that since <span
+class="math inline">\(\left\{e_{t}\right\}\)</span> is unobservable,
+there is no loss in the generality of Equation (4.1.2) if we assume that
+the coefficient on <span class="math inline">\(e_{t}\)</span> is 1 ;
+effectively, <span class="math inline">\(\psi_{0}=1\)</span></p>
+<ul>
+<li><span class="math inline">\(\left\{Y_{t}\right\}\)</span> denote the
+observed time series.</li>
+<li><span class="math inline">\(\left\{e_{t}\right\}\)</span> represent
+an unobserved white noise series, that is, a sequence of identically
+distributed, zero-mean, independent random variables.</li>
+<li>the assumption of independence could be replaced by the weaker
+assumption that the <span
+class="math inline">\(\left\{e_{t}\right\}\)</span> are uncorrelated
+random variables</li>
+</ul>
+<p>An important nontrivial example to which we will return often is the
+case where the <span class="math inline">\(\psi\)</span> is form an
+exponentially decaying sequence <span class="math display">\[
+\psi_{j}=\phi^{j}
+\]</span> where <span class="math inline">\(\phi\)</span> is a number
+strictly between <span class="math inline">\(-1\)</span> and <span
+class="math inline">\(+1\)</span>. Then <span class="math display">\[
+Y_{t}=e_{t}+\phi e_{t-1}+\phi^{2} e_{t-2}+\cdots
+\]</span> For this example, <span class="math display">\[
+E\left(Y_{t}\right)=E\left(e_{t}+\phi e_{t-1}+\phi^{2}
+e_{t-2}+\cdots\right)=0
+\]</span></p>
+<p>so that <span class="math inline">\(\left\{Y_{t}\right\}\)</span> has
+a constant mean of zero. Also, <span class="math display">\[
+\begin{aligned}
+\operatorname{Var}\left(Y_{t}\right)
+&amp;=\operatorname{Var}\left(e_{t}+\phi e_{t-1}+\phi^{2}
+e_{t-2}+\cdots\right) \\
+&amp;=\operatorname{Var}\left(e_{t}\right)+\phi^{2}
+\operatorname{Var}\left(e_{t-1}\right)+\phi^{4}
+\operatorname{Var}\left(e_{t-2}\right)+\cdots \\
+&amp;=\sigma_{e}^{2}\left(1+\phi^{2}+\phi^{4}+\cdots\right) \\
+&amp;=\frac{\sigma_{e}^{2}}{1-\phi^{2}} \text { (by summing a geometric
+series) }
+\end{aligned}
+\]</span> Furthermore, <span class="math display">\[
+\begin{aligned}
+\operatorname{Cov}\left(Y_{t}, Y_{t-1}\right)
+&amp;=\operatorname{Cov}\left(e_{t}+\phi e_{t-1}+\phi^{2}
+e_{t-2}+\cdots, e_{t-1}+\phi e_{t-2}+\phi^{2} e_{t-3}+\cdots\right) \\
+&amp;=\operatorname{Cov}\left(\phi e_{t-1},
+e_{t-1}\right)+\operatorname{Cov}\left(\phi^{2} e_{t-2}, \phi
+e_{t-2}\right)+\cdots \\
+&amp;=\phi \sigma_{e}^{2}+\phi^{3} \sigma_{e}^{2}+\phi^{5}
+\sigma_{e}^{2}+\cdots \\
+&amp;=\phi \sigma_{e}^{2}\left(1+\phi^{2}+\phi^{4}+\cdots\right) \\
+&amp;=\frac{\phi \sigma_{e}^{2}}{1-\phi^{2}} \text { (again summing a
+geometric series) }
+\end{aligned}
+\]</span> Thus <span class="math display">\[
+\operatorname{Corr}\left(Y_{t}, Y_{t-1}\right)=\left[\frac{\phi
+\sigma_{e}^{2}}{1-\phi^{2}}\right]
+/\left[\frac{\sigma_{e}^{2}}{1-\phi^{2}}\right]=\phi
+\]</span> In a similar manner, we can find <span
+class="math inline">\(\operatorname{Cov}\left(Y_{t},
+Y_{t-k}\right)=\frac{\phi^{k} \sigma_{e}^{2}}{1-\phi^{2}}\)</span> and
+thus <span class="math display">\[
+\operatorname{Corr}\left(Y_{t}, Y_{t-k}\right)=\phi^{k}
+\]</span></p>
+<p><strong>The process defined in this way is stationary—the
+autocovariance structure depends only on time lag and not on absolute
+time</strong></p>
+</div>
+<div id="moving-average-processes" class="section level3">
+<h3>Moving Average Processes</h3>
+<p><span class="math display">\[
+Y_{t}=e_{t}-\theta_{1} e_{t-1}-\theta_{2} e_{t-2}-\cdots-\theta_{q}
+e_{t-q}
+\]</span> We call such a series a moving average of order <span
+class="math inline">\(q\)</span> and abbreviate the name to <span
+class="math inline">\(\operatorname{MA}(q)\)</span>.</p>
+<p><span class="math inline">\(Y_{t}\)</span> is obtained by applying
+the weights <span class="math inline">\(1,-\theta_{1},-\theta_{2},
+\ldots,-\theta_{q}\)</span> to the variables <span
+class="math inline">\(e_{t}, e_{t-1}, e_{t-2}, \ldots, e_{t-q}\)</span>
+and then moving the weights and applying them to <span
+class="math inline">\(e_{t+1}, e_{t}, e_{t-1}, \ldots,
+e_{t-q+1}\)</span> to obtain <span
+class="math inline">\(Y_{t+1}\)</span> and so on. Moving average models
+were first considered by Slutsky (1927) and Wold (1938).</p>
+<!-- Yt 是通过将权重 1、-θ1、-θ2、...、-θq 应用于变量 et , et − 1, et − 2,..., et − q 获得的，然后 移动权重并将它们应用于 et + 1, et , et − 1,..., et − q + 1 以获得 Yt+1 等等。 -->
+<div id="ma1-the-first-order-moving-average-process"
+class="section level4">
+<h4>MA(1): The First-Order Moving Average Process</h4>
+<p>It is instructive to rederive the results. The model is <span
+class="math display">\[
+Y_{t}=e_{t}-\theta e_{t-1}
+\]</span></p>
+<pre class="r"><code>### Sample Path of an AR(1) Process
+par(mfrow = c(2,1))
+plot(arima.sim(list(order=c(0,0,1), ma=.9), n=100), ylab=&quot;x&quot;,
+main=(expression(MA(1)~~~theta==+.5)))
+plot(arima.sim(list(order=c(0,0,1), ma=-.9), n=100), ylab=&quot;x&quot;,
+main=(expression(MA(1)~~~theta==-.5)))</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Sample%20Path%20of%20an%20MA(1)%20Process-1.png" width="960" /></p>
+<p>only one <span class="math inline">\(\theta\)</span> is involved, so
+drop the redundant subscript 1. Clearly <span
+class="math inline">\(E\left(Y_{t}\right)=0\)</span> and <span
+class="math inline">\(\operatorname{Var}\left(Y_{t}\right)=\sigma_{e}^{2}\left(1+\theta^{2}\right)
+.\)</span> Now <span class="math display">\[
+\begin{aligned}
+\operatorname{Cov}\left(Y_{t}, Y_{t-1}\right)
+&amp;=\operatorname{Cov}\left(e_{t}-\theta e_{t-1}, e_{t-1}-\theta
+e_{t-2}\right) \\
+&amp;=\operatorname{Cov}\left(-\theta e_{t-1}, e_{t-1}\right)=-\theta
+\sigma_{e}^{2}
+\end{aligned}
+\]</span> and <span class="math display">\[
+\begin{aligned}
+\operatorname{Cov}\left(Y_{t}, Y_{t-2}\right)
+&amp;=\operatorname{Cov}\left(e_{t}-\theta e_{t-1}, e_{t-2}-\theta
+e_{t-3}\right) \\
+&amp;=0
+\end{aligned}
+\]</span> since there are no <span class="math inline">\(e\)</span> ’s
+with subscripts in common between <span
+class="math inline">\(Y_{t}\)</span> and <span
+class="math inline">\(Y_{t-2}\)</span>. Similarly, <span
+class="math inline">\(\operatorname{Cov}\left(Y_{t},
+Y_{t-k}\right)=0\)</span> whenever <span class="math inline">\(k \geq
+2\)</span>;</p>
+<p><strong>the process has no correlation beyond lag 1.</strong></p>
+<p><strong>In summary</strong> for an MA(1) model <span
+class="math inline">\(Y_{t}=e_{t}-\theta e_{t-1}\)</span> <span
+class="math display">\[
+\left.\begin{array}{rl}
+E\left(Y_{t}\right) &amp; =0 \\
+\gamma_{0} &amp;
+=\operatorname{Var}\left(Y_{t}\right)=\sigma_{e}^{2}\left(1+\theta^{2}\right)
+\\
+\gamma_{1} &amp; =-\theta \sigma_{e}^{2} \\
+\rho_{1} &amp; =(-\theta) /\left(1+\theta^{2}\right) \\
+\gamma_{k} &amp; =\rho_{k}=0 \quad \text { for } k \geq 2
+\end{array}\right\}
+\]</span></p>
+</div>
+<div id="ma2-the-second-order-moving-average-process"
+class="section level4">
+<h4>MA(2): The Second-Order Moving Average Process</h4>
+<p>Consider the moving average process of order 2 : <span
+class="math display">\[
+Y_{t}=e_{t}-\theta_{1} e_{t-1}-\theta_{2} e_{t-2}
+\]</span> Here <span class="math display">\[
+\begin{aligned}
+\gamma_{0}
+&amp;=\operatorname{Var}\left(Y_{t}\right)=\operatorname{Var}\left(e_{t}-\theta_{1}
+e_{t-1}-\theta_{2}
+e_{t-2}\right)=\left(1+\theta_{1}^{2}+\theta_{2}^{2}\right)
+\sigma_{e}^{2} \\
+\gamma_{1} &amp;=\operatorname{Cov}\left(Y_{t},
+Y_{t-1}\right)=\operatorname{Cov}\left(e_{t}-\theta_{1}
+e_{t-1}-\theta_{2} e_{t-2}, e_{t-1}-\theta_{1} e_{t-2}-\theta_{2}
+e_{t-3}\right) \\
+&amp;=\operatorname{Cov}\left(-\theta_{1} e_{t-1},
+e_{t-1}\right)+\operatorname{Cov}\left(-\theta_{1} e_{t-2},-\theta_{2}
+e_{t-2}\right) \\
+&amp;=\left[-\theta_{1}+\left(-\theta_{1}\right)\left(-\theta_{2}\right)\right]
+\sigma_{e}^{2} \\
+&amp;=\left(-\theta_{1}+\theta_{1} \theta_{2}\right) \sigma_{e}^{2}
+\end{aligned}
+\]</span> <span class="math display">\[
+\begin{aligned}
+\gamma_{2} &amp;=\operatorname{Cov}\left(Y_{t},
+Y_{t-2}\right)=\operatorname{Cov}\left(e_{t}-\theta_{1}
+e_{t-1}-\theta_{2} e_{t-2}, e_{t-2}-\theta_{1} e_{t-3}-\theta_{2}
+e_{t-4}\right) \\
+&amp;=\operatorname{Cov}\left(-\theta_{2} e_{t-2}, e_{t-2}\right) \\
+&amp;=-\theta_{2} \sigma_{e}^{2}
+\end{aligned}
+\]</span> Thus, for an MA(2) process, <span class="math display">\[
+\begin{array}{l}
+\rho_{1}=\frac{-\theta_{1}+\theta_{1}
+\theta_{2}}{1+\theta_{1}^{2}+\theta_{2}^{2}} \\
+\rho_{2}=\frac{-\theta_{2}}{1+\theta_{1}^{2}+\theta_{2}^{2}} \\
+\rho_{k}=0 \text { for } k=3,4, \ldots
+\end{array}
+\]</span> For the specific case <span
+class="math inline">\(Y_{t}=e_{t}-e_{t-1}+0.6 e_{t-2}\)</span>, we have
+<span class="math display">\[
+\rho_{1}=\frac{-1+(1)(-0.6)}{1+(1)^{2}+(-0.6)^{2}}=\frac{-1.6}{2.36}=-0.678
+\]</span> <span class="math display">\[
+\rho_{2}=\frac{0.6}{2.36}=0.254
+\]</span></p>
+</div>
+<div id="the-general-maq-process" class="section level4">
+<h4>The General MA(q) Process</h4>
+<p>For the general <span
+class="math inline">\(\operatorname{MA}(q)\)</span> process <span
+class="math inline">\(Y_{t}=e_{t}-\theta_{1} e_{t-1}-\theta_{2}
+e_{t-2}-\cdots-\theta_{q} e_{t-q}\)</span>, similar calculations show
+that <span class="math display">\[
+\gamma_{0}=\left(1+\theta_{1}^{2}+\theta_{2}^{2}+\cdots+\theta_{q}^{2}\right)
+\sigma_{e}^{2}
+\]</span> and <span class="math display">\[
+\rho_{k}=\left\{\begin{array}{l}
+\frac{-\theta_{k}+\theta_{1} \theta_{k+1}+\theta_{2}
+\theta_{k+2}+\cdots+\theta_{q-k}
+\theta_{q}}{1+\theta_{1}^{2}+\theta_{2}^{2}+\cdots+\theta_{q}^{2}} \quad
+\text { for } k=1,2, \ldots, q \\
+0 \quad \text { for } k&gt;q
+\end{array}\right.
+\]</span> where the numerator of <span
+class="math inline">\(\rho_{q}\)</span> is just <span
+class="math inline">\(-\theta_{q} .\)</span> The autocorrelation
+function “cuts off’ after lag <span class="math inline">\(q\)</span>;
+that is, it is zero. Its shape can be almost anything for the earlier
+lags.</p>
+</div>
+</div>
+<div id="autoregressive-processes" class="section level3">
+<h3>Autoregressive Processes</h3>
+<p>A <span class="math inline">\(p\)</span> th-order autoregressive
+process <span class="math inline">\(\left\{Y_{t}\right\}\)</span>
+satisfies the equation <span class="math display">\[
+Y_{t}=\phi_{1} Y_{t-1}+\phi_{2} Y_{t-2}+\cdots+\phi_{p} Y_{t-p}+e_{t}
+\]</span> The current value of the series <span
+class="math inline">\(Y_{t}\)</span> is a linear combination of the
+<span class="math inline">\(p\)</span> most recent past values of itself
+plus an “innovation” term <span class="math inline">\(e_{t}\)</span>
+that incorporates everything new in the series at time <span
+class="math inline">\(t\)</span> that is not explained by the past
+values. Thus, for every <span class="math inline">\(t\)</span>, we
+assume that <span class="math inline">\(e_{t}\)</span> is independent of
+<span class="math inline">\(Y_{t-1}, Y_{t-2}, Y_{t-3}, \ldots .\)</span>
+Yule (1926) carried out the original work on autoregressive
+processes.</p>
+<!-- 序列 Y_t 的当前值是它自身的 p 个最近的过去值加上“创新”项 e_t 的线性组合，e_t 包含了在时间 t 序列中未被过去值解释的所有新事物。 -->
+<div id="ar1-the-first-order-autoregressive-process"
+class="section level4">
+<h4>AR(1): The First-Order Autoregressive Process</h4>
+<p>Assume the series is stationary and satisfies <span
+class="math display">\[
+Y_{t}=\phi Y_{t-1}+e_{t}
+\]</span></p>
+<pre class="r"><code>### Sample Path of an AR(1) Process
+par(mfrow=c(2,1))
+plot(arima.sim(list(order=c(1,0,0), ar=.9), n=100), ylab=&quot;x&quot;,
+main=(expression(AR(1)~~~phi==+.9)))
+plot(arima.sim(list(order=c(1,0,0), ar=-.9), n=100), ylab=&quot;x&quot;,
+main=(expression(AR(1)~~~phi==-.9)))</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Sample%20Path%20of%20an%20AR(1)%20Process-1.png" width="960" /></p>
+<p>We first take variances of both sides above and obtain <span
+class="math display">\[
+\gamma_{0}=\phi^{2} \gamma_{0}+\sigma_{e}^{2}
+\]</span> Solving for <span class="math inline">\(\gamma_{0}\)</span>
+yields <span class="math display">\[
+\gamma_{0}=\frac{\sigma_{e}^{2}}{1-\phi^{2}}
+\]</span> <span class="math display">\[
+\gamma_{k}=\phi \gamma_{k-1} \quad \text { for } k=1,2,3, \ldots
+\]</span> Setting <span class="math inline">\(k=1\)</span>, we get <span
+class="math inline">\(\gamma_{1}=\phi \gamma_{0}=\phi \sigma_{e}^{2}
+/\left(1-\phi^{2}\right) .\)</span> With <span
+class="math inline">\(k=2\)</span>, we obtain <span
+class="math inline">\(\gamma_{2}=\)</span> <span
+class="math inline">\(\phi^{2} \sigma_{e}^{2}
+/\left(1-\phi^{2}\right)\)</span>. Now it is easy to see that in general
+<span class="math display">\[
+\gamma_{k}=\phi^{k} \frac{\sigma_{e}^{2}}{1-\phi^{2}}
+\]</span> and thus <span class="math display">\[
+\rho_{k}=\frac{\gamma_{k}}{\gamma_{0}}=\phi^{k} \quad \text { for }
+k=1,2,3, \ldots
+\]</span> Since <span class="math inline">\(|\phi|&lt;1\)</span>, the
+magnitude of the autocorrelation function decreases exponentially as the
+number of lags, <span class="math inline">\(k\)</span>, increases. If
+<span class="math inline">\(0&lt;\phi&lt;1\)</span>, all correlations
+are positive; if <span class="math inline">\(-1&lt;\phi&lt;0\)</span>,
+the lag 1 autocorrelation is negative <span
+class="math inline">\(\left(\rho_{1}=\phi\right)\)</span> and the signs
+of successive autocorrelations alternate from positive to negative, with
+their magnitudes decreasing exponentially.</p>
+<p><strong>Recursive definition of the AR(1) process</strong></p>
+<p>The recursive definition is valid for all <span
+class="math inline">\(t .\)</span> If we use this equation with <span
+class="math inline">\(t\)</span> replaced by <span
+class="math inline">\(t-1\)</span>, we get <span
+class="math inline">\(Y_{t-1}=\)</span> <span class="math inline">\(\phi
+Y_{t-2}+e_{t-1} .\)</span> Substituting this into the original
+expression gives <span class="math display">\[
+\begin{aligned}
+Y_{t} &amp;=\phi\left(\phi Y_{t-2}+e_{t-1}\right)+e_{t} \\
+&amp;=e_{t}+\phi e_{t-1}+\phi^{2} Y_{t-2}
+\end{aligned}
+\]</span> If we repeat this substitution into the past, say <span
+class="math inline">\(k-1\)</span> times, we get <span
+class="math display">\[
+Y_{t}=e_{t}+\phi e_{t-1}+\phi^{2} e_{t-2}+\cdots+\phi^{k-1}
+e_{t-k+1}+\phi^{k} Y_{t-k}
+\]</span> Assuming <span class="math inline">\(|\phi|&lt;1\)</span> and
+letting <span class="math inline">\(k\)</span> increase without bound,
+it seems reasonable (this is almost a rigorous proof) that we should
+obtain the infinite series representation <span class="math display">\[
+Y_{t}=e_{t}+\phi e_{t-1}+\phi^{2} e_{t-2}+\phi^{3} e_{t-3}+\cdots
+\]</span></p>
+<p>we should note that the autocorrelation function for the AR(1)
+process has been derived in two different ways. The first method used
+the general linear process representation. The second method used the
+defining recursion.</p>
+</div>
+<div id="ar2-the-second-order-autoregressive-process"
+class="section level4">
+<h4>AR(2): The Second-Order Autoregressive Process</h4>
+<p>Now consider the series satisfying <span class="math display">\[
+Y_{t}=\phi_{1} Y_{t-1}+\phi_{2} Y_{t-2}+e_{t}
+\]</span> where, as usual, we assume that <span
+class="math inline">\(e_{t}\)</span> is independent of <span
+class="math inline">\(Y_{t-1}, Y_{t-2}, Y_{t-3}, \ldots .\)</span> To
+discuss stationarity, we introduce the <strong>AR characteristic
+polynomial</strong> <span class="math display">\[
+\phi(x)=1-\phi_{1} x-\phi_{2} x^{2}
+\]</span> and the corresponding <strong>AR characteristic
+equation</strong> <span class="math display">\[
+1-\phi_{1} x-\phi_{2} x^{2}=0
+\]</span> We recall that a quadratic equation always has two roots
+(possibly complex).</p>
+<!-- 相应的 AR 特征方程我们记得二次方程总是有两个根（可能是复数）。 AR(2) 过程的平稳性 可以证明，在满足 et 独立于 Yt − 1, Yt − 2, Yt − 3,... 的条件下，方程 (4.3.9) 的平稳解存在 当且仅当 AR 特征方程的根的绝对值（模数）超过 1。 我们有时会说根应该位于复平面中的单位圆之外。 -->
+<p>In the second-order case, the roots of the quadratic characteristic
+equation are easily found to be <span class="math display">\[
+\frac{\phi_{1} \pm \sqrt{\phi_{1}^{2}+4 \phi_{2}}}{-2 \phi_{2}}
+\]</span> For stationarity, we require that these roots exceed 1 in
+absolute value. This will be true if and only if three conditions are
+satisfied: <span class="math display">\[
+\phi_{1}+\phi_{2}&lt;1, \quad \phi_{2}-\phi_{1}&lt;1, \quad \text { and
+} \quad\left|\phi_{2}\right|&lt;1
+\]</span> As with the AR(1) model, we call these the stationarity
+conditions for the AR(2) model. This stationarity region is displayed in
+the following.</p>
+<div class="figure" style="text-align: center">
+<img src="02_Plots/Time%20Series/TS_Parameter_Region_for_AR2.png" alt="Stationarity Parameter Region for AR(2) Process" width="100%" />
+<p class="caption">
+Stationarity Parameter Region for AR(2) Process
+</p>
+</div>
+<p><strong>Autocorrelation Function for the AR(2) Process</strong></p>
+<p>Assuming stationarity, zero means, and that <span
+class="math inline">\(e_{t}\)</span> is independent of <span
+class="math inline">\(Y_{t-k}\)</span>, we get <span
+class="math display">\[
+\gamma_{k}=\phi_{1} \gamma_{k-1}+\phi_{2} \gamma_{k-2} \quad \text { for
+} k=1,2,3, \ldots
+\]</span> or, dividing through by <span
+class="math inline">\(\gamma_{0}\)</span>, <span class="math display">\[
+\rho_{k}=\phi_{1} \rho_{k-1}+\phi_{2} \rho_{k-2} \quad \text { for }
+k=1,2,3, \ldots
+\]</span> the two equations are usually called the Yule-Walker
+equations, especially the set of two equations obtained for <span
+class="math inline">\(k=1\)</span> and <span class="math inline">\(2
+.\)</span> Setting <span class="math inline">\(k=1\)</span> and using
+<span class="math inline">\(\rho_{0}=1\)</span> and <span
+class="math inline">\(\rho_{-1}=\rho_{1}\)</span>, we get <span
+class="math inline">\(\rho_{1}=\phi_{1}+\phi_{2} \rho_{1}\)</span> and
+so <span class="math display">\[
+\rho_{1}=\frac{\phi_{1}}{1-\phi_{2}}
+\]</span> Using the now known values for <span
+class="math inline">\(\rho_{1}\)</span> (and <span
+class="math inline">\(\rho_{0}\)</span> ), Equation <span
+class="math inline">\(\rho_{k}=\phi_{1} \rho_{k-1}+\phi_{2} \rho_{k-2}
+\quad \text { for } k=1,2,3, \ldots\)</span> can be used with <span
+class="math inline">\(k=2\)</span> to obtain <span
+class="math display">\[
+\begin{aligned}
+\rho_{2} &amp;=\phi_{1} \rho_{1}+\phi_{2} \rho_{0} \\
+&amp;=\frac{\phi_{2}\left(1-\phi_{2}\right)+\phi_{1}^{2}}{1-\phi_{2}}
+\end{aligned}
+\]</span> Successive values of <span
+class="math inline">\(\rho_{k}\)</span> may be easily calculated
+numerically from the recursive relationship</p>
+<p><strong>The Variance for the AR(2) Model</strong></p>
+<p>Taking the variance of both sides of Equation <span
+class="math inline">\(Y_{t}=\phi_{1} Y_{t-1}+\phi_{2}
+Y_{t-2}+e_{t}\)</span> yields <span class="math display">\[
+\gamma_{0}=\left(\phi_{1}^{2}+\phi_{2}^{2}\right) \gamma_{0}+2 \phi_{1}
+\phi_{2} \gamma_{1}+\sigma_{e}^{2}
+\]</span> <span class="math display">\[
+\begin{aligned}
+\gamma_{0} &amp;=\frac{\left(1-\phi_{2}\right)
+\sigma_{e}^{2}}{\left(1-\phi_{2}\right)\left(1-\phi_{1}^{2}-\phi_{2}^{2}\right)-2
+\phi_{2} \phi_{1}^{2}} \\
+&amp;=\left(\frac{1-\phi_{2}}{1+\phi_{2}}\right)
+\frac{\sigma_{e}^{2}}{\left(1-\phi_{2}\right)^{2}-\phi_{1}^{2}}
+\end{aligned}
+\]</span></p>
+</div>
+</div>
+<div id="the-mixed-autoregressive-moving-average-model"
+class="section level3">
+<h3>The Mixed Autoregressive Moving Average Model</h3>
+<p>If we assume that the series is partly autoregressive and partly
+moving average, we obtain a quite general time series model. In general,
+if <span class="math display">\[
+\begin{array}{r}
+Y_{t}=\phi_{1} Y_{t-1}+\phi_{2} Y_{t-2}+\cdots+\phi_{p}
+Y_{t-p}+e_{t}-\theta_{1} e_{t-1}-\theta_{2} e_{t-2} \\
+-\cdots-\theta_{q} e_{t-q}
+\end{array}
+\]</span> we say that <span
+class="math inline">\(\left\{Y_{t}\right\}\)</span> is a mixed
+autoregressive moving average process of orders <span
+class="math inline">\(p\)</span> and <span
+class="math inline">\(q\)</span> respectively; we abbreviate the name to
+<span class="math inline">\(\operatorname{ARMA}(p, q)\)</span>.</p>
+<div id="arma11-model" class="section level4">
+<h4>ARMA(1,1) Model</h4>
+<p>The defining equation can be written <span class="math display">\[
+Y_{t}=\phi Y_{t-1}+e_{t}-\theta e_{t-1}
+\]</span> To derive Yule-Walker type equations, we first note that <span
+class="math display">\[
+\begin{aligned}
+E\left(e_{t} Y_{t}\right) &amp;=E\left[e_{t}\left(\phi
+Y_{t-1}+e_{t}-\theta e_{t-1}\right)\right] \\
+&amp;=\sigma_{e}^{2}
+\end{aligned}
+\]</span> <span class="math display">\[
+\begin{aligned}
+E\left(e_{t-1} Y_{t}\right) &amp;=E\left[e_{t-1}\left(\phi
+Y_{t-1}+e_{t}-\theta e_{t-1}\right)\right] \\
+&amp;=\phi \sigma_{e}^{2}-\theta \sigma_{e}^{2} \\
+&amp;=(\phi-\theta) \sigma_{e}^{2}
+\end{aligned}
+\]</span> If we multiply Equation (<span
+class="math inline">\(Y_{t}=\phi Y_{t-1}+e_{t}-\theta e_{t-1}\)</span>)
+by <span class="math inline">\(Y_{t-k}\)</span> and take expectations,
+we have <span class="math display">\[
+\left.\begin{array}{l}
+\gamma_{0}=\phi \gamma_{1}+[1-\theta(\phi-\theta)] \sigma_{e}^{2} \\
+\gamma_{1}=\phi \gamma_{0}-\theta \sigma_{e}^{2} \\
+\gamma_{k}=\phi \gamma_{k-1} \quad \text { for } k \geq 2
+\end{array}\right\}
+\]</span> Solving the first two equations yields <span
+class="math display">\[
+\gamma_{0}=\frac{\left(1-2 \phi \theta+\theta^{2}\right)}{1-\phi^{2}}
+\sigma_{e}^{2}
+\]</span> and solving the simple recursion gives <span
+class="math display">\[
+\rho_{k}=\frac{(1-\theta \phi)(\phi-\theta)}{1-2 \theta \phi+\theta^{2}}
+\phi^{k-1} \quad \text { for } k \geq 1
+\]</span></p>
+</div>
+</div>
+<div id="invertibility" class="section level3">
+<h3>Invertibility</h3>
+<p>We have seen that for the MA(1) process we get exactly the same
+autocorrelation function if <span class="math inline">\(\theta\)</span>
+is replaced by <span class="math inline">\(1 / \theta\)</span>.</p>
+<!-- 对于 MA(1) 过程，如果将 θ 替换为 1/θ，我们会得到完全相同的自相关函数。 -->
+<p>For example the 2 models <span
+class="math inline">\(Y_{t}=e_{t}-\theta e_{t-1}\)</span> and <span
+class="math inline">\(Y_{t}=e_{t}-\frac{1}{\theta} e_{t-1}\)</span> have
+equal autocorrelation coefficient.</p>
+</div>
+<div id="fit-the-ar-model-in-r" class="section level3">
+<h3>Fit the AR model in R</h3>
+<pre class="r"><code>library(tseries) 
+#Loading the Data Set
+data(&quot;AirPassengers&quot;)
+
+#This tells you that the data series is in a time series format
+is.ts(AirPassengers)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>#Starting index, end index
+start(AirPassengers)</code></pre>
+<pre><code>## [1] 1949    1</code></pre>
+<pre class="r"><code>end(AirPassengers)</code></pre>
+<pre><code>## [1] 1960   12</code></pre>
+<pre class="r"><code>time(AirPassengers)</code></pre>
+<pre><code>##           Jan      Feb      Mar      Apr      May      Jun      Jul      Aug
+## 1949 1949.000 1949.083 1949.167 1949.250 1949.333 1949.417 1949.500 1949.583
+## 1950 1950.000 1950.083 1950.167 1950.250 1950.333 1950.417 1950.500 1950.583
+## 1951 1951.000 1951.083 1951.167 1951.250 1951.333 1951.417 1951.500 1951.583
+## 1952 1952.000 1952.083 1952.167 1952.250 1952.333 1952.417 1952.500 1952.583
+## 1953 1953.000 1953.083 1953.167 1953.250 1953.333 1953.417 1953.500 1953.583
+## 1954 1954.000 1954.083 1954.167 1954.250 1954.333 1954.417 1954.500 1954.583
+## 1955 1955.000 1955.083 1955.167 1955.250 1955.333 1955.417 1955.500 1955.583
+## 1956 1956.000 1956.083 1956.167 1956.250 1956.333 1956.417 1956.500 1956.583
+## 1957 1957.000 1957.083 1957.167 1957.250 1957.333 1957.417 1957.500 1957.583
+## 1958 1958.000 1958.083 1958.167 1958.250 1958.333 1958.417 1958.500 1958.583
+## 1959 1959.000 1959.083 1959.167 1959.250 1959.333 1959.417 1959.500 1959.583
+## 1960 1960.000 1960.083 1960.167 1960.250 1960.333 1960.417 1960.500 1960.583
+##           Sep      Oct      Nov      Dec
+## 1949 1949.667 1949.750 1949.833 1949.917
+## 1950 1950.667 1950.750 1950.833 1950.917
+## 1951 1951.667 1951.750 1951.833 1951.917
+## 1952 1952.667 1952.750 1952.833 1952.917
+## 1953 1953.667 1953.750 1953.833 1953.917
+## 1954 1954.667 1954.750 1954.833 1954.917
+## 1955 1955.667 1955.750 1955.833 1955.917
+## 1956 1956.667 1956.750 1956.833 1956.917
+## 1957 1957.667 1957.750 1957.833 1957.917
+## 1958 1958.667 1958.750 1958.833 1958.917
+## 1959 1959.667 1959.750 1959.833 1959.917
+## 1960 1960.667 1960.750 1960.833 1960.917</code></pre>
+<pre class="r"><code>#This will print the cycle across years.
+frequency(AirPassengers)</code></pre>
+<pre><code>## [1] 12</code></pre>
+<pre class="r"><code>## plot the time series
+library(ggplot2)
+library(fpp)
+###  the autoplot() command frequently. It automatically produces an appropriate plot of whatever you pass to it in the first argument. In this case, it recognises melsyd[,&quot;Economy.Class&quot;] as a time series and produces a time plot.
+reg=lm(AirPassengers~time(AirPassengers))
+
+autoplot(AirPassengers) + 
+  ylim(0, 600) +
+  ggtitle(&quot;Monthly totals of international airline passengers, 1949-1960&quot;) +
+  xlab(&quot;Year&quot;) +
+  ylab(&quot;Number of Passengers&quot;)</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Fit%20AR%20model-1.png" width="960" /></p>
+<pre class="r"><code>## ACF help us determine what type of series we have, whether it is a White noise, Random walk, Auto regressive or Moving average.
+ggAcf(AirPassengers)</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Fit%20AR%20model-2.png" width="960" /></p>
+<pre class="r"><code>## Fit the AR model to AirPassengers
+## Note for reference that an AR model is an ARIMA(1, 0, 0) model.
+AR &lt;- arima(AirPassengers, order = c(1,0,0))
+print(AR)</code></pre>
+<pre><code>## 
+## Call:
+## arima(x = AirPassengers, order = c(1, 0, 0))
+## 
+## Coefficients:
+##          ar1  intercept
+##       0.9646   278.4649
+## s.e.  0.0214    67.1141
+## 
+## sigma^2 estimated as 1119:  log likelihood = -711.09,  aic = 1428.18</code></pre>
+<pre class="r"><code>#plotting the series along with the fitted values
+library(zoo)
+library(tseries)
+library(ggplot2)
+library(ggfortify)
+AR_fit &lt;- AirPassengers - residuals(AR)
+autoplot(ts.union(AirPassengers, AR_fit), facets = FALSE) +
+ scale_color_manual(labels = c(&quot;Actual&quot;, &quot;Forecasted&quot;),
+                    values=c(&quot;black&quot;, &quot;red&quot;)) +
+  ggtitle(&quot;Plotting the series along with the AR fitted values&quot;) +
+  xlab(&quot;Year&quot;) +
+  ylab(&quot;Number of Passengers&quot;)</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Fit%20AR%20model-3.png" width="960" /></p>
+<pre class="r"><code>#Using predict() to make a 1-step forecast
+predict_AR &lt;- predict(AR)
+
+#Obtaining the 1-step forecast using $pred[1]
+predict_AR$pred[1]</code></pre>
+<pre><code>## [1] 426.5698</code></pre>
+<pre class="r"><code>#ALternatively Using predict to make 1-step through 10-step forecasts
+predict(AR, n.ahead = 10)</code></pre>
+<pre><code>## $pred
+##           Jan      Feb      Mar      Apr      May      Jun      Jul      Aug
+## 1961 426.5698 421.3316 416.2787 411.4045 406.7027 402.1672 397.7921 393.5717
+##           Sep      Oct
+## 1961 389.5006 385.5735
+## 
+## $se
+##           Jan      Feb      Mar      Apr      May      Jun      Jul      Aug
+## 1961 33.44577 46.47055 55.92922 63.47710 69.77093 75.15550 79.84042 83.96535
+##           Sep      Oct
+## 1961 87.62943 90.90636</code></pre>
+</div>
+<div id="fit-the-ma-model-in-r" class="section level3">
+<h3>Fit the MA model in R</h3>
+<pre class="r"><code>#Fitting the MA model to AirPassengers
+MA &lt;- arima(AirPassengers, order = c(0,0,1))
+print(MA)</code></pre>
+<pre><code>## 
+## Call:
+## arima(x = AirPassengers, order = c(0, 0, 1))
+## 
+## Coefficients:
+##          ma1  intercept
+##       0.9642   280.6464
+## s.e.  0.0214    10.5788
+## 
+## sigma^2 estimated as 4205:  log likelihood = -806.43,  aic = 1618.86</code></pre>
+<pre class="r"><code>autoplot(ts.union(AirPassengers, AirPassengers - resid(MA)), facets = FALSE) +
+ scale_color_manual(labels = c(&quot;Actual&quot;, &quot;Forecasted&quot;),
+                    values=c(&quot;black&quot;, &quot;blue&quot;)) +
+  ggtitle(&quot;Plotting the series along with the MA fitted values&quot;) +
+  xlab(&quot;Year&quot;) +
+  ylab(&quot;Number of Passengers&quot;)</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Fit%20MA%20model-1.png" width="960" /></p>
+<pre class="r"><code>#Alternately Making a 1-step through 10-step forecast based on MA
+predict(MA,n.ahead=10)</code></pre>
+<pre><code>## $pred
+##           Jan      Feb      Mar      Apr      May      Jun      Jul      Aug
+## 1961 425.1049 280.6464 280.6464 280.6464 280.6464 280.6464 280.6464 280.6464
+##           Sep      Oct
+## 1961 280.6464 280.6464
+## 
+## $se
+##           Jan      Feb      Mar      Apr      May      Jun      Jul      Aug
+## 1961 64.84895 90.08403 90.08403 90.08403 90.08403 90.08403 90.08403 90.08403
+##           Sep      Oct
+## 1961 90.08403 90.08403</code></pre>
+<pre class="r"><code># Find correlation between AR_fit and MA_fit
+MA_fit &lt;- AirPassengers - resid(MA)
+cor(AR_fit, MA_fit)</code></pre>
+<pre><code>## [1] 0.954995</code></pre>
+<pre class="r"><code># Find AIC of AR
+AIC(AR)</code></pre>
+<pre><code>## [1] 1428.179</code></pre>
+<pre class="r"><code>AIC(MA)</code></pre>
+<pre><code>## [1] 1618.863</code></pre>
+<pre class="r"><code>BIC(AR)</code></pre>
+<pre><code>## [1] 1437.089</code></pre>
+<pre class="r"><code>BIC(MA)</code></pre>
+<pre><code>## [1] 1627.772</code></pre>
+<p>Once we have got the models ready we must answer the important
+question: Should we choose AR or MA process? Goodness of fit such as an
+Information criteria is an method to help us make the decision.
+Specifically Akaike information criterion (AIC) and Bayesian information
+criterion (BIC) are used for Time series Models. Information Criteria is
+a more advanced concept but for either measure a lower value indicates a
+relatively better fitting model.</p>
+<!-- 一旦我们准备好模型，我们必须回答一个重要的问题：我们应该选择 AR 还是 MA 过程？ 诸如信息标准之类的拟合优度是一种帮助我们做出决定的方法。 具体而言，Akaike 信息准则 (AIC) 和贝叶斯信息准则 (BIC) 用于时间序列模型。 Information Criteria 是一个更高级的概念，但对于任何一个度量，较低的值表示相对更好的拟合模型。 -->
+</div>
+</div>
+<div id="arima-models" class="section level2">
+<h2>ARIMA Models</h2>
+<blockquote>
+<p>MODELS FOR NONSTATIONARY TIME SERIES</p>
+</blockquote>
+<div id="stationarity-through-differencing" class="section level3">
+<h3>Stationarity Through Differencing</h3>
+<p>Consider again the AR(1) model <span class="math display">\[
+Y_{t}=\phi Y_{t-1}+e_{t}
+\]</span> We have seen that assuming <span
+class="math inline">\(e_{t}\)</span> is a true “innovation” (that is,
+<span class="math inline">\(e_{t}\)</span> is uncorrelated with <span
+class="math inline">\(\left.Y_{t-1}, Y_{t-2}, \ldots\right)\)</span>, we
+must have <span class="math inline">\(|\phi|&lt;1\)</span>. What can we
+say about solutions to above Equation if <span
+class="math inline">\(|\phi| \geq 1\)</span></p>
+<p>When <span class="math inline">\(\phi=1\)</span>. If <span
+class="math inline">\(\phi=1\)</span>, the AR(1) model equation is <span
+class="math display">\[
+Y_{t}=Y_{t}+e_{t}
+\]</span> This is the relationship satisfied by the random walk process.
+Alternatively, we can rewrite this as <span class="math display">\[
+\nabla Y_{t}=e_{t}
+\]</span></p>
+<p><span class="math display">\[
+Y_{t}=M_{t}+e_{t}, \quad \text { where } \quad M_{t}=M_{t-1}+W_{t}
+\]</span> with <span class="math inline">\(\left\{e_{t}\right\}\)</span>
+and <span class="math inline">\(\left\{\varepsilon_{t}\right\}\)</span>
+independent white noise time series. Here the stochastic trend <span
+class="math inline">\(M_{t}\)</span> is such that its “rate of change,”
+<span class="math inline">\(\nabla M_{t}\)</span>, is changing slowly
+over time. Then <span class="math display">\[
+\nabla Y_{t}=\nabla M_{t}+\nabla e_{t}=W_{t}+\nabla e_{t}
+\]</span></p>
+</div>
+<div id="arima-integrated-autoregressive-moving-average-model"
+class="section level3">
+<h3>ARIMA: Integrated autoregressive moving average model</h3>
+<p>A time series <span
+class="math inline">\(\left\{Y_{t}\right\}\)</span> is said to follow an
+integrated autoregressive moving average model if the <span
+class="math inline">\(d\)</span> th difference <span
+class="math inline">\(W_{t}=\nabla^{d} Y_{t}\)</span> is a stationary
+ARMA process. If <span
+class="math inline">\(\left\{W_{t}\right\}\)</span> follows an ARMA
+<span class="math inline">\((p, q)\)</span> model, we say that <span
+class="math inline">\(\left\{Y_{t}\right\}\)</span> is an ARIMA <span
+class="math inline">\((p, d, q)\)</span> process. Fortunately, for
+practical purposes, we can usually take <span
+class="math inline">\(d=1\)</span> or at most 2 . Consider then an <span
+class="math inline">\(\operatorname{ARIMA}(p, 1, q)\)</span> process.
+With <span class="math inline">\(W_{t}=Y_{t}-Y_{t-1}\)</span>, we have
+<span class="math display">\[
+\begin{array}{r}
+W_{t}=\phi_{1} W_{t-1}+\phi_{2} W_{t-2}+\cdots+\phi_{p}
+W_{t-p}+e_{t}-\theta_{1} e_{t-1}-\theta_{2} e_{t-2} \\
+-\cdots-\theta_{q} e_{t-q}
+\end{array}
+\]</span> or, in terms of the observed series, <span
+class="math display">\[
+\begin{array}{c}
+Y_{t}-Y_{t-1}=\phi_{1}\left(Y_{t-1}-Y_{t-2}\right)+\phi_{2}\left(Y_{t-2}-Y_{t-3}\right)+\cdots+\phi_{p}\left(Y_{t-p}-Y_{t-p-1}\right)
+\\
++e_{t}-\theta_{1} e_{t-1}-\theta_{2} e_{t-2}-\cdots-\theta_{q} e_{t-q}
+\end{array}
+\]</span> which we may rewrite as <span class="math display">\[
+\begin{array}{l}
+Y_{t}=\left(1+\phi_{1}\right) Y_{t-1}+\left(\phi_{2}-\phi_{1}\right)
+Y_{t-2}+\left(\phi_{3}-\phi_{2}\right) Y_{t-3}+\cdots \\
+\quad+\left(\phi_{p}-\phi_{p-1}\right) Y_{t-p}-\phi_{p}
+Y_{t-p-1}+e_{t}-\theta_{1} e_{t-1}-\theta_{2} e_{t-2}-\cdots-\theta_{q}
+e_{t-q}
+\end{array}
+\]</span> We call this the <strong>difference equation form</strong> of
+the model. Notice that it appears to be an ARMA <span
+class="math inline">\((p+1, q)\)</span> process. However, the
+characteristic polynomial satisfies <span class="math display">\[
+\begin{array}{c}
+1-\left(1+\phi_{1}\right) x-\left(\phi_{2}-\phi_{1}\right)
+x^{2}-\left(\phi_{3}-\phi_{2}\right)
+x^{3}-\cdots-\left(\phi_{p}-\phi_{p-1}\right) x^{p}+\phi_{p} x^{p+1} \\
+=\left(1-\phi_{1} x-\phi_{2} x^{2}-\cdots-\phi_{p} x^{p}\right)(1-x)
+\end{array}
+\]</span> which can be easily checked. This factorization clearly shows
+the root at <span class="math inline">\(x = 1\)</span>, which implies
+nonstationarity</p>
+<p>For convenience, we take <span class="math inline">\(Y_{t}=0\)</span>
+for <span class="math inline">\(t&lt;-m\)</span>. The difference
+equation <span class="math inline">\(Y_{t}-Y_{t-1}=W_{t}\)</span> can be
+solved by summing both sides from <span
+class="math inline">\(t=-m\)</span> to <span
+class="math inline">\(t=\)</span> <span class="math inline">\(t\)</span>
+to get the representation <span class="math display">\[
+Y_{t}=\sum_{j=-m}^{t} W_{j}
+\]</span> for the <span class="math inline">\(\operatorname{ARIMA}(p, 1,
+q)\)</span> process. The ARIMA( <span class="math inline">\(p, 2,
+q)\)</span> process can be dealt with similarly by summing twice to get
+the representations <span class="math display">\[
+\begin{aligned}
+Y_{t} &amp;=\sum_{j=-m}^{t} \sum_{i=-m}^{j} W_{i} \\
+&amp;=\sum_{j=0}^{t+m}(j+1) W_{t-j}
+\end{aligned}
+\]</span></p>
+</div>
+<div id="ima11-model" class="section level3">
+<h3>IMA(1,1) Model</h3>
+<p>The simple IMA(1,1) model satisfactorily represents numerous time
+series, especially those arising in economics and business. In
+difference equation form, the model is <span class="math display">\[
+Y_{t}=Y_{t-1}+e_{t}-\theta e_{t-1}
+\]</span> To write <span class="math inline">\(Y_{t}\)</span> explicitly
+as a function of present and past noise values, we use Equation <span
+class="math inline">\(Y_{t}=\sum_{j=-m}^{t} W_{j}\)</span> and the fact
+that <span class="math inline">\(W_{t}=e_{t}-\theta e_{t-1}\)</span> in
+this case. After a little rearrangement, we can write <span
+class="math display">\[
+Y_{t}=e_{t}+(1-\theta) e_{t-1}+(1-\theta) e_{t-2}+\cdots+(1-\theta)
+e_{-m}-\theta e_{-m-1}
+\]</span> Notice that in contrast to our stationary ARMA models, the
+weights on the white noise terms do not die out as we go into the past.
+Since we are assuming that <span class="math inline">\(-m&lt;1\)</span>
+and <span class="math inline">\(0&lt;t\)</span>, we may usefully think
+of <span class="math inline">\(Y_{t}\)</span> as mostly an equally
+weighted accumulation of a large number of white noise values.</p>
+<!-- 可能有用地认为 $Y_{t}$ 主要是大量白噪声值的同等加权累积。 -->
+<p>We can easily derive variances and correlations. We have <span
+class="math display">\[
+\operatorname{Var}\left(Y_{t}\right)=\left[1+\theta^{2}+(1-\theta)^{2}(t+m)\right]
+\sigma_{e}^{2}
+\]</span> and <span class="math display">\[
+\begin{aligned}
+\operatorname{Corr}\left(Y_{t}, Y_{t-k}\right)
+&amp;=\frac{1-\theta+\theta^{2}+(1-\theta)^{2}(t+m-k)}{\left[\operatorname{Var}\left(Y_{t}\right)
+\operatorname{Var}\left(Y_{t-k}\right)\right]^{1 / 2}} \\
+&amp; \approx \sqrt{\frac{t+m-k}{t+m}} \\
+&amp; \approx 1 \quad \text { for large } m \text { and moderate } k
+\end{aligned}
+\]</span> We see that as <span class="math inline">\(t\)</span>
+increases, <span
+class="math inline">\(\operatorname{Var}\left(Y_{t}\right)\)</span>
+increases and could be quite large. Also, the correlation between <span
+class="math inline">\(Y_{t}\)</span> and <span
+class="math inline">\(Y_{t-k}\)</span> will be strongly positive for
+many lags <span class="math inline">\(k=1,2, \ldots\)</span>.</p>
+</div>
+<div id="ari11-model" class="section level3">
+<h3>ARI(1,1) Model</h3>
+<p>The ARI(1,1) process will satisfy <span class="math display">\[
+Y_{t}-Y_{t-1}=\phi\left(Y_{t-1}-Y_{t-2}\right)+e_{t}
+\]</span> or <span class="math display">\[
+Y_{t}=(1+\phi) Y_{t-1}-\phi Y_{t-2}+e_{t}
+\]</span> where <span
+class="math inline">\(|\phi|&lt;1\rangle\)</span></p>
+</div>
+</div>
+<div id="time-series-graphics" class="section level2">
+<h2>Time series graphics</h2>
+<div id="time-plots" class="section level3">
+<h3>Time plots</h3>
+<pre class="r"><code>require(fpp)
+library(ggplot2)
+data(melsyd)
+
+###  the autoplot() command frequently. It automatically produces an appropriate plot of whatever you pass to it in the first argument. In this case, it recognises melsyd[,&quot;Economy.Class&quot;] as a time series and produces a time plot.
+autoplot(melsyd[,&quot;Economy.Class&quot;]) +
+  ggtitle(&quot;Economy class passengers: Melbourne-Sydney&quot;) +
+  xlab(&quot;Year&quot;) +
+  ylab(&quot;Thousands&quot;)</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Time-plots-1.png" width="960" /></p>
+<p><strong>Time series patterns</strong></p>
+<p>In describing these time series, we have used words such as “trend”
+and “seasonal” which need to be defined more carefully.</p>
+<ul>
+<li>Trend
+<ul>
+<li>A trend exists when there is a long-term increase or decrease in the
+data. It does not have to be linear. Sometimes we will refer to a trend
+as “changing direction,” when it might go from an increasing trend to a
+decreasing trend. There is a trend in the antidiabetic drug sales
+data</li>
+</ul></li>
+<li>Seasonal
+<ul>
+<li>A seasonal pattern occurs when a time series is affected by seasonal
+factors such as the time of the year or the day of the week. Seasonality
+is always of a fixed and known frequency. The monthly sales of
+antidiabetic drugs above shows seasonality which is induced partly by
+the change in the cost of the drugs at the end of the calendar
+year.</li>
+</ul></li>
+<li>Cyclic
+<ul>
+<li>A cycle occurs when the data exhibit rises and falls that are not of
+a fixed frequency. These fluctuations are usually due to economic
+conditions, and are often related to the “business cycle.” The duration
+of these fluctuations is usually at least 2 years.</li>
+</ul></li>
+</ul>
+</div>
+<div id="seasonal-plots" class="section level3">
+<h3>Seasonal plots</h3>
+<pre class="r"><code>require(fpp) 
+data(a10)
+str(a10)</code></pre>
+<pre><code>##  Time-Series [1:204] from 1992 to 2008: 3.53 3.18 3.25 3.61 3.57 ...</code></pre>
+<pre class="r"><code>head(a10)</code></pre>
+<pre><code>##           Jul      Aug      Sep      Oct      Nov      Dec
+## 1991 3.526591 3.180891 3.252221 3.611003 3.565869 4.306371</code></pre>
+<pre class="r"><code>ggseasonplot(a10, year.labels=TRUE, year.labels.left=TRUE) +
+  ylab(&quot;$ million&quot;) +
+  ggtitle(&quot;Seasonal plot: antidiabetic drug sales&quot;)</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Seasonal-plots-1.png" width="960" /></p>
+<pre class="r"><code>### A useful variation on the seasonal plot uses polar coordinates. Setting polar=TRUE makes the time series axis circular rather than horizontal, as shown below.
+ggseasonplot(a10, polar=TRUE) +
+  ylab(&quot;$ million&quot;) +
+  ggtitle(&quot;Polar seasonal plot: antidiabetic drug sales&quot;)</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Seasonal-plots-2.png" width="960" />
+<strong>Seasonal subseries plots</strong></p>
+<p>An alternative plot that emphasises the seasonal patterns is where
+the data for each season are collected together in separate mini time
+plots.</p>
+<!-- 另一个强调季节性模式的图是将每个季节的数据收集在单独的迷你时间图中。 -->
+<pre class="r"><code>ggsubseriesplot(a10) +
+  ylab(&quot;$ million&quot;) +
+  ggtitle(&quot;Seasonal subseries plot: antidiabetic drug sales&quot;)</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Seasonal-subseries-plots-1.png" width="960" />
+### Scatterplots matrices</p>
+<pre class="r"><code>library(fpp2)
+data(visnights)
+autoplot(visnights[,1:5], facets=TRUE) +
+  ylab(&quot;Number of visitor nights each quarter (millions)&quot;)</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Scatterplots-matrices-1.png" width="960" /></p>
+<pre class="r"><code>## To see the relationships between these five time series, we can plot each time series against the others. These plots can be arranged in a scatterplot matrix
+GGally::ggpairs(as.data.frame(visnights[,1:5]))</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Scatterplots-matrices-2.png" width="960" />
+### Lag plots</p>
+<p>The horizontal axis shows lagged values of the time series. Each
+graph shows <span class="math inline">\(y_{t}\)</span> plotted against
+<span class="math inline">\(y_{t-k}\)</span> for different values of
+<span class="math inline">\(k\)</span>.</p>
+<pre class="r"><code>## Lagged scatterplots for quarterly beer production.
+library(fpp)
+data(ausbeer)
+## The window() function used here is very useful when extracting a portion of a time series.
+beer2 &lt;- window(ausbeer, start=1992)
+gglagplot(beer2)</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Lag-plots-1.png" width="960" />
+### Autocorrelation</p>
+<p>Just as correlation measures the extent of a linear relationship
+between two variables, autocorrelation measures the linear relationship
+between lagged values of a time series.</p>
+<p><span class="math inline">\(r_{1}\)</span> measures the relationship
+between <span class="math inline">\(y_{t}\)</span> and <span
+class="math inline">\(y_{t-1}, r_{2}\)</span> measures the relationship
+between <span class="math inline">\(y_{t}\)</span> and <span
+class="math inline">\(y_{t-2}\)</span>, and so on. The value of <span
+class="math inline">\(r_{k}\)</span> can be written as <span
+class="math display">\[
+r_{k}=\frac{\sum_{t=k+1}^{T}\left(y_{t}-\bar{y}\right)\left(y_{t-k}-\bar{y}\right)}{\sum_{t=1}^{T}\left(y_{t}-\bar{y}\right)^{2}}
+\]</span> where <span class="math inline">\(T\)</span> is the length of
+the time series.</p>
+<p>The autocorrelation coefficients are plotted to show the
+autocorrelation function or ACF. The plot is also known as a
+correlogram.</p>
+<pre class="r"><code>ggAcf(beer2)</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Autocorrelation%20function%20-1.png" width="960" /></p>
+<pre class="r"><code>data(elec)
+aelec &lt;- window(elec, start=1980)
+ggAcf(aelec, lag=48)</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/Autocorrelation%20function%20-2.png" width="960" /></p>
+</div>
+<div id="white-noise-1" class="section level3">
+<h3>White noise</h3>
+<pre class="r"><code>set.seed(30)
+y &lt;- ts(rnorm(50))
+autoplot(y) + ggtitle(&quot;A white noise time series.&quot;)</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/White%20noise-1.png" width="960" /></p>
+<pre class="r"><code>ggAcf(y)+ ggtitle(&quot;Autocorrelation function for the white noise series.&quot;)</code></pre>
+<p><img src="06-Analysis-Time-Series-Analysis_files/figure-html/White%20noise-2.png" width="960" /></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,28 +1,21 @@
 ---
 title: |
   ![](logo.png){width=3in}  
-  Structural Equation Modeling Project
-author: "Zehui Bai"
-date: '`r format(Sys.time())`'
+  Structural Equation Modeling
 output:
   html_document:
     df_print: paged
-    number_sections: yes
+    number_sections: No
     toc: yes
-    toc_float:
-      collapsed: false
-      smooth_scroll: true
-    theme: flatly # <!-- https://bootswatch.com/3/  -->
-    highlight: tango
+    toc_float: yes
   word_document:
-    toc: yes
-  pdf_document:
     toc: yes
 fontsize: 10pt
 editor_options:
   chunk_output_type: console
 colorlinks: yes
 ---
+ 
 
 ```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
@@ -56,129 +49,8 @@ getwd()
 Sys.setlocale("LC_ALL","English")
 
 
-## Open the folder
-open_folder <-function(dir){
-	if (.Platform['OS.type'] == "windows"){
-	shell.exec(dir)  
-	} else {
-	system(paste(Sys.getenv("R_BROWSER"), dir))
-  }
-}
-open_folder(getwd())
-
-## convert backslash to forward slash in R
-# gsub('"', "", gsub("\\\\", "/", readClipboard()))
-
-### get the path
-# rstudioapi::getSourceEditorContext()$path
-# dirname(rstudioapi::getSourceEditorContext()$path)
-
-### set working directory
-# getwd()
-# setwd("c:/Users/zbai/Desktop")
-# Sys.setlocale("LC_ALL","English")
-
-### get the R Version
-# paste(R.Version()[c("major", "minor")], collapse = ".")
-
-### convert backslash to forward slash 
-# scan("clipboard",what="string")
-# gsub('"', "", gsub("\\\\", "/", readClipboard())) 
-
-## Load all r functions
-## The directory where all source code files are saved.
-source_code_dir <- "C:/Users/baiz/Downloads/Data-Analyst-with-R/00 R Function/ZB Function/"  
-file_path_vec <- list.files(source_code_dir, full.names = T)
-for(f_path in file_path_vec){source(f_path)}
-
-# <!-- ---------------------------------------------------------------------- -->
-# <!--                         3. Import the datasets                         -->
-# <!-- ---------------------------------------------------------------------- -->
-
-# <!-- ---------------------------- -->
-# <!-- --3.1 Import csv data ------ -->
-# <!-- ---------------------------- -->
-
-# pfad <- "~/Desktop/SASUniversityEdition/myfolders/Daten"
-# mydata1 <- read.csv(file.path(pfad, "yourcsv_data.csv"), 
-#                     sep=";", 
-#                     header=TRUE)   
-
-## Import all csv data from folder
-# list_csv_files <- list.files(path = "./csvfolder/")
-# do.call(rbind, lapply(list_csv_files, function(x) read.csv(x, stringsAsFactors = FALSE)))
-
-# <!-- ---------------------------- -->
-# <!-- --3.2 Import xlsx data ----- -->
-# <!-- ---------------------------- -->
-
-# library(readxl)
-# mydata2 <- read_excel("C:/Users/zbai/Documents/GitHub/R-Projects/SAS/Yimeng/results-text.xlsx")
-
-# <!-- ---------------------------- -->
-# <!-- --3.3 Import sas7dbat data - -->
-# <!-- ---------------------------- -->
-
-# library(sas7bdat)
-# mydata3 <- read.sas7bdat("~/Desktop/SASUniversityEdition/myfolders/Daten/uis.sas7bdat")
-
-## Import all sas7dbat data from SASfolder
-# ZB.import.sas.folder("./SASfolder/")
-
-# <!-- ---------------------------- -->
-# <!-- --3.4 Import from copyboard --->
-# <!-- ---------------------------- -->
-# copdat <- read.delim("clipboard")
-# Data_D01 <- copdat
-
-# <!-- ---------------------------------------------------------------------- -->
-# <!--                           4. Some Tools                                -->
-# <!-- ---------------------------------------------------------------------- -->
-
-## To check out vignettes for one specific package
-# browseVignettes("sjPlot")      ## sjPlot for Models Summary
-# browseVignettes("gtsummary")
-
-
-# <!-- ---------------------------------------------------------------------- -->
-# <!--                           5. Citation                                -->
-# <!-- ---------------------------------------------------------------------- -->
-# citation("lavaan")
-# <!-- ---------------------------------------------------------------------- -->
 ```
 
-
-<!-- ----------------------------------------- -->
-<!-- -----------Mind Map of ToC--------------- -->
-<!-- ----------------------------------------- -->
-
-
-```{r mind map,echo = F,message = FALSE, error = FALSE, warning = FALSE}
-library(mindr)
-input <- rstudioapi::getSourceEditorContext()$path 
-input_txt <- readLines(input, encoding = "UTF-8")
-## Widget Output
-mm_output <- mm(input_txt, 
-                output_type = c("widget"),
-                root = "")
-mm_output$widget
-```
-
-
-<!-- ----------------------------------------- -->
-<!-- --------------CSS Define----------------- -->
-<!-- ----------------------------------------- -->
-<style>
-.bold-list-257f96 + ol {
-    font-weight: 900;
-    color: #257f96;
-}
-.bold-list-ff9900 + ol {
-    font-weight: 900;
-    color: #ff9900;
-}
-</style>
-<!-- ----------------------------------------- -->
 
 # Introduction
 
@@ -225,7 +97,7 @@ SEM includes a range of linear models:
 - **Structural Regression**: It predicts relationships between latent constructs and can include observed endogenous variables as single indicator measurement models with constraints.
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_semflow.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_semflow.png")
 ```
 
 # Path Analysis Model
@@ -305,20 +177,20 @@ To facilitate understanding of the matrix equations (which can be a bit intimida
 
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_pathlegend1.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_pathlegend1.png")
 ```
 
 For example in the figure below, the diagram on the left depicts the regression of a factor on an item (contained in a measurement model) and the diagram on the right depicts the variance of the factor (a two-way arrow pointing to a the factor itself).
 
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_pathlegend2.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_pathlegend2.png")
 ```
 
 The following is a path diagram of all the types of variables and relationships 
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_pathlegend3.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_pathlegend3.png")
 ```
 
 
@@ -391,13 +263,13 @@ After the estimation of model parameters, we want to make some inferential state
 For over-identified models, there are many types of fit indexes available to the researcher. Historically, model chi-square was the only measure of fit but in practice the null hypothesis was often rejected due to the chi-square’s heightened sensitivity under large samples. To resolve this problem, approximate fit indexes that were not based on accepting or rejecting the null hypothesis were developed. Approximate fit indexes can be further classified into a) absolute and b) incremental or relative fit indexes. An incremental fit index (a.k.a. relative fit index) assesses the ratio of the deviation of the user model from the worst fitting model (a.k.a. the baseline model) against the deviation of the saturated model from the baseline model. Conceptually, if the deviation of the user model is the same as the deviation of the saturated model (a.k.a best fitting model), then the ratio should be 1. Alternatively, the more discrepant the two deviations, the closer the ratio is to 0 (see figure below). Examples of incremental fit indexes are the CFI and TLI.
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SME_fit1.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SME_fit1.png")
 ```
 
 An absolute fit index on the other hand, does not compare the user model against a baseline model, but instead compares it to the observed data. An example of an absolute fit index is the RMSEA (see flowchart below).
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SME_fit2.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SME_fit2.png")
 ```
 
 
@@ -509,7 +381,7 @@ Definitions
 To see the matrix visually, we can use a path diagram (Model 1A):
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_m1a.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_m1a.png")
 ```
 
 
@@ -598,7 +470,7 @@ Assumptions
 Suppose we have two exogenous variables $x_1, x_2$ predicting a single endogenous variable $y_1$. The path diagram for this multiple regression is:
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_m2.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_m2.png")
 ```
 
 
@@ -655,7 +527,7 @@ Definitions
 
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_m3a.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_m3a.png")
 ```
 
 Here $x_1$ ppsych and $x_2$ motiv predict $y_1$ read and only $x_2$ motiv predicts $y_2$ arith. The parameters $\phi_{11}, \phi_{22}$ represent the variance of the two exogenous variables respectively and $\phi_{12}$ is the covariance. Note that these parameters are modeled implicitly and not depicted in lavaan output. The parameters $\zeta_1, \zeta_2$ refer to the residuals of read and arith. Finally $\psi_{11}, \psi_{22}$ represent the residual variances of read and arith and $\psi_{12}$ is its covariance. You can identify residual terms lavaan by noting a . before the term in the output.
@@ -688,7 +560,7 @@ m3c <- lm(arith ~ motiv, data=dat)
 There are two facets to the question above. We already know previously that $1m()$ uses the least squares estimator but lavaan uses maximum likelihood, hence the difference in residual variance estimates. However, regardless of which of the two estimators used, the regression coefficients should be unbiased so there must be something else accounting for the difference in coefficients. The answer lies in the implicit fact that lavaan by default will covary residual variances of endogenous variables . read . arith. **Removing the default residual covariances**, we see in the path diagram 
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_m3b.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_m3b.png")
 ```
 
 
@@ -713,7 +585,7 @@ Both simple regression and multiple regression are saturated models which means 
 we understand that adding a single path of $\gamma_{21}$ turns Model 3A into a just-identified or fully saturated model which we call Model 3E.
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_m3c.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_m3c.png")
 ```
 
 
@@ -746,7 +618,7 @@ The matrix $B$ is a $p \times p$ matrix that is not necessarily symmetric. The r
 Extend our previous multivariate regression Model 3A so that we believe read which is an endogenous variable also predicts arith
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_m4a.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_m4a.png")
 ```
 
 To see the matrix formulation for Model 4A, we have:
@@ -826,7 +698,7 @@ modindices(fit4a,sort=TRUE)
 
  
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_m4b.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_m4b.png")
 ```
 
 
@@ -847,7 +719,7 @@ modindices(fit4b,sort=TRUE)
 The baseline model can be thought of as the “worst-fitting” model and simply assumes that there is absolutely no covariance between variables. Suppose we modified Model 4A to become a baseline model, we would take out all paths and covariances; essentially estimating only the variances. Since there is are no regression paths, there are no endogenous variables in our model and we would only have x’s and $\phi$’s.
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_m4c.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_m4c.png")
 ```
 
 
@@ -889,7 +761,7 @@ The term $\tau_{x_1}$ means the Intercept of the flrst Item, and $\lambda_2^x$ I
 Suppose we have three outcomes or $x$-slde Indlcators $\left(x_1, x_2, x_3\right)$ measured by a slngle latent exogenous varlable $\xi$. Then the path dlagram (Model 5A) for our factor model looks llke the following. Take note that the Intercepts $\tau_{\mathbf{x}}$ are not shown but stlll modeled, and that the measurement arrows are polnting to the left.
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_m5a.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_m5a.png")
 ```
 
 * $\xi$ are latent exogenous variables which do not have residuals hence no residual covariances
@@ -924,7 +796,7 @@ Suppose again that we have three Items except now they are labeled $\left(y_1, y
 
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_m5b.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_m5b.png")
 ```
 
 
@@ -1009,7 +881,7 @@ $$
 
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_m6a.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_m6a.png")
 ```
 
 
@@ -1066,7 +938,7 @@ The flrst equatlon speclfles that the flrst endogenous varlable is belng predlct
 
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_m6a.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_m6a.png")
 ```
 
 
@@ -1101,7 +973,7 @@ The CFA model commonly used for this data is the three correlated latent  variab
 * Speed factor measured by three items: x7, x8 and x9.
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'}
-knitr::include_graphics("./02_Plots/SEM_CFA_01.png")
+knitr::include_graphics("./02_Plots/Structural Equation Modeling/SEM_CFA_01.png")
 ```
 
 The functional relationships between the variables and the factors are prescribed by the following equations in the CFA model:

@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Factor Analysis</title>
+
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Biosimilar-Trials.html">Statistical Considerations for the Design and Analysis of Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Alternatives-to-Power.html">Bayesian methods - Alternatives to Power</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Continuous-Endpoint.html">Sample Size Determination for Continuous Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Categorical-Endpoint.html">Sample Size Determination for Categorical Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Survival-Endpoint.html">Sample Size Determination for Survival Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Repeated-Measures.html">Sample Size Determination for Repeated Measures</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Sequential-Design.html">Statistical Considerations for Group Sequential Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Adaptive-Design.html">Statistical Considerations for Adaptive Design</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-Estimands.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot-Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Time-To-Event.html">Time to Event Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-PRO-Data.html">Patient Reported Outcome Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-SSC-and-Power-Calculation.html">Sample Size and Power Calculations Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Correlation.html">Correlation Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Model-Table.html">Clinical Data and Model visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-ScatterPlot.html">Scatter and Line Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-BarPlot.html">Bar Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-PieChart.html">Pie Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-BoxPlot.html">Box Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Histogram.html">Histogram</a>
+    </li>
+    <li>
+      <a href="05-Plot-Forest-Plot.html">Forest Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Flow-Chart.html">Flow Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Linear-Regression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Time-Series-Analysis.html">Time Series Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-SEM.html">Structural Equation Modeling</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Factor-Analysis.html">Factor Analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="07-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Factor Analysis</p></h1>
+
+</div>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Factor analysis (FA) assumes that there are a number of underlying
+(latent) factors affecting the observed scores on items/tests. In other
+words, the traits underlying a test might be multidimensional.</p>
+<p>When a new measure is established, researchers often make assumptions
+about the traits that each item/subtest would measure. If the items are
+indeed loading on different factors in the same way as proposed, the
+test is said to have high factorial validity.</p>
+<p>Factor analysis can be divided into two types:</p>
+<ul>
+<li><strong>Exploratory factor analysis (EFA)</strong>: method to
+explore the underlying structure of a set of observed variables, and is
+a crucial step in the scale development process. For example, how many
+factors are needed to sufficiently explain the observed score variance?
+Which is the relationship between each item and factor?</li>
+<li><strong>Confirmatory factor analysis (CFA)</strong>: method to
+verify a hypothesized factor structure. In CFA, theory specifies which
+factor(s) an item should load on. Other entries are restricted to 0. You
+want to see if the hypothesized model fits the data well.</li>
+</ul>
+<div id="types-of-factoring-methods" class="section level2">
+<h2>Types of Factoring Methods</h2>
+<ul>
+<li><strong>Principal Component Analysis (PCA)</strong>: Extracts
+maximum variance as the first factor, then continues sequentially for
+subsequent factors.</li>
+<li><strong>Common Factor Analysis</strong>: Focuses on extracting
+common variance, excluding unique variances. Used in structural equation
+modeling (SEM).</li>
+<li><strong>Image Factoring</strong>: Based on the correlation matrix
+and uses OLS regression to predict factors.</li>
+<li><strong>Maximum Likelihood Method</strong>: Uses the maximum
+likelihood approach based on the correlation matrix.</li>
+<li><strong>Other Methods</strong>: Includes Alfa factoring and weight
+square methods, which are regression-based.</li>
+</ul>
+<p><strong>Factor Loading</strong>: Represents the correlation between
+variables and factors, indicating how much variance in the variable is
+explained by the factor. A factor loading of 0.7 or higher is generally
+considered sufficient.</p>
+<p><strong>Eigenvalues</strong>: Indicate the variance explained by a
+factor out of the total variance. A common rule is to consider factors
+with eigenvalues greater than one.</p>
+<p><strong>Factor Score</strong>: A score for each observation that can
+be used in further analysis, assuming all variables will behave as these
+scores.</p>
+<p><strong>Criteria for determining the number of factors</strong>:
+According to the Kaiser Criterion, Eigenvalues is a good criteria for
+determining a factor. If Eigenvalues is greater than one, we should
+consider that a factor and if Eigenvalues is less than one, then we
+should not consider that a factor. According to the variance extraction
+rule, it should be more than 0.7. If variance is less than 0.7, then we
+should not consider that a factor.</p>
+</div>
+<div id="assumptions" class="section level2">
+<h2>Assumptions</h2>
+<ul>
+<li><strong>No outlier</strong>: Assume that there are no outliers in
+data.</li>
+<li><strong>Adequate sample size</strong>: The case must be greater than
+the factor.</li>
+<li><strong>No perfect multicollinearity</strong>: Factor analysis is an
+interdependency technique. There should not be perfect multicollinearity
+between the variables.</li>
+<li><strong>Homoscedasticity</strong>: Since factor analysis is a linear
+function of measured variables, it does not require homoscedasticity
+between the variables.</li>
+<li><strong>Linearity</strong>: Factor analysis is also based on
+linearity assumption. Non-linear variables can also be used. After
+transfer, however, it changes into linear variable.</li>
+<li><strong>Interval Data</strong>: Interval data are assumed.</li>
+</ul>
+</div>
+</div>
+<div id="exploratory-factor-analysis-efa" class="section level1">
+<h1>Exploratory Factor Analysis (EFA)</h1>
+<p>Assumes that any indicator or variable may be associated with any
+factor. This is the most common factor analysis used by researchers and
+it is not based on any prior theory.</p>
+<div id="r-base-implementation" class="section level2">
+<h2>R base Implementation</h2>
+<ol style="list-style-type: decimal">
+<li>If 2 items/tests have high observed-score correlations, they might
+be related to (or loading on) some common factor. To get a general idea
+about the correlation between items/subtests, we can use the cor
+function in R to obtain a correlation matrix.
+<ul>
+<li><em>The correlation matrix suggests that: tests 1, 2, 4, 6 are
+highly correlated, and tests 3, 5, 7, 8 are also highly correlated. The
+test correlations across these two groups are almost all zero. This
+suggests that there may be 2 underlying factors, tests 1, 2, 4, 6 may
+load on one, and tests 3, 5, 7, 8 may load on the other.</em></li>
+</ul></li>
+<li>EFA with 1 factor using the scores data. Here you assume there is
+only one underlying factor.
+<ul>
+<li><em>Loadings: You can see that some loadings are blank. In fact,
+loadings smaller than .1 in absolute value are omitted (so that a sparse
+structure is displayed more clearly). Tests 3,5,7,8 are the only ones
+with nontrivial loadings on the single factor.</em></li>
+<li><em>Looking at Proportion Var: About 40.2% variance in the data is
+explained by this single factor model.</em></li>
+</ul></li>
+<li>EFA with 2 factors
+<ul>
+<li><em>With 2 factors, the proportion of explained variance (Cumulative
+var) increased to 78.9%.</em></li>
+</ul></li>
+<li>EFA with Covariance Matrix
+<ul>
+<li><em>If the complete response data is not available, and we only have
+the covariance or correlation matrix containing the
+covariance/correlations between the indicators, we can still conduct
+factor analysis with this as the input.</em></li>
+</ul></li>
+<li>Factor scores
+<ul>
+<li><em>The individual indicator/subtest scores would be the weighted
+sum of the factor scores, where the weights are the determined by factor
+loadings.</em></li>
+</ul></li>
+<li>Rotational Indeterminacy
+<ul>
+<li><em>There exist infinitely many possible solutions to the EFA. This
+is called rotational indeterminacy. We can rotate the factors, so that
+the loadings will be as close as possible to a desired
+structure.</em></li>
+<li><em>There are two types of rotation methods:</em>
+<ul>
+<li><strong>Orthogonal</strong>: The underlying factors after rotation
+will be uncorrelated.</li>
+<li><strong>Oblique</strong>: The underlying factors after rotation can
+be correlated.</li>
+</ul></li>
+</ul></li>
+</ol>
+<pre class="r"><code>## Load Dataset
+head(scores) %&gt;%
+  kable(caption = &quot;Check Data Structure&quot;, format = &quot;html&quot;) %&gt;%
+  kable_styling(latex_options = &quot;striped&quot;)</code></pre>
+<table class="table" style="color: black; margin-left: auto; margin-right: auto;">
+<caption>
+Check Data Structure
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+test.1
+</th>
+<th style="text-align:right;">
+test.2
+</th>
+<th style="text-align:right;">
+test.3
+</th>
+<th style="text-align:right;">
+test.4
+</th>
+<th style="text-align:right;">
+test.5
+</th>
+<th style="text-align:right;">
+test.6
+</th>
+<th style="text-align:right;">
+test.7
+</th>
+<th style="text-align:right;">
+test.8
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+4
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+5
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+6
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>## Check Correlation
+cor_subtests &lt;- cor(scores)
+round(cor_subtests, 2) %&gt;%
+  kable(caption = &quot;Check Data Correlation&quot;, format = &quot;html&quot;) %&gt;%
+  kable_styling(latex_options = &quot;striped&quot;)</code></pre>
+<table class="table" style="color: black; margin-left: auto; margin-right: auto;">
+<caption>
+Check Data Correlation
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+test.1
+</th>
+<th style="text-align:right;">
+test.2
+</th>
+<th style="text-align:right;">
+test.3
+</th>
+<th style="text-align:right;">
+test.4
+</th>
+<th style="text-align:right;">
+test.5
+</th>
+<th style="text-align:right;">
+test.6
+</th>
+<th style="text-align:right;">
+test.7
+</th>
+<th style="text-align:right;">
+test.8
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+test.1
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+0.74
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+0.79
+</td>
+<td style="text-align:right;">
+-0.03
+</td>
+<td style="text-align:right;">
+0.79
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+test.2
+</td>
+<td style="text-align:right;">
+0.74
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+-0.02
+</td>
+<td style="text-align:right;">
+0.74
+</td>
+<td style="text-align:right;">
+-0.03
+</td>
+<td style="text-align:right;">
+0.82
+</td>
+<td style="text-align:right;">
+-0.03
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+test.3
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-0.02
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.83
+</td>
+<td style="text-align:right;">
+-0.07
+</td>
+<td style="text-align:right;">
+0.80
+</td>
+<td style="text-align:right;">
+0.81
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+test.4
+</td>
+<td style="text-align:right;">
+0.79
+</td>
+<td style="text-align:right;">
+0.74
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.75
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+test.5
+</td>
+<td style="text-align:right;">
+-0.03
+</td>
+<td style="text-align:right;">
+-0.03
+</td>
+<td style="text-align:right;">
+0.83
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+-0.08
+</td>
+<td style="text-align:right;">
+0.82
+</td>
+<td style="text-align:right;">
+0.77
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+test.6
+</td>
+<td style="text-align:right;">
+0.79
+</td>
+<td style="text-align:right;">
+0.82
+</td>
+<td style="text-align:right;">
+-0.07
+</td>
+<td style="text-align:right;">
+0.75
+</td>
+<td style="text-align:right;">
+-0.08
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+-0.06
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+test.7
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-0.03
+</td>
+<td style="text-align:right;">
+0.80
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+0.82
+</td>
+<td style="text-align:right;">
+-0.06
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+0.80
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+test.8
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+<td style="text-align:right;">
+0.81
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.77
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+<td style="text-align:right;">
+0.80
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>library(&quot;corrplot&quot;)
+corrplot(cor_subtests, method = &quot;circle&quot;, type = &quot;upper&quot;, order = &quot;hclust&quot;,
+         tl.col = &quot;black&quot;, tl.srt = 45, addCoef.col = &quot;black&quot;)</code></pre>
+<p><img src="06-Analysis-Factor-Analysis_files/figure-html/unnamed-chunk-1-1.png" width="960" /></p>
+<pre class="r"><code>## Single Factor Analysis
+efa_1 &lt;- factanal(x = scores, factors = 1)
+loadings &lt;- efa_1$loadings # Factor loadings
+loadings</code></pre>
+<pre><code>## 
+## Loadings:
+##        Factor1
+## test.1        
+## test.2        
+## test.3  0.909 
+## test.4        
+## test.5  0.901 
+## test.6        
+## test.7  0.894 
+## test.8  0.880 
+## 
+##                Factor1
+## SS loadings      3.216
+## Proportion Var   0.402</code></pre>
+<pre class="r"><code>as.numeric(loadings)</code></pre>
+<pre><code>## [1]  0.003100294 -0.028298495  0.908886177  0.006756035  0.901239123
+## [6] -0.067765586  0.893647841  0.879585184</code></pre>
+<pre class="r"><code>sum(loadings^2) # SS Loadings</code></pre>
+<pre><code>## [1] 3.216031</code></pre>
+<pre class="r"><code>sum(loadings^2) / ncol(scores) # Proportion Var</code></pre>
+<pre><code>## [1] 0.4020039</code></pre>
+<pre class="r"><code>## EFA with 2 factors
+factanal(x = scores, factors = 2)</code></pre>
+<pre><code>## 
+## Call:
+## factanal(x = scores, factors = 2)
+## 
+## Uniquenesses:
+## test.1 test.2 test.3 test.4 test.5 test.6 test.7 test.8 
+##  0.230  0.227  0.174  0.279  0.187  0.166  0.201  0.226 
+## 
+## Loadings:
+##        Factor1 Factor2
+## test.1          0.877 
+## test.2          0.879 
+## test.3  0.909         
+## test.4          0.849 
+## test.5  0.901         
+## test.6          0.910 
+## test.7  0.894         
+## test.8  0.879         
+## 
+##                Factor1 Factor2
+## SS loadings      3.217   3.092
+## Proportion Var   0.402   0.387
+## Cumulative Var   0.402   0.789
+## 
+## Test of the hypothesis that 2 factors are sufficient.
+## The chi square statistic is 15.18 on 13 degrees of freedom.
+## The p-value is 0.296</code></pre>
+<pre class="r"><code>## EFA with Covariance Matrix
+cov_mat &lt;- cov(scores)
+round(cov_mat, 2) %&gt;%
+  kable(caption = &quot;Covariance Matrix&quot;, format = &quot;html&quot;) %&gt;%
+  kable_styling(latex_options = &quot;striped&quot;)</code></pre>
+<table class="table" style="color: black; margin-left: auto; margin-right: auto;">
+<caption>
+Covariance Matrix
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+test.1
+</th>
+<th style="text-align:right;">
+test.2
+</th>
+<th style="text-align:right;">
+test.3
+</th>
+<th style="text-align:right;">
+test.4
+</th>
+<th style="text-align:right;">
+test.5
+</th>
+<th style="text-align:right;">
+test.6
+</th>
+<th style="text-align:right;">
+test.7
+</th>
+<th style="text-align:right;">
+test.8
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+test.1
+</td>
+<td style="text-align:right;">
+0.90
+</td>
+<td style="text-align:right;">
+0.70
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+0.68
+</td>
+<td style="text-align:right;">
+-0.02
+</td>
+<td style="text-align:right;">
+0.66
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+test.2
+</td>
+<td style="text-align:right;">
+0.70
+</td>
+<td style="text-align:right;">
+0.97
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+<td style="text-align:right;">
+0.67
+</td>
+<td style="text-align:right;">
+-0.03
+</td>
+<td style="text-align:right;">
+0.71
+</td>
+<td style="text-align:right;">
+-0.02
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+test.3
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+<td style="text-align:right;">
+0.82
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.71
+</td>
+<td style="text-align:right;">
+-0.06
+</td>
+<td style="text-align:right;">
+0.63
+</td>
+<td style="text-align:right;">
+0.68
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+test.4
+</td>
+<td style="text-align:right;">
+0.68
+</td>
+<td style="text-align:right;">
+0.67
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.83
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.60
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+test.5
+</td>
+<td style="text-align:right;">
+-0.02
+</td>
+<td style="text-align:right;">
+-0.03
+</td>
+<td style="text-align:right;">
+0.71
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.90
+</td>
+<td style="text-align:right;">
+-0.07
+</td>
+<td style="text-align:right;">
+0.67
+</td>
+<td style="text-align:right;">
+0.68
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+test.6
+</td>
+<td style="text-align:right;">
+0.66
+</td>
+<td style="text-align:right;">
+0.71
+</td>
+<td style="text-align:right;">
+-0.06
+</td>
+<td style="text-align:right;">
+0.60
+</td>
+<td style="text-align:right;">
+-0.07
+</td>
+<td style="text-align:right;">
+0.77
+</td>
+<td style="text-align:right;">
+-0.05
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+test.7
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-0.02
+</td>
+<td style="text-align:right;">
+0.63
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+0.67
+</td>
+<td style="text-align:right;">
+-0.05
+</td>
+<td style="text-align:right;">
+0.76
+</td>
+<td style="text-align:right;">
+0.64
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+test.8
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+<td style="text-align:right;">
+0.68
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.68
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+<td style="text-align:right;">
+0.64
+</td>
+<td style="text-align:right;">
+0.86
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>## Visualize the Covariance Matrix
+library(&quot;reshape2&quot;)
+cov_long &lt;- melt(cov_mat)
+ggplot(cov_long, aes(x=Var1, y=Var2, fill=value)) +
+  geom_tile() +
+  scale_fill_gradient2(low = &quot;blue&quot;, high = &quot;red&quot;, mid = &quot;white&quot;, midpoint = 0) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = &quot;Covariance Matrix&quot;, x = &quot;&quot;, y = &quot;&quot;)</code></pre>
+<p><img src="06-Analysis-Factor-Analysis_files/figure-html/unnamed-chunk-1-2.png" width="960" /></p>
+<pre class="r"><code>## covmat = to notify that the input data is a covariance matrix.
+## n.obs = which is the sample size you used for computing the covariance matrix
+factanal(covmat = cov_mat, 
+         factors = 2, 
+         n.obs = nrow(scores))</code></pre>
+<pre><code>## 
+## Call:
+## factanal(factors = 2, covmat = cov_mat, n.obs = nrow(scores))
+## 
+## Uniquenesses:
+## test.1 test.2 test.3 test.4 test.5 test.6 test.7 test.8 
+##  0.230  0.227  0.174  0.279  0.187  0.166  0.201  0.226 
+## 
+## Loadings:
+##        Factor1 Factor2
+## test.1          0.877 
+## test.2          0.879 
+## test.3  0.909         
+## test.4          0.849 
+## test.5  0.901         
+## test.6          0.910 
+## test.7  0.894         
+## test.8  0.879         
+## 
+##                Factor1 Factor2
+## SS loadings      3.217   3.092
+## Proportion Var   0.402   0.387
+## Cumulative Var   0.402   0.789
+## 
+## Test of the hypothesis that 2 factors are sufficient.
+## The chi square statistic is 15.18 on 13 degrees of freedom.
+## The p-value is 0.296</code></pre>
+<pre class="r"><code>## Factor scores
+## The individual indicator/subtest scores would be the weighted sum of the factor scores, where the weights are the determined by factor loadings.
+output &lt;- factanal(x = scores, 
+                   factors = 2, 
+                   scores = &quot;regression&quot;)
+head(output$scores)</code></pre>
+<pre><code>##       Factor1     Factor2
+## 1 -0.88097000  0.03016465
+## 2 -0.04549636  0.98800767
+## 3 -0.62996212 -1.09674458
+## 4  0.49201233 -0.61045599
+## 5 -1.80701705 -0.21758291
+## 6  1.63726192  0.79152799</code></pre>
+<pre class="r"><code>## Rotational Indeterminacy (varimax-Orthogonal rotation)
+varimax &lt;- factanal(scores, 
+                    factors = 2, 
+                    rotation=&quot;varimax&quot;, 
+                    scores=&quot;regression&quot;)
+cor(varimax$scores)</code></pre>
+<pre><code>##              Factor1      Factor2
+## Factor1  1.000000000 -0.001527159
+## Factor2 -0.001527159  1.000000000</code></pre>
+<pre class="r"><code>## Rotational Indeterminacy (varimax-oblique rotation)
+promax &lt;- factanal(scores, 
+                   factors = 2, 
+                   rotation = &quot;promax&quot;, 
+                   scores = &quot;regression&quot;)
+cor(promax$scores)</code></pre>
+<pre><code>##            Factor1    Factor2
+## Factor1 1.00000000 0.01563374
+## Factor2 0.01563374 1.00000000</code></pre>
+</div>
+<div id="r-psych-implementation" class="section level2">
+<h2>R psych Implementation</h2>
+<div id="check-data" class="section level3">
+<h3>Check Data</h3>
+<pre class="r"><code>library(psych)
+## Look for outliers
+outlier(scores, plot=T, bad=10, na.rm=T)</code></pre>
+<p><img src="06-Analysis-Factor-Analysis_files/figure-html/unnamed-chunk-2-1.png" width="960" /></p>
+<pre><code>##         1         2         3         4         5         6         7         8 
+##  7.670126  7.311951  8.383881  3.366754  7.702182  6.285384  4.837326  6.652661 
+##         9        10        11        12        13        14        15        16 
+##  6.908216  5.068674  4.073068  8.759132  3.196744  3.865613  9.508442 14.060832 
+##        17        18        19        20        21        22        23        24 
+##  3.366754  4.323155  6.866936  2.911364 10.753836  6.311135  7.039912 13.228568 
+##        25        26        27        28        29        30        31        32 
+##  4.060566  3.157005  9.617554  3.157005  5.783499 15.205834  9.742606 10.828921 
+##        33        34        35        36        37        38        39        40 
+##  7.352785  8.245958  6.824665  5.651806  5.677648  5.463839  8.445588  7.169869 
+##        41        42        43        44        45        46        47        48 
+## 10.012411  5.371632  3.196744  4.837326  9.040271  6.364637 13.914572  8.546721 
+##        49        50        51        52        53        54        55        56 
+##  9.794546 14.942946  5.425011  8.589240  6.482226  5.862889  9.803588  3.815519 
+##        57        58        59        60        61        62        63        64 
+## 19.676705  4.755823 11.359367 12.370905  4.036386  3.947633  7.026140 12.818286 
+##        65        66        67        68        69        70        71        72 
+## 11.465034  2.773438  5.526775  3.366754 10.135226  8.327697  5.453490  8.912829 
+##        73        74        75        76        77        78        79        80 
+##  3.432884 10.628570  7.012493 22.004446  8.245958 11.285399  6.524658  4.323155 
+##        81        82        83        84        85        86        87        88 
+##  6.982696  4.920797 20.710815  8.037874  7.995510  6.478941 15.461273  8.310104 
+##        89        90        91        92        93        94        95        96 
+##  5.130685  5.793320  5.130685 12.120256  7.679872  6.611138 11.958340 10.978177 
+##        97        98        99       100 
+##  5.593896 10.821548  7.987800 13.048147</code></pre>
+<pre class="r"><code>## Scree plot
+VSS.scree(scores)</code></pre>
+<p><img src="06-Analysis-Factor-Analysis_files/figure-html/unnamed-chunk-2-2.png" width="960" /></p>
+</div>
+<div id="fit-model" class="section level3">
+<h3>Fit Model</h3>
+<p>An eigenvalue in the context of EFA represents the total variance
+explained by each factor. It is a measure of the factor’s overall
+contribution to explaining the variability in the data. An eigenvalue
+explains how much of the information (variation) in the original
+variables is captured by the factor. Factors with higher eigenvalues are
+considered more important because they explain a larger portion of the
+total variance in the dataset. A factor loading of 0.40 or higher was
+the significant criterion for item assignment.</p>
+<pre class="r"><code>output2 &lt;- fa(scores, # input data
+              nfactors = 2, # number of factors
+              rotate = &quot;varimax&quot;, # rotation
+              scores = &quot;regression&quot;) # factor score estimation
+
+
+output2$loadings # factor loadings</code></pre>
+<pre><code>## 
+## Loadings:
+##        MR1    MR2   
+## test.1         0.882
+## test.2         0.872
+## test.3  0.909       
+## test.4         0.854
+## test.5  0.900       
+## test.6         0.907
+## test.7  0.896       
+## test.8  0.879       
+## 
+##                  MR1   MR2
+## SS loadings    3.217 3.093
+## Proportion Var 0.402 0.387
+## Cumulative Var 0.402 0.789</code></pre>
+<pre class="r"><code>output2$uniquenesses # uniqueness</code></pre>
+<pre><code>##    test.1    test.2    test.3    test.4    test.5    test.6    test.7    test.8 
+## 0.2214045 0.2375525 0.1730854 0.2706205 0.1907075 0.1720624 0.1974814 0.2267084</code></pre>
+<pre class="r"><code>output2$communality # communality</code></pre>
+<pre><code>##    test.1    test.2    test.3    test.4    test.5    test.6    test.7    test.8 
+## 0.7785955 0.7624475 0.8269146 0.7293795 0.8092925 0.8279376 0.8025186 0.7732916</code></pre>
+<pre class="r"><code>output2$uniquenesses + output2$communalities</code></pre>
+<pre><code>##    test.1    test.2    test.3    test.4    test.5    test.6    test.7    test.8 
+## 1.0000000 1.0000000 1.0000000 0.9999999 1.0000000 0.9999999 1.0000000 1.0000000</code></pre>
+</div>
+<div id="visualize-results" class="section level3">
+<h3>Visualize Results</h3>
+<p>To visualize the results of a factor analysis conducted with the fa()
+function from the psych package in R, you can use various approaches
+depending on what aspects of the results you’re interested in
+visualizing. Here are a few common methods:</p>
+<ul>
+<li><strong>Scree Plot</strong>: Shows the eigenvalues of factors to
+help determine the number of factors to retain.</li>
+<li><strong>Factor Score Plot</strong>: Plots the factor scores for each
+observation, usually for the first two factors. The Factor Score Plot
+visualizes how observations score on the first two factors, which can be
+useful for identifying patterns or clusters among observations.</li>
+</ul>
+<pre class="r"><code>## Scree Plot
+fa.diagram(output2)</code></pre>
+<p><img src="06-Analysis-Factor-Analysis_files/figure-html/unnamed-chunk-4-1.png" width="960" /></p>
+<pre class="r"><code># Factor Score Plot (for the first two factors)
+scores &lt;- as.data.frame(output2$scores)
+ggplot(scores, aes(x = MR1, y = MR2)) + 
+  geom_point() + 
+  labs(x = &quot;Factor 1 Scores&quot;, y = &quot;Factor 2 Scores&quot;, title = &quot;Factor Score Plot&quot;)</code></pre>
+<p><img src="06-Analysis-Factor-Analysis_files/figure-html/unnamed-chunk-4-2.png" width="960" /></p>
+</div>
+<div id="reliability-analysis" class="section level3">
+<h3>Reliability Analysis</h3>
+<p>Internal consistency is a measure of how well the items within a
+scale correlate with each other, indicating the extent to which all the
+items measure the same concept. It’s a crucial aspect of scale
+reliability, ensuring that the scale consistently measures what it’s
+intended to across different items.</p>
+<p>Two statistical methods will be used to calculate internal
+consistency:</p>
+<ul>
+<li><p><strong>Cronbach’s Alpha (α)</strong>: It ranges from 0 to 1,
+with higher values indicating greater internal consistency. A Cronbach’s
+alpha of 0.7 or above is generally considered satisfactory, suggesting
+that the items on the scale are well-correlated and measure the same
+underlying construct.</p></li>
+<li><p><strong>McDonald’s Omega (ω)</strong>: McDonald’s omega is
+another measure of internal consistency that, like Cronbach’s alpha,
+ranges from 0 to 1. Omega is sometimes preferred over alpha because it
+can provide a more accurate estimate of internal consistency, especially
+in cases where the assumptions of Cronbach’s alpha are not met. A value
+greater than 0.7 is also considered satisfactory for McDonald’s omega,
+indicating good internal consistency.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="confirmatory-factor-analysis-cfa" class="section level1">
+<h1>Confirmatory Factor Analysis (CFA)</h1>
+<p>Used to determine the factor and factor loading of measured
+variables, and to confirm what is expected on the basic or
+pre-established theory. CFA assumes that each factor is associated with
+a specified subset of measured variables. It commonly uses two
+approaches:</p>
+<ul>
+<li><strong>The traditional method</strong>: Traditional factor method
+is based on principal factor analysis method rather than common factor
+analysis. Traditional method allows the researcher to know more about
+insight factor loading.</li>
+<li><strong>The SEM approach</strong>: CFA is an alternative approach of
+factor analysis which can be done in SEM. In SEM, we will remove all
+straight arrows from the latent variable, and add only that arrow which
+has to observe the variable representing the covariance between every
+pair of latents. We will also leave the straight arrows error free and
+disturbance terms to their respective variables. If standardized error
+term in SEM is less than the absolute value two, then it is assumed good
+for that factor, and if it is more than two, it means that there is
+still some unexplained variance which can be explained by factor.
+Chi-square and a number of other goodness-of-fit indexes are used to
+test how well the model fits.</li>
+</ul>
+<div id="r-lavaan-implementation" class="section level2">
+<h2>R lavaan Implementation</h2>
+<div id="fit-model-1" class="section level3">
+<h3>Fit Model</h3>
+<p><strong>Fitting a CFA model</strong> in lavaan requires a special
+model syntax. Let’s say we fit a 2-factor CFA model where the first
+factor f1 is measured by x1, x2, x4, and x6. The second factor f2 is
+measured by x3, x5, x7, and x8.</p>
+<pre class="r"><code>if (!requireNamespace(&quot;lavaan&quot;, quietly = TRUE)) install.packages(&quot;lavaan&quot;)
+library(&quot;lavaan&quot;)
+
+
+names(scores_CFA) &lt;- paste0(&quot;x&quot;, 1:8)
+names(scores_CFA)</code></pre>
+<pre><code>## [1] &quot;x1&quot; &quot;x2&quot; &quot;x3&quot; &quot;x4&quot; &quot;x5&quot; &quot;x6&quot; &quot;x7&quot; &quot;x8&quot;</code></pre>
+<pre class="r"><code>model &lt;- &#39;
+f1 =~ x1 + x2 + x4 + x6
+f2 =~ x3 + x5 + x7 + x8
+&#39;
+fit &lt;- cfa(model = model, data = scores_CFA)
+result &lt;- summary(fit, fit.measures = TRUE)  # fit.measures = TRUE to print additional fit indices
+print(result)</code></pre>
+<pre><code>## lavaan 0.6-19 ended normally after 31 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        17
+## 
+##   Number of observations                           100
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                18.461
+##   Degrees of freedom                                19
+##   P-value (Chi-square)                           0.492
+## 
+## Model Test Baseline Model:
+## 
+##   Test statistic                               710.828
+##   Degrees of freedom                                28
+##   P-value                                        0.000
+## 
+## User Model versus Baseline Model:
+## 
+##   Comparative Fit Index (CFI)                    1.000
+##   Tucker-Lewis Index (TLI)                       1.001
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)               -719.358
+##   Loglikelihood unrestricted model (H1)       -710.128
+##                                                       
+##   Akaike (AIC)                                1472.717
+##   Bayesian (BIC)                              1517.005
+##   Sample-size adjusted Bayesian (SABIC)       1463.314
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.000
+##   90 Percent confidence interval - lower         0.000
+##   90 Percent confidence interval - upper         0.085
+##   P-value H_0: RMSEA &lt;= 0.050                    0.743
+##   P-value H_0: RMSEA &gt;= 0.080                    0.068
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.025
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   f1 =~                                               
+##     x1                1.000                           
+##     x2                1.044    0.086   12.178    0.000
+##     x4                0.929    0.082   11.372    0.000
+##     x6                0.959    0.074   13.006    0.000
+##   f2 =~                                               
+##     x3                1.000                           
+##     x5                1.039    0.074   14.113    0.000
+##     x7                0.947    0.068   13.833    0.000
+##     x8                0.993    0.074   13.334    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   f1 ~~                                               
+##     f2               -0.019    0.072   -0.261    0.794
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .x1                0.208    0.039    5.336    0.000
+##    .x2                0.218    0.041    5.269    0.000
+##    .x4                0.230    0.040    5.733    0.000
+##    .x6                0.129    0.029    4.503    0.000
+##    .x3                0.141    0.029    4.928    0.000
+##    .x5                0.167    0.033    5.124    0.000
+##    .x7                0.151    0.029    5.288    0.000
+##    .x8                0.192    0.035    5.537    0.000
+##     f1                0.686    0.125    5.464    0.000
+##     f2                0.669    0.115    5.835    0.000</code></pre>
+<pre class="r"><code>## To extract parameter estimates (such as factor loadings, variances, covariances, etc.) from a lavaan model fit object in R, you can use the $ operator followed by pe or the parameterEstimates() 
+## result$pe
+parameterEstimates(fit)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["lhs"],"name":[1],"type":["chr"],"align":["left"]},{"label":["op"],"name":[2],"type":["chr"],"align":["left"]},{"label":["rhs"],"name":[3],"type":["chr"],"align":["left"]},{"label":["est"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["se"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["z"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["pvalue"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["ci.lower"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["ci.upper"],"name":[9],"type":["dbl"],"align":["right"]}],"data":[{"1":"f1","2":"=~","3":"x1","4":"1.00000000","5":"0.00000000","6":"NA","7":"NA","8":"1.00000000","9":"1.0000000"},{"1":"f1","2":"=~","3":"x2","4":"1.04383789","5":"0.08571524","6":"12.1779725","7":"0.000000e+00","8":"0.87583910","9":"1.2118367"},{"1":"f1","2":"=~","3":"x4","4":"0.92940237","5":"0.08172641","6":"11.3721184","7":"0.000000e+00","8":"0.76922156","9":"1.0895832"},{"1":"f1","2":"=~","3":"x6","4":"0.95915104","5":"0.07374465","6":"13.0063821","7":"0.000000e+00","8":"0.81461419","9":"1.1036879"},{"1":"f2","2":"=~","3":"x3","4":"1.00000000","5":"0.00000000","6":"NA","7":"NA","8":"1.00000000","9":"1.0000000"},{"1":"f2","2":"=~","3":"x5","4":"1.03850718","5":"0.07358280","6":"14.1134511","7":"0.000000e+00","8":"0.89428756","9":"1.1827268"},{"1":"f2","2":"=~","3":"x7","4":"0.94689409","5":"0.06845160","6":"13.8330457","7":"0.000000e+00","8":"0.81273142","9":"1.0810568"},{"1":"f2","2":"=~","3":"x8","4":"0.99291302","5":"0.07446644","6":"13.3336985","7":"0.000000e+00","8":"0.84696149","9":"1.1388646"},{"1":"x1","2":"~~","3":"x1","4":"0.20750205","5":"0.03888987","6":"5.3356330","7":"9.521182e-08","8":"0.13127932","9":"0.2837248"},{"1":"x2","2":"~~","3":"x2","4":"0.21807407","5":"0.04139139","6":"5.2685852","7":"1.374792e-07","8":"0.13694844","9":"0.2991997"},{"1":"x4","2":"~~","3":"x4","4":"0.22968811","5":"0.04006638","6":"5.7326890","7":"9.885080e-09","8":"0.15115944","9":"0.3082168"},{"1":"x6","2":"~~","3":"x6","4":"0.12926998","5":"0.02870499","6":"4.5033979","7":"6.687552e-06","8":"0.07300924","9":"0.1855307"},{"1":"x3","2":"~~","3":"x3","4":"0.14102341","5":"0.02861807","6":"4.9277744","7":"8.317158e-07","8":"0.08493302","9":"0.1971138"},{"1":"x5","2":"~~","3":"x5","4":"0.16717930","5":"0.03262978","6":"5.1235183","7":"2.998865e-07","8":"0.10322610","9":"0.2311325"},{"1":"x7","2":"~~","3":"x7","4":"0.15143132","5":"0.02863529","6":"5.2882767","7":"1.234741e-07","8":"0.09530719","9":"0.2075554"},{"1":"x8","2":"~~","3":"x8","4":"0.19247750","5":"0.03476103","6":"5.5371636","7":"3.074093e-08","8":"0.12434714","9":"0.2606079"},{"1":"f1","2":"~~","3":"f1","4":"0.68559785","5":"0.12546986","6":"5.4642433","7":"4.648857e-08","8":"0.43968144","9":"0.9315143"},{"1":"f2","2":"~~","3":"f2","4":"0.66937669","5":"0.11471032","6":"5.8353661","7":"5.367258e-09","8":"0.44454860","9":"0.8942048"},{"1":"f1","2":"~~","3":"f2","4":"-0.01886384","5":"0.07222424","6":"-0.2611844","7":"7.939503e-01","8":"-0.16042075","9":"0.1226931"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="visualize-results-1" class="section level3">
+<h3>Visualize Results</h3>
+<p>To visualize the results of a confirmatory factor analysis (CFA)
+performed with the lavaan package in R, you can create several types of
+plots, including path diagrams to show the relationships specified in
+the model, or plots to show the model fit. However, lavaan itself does
+not have built-in functions for plotting. Instead, you can use the
+semPlot package, which integrates well with lavaan and offers extensive
+capabilities for visualizing SEM models, including CFA.</p>
+<pre class="r"><code>if (!requireNamespace(&quot;semPlot&quot;, quietly = TRUE)) install.packages(&quot;semPlot&quot;)
+library(semPlot)
+
+# Plotting the CFA model
+options(warn=-1)
+semPaths(fit, whatLabels = &quot;est&quot;, layout = &quot;tree&quot;, edge.label.cex = 0.75, node.label.cex = 0.75)
+options(warn=0)
+# Adding a title separately
+title(&quot;CFA Model&quot;)</code></pre>
+<p><img src="06-Analysis-Factor-Analysis_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
+</div>
+</div>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<p><a
+href="https://stats.oarc.ucla.edu/spss/seminars/introduction-to-factor-analysis/a-practical-introduction-to-factor-analysis/">A
+PRACTICAL INTRODUCTION TO FACTOR ANALYSIS: EXPLORATORY FACTOR
+ANALYSIS</a></p>
+<p><a
+href="https://bookdown.org/sz_psyc490/r4psychometics/factor-analysis.html">R
+Programming for Psychometrics - Factor Analysis</a></p>
+<p>Watkins, M. (2020). A Step-by-Step Guide to Exploratory Factor
+Analysis with R and RStudio (1st ed.). Routledge. <a
+href="https://doi.org/10.4324/9781003120001"
+class="uri">https://doi.org/10.4324/9781003120001</a></p>
+<p>Bryant, F. B., &amp; Yarnold, P. R. (1995). Principal components
+analysis and exploratory and confirmatory factor analysis. In L. G.
+Grimm &amp; P. R. Yarnold (Eds.), Reading and understanding multivariate
+analysis. Washington, DC: American Psychological Association.</p>
+<p>Hatcher, L. (1994). A step-by-step approach to using the SAS system
+for factor analysis and structural equation modeling. Cary, NC: SAS
+Institute.</p>
+</div>
+<div id="session-info" class="section level1">
+<h1>Session Info</h1>
+<div class="figure" style="text-align: center">
+<img src="logo.png" alt=" " width="25%" />
+<p class="caption">
+</p>
+</div>
+<pre><code>## R version 4.4.2 (2024-10-31 ucrt)
+## Platform: x86_64-w64-mingw32/x64
+## Running under: Windows 10 x64 (build 19045)
+## 
+## Matrix products: default
+## 
+## 
+## locale:
+## [1] LC_COLLATE=English_United States.1252 
+## [2] LC_CTYPE=English_United States.1252   
+## [3] LC_MONETARY=English_United States.1252
+## [4] LC_NUMERIC=C                          
+## [5] LC_TIME=English_United States.1252    
+## system code page: 65001
+## 
+## time zone: Europe/Berlin
+## tzcode source: internal
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+##  [1] semPlot_1.1.6            lavaan_0.6-19            psych_2.4.6.26          
+##  [4] reshape2_1.4.4           corrplot_0.95            clinUtils_0.2.0         
+##  [7] htmltools_0.5.8.1        Hmisc_5.1-3              inTextSummaryTable_3.3.3
+## [10] gtsummary_2.0.3          kableExtra_1.4.0         lubridate_1.9.3         
+## [13] forcats_1.0.0            stringr_1.5.1            dplyr_1.1.4             
+## [16] purrr_1.0.2              readr_2.1.5              tidyr_1.3.1             
+## [19] tibble_3.2.1             ggplot2_3.5.1            tidyverse_2.0.0         
+## 
+## loaded via a namespace (and not attached):
+##   [1] rstudioapi_0.17.1       jsonlite_1.8.9          magrittr_2.0.3         
+##   [4] farver_2.1.2            nloptr_2.1.1            rmarkdown_2.28         
+##   [7] ragg_1.3.3              vctrs_0.6.5             minqa_1.2.8            
+##  [10] askpass_1.2.1           base64enc_0.1-3         haven_2.5.4            
+##  [13] Formula_1.2-5           sass_0.4.9              bslib_0.8.0            
+##  [16] htmlwidgets_1.6.4       plyr_1.8.9              cachem_1.1.0           
+##  [19] uuid_1.2-1              igraph_2.1.1            lifecycle_1.0.4        
+##  [22] pkgconfig_2.0.3         Matrix_1.7-1            R6_2.5.1               
+##  [25] fastmap_1.2.0           digest_0.6.35           OpenMx_2.21.13         
+##  [28] fdrtool_1.2.18          colorspace_2.1-1        textshaping_0.4.0      
+##  [31] crosstalk_1.2.1         labeling_0.4.3          fansi_1.0.6            
+##  [34] timechange_0.3.0        abind_1.4-8             compiler_4.4.2         
+##  [37] fontquiver_0.2.1        withr_3.0.2             glasso_1.11            
+##  [40] htmlTable_2.4.3         backports_1.5.0         carData_3.0-5          
+##  [43] highr_0.11              MASS_7.3-61             openssl_2.2.2          
+##  [46] corpcor_1.6.10          gtools_3.9.5            tools_4.4.2            
+##  [49] pbivnorm_0.6.0          foreign_0.8-87          zip_2.3.1              
+##  [52] nnet_7.3-19             glue_1.8.0              quadprog_1.5-8         
+##  [55] nlme_3.1-166            lisrelToR_0.3           grid_4.4.2             
+##  [58] checkmate_2.3.2         cluster_2.1.6           generics_0.1.3         
+##  [61] gtable_0.3.6            tzdb_0.4.0              data.table_1.16.2      
+##  [64] hms_1.1.3               xml2_1.3.6              utf8_1.2.4             
+##  [67] sem_3.1-16              ggrepel_0.9.6           pillar_1.9.0           
+##  [70] rockchalk_1.8.157       splines_4.4.2           lattice_0.22-6         
+##  [73] kutils_1.73             tidyselect_1.2.1        fontLiberation_0.1.0   
+##  [76] pbapply_1.7-2           knitr_1.48              fontBitstreamVera_0.1.1
+##  [79] gridExtra_2.3           svglite_2.1.3           stats4_4.4.2           
+##  [82] xfun_0.48               qgraph_1.9.8            arm_1.14-4             
+##  [85] DT_0.33                 stringi_1.8.4           yaml_2.3.10            
+##  [88] boot_1.3-31             evaluate_1.0.1          officer_0.6.7          
+##  [91] mi_1.1                  gdtools_0.4.0           cli_3.6.3              
+##  [94] RcppParallel_5.1.9      rpart_4.1.23            xtable_1.8-4           
+##  [97] systemfonts_1.1.0       munsell_0.5.1           jquerylib_0.1.4        
+## [100] Rcpp_1.0.13             coda_0.19-4.1           png_0.1-8              
+## [103] XML_3.99-0.17           parallel_4.4.2          jpeg_0.1-10            
+## [106] lme4_1.1-35.5           viridisLite_0.4.2       scales_1.3.0           
+## [109] openxlsx_4.2.7.1        flextable_0.9.7         rlang_1.1.4            
+## [112] cowplot_1.1.3           mnormt_2.1.1</code></pre>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
