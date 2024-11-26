@@ -1311,6 +1311,83 @@ The original data included 2,656 patients with 14 (patient and practice) charact
 ![](./02_Plots/Visualization/PRO/Regression2.png)
 
 
+
+## Regression model-Prediction of health status (EQ-5D)
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library(plotly)
+library(shiny)
+options(warn = -1)
+ 
+
+  radioButtons("yScale",
+               label = "Scale",
+  #                #HTML('<FONT color="black"><FONT size="5pt">Y-Scale</FONT></FONT><br> #<b>Your favorite color is red ?</b>'),
+               choices = c("Z-score", "Percentile"),
+               selected = "Z-score",
+               inline = T,
+               width = "100%")
+
+# par(mfrow = c(2, 1))
+
+# bp1
+# bp2
+
+PedsGrowth <- read_csv("./01_Datasets/PedsGrowth.csv")
+ PedsGrowth$TIME <- as.factor(PedsGrowth$TIME)
+ width <- PedsGrowth %>% group_by(MEASURE, TIME) %>% count()
+subset <- reactive({
+  if(input$yScale == "Z-score"){
+  "ZSCORES"
+  }else{
+      "PERCENTILES"
+  }
+})
+
+ylabel <- reactive({
+  if(input$yScale == "Z-score")
+    "Z-score"
+  else
+    "Percentile"
+})
+shading <- reactive({
+  if(input$yScale == "Z-score"){
+    c(-1, 1)
+  }
+  # else if(input$yScale == "Z-score" & input$data == "Change"){
+  #   c(-0.5, 0.5)
+  # }
+  else
+    c(0.25, 0.75)
+    
+})
+output$bp1 <- renderPlot({
+  if(subset() == "ZSCORES"){
+  PedsGrowth %>% filter(complete.cases(.)) %>% group_by(MEASURE, TIME) %>% ggplot(aes(x = TIME, y = ZSCORES)) +          
+  geom_boxplot() + facet_wrap(.~MEASURE, scales="free_y", ncol=1) + theme_minimal() +
+  stat_summary(fun = mean, geom = "point", col = "red") +
+      scale_x_discrete(limits=0:76, breaks = seq(0,76,4), labels = paste(seq(0,76,4), "Weeks")) + scale_y_discrete(limits=-3:3, breaks = seq(-3,3,1)) + 
+      annotate("rect", xmin = -Inf, xmax = Inf, ymin = shading()[1], ymax = shading()[2], 
+           alpha = .2, fill = "grey") + theme(panel.grid.major.x = element_blank())
+  }
+  else
+  {
+    PedsGrowth %>% filter(complete.cases(.)) %>% group_by(MEASURE, TIME) %>% ggplot(aes(x = TIME, y = PERCENTILES)) +          
+  geom_boxplot() + facet_wrap(.~MEASURE, scales="free_y", ncol=1) + theme_minimal() +
+  stat_summary(fun = mean, geom = "point", col = "red") +
+      scale_x_discrete(limits=0:76, breaks = seq(0,76,4), labels = paste(seq(0,76,4), "Weeks")) +
+      annotate("rect", xmin = -Inf, xmax = Inf, ymin = shading()[1], ymax = shading()[2], 
+           alpha = .2, fill = "grey") + theme(panel.grid.major.x = element_blank())
+  }
+  })
+
+plotOutput("bp1")
+```
+
+
+
+
 ## Reference
  
 SIG (2023, Sept. 13). VIS-SIG Blog: Wonderful Wednesdays September 2023. Retrieved from https://graphicsprinciples.github.io/posts/2023-12-17-wonderful-wednesdays-september-2023/

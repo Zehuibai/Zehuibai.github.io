@@ -1,7 +1,7 @@
 ---
 title: |
   ![](logo.png){width=3in}  
-  Forest Plot
+  Forest Plot and Meta Analysis
 output:
   html_document:
     df_print: paged
@@ -897,6 +897,190 @@ p <- plot_grid(title,
 p
 ```
 
+
+# Visualising Ranking Data
+
+To visualise ranking data resulting from a network meta-analysis (NMA). The NMA synthesised the results of 11 trials comparing 12 treatments for major depression. The provided dataset consisted of the probabilities that each treatment ranked in each position from Rank 1 (best) to Rank 12 (worst).
+ 
+ 
+## Lolly plot
+
+
+![](./02_Plots/Visualization/ForestPlot/Rank.png)
+
+```
+alpha <- 0.10
+dta <- read.csv("./01_Datasets/bayesian_ranking.csv") %>%
+  pivot_longer(cols = -"Treatment") %>%
+  mutate(
+    rank = gsub("^Rank(.*)$", "\\1", name),
+    rank = factor(rank, levels = unique(rank[order(as.numeric(rank))])),
+    rankx = as.numeric(rank)
+  ) %>%
+  group_by(Treatment) %>%
+  mutate(
+    lci = cumsum(value) >= !!alpha / 2,
+    uci = rev(cumsum(rev(value))) >= !!alpha / 2,
+    raw_value = value,
+    value = (function(x) (x - min(x)) / (max(x) - min(x)))(value)
+  ) %>%
+  mutate(avg = as.numeric(rank)[which.max(value)]) %>%
+  ungroup() %>%
+  mutate(
+    Treatment = paste0(stringr::str_to_title(Treatment), ":"),
+    Treatment = factor(Treatment, levels = unique(Treatment[order(avg)]))
+  )
+
+ci <- dta %>%
+  group_by(Treatment) %>%
+  summarise(min = min(rankx[lci]), max = max(rankx[uci])) %>%
+  ungroup()
+
+gg <- ggplot(
+  dta,
+  aes(rankx, value, color = value, alpha = value, size = value)
+) +
+  geom_ribbon(
+    aes(ymin = 0, ymax = value),
+    fill = "gray90", color = "transparent", alpha = 1, size = 1
+  ) +
+  geom_hline(yintercept = 0, color = "gray80", lwd = .1) +
+  geom_segment(aes(xend = rankx, yend = 0), lwd = 1) +
+  geom_point(shape = 21, fill = "white", stroke = .5) +
+  geom_point(shape = 21, fill = "white", stroke = 0, alpha = 1) +
+  geom_segment(
+    data = ci,
+    mapping = aes(x = min - 0.2, xend = max + 0.2, y = 0, yend = 0),
+    color = "gray20",
+    alpha = 1,
+    size = .25,
+    arrow = arrow(angle = 90, ends = "both", length = unit(0.1, "lines"))
+  ) +
+  scale_color_viridis_c(direction = -1, option = "D", begin = .2, end = .8) +
+  scale_x_continuous(breaks = 1:12) +
+  scale_alpha_continuous(range = c(.3, 1)) +
+  scale_size_continuous(range = c(.5, 2)) +
+  xlab("Ranks") +
+  facet_grid(Treatment ~ ., switch = "y", scales = "free") +
+  coord_cartesian(clip = "off") +
+  guides(color = "none", alpha = "none", size = "none") +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    strip.text.y.left = element_text(
+      margin = margin(b = 2, r = 5),
+      angle = 0, vjust = 0,
+      face = "bold",
+      color = "gray30",
+      size = 7
+    ),
+    panel.spacing.y = unit(.5, "lines"),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(margin = margin(t = 5, b = 5), size = 7),
+    axis.title.x = element_text(color = "gray40", size = 9),
+    axis.title.y = element_blank()
+  )
+
+gg
+```
+
+
+This plot uses lollipops to display the probability of a given treatment ranking in each position. Rank is again displayed on the x-axis and probability on the y-axis, although a separate sub-plot is now produced for each treatment and stacked vertically. The ordering of these subplots is logical, from the most effective treatment at the top to the least effective treatment at the bottom, allowing the reader to quickly establish the relative performance of each treatment. Lots of visual elements are utilised in the plot, with the colour-gradient, y-axis, point size and transparency all scaled to the treatment-wise min-max-normalised NMA rank probabilities. The panel suggested that this could result in some redundancy in the plot and that a subset of these visual elements could be used to display key probability scales of interest. Whilst the submitter acknowledges they have been produced by a somewhat questionable algorithm in this instance, the panel appreciated the inclusion of the credible intervals (shown by the horizontal black lines under the lollipops), which add useful information to such plots without adding significant clutter. Likewise, the inclusion of the shaded grey background nicely displays how underlying distributions can be displayed in such plots. The panel were extremely complimentary of the aesthetics of the plot and all the little details that had been considered to minimise clutter and produce an extremely clean display. The main suggestion for improvement was to incorporate the absolute probabilities somehow, perhaps with one of the several visual elements used. Whilst the current scaled display makes within-treatment comparison straightforward, it makes comparisons across treatments more difficult. For instance, the rank 12 lollipop for Reboxetine is of similar height to the Rank 11 lollipops for the three treatments above it, despite us knowing from submission 1 that this probability is clearly the largest observed for any treatment/rank.
+
+## Use of color intensity
+
+In the first, rank is displayed on the x-axis and treatment on the y-axis, with the intensity of the colour used to display the probability (ranging from 0=white to 1=red). The left-hand plot displays absolute probability, whilst the right displays cumulative probability. The panel appreciated the two different probabilities each being displayed, suggesting they compliment one another. The cumulative probability plot gives an area-under-the-curve like interpretation, providing a notion of overall performance of the treatment. This could be further enhanced by a logical ordering of the treatments, like seen in submission 2. Similarly, some of the ‘cleaning’ seen in submission 2 would help remove clutter from this plot, such as the background and gridlines. Whilst aesthetically pleasing, the use of a colour gradient could cause confusion as to the discrete nature of the ranks, since a smooth gradient is displayed between each successive rank’s colour. This could be circumvented with the use of a heatmap style display, with a distinct cell displayed for each treatment and rank. The second half of the submission displays the same information, but rather than having rank on the x-axis, each rank corresponds to a concentric ring (with faceting applied to distinguish treatments). This gives an aesthetically pleasing plot that would be great for grabbing attention, although the interpretation is less obvious than the previous plots. That being said, the cumulative probability plots once again provide an area-under-the-curve like interpretation which helps in assessing relative performance (although once more a logical ordering of treatments would support this). The panel highlighted that the main challenge with such plots is that outer rings occupy much more space than inner ones. This makes the worst performing treatment Reboxetine stand out far more on the left-hand plot than the best performing Mirtazapine. Inverting the ring ordering could be considered if wanting to emphasise the best performing treatment.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE} 
+# Read in packages
+require(gganimate)
+library("ggpubr")
+library(modelr)
+library(broom)
+library(grid)
+library(gridExtra)
+library("transformr")
+library(ggtext)
+library('ggforce') 
+
+#data processing
+
+# Set working directory using setwd()
+rnk1 <-  read.csv("./01_Datasets/bayesian_ranking.csv")
+rnk2<-tibble(rnk1)
+rnk3 <- mutate(rnk2, rowid_to_column(rnk2, "ID"))
+
+rnk4 <- rnk3 %>%
+  pivot_longer(!c(Treatment,ID), names_to = "ranks", values_to = "prop")
+rnk5 <- mutate(rnk4, ranker=str_replace_all(string=ranks, pattern="Rank", replacement="")) 
+rnk6 <- mutate(rnk5, rnk=as.numeric(ranker), r1=rnk-0.5, r2=rnk+0.5, p2=prop*12, rnkr=1/rnk, clr=letters[4])
+rnk <- rnk6 %>% group_by(Treatment) %>% mutate(cp=cumsum(prop))
+
+#drawing
+
+p<-
+ggplot() +
+  ggforce::geom_link2(data = rnk,
+                      aes(x = rnk, y = Treatment, color=clr, alpha = prop, size=5)) +
+  #scale_colour_manual(values = "green") +
+  theme(legend.position="none") + 
+  scale_x_discrete(name ="Rank", limits=c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'))
+print(p)     
+ 
+
+
+
+q<-
+ggplot() +
+  ggforce::geom_link2(data = rnk,
+                      aes(x = rnk, y = Treatment, colour='green', alpha = cp, size=5))  +
+  #scale_colour_manual(values = "green") +
+  theme(legend.position="none") + 
+  scale_x_discrete(name ="Rank", limits=c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'))
+print(q)     
+
+
+r1 <- 
+  ggplot(data = rnk, aes(x = factor(1), group=factor(rnkr), fill=p2)) +
+  geom_bar(width = 1) +
+  scale_fill_continuous(low='white', high='green1', guide="none") +
+  facet_wrap(~Treatment, ncol=4) + theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+  axis.text.x = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks = element_blank())  
+r1
+r <- r1 + coord_polar(theta = "x")
+print(r) 
+
+s1 <- ggplot(data = rnk, aes(x = factor(1), group=factor(rnkr), fill=cp)) +
+  geom_bar(width = 1) +
+  scale_fill_continuous(low='white', high='green1', guide="none") +
+  facet_wrap(~Treatment, ncol=4) + theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())
+s1
+s<- s1 + coord_polar(theta = "x")
+print(s)
+```
+
+## Treatment Ranking Dashboard
+
+[App 1](https://huw-wilson.shinyapps.io/RankingDashboard/)
+
+On the left-hand side, a horizontal bar chart is displayed, representing the SUCRA (surface under the cumulative ranking). A description of this metric is provided, and this metric is used consistently throughout to order plots for individual treatments from best to worst, which the panel complimented. The user can select a treatment of interest from a drop-down box, and this treatment is highlighted in blue in all plots, with other treatments displayed in grey and pushed to the background. This nicely highlights a treatment of interest in a way that could be considered for enhancing submission 1. On the right-hand side of the app, the user can explore a range of plots. The first are line graphs and the user can select to display either absolute or cumulative probabilities. By hovering over the plot, the user can view the probability that each treatment ranks in each position, meaning the entire underlying dataset can be recovered. This feature can also be used to identify an interesting treatment from the plot and subsequently select it from the drop-down box. The user can either view all lines on a single plot select to display faceted plots by treatment to make it easier to follow the line for a given treatment. More could be done on these plots to emphasise the discrete nature of the ranks, although the ability to hover and see the discrete probabilities does go some way towards doing this. The user can also select to view bar charts. These have probability on the x-axis and allow the user to display whether to stack by treatment or by rank. Depending on this selection, either treatment or rank is displayed on the y-axis, with the other used to fill the stacked bars. This better emphasises the discrete nature of the ranks than the line graphs and allows the user to make both treatment-wise and rank-wise comparisons. Small updates could further enhance this submission, such as widening the extremes of the colour gradient on the bar charts. This would make individual sections of the stacked bars easier to distinguish in the presence of many treatments/ranks. Similarly, the consistent use of colouring applied throughout the plots (blue for the selected treatments, grey for the others), could be extended to legends and labels to further strengthen the connection.
+
+
+```{r showChoro1}
+shiny::includeHTML("./02_Plots/Visualization/ForestPlot/bayesian_ranking_lineup.html")
+```
+
+
+This second dashboard comes with a range of interactive features to help the user drive the display. Again, treatments are displayed on the ‘y-axis’ and ranks on the ‘x-axis’. Bars are displayed to indicate the corresponding probability and are presented in such a way to emphasise the discrete nature of the ranks. For the top 3 ranks, the probability is displayed as a weighted sum. Although this may not be of the most interest for this example and the choice of top 3 is somewhat arbitrary here, one can easily imagine use cases where this would be an extremely useful feature. Further, the user can assign the weights used in computing this weighted sum (again, not the most directly relevant here but certainly relevant in other use cases). Here, the weighted sum shows an interesting message that a treatment could have a much higher probability of being 1st specifically, but not necessarily have any/much higher probability of being ranked in say the top 3. This can be seen somewhat in cumulative probability plots from other submissions but is most easily identified here. In addition to the bars, box plots are displayed at the top of each column, displaying the distribution within each rank. These highlight the contrasting behaviour of the extreme and intermediate ranks, as seen in submission 1. Like the previous dashboard, this one allows the user to view each individual probability by hovering and goes further in providing selection boxes which can be used to keep these probabilities displayed at all times. The app allows the user to search for a treatment of interest and to sort the visualization within/across ranks. This not only allows for a logical ordering of treatments but allows the user to determine which ordering they consider to be the most logical and display the visualization that way.
 
 # Reference
 
