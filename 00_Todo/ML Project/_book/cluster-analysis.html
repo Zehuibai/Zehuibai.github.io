@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 7 Cluster Analysis | ML Project Using bookdown</title>
+  <meta name="description" content="A book example for a Chapman &amp; Hall book." />
+  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 7 Cluster Analysis | ML Project Using bookdown" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="A book example for a Chapman &amp; Hall book." />
+  <meta name="github-repo" content="yihui/bookdown-crc" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 7 Cluster Analysis | ML Project Using bookdown" />
+  
+  <meta name="twitter:description" content="A book example for a Chapman &amp; Hall book." />
+  
+
+<meta name="author" content="Zehui Bai" />
+
+
+<meta name="date" content="2023-12-06" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="pca.html"/>
+<link rel="next" href="linear-discriminant-analysis-lda.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="libs/d3-3.5.17/d3.min.js"></script>
+<link href="libs/markmap-0.3.3/view.mindmap.css" rel="stylesheet" />
+<script src="libs/markmap-0.3.3/view.mindmap.js"></script>
+<script src="libs/markmap-0.3.3/plugins/parsemd.min.js"></script>
+<script src="libs/markmap-binding-1.3.2/markmap.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">ML Project</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#why-read-this-book"><i class="fa fa-check"></i>Why read this book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#structure-of-the-book"><i class="fa fa-check"></i>Structure of the book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information-and-conventions"><i class="fa fa-check"></i>Software information and conventions</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html"><i class="fa fa-check"></i><b>1</b> Regularization Penalized Regression</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#motivation"><i class="fa fa-check"></i><b>1.1.1</b> Motivation</a></li>
+<li class="chapter" data-level="1.1.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#data-preparation"><i class="fa fa-check"></i><b>1.1.2</b> Data preparation</a></li>
+<li class="chapter" data-level="1.1.3" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#best-subset-regression"><i class="fa fa-check"></i><b>1.1.3</b> Best subset regression</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#ridge-regression"><i class="fa fa-check"></i><b>1.2</b> Ridge Regression</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modeling"><i class="fa fa-check"></i><b>1.2.1</b> Modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#lasso-regression"><i class="fa fa-check"></i><b>1.3</b> Lasso Regression</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modelling"><i class="fa fa-check"></i><b>1.3.1</b> Modelling</a></li>
+<li class="chapter" data-level="1.3.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#glmnet-cross-validation"><i class="fa fa-check"></i><b>1.3.2</b> glmnet cross validation</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#elasticnet"><i class="fa fa-check"></i><b>1.4</b> ElasticNet</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modelling-1"><i class="fa fa-check"></i><b>1.4.1</b> Modelling</a></li>
+<li class="chapter" data-level="1.4.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#classification"><i class="fa fa-check"></i><b>1.4.2</b> Classification</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="smoothing.html"><a href="smoothing.html"><i class="fa fa-check"></i><b>2</b> Smoothing</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="smoothing.html"><a href="smoothing.html#smoothing-1"><i class="fa fa-check"></i><b>2.1</b> Smoothing</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="smoothing.html"><a href="smoothing.html#bin-smoothing"><i class="fa fa-check"></i><b>2.1.1</b> Bin smoothing</a></li>
+<li class="chapter" data-level="2.1.2" data-path="smoothing.html"><a href="smoothing.html#kernels"><i class="fa fa-check"></i><b>2.1.2</b> Kernels</a></li>
+<li class="chapter" data-level="2.1.3" data-path="smoothing.html"><a href="smoothing.html#local-weighted-regression-loess"><i class="fa fa-check"></i><b>2.1.3</b> Local weighted regression (loess)</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="smoothing.html"><a href="smoothing.html#loess-regression"><i class="fa fa-check"></i><b>2.2</b> Loess Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="knn.html"><a href="knn.html"><i class="fa fa-check"></i><b>3</b> KNN</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="knn.html"><a href="knn.html#introduction-1"><i class="fa fa-check"></i><b>3.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="knn.html"><a href="knn.html#idee"><i class="fa fa-check"></i><b>3.1.1</b> Idee</a></li>
+<li class="chapter" data-level="3.1.2" data-path="knn.html"><a href="knn.html#加权最近邻法"><i class="fa fa-check"></i><b>3.1.2</b> 加权最近邻法</a></li>
+<li class="chapter" data-level="3.1.3" data-path="knn.html"><a href="knn.html#knn算法三要素"><i class="fa fa-check"></i><b>3.1.3</b> KNN算法三要素</a></li>
+<li class="chapter" data-level="3.1.4" data-path="knn.html"><a href="knn.html#优缺点"><i class="fa fa-check"></i><b>3.1.4</b> 优缺点</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="knn.html"><a href="knn.html#knn算法的实现方式"><i class="fa fa-check"></i><b>3.2</b> KNN算法的实现方式</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="knn.html"><a href="knn.html#brute-force"><i class="fa fa-check"></i><b>3.2.1</b> Brute-force</a></li>
+<li class="chapter" data-level="3.2.2" data-path="knn.html"><a href="knn.html#kd树实现"><i class="fa fa-check"></i><b>3.2.2</b> KD树实现</a></li>
+<li class="chapter" data-level="3.2.3" data-path="knn.html"><a href="knn.html#球树实现"><i class="fa fa-check"></i><b>3.2.3</b> 球树实现</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="knn.html"><a href="knn.html#application"><i class="fa fa-check"></i><b>3.3</b> Application</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="knn.html"><a href="knn.html#data-preparation-1"><i class="fa fa-check"></i><b>3.3.1</b> Data Preparation</a></li>
+<li class="chapter" data-level="3.3.2" data-path="knn.html"><a href="knn.html#knn-modelling"><i class="fa fa-check"></i><b>3.3.2</b> KNN Modelling</a></li>
+<li class="chapter" data-level="3.3.3" data-path="knn.html"><a href="knn.html#加权最近邻法-1"><i class="fa fa-check"></i><b>3.3.3</b> 加权最近邻法</a></li>
+<li class="chapter" data-level="3.3.4" data-path="knn.html"><a href="knn.html#over-training"><i class="fa fa-check"></i><b>3.3.4</b> Over-training</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="svm.html"><a href="svm.html"><i class="fa fa-check"></i><b>4</b> SVM</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="svm.html"><a href="svm.html#introduction-2"><i class="fa fa-check"></i><b>4.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="svm.html"><a href="svm.html#perceptron"><i class="fa fa-check"></i><b>4.1.1</b> Perceptron</a></li>
+<li class="chapter" data-level="4.1.2" data-path="svm.html"><a href="svm.html#函数间隔与几何间隔"><i class="fa fa-check"></i><b>4.1.2</b> 函数间隔与几何间隔</a></li>
+<li class="chapter" data-level="4.1.3" data-path="svm.html"><a href="svm.html#svm支持向量"><i class="fa fa-check"></i><b>4.1.3</b> SVM支持向量</a></li>
+<li class="chapter" data-level="4.1.4" data-path="svm.html"><a href="svm.html#svm模型目标函数与优化"><i class="fa fa-check"></i><b>4.1.4</b> SVM模型目标函数与优化</a></li>
+<li class="chapter" data-level="4.1.5" data-path="svm.html"><a href="svm.html#线性可分svm的算法过程"><i class="fa fa-check"></i><b>4.1.5</b> 线性可分SVM的算法过程</a></li>
+<li class="chapter" data-level="4.1.6" data-path="svm.html"><a href="svm.html#线性svm的软间隔最大化"><i class="fa fa-check"></i><b>4.1.6</b> 线性SVM的软间隔最大化</a></li>
+<li class="chapter" data-level="4.1.7" data-path="svm.html"><a href="svm.html#线性不可分支持向量机与核函数"><i class="fa fa-check"></i><b>4.1.7</b> 线性不可分支持向量机与核函数</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="svm.html"><a href="svm.html#application-1"><i class="fa fa-check"></i><b>4.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="svm.html"><a href="svm.html#data-preparation-2"><i class="fa fa-check"></i><b>4.2.1</b> Data Preparation</a></li>
+<li class="chapter" data-level="4.2.2" data-path="svm.html"><a href="svm.html#svm-modelling"><i class="fa fa-check"></i><b>4.2.2</b> SVM Modelling</a></li>
+<li class="chapter" data-level="4.2.3" data-path="svm.html"><a href="svm.html#model-selection"><i class="fa fa-check"></i><b>4.2.3</b> Model Selection</a></li>
+<li class="chapter" data-level="4.2.4" data-path="svm.html"><a href="svm.html#character-selection"><i class="fa fa-check"></i><b>4.2.4</b> Character selection</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="tree-models.html"><a href="tree-models.html"><i class="fa fa-check"></i><b>5</b> Tree models</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="tree-models.html"><a href="tree-models.html#decision-tree-model"><i class="fa fa-check"></i><b>5.1</b> Decision Tree Model</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="tree-models.html"><a href="tree-models.html#decision-tree-algorithm"><i class="fa fa-check"></i><b>5.1.1</b> Decision tree algorithm</a></li>
+<li class="chapter" data-level="5.1.2" data-path="tree-models.html"><a href="tree-models.html#id3-algorithm"><i class="fa fa-check"></i><b>5.1.2</b> ID3 Algorithm</a></li>
+<li class="chapter" data-level="5.1.3" data-path="tree-models.html"><a href="tree-models.html#c4.5-algorithm"><i class="fa fa-check"></i><b>5.1.3</b> C4.5 Algorithm</a></li>
+<li class="chapter" data-level="5.1.4" data-path="tree-models.html"><a href="tree-models.html#cart-algorithm"><i class="fa fa-check"></i><b>5.1.4</b> CART Algorithm</a></li>
+<li class="chapter" data-level="5.1.5" data-path="tree-models.html"><a href="tree-models.html#pruning"><i class="fa fa-check"></i><b>5.1.5</b> Pruning</a></li>
+<li class="chapter" data-level="5.1.6" data-path="tree-models.html"><a href="tree-models.html#package-rpart"><i class="fa fa-check"></i><b>5.1.6</b> Package ‘rpart’</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="tree-models.html"><a href="tree-models.html#random-forest"><i class="fa fa-check"></i><b>5.2</b> Random Forest</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="tree-models.html"><a href="tree-models.html#bootstrap-bagging"><i class="fa fa-check"></i><b>5.2.1</b> Bootstrap (Bagging)</a></li>
+<li class="chapter" data-level="5.2.2" data-path="tree-models.html"><a href="tree-models.html#bagging算法流程"><i class="fa fa-check"></i><b>5.2.2</b> bagging算法流程</a></li>
+<li class="chapter" data-level="5.2.3" data-path="tree-models.html"><a href="tree-models.html#random-forest-algorithm"><i class="fa fa-check"></i><b>5.2.3</b> Random Forest Algorithm</a></li>
+<li class="chapter" data-level="5.2.4" data-path="tree-models.html"><a href="tree-models.html#random-forest-promotion"><i class="fa fa-check"></i><b>5.2.4</b> Random forest promotion</a></li>
+<li class="chapter" data-level="5.2.5" data-path="tree-models.html"><a href="tree-models.html#package-randomforest"><i class="fa fa-check"></i><b>5.2.5</b> Package ‘randomForest’</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="tree-models.html"><a href="tree-models.html#modelling-2"><i class="fa fa-check"></i><b>5.3</b> Modelling</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="tree-models.html"><a href="tree-models.html#data-preparation-3"><i class="fa fa-check"></i><b>5.3.1</b> Data preparation</a></li>
+<li class="chapter" data-level="5.3.2" data-path="tree-models.html"><a href="tree-models.html#regression-tree-1"><i class="fa fa-check"></i><b>5.3.2</b> Regression tree</a></li>
+<li class="chapter" data-level="5.3.3" data-path="tree-models.html"><a href="tree-models.html#classification-tree-1"><i class="fa fa-check"></i><b>5.3.3</b> Classification tree</a></li>
+<li class="chapter" data-level="5.3.4" data-path="tree-models.html"><a href="tree-models.html#random-forest-for-regression"><i class="fa fa-check"></i><b>5.3.4</b> Random forest for regression</a></li>
+<li class="chapter" data-level="5.3.5" data-path="tree-models.html"><a href="tree-models.html#random-forest-for-classification"><i class="fa fa-check"></i><b>5.3.5</b> Random forest for classification</a></li>
+<li class="chapter" data-level="5.3.6" data-path="tree-models.html"><a href="tree-models.html#皮玛印第安人糖尿病数据集"><i class="fa fa-check"></i><b>5.3.6</b> 皮玛印第安人糖尿病数据集</a></li>
+<li class="chapter" data-level="5.3.7" data-path="tree-models.html"><a href="tree-models.html#使用随机森林进行特征选择"><i class="fa fa-check"></i><b>5.3.7</b> 使用随机森林进行特征选择</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="tree-models.html"><a href="tree-models.html#gradient-boosting"><i class="fa fa-check"></i><b>5.4</b> Gradient Boosting</a></li>
+<li class="chapter" data-level="5.5" data-path="tree-models.html"><a href="tree-models.html#gradient-descent"><i class="fa fa-check"></i><b>5.5</b> Gradient Descent</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="tree-models.html"><a href="tree-models.html#gradient"><i class="fa fa-check"></i><b>5.5.1</b> Gradient</a></li>
+<li class="chapter" data-level="5.5.2" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-1"><i class="fa fa-check"></i><b>5.5.2</b> Gradient Descent</a></li>
+<li class="chapter" data-level="5.5.3" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-algorithm"><i class="fa fa-check"></i><b>5.5.3</b> Gradient Descent Algorithm</a></li>
+<li class="chapter" data-level="5.5.4" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-familiy"><i class="fa fa-check"></i><b>5.5.4</b> Gradient Descent Familiy</a></li>
+<li class="chapter" data-level="5.5.5" data-path="tree-models.html"><a href="tree-models.html#gbdt分类算法"><i class="fa fa-check"></i><b>5.5.5</b> GBDT分类算法</a></li>
+<li class="chapter" data-level="5.5.6" data-path="tree-models.html"><a href="tree-models.html#package-gbm"><i class="fa fa-check"></i><b>5.5.6</b> Package ‘gbm’</a></li>
+<li class="chapter" data-level="5.5.7" data-path="tree-models.html"><a href="tree-models.html#极限梯度提升分类"><i class="fa fa-check"></i><b>5.5.7</b> 极限梯度提升——分类</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="tree-models.html"><a href="tree-models.html#cubist-model"><i class="fa fa-check"></i><b>5.6</b> Cubist Model</a>
+<ul>
+<li class="chapter" data-level="5.6.1" data-path="tree-models.html"><a href="tree-models.html#introduction-3"><i class="fa fa-check"></i><b>5.6.1</b> Introduction</a></li>
+<li class="chapter" data-level="5.6.2" data-path="tree-models.html"><a href="tree-models.html#application-data-preparation"><i class="fa fa-check"></i><b>5.6.2</b> Application Data Preparation</a></li>
+<li class="chapter" data-level="5.6.3" data-path="tree-models.html"><a href="tree-models.html#fit-continious-outcome"><i class="fa fa-check"></i><b>5.6.3</b> Fit Continious Outcome</a></li>
+<li class="chapter" data-level="5.6.4" data-path="tree-models.html"><a href="tree-models.html#variable-importance"><i class="fa fa-check"></i><b>5.6.4</b> Variable Importance</a></li>
+<li class="chapter" data-level="5.6.5" data-path="tree-models.html"><a href="tree-models.html#summary-display"><i class="fa fa-check"></i><b>5.6.5</b> Summary display</a></li>
+<li class="chapter" data-level="5.6.6" data-path="tree-models.html"><a href="tree-models.html#specific-parts"><i class="fa fa-check"></i><b>5.6.6</b> specific parts</a></li>
+<li class="chapter" data-level="5.6.7" data-path="tree-models.html"><a href="tree-models.html#ensembles-by-committees"><i class="fa fa-check"></i><b>5.6.7</b> Ensembles By Committees</a></li>
+<li class="chapter" data-level="5.6.8" data-path="tree-models.html"><a href="tree-models.html#nearestneighbors-adjustmemt"><i class="fa fa-check"></i><b>5.6.8</b> Nearest–neighbors Adjustmemt</a></li>
+<li class="chapter" data-level="5.6.9" data-path="tree-models.html"><a href="tree-models.html#optimize-parameters"><i class="fa fa-check"></i><b>5.6.9</b> Optimize parameters</a></li>
+<li class="chapter" data-level="5.6.10" data-path="tree-models.html"><a href="tree-models.html#logistic-cv"><i class="fa fa-check"></i><b>5.6.10</b> Logistic CV</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="pca.html"><a href="pca.html"><i class="fa fa-check"></i><b>6</b> PCA</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="pca.html"><a href="pca.html#introduction-4"><i class="fa fa-check"></i><b>6.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="pca.html"><a href="pca.html#component"><i class="fa fa-check"></i><b>6.1.1</b> Component</a></li>
+<li class="chapter" data-level="6.1.2" data-path="pca.html"><a href="pca.html#pca算法"><i class="fa fa-check"></i><b>6.1.2</b> PCA算法</a></li>
+<li class="chapter" data-level="6.1.3" data-path="pca.html"><a href="pca.html#主成分旋转"><i class="fa fa-check"></i><b>6.1.3</b> 主成分旋转</a></li>
+<li class="chapter" data-level="6.1.4" data-path="pca.html"><a href="pca.html#kernelized-pca"><i class="fa fa-check"></i><b>6.1.4</b> Kernelized PCA</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="pca.html"><a href="pca.html#application-2"><i class="fa fa-check"></i><b>6.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="pca.html"><a href="pca.html#data-preparation-4"><i class="fa fa-check"></i><b>6.2.1</b> Data preparation</a></li>
+<li class="chapter" data-level="6.2.2" data-path="pca.html"><a href="pca.html#modeling-1"><i class="fa fa-check"></i><b>6.2.2</b> Modeling</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="cluster-analysis.html"><a href="cluster-analysis.html"><i class="fa fa-check"></i><b>7</b> Cluster Analysis</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering"><i class="fa fa-check"></i><b>7.1</b> Hierarchical Clustering</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#introduction-5"><i class="fa fa-check"></i><b>7.1.1</b> Introduction</a></li>
+<li class="chapter" data-level="7.1.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering-algorithms"><i class="fa fa-check"></i><b>7.1.2</b> Hierarchical clustering algorithms</a></li>
+<li class="chapter" data-level="7.1.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#measure-the-dissimilarity-between-two-clusters-of-observations"><i class="fa fa-check"></i><b>7.1.3</b> Measure the dissimilarity between two clusters of observations</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering"><i class="fa fa-check"></i><b>7.2</b> K-means Clustering</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#algorithm"><i class="fa fa-check"></i><b>7.2.1</b> Algorithm</a></li>
+<li class="chapter" data-level="7.2.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means"><i class="fa fa-check"></i><b>7.2.2</b> K-Means++</a></li>
+<li class="chapter" data-level="7.2.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#elkan-k-means"><i class="fa fa-check"></i><b>7.2.3</b> elkan K-Means</a></li>
+<li class="chapter" data-level="7.2.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#mini-batch-k-means"><i class="fa fa-check"></i><b>7.2.4</b> Mini Batch K-Means</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient-and-pam"><i class="fa fa-check"></i><b>7.3</b> Gower’s coefficient and PAM</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient"><i class="fa fa-check"></i><b>7.3.1</b> Gower’s coefficient</a></li>
+<li class="chapter" data-level="7.3.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#不同数据类型的相异度计算-距离法"><i class="fa fa-check"></i><b>7.3.2</b> 不同数据类型的相异度计算 (距离法)</a></li>
+<li class="chapter" data-level="7.3.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#pam"><i class="fa fa-check"></i><b>7.3.3</b> PAM</a></li>
+</ul></li>
+<li class="chapter" data-level="7.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch-clustering"><i class="fa fa-check"></i><b>7.4</b> BIRCH Clustering</a>
+<ul>
+<li class="chapter" data-level="7.4.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch-introduction"><i class="fa fa-check"></i><b>7.4.1</b> BIRCH Introduction</a></li>
+<li class="chapter" data-level="7.4.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#聚类特征cf与聚类特征树cf-tree"><i class="fa fa-check"></i><b>7.4.2</b> 聚类特征CF与聚类特征树CF Tree</a></li>
+<li class="chapter" data-level="7.4.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#cf-tree的生成"><i class="fa fa-check"></i><b>7.4.3</b> CF Tree的生成</a></li>
+<li class="chapter" data-level="7.4.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch算法"><i class="fa fa-check"></i><b>7.4.4</b> BIRCH算法</a></li>
+</ul></li>
+<li class="chapter" data-level="7.5" data-path="cluster-analysis.html"><a href="cluster-analysis.html#application-3"><i class="fa fa-check"></i><b>7.5</b> Application</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#data-preparation-5"><i class="fa fa-check"></i><b>7.5.1</b> Data preparation</a></li>
+<li class="chapter" data-level="7.5.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering-1"><i class="fa fa-check"></i><b>7.5.2</b> Hierarchical Clustering</a></li>
+<li class="chapter" data-level="7.5.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering-1"><i class="fa fa-check"></i><b>7.5.3</b> K-means Clustering</a></li>
+<li class="chapter" data-level="7.5.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient-and-pam-1"><i class="fa fa-check"></i><b>7.5.4</b> Gower’s coefficient and PAM</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html"><i class="fa fa-check"></i><b>8</b> linear discriminant analysis (LDA)</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#introduction-6"><i class="fa fa-check"></i><b>8.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#naive-bayes"><i class="fa fa-check"></i><b>8.1.1</b> Naive Bayes</a></li>
+<li class="chapter" data-level="8.1.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#controlling-prevalence"><i class="fa fa-check"></i><b>8.1.2</b> Controlling prevalence</a></li>
+<li class="chapter" data-level="8.1.3" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#qda"><i class="fa fa-check"></i><b>8.1.3</b> QDA</a></li>
+<li class="chapter" data-level="8.1.4" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda"><i class="fa fa-check"></i><b>8.1.4</b> LDA</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#discriminant-analysis-algorithm"><i class="fa fa-check"></i><b>8.2</b> Discriminant analysis algorithm</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#idee-1"><i class="fa fa-check"></i><b>8.2.1</b> Idee</a></li>
+<li class="chapter" data-level="8.2.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#瑞利商rayleigh-quotient"><i class="fa fa-check"></i><b>8.2.2</b> 瑞利商（Rayleigh quotient）</a></li>
+<li class="chapter" data-level="8.2.3" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#广义瑞利商-genralized-rayleigh-quotient"><i class="fa fa-check"></i><b>8.2.3</b> 广义瑞利商 genralized Rayleigh quotient</a></li>
+<li class="chapter" data-level="8.2.4" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda算法流程"><i class="fa fa-check"></i><b>8.2.4</b> LDA算法流程</a></li>
+<li class="chapter" data-level="8.2.5" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda-application"><i class="fa fa-check"></i><b>8.2.5</b> LDA Application</a></li>
+<li class="chapter" data-level="8.2.6" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#qda-1"><i class="fa fa-check"></i><b>8.2.6</b> QDA</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="neural-network.html"><a href="neural-network.html"><i class="fa fa-check"></i><b>9</b> Neural Network</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="neural-network.html"><a href="neural-network.html#introduction-7"><i class="fa fa-check"></i><b>9.1</b> Introduction</a></li>
+<li class="chapter" data-level="9.2" data-path="neural-network.html"><a href="neural-network.html#反向传播方法进行训练的前馈神经网络"><i class="fa fa-check"></i><b>9.2</b> 反向传播方法进行训练的前馈神经网络</a></li>
+<li class="chapter" data-level="9.3" data-path="neural-network.html"><a href="neural-network.html#application-4"><i class="fa fa-check"></i><b>9.3</b> Application</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="neural-network.html"><a href="neural-network.html#数据准备"><i class="fa fa-check"></i><b>9.3.1</b> 数据准备</a></li>
+<li class="chapter" data-level="9.3.2" data-path="neural-network.html"><a href="neural-network.html#模型构建"><i class="fa fa-check"></i><b>9.3.2</b> 模型构建</a></li>
+</ul></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="more-to-say.html"><a href="more-to-say.html"><i class="fa fa-check"></i><b>A</b> More to Say</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://bookdown.org" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">ML Project Using bookdown</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="cluster-analysis" class="section level1 hasAnchor" number="7">
+<h1><span class="header-section-number">Chapter 7</span> Cluster Analysis<a href="cluster-analysis.html#cluster-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div class="markmap html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-11af041ce9791c790f6a" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-11af041ce9791c790f6a">{"x":{"data":"# \n## Cluster Analysis\n### Hierarchical Clustering\n#### Introduction\n#### Hierarchical clustering algorithms\n####  Measure the dissimilarity between two clusters of observations\n### K-means Clustering\n#### Algorithm\n#### K-Means++\n#### elkan K-Means\n#### Mini Batch K-Means\n### Gower's coefficient and PAM\n#### Gower's coefficient\n#### 不同数据类型的相异度计算 (距离法)\n##### 欧几里得距离\n##### 切比雪夫距离\n##### 曼哈顿距离\n##### 兰氏距离\n#### PAM\n### BIRCH Clustering\n#### BIRCH Introduction\n#### 聚类特征CF与聚类特征树CF Tree\n#### CF Tree的生成\n#### BIRCH算法\n### Application\n#### Data preparation\n#### Hierarchical Clustering\n#### K-means Clustering\n#### Gower's coefficient and PAM","options":{"preset":"colorful","autoFit":true}},"evals":[],"jsHooks":[]}</script>
+<p>The goal of cluster analysis is to divide observations into groups (k groups) such that members within the same group are as similar as possible and members between groups are as different as possible. We will focus on the two most commonly used techniques: hierarchical clustering and K-means clustering. They are both very effective clustering methods, but they may not be suitable if you are analyzing large, complex datasets. So, we also study the partitioning around the center point, which uses as input a dissimilarity matrix based on the GoW metric. Finally I discuss a new technique that I have only recently learned and used - transforming data using random forests. The transformed data can be used as input for unsupervised learning.</p>
+<div id="hierarchical-clustering" class="section level2 hasAnchor" number="7.1">
+<h2><span class="header-section-number">7.1</span> Hierarchical Clustering<a href="cluster-analysis.html#hierarchical-clustering" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="introduction-5" class="section level3 hasAnchor" number="7.1.1">
+<h3><span class="header-section-number">7.1.1</span> Introduction<a href="cluster-analysis.html#introduction-5" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>层次聚类算法的基础是观测之间的相异度测量。我们使用的是通用的测量方式——欧氏距 离，当然还有其他方式。层次聚类是一种凝聚式的或自底向上的技术。</p>
+<p><strong>Agglomerative clustering</strong></p>
+<ol style="list-style-type: decimal">
+<li>首先，所有观测都是自己本身的一 个簇；</li>
+<li>然后，算法开始在所有的<strong>两点组合之中进行迭代搜索，找出最相似的两个 簇</strong>，将它们聚集成一个簇。所以，第一次迭代之后，有n 1个簇；第二次迭代 之后，有n 2个簇，依此类推</li>
+<li>进行迭代时，除了距离测量之外，还有一个重要问题是需要确定观测组之间的测距方式，不 同类型的数据集需要使用不同的簇间测距方式。常用的测距方式类型:
+<ol style="list-style-type: decimal">
+<li>Ward距离, 使总的簇内方差最小，使用簇中的点到质心的误差平方和作为测量方式</li>
+<li>最大距离（Complete linkage), 两个簇之间的距离就是两个簇中的观测之间的最大距离</li>
+<li>质心距离（Centroid linkage), 两个簇之间的距离就是两个簇的质心之间的距离</li>
+</ol></li>
+</ol>
+<p>dist()函数计算距离: 默认方式欧氏距离, 可以在这个函数中指定其他距离计算方式（如最大值距离、 曼哈顿距离、堪培拉距离、二值距离和闵可夫斯基距离）。</p>
+<p>最后需要注意的是，要对你的数据进行标准化的缩放操作，使数据的均值为0， 标准差为1，这样在计算距离时才能进行比较。否则，变量的测量值越大，对距 离的影响就越大。</p>
+<p>层次聚类算法的基础是观测之间的相异度测量。层次聚类(Hierarchical Clustering)是聚类算法的一种，通过计算不同类别数据点间的相似度来创建一棵有层次的嵌套聚类树。在聚类树中，不同类别的原始数据点是树的最低层，树的顶层是一个聚类的根节点。创建聚类树有自下而上合并和自上而下分裂两种方法</p>
+<p>分层聚类可能比k均值有一些好处，例如不必预先指定聚类的数量，以及它可以产生很好的聚类的分层图示（这对于较小的数据集很有用）。但是，从实际的角度来看，层次聚类分析仍然涉及许多决策，这些决策可能会对结果的解释产生重大影响。</p>
+<ol style="list-style-type: decimal">
+<li>首先，像k均值一样，您仍然需要对要使用的相异性度量进行决策。 make a decision on the dissimilarity measure to use.</li>
+<li>其次，需要确定链接方法。每种链接方法在对观察结果进行分组的方式上都有不同的系统趋势（或偏差），并且可能导致明显不同的结果。
+<ul>
+<li>Each linkage method has different systematic tendencies (or biases) in the way it groups observations and can result in significantly different results.</li>
+<li>例如，质心法倾向于产生不规则形状的簇。</li>
+<li>Ward的方法往往会产生具有大致相同数量观察值的聚类，并且其提供的解决方案往往会被异常值严重扭曲。鉴于这种趋势，所选算法与数据的基础结构之间应该存在匹配（例如样本大小，观察值分布以及包括哪些类型的变量-标称，有序，比率或区间）。</li>
+</ul></li>
+<li>第三，尽管我们不需要预先指定簇的数量，但是我们经常仍然需要决定在哪里切割树状图以获得最终要使用的簇。not need to pre-specify the number of clusters, we often still need to decide where to cut the dendrogram in order to obtain the final clusters to use.</li>
+</ol>
+</div>
+<div id="hierarchical-clustering-algorithms" class="section level3 hasAnchor" number="7.1.2">
+<h3><span class="header-section-number">7.1.2</span> Hierarchical clustering algorithms<a href="cluster-analysis.html#hierarchical-clustering-algorithms" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Hierarchical clustering can be divided into two main types:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Agglomerative clustering:</strong> Commonly referred to as AGNES (AGglomerative NESting) works in a bottom-up manner. That is, each observation is initially considered as a single-element cluster (leaf). At each step of the algorithm, the two clusters that are the most similar are combined into a new bigger cluster (nodes). This procedure is iterated until all points are a member of just one single big cluster (root). The result is a tree that can be displayed using a dendrogram.</li>
+<li><strong>Divisive hierarchical clustering:</strong> Commonly referred to as DIANA (DIvise ANAlysis) works in a top-down manner. DIANA is like the reverse of AGNES. It begins with the root, in which all observations are included in a single cluster. At each step of the algorithm, the current cluster is split into two clusters that are considered most heterogeneous. The process is iterated until all observations are in their own cluster.</li>
+</ol>
+<blockquote>
+<p>聚集群集：通常称为AGNES（聚集嵌套）以自下而上的方式工作。 也就是说，每个观察值最初都被视为一个单元素簇（叶 leaf）。 在算法的每个步骤中，最相似的两个群集将合并为一个新的较大群集（节点 nodes）。 重复此过程，直到所有点仅是一个大群集（根 root）的成员为止。其结果是其可以使用树状显示的树。</p>
+</blockquote>
+<blockquote>
+<p>分裂式层次聚类：通常称为DIANA（DIvise ANAlysis）以自上而下的方式工作。 DIANA就像AGNES的反面。 它从根开始，其中所有观测值都包含在一个群集中。 在算法的每个步骤中，当前群集都被分为两个群集，这两个群集被认为是最异构的。 重复此过程，直到所有观测值都在其自己的群集中。</p>
+</blockquote>
+</div>
+<div id="measure-the-dissimilarity-between-two-clusters-of-observations" class="section level3 hasAnchor" number="7.1.3">
+<h3><span class="header-section-number">7.1.3</span> Measure the dissimilarity between two clusters of observations<a href="cluster-analysis.html#measure-the-dissimilarity-between-two-clusters-of-observations" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>与k均值类似，使用距离量度（例如，欧几里得距离，曼哈顿距离等）来测量观测值的（非相似性）;欧几里得距离是最常用的默认。但是，层次聚类中的一个基本问题是：我们如何测量两个观察聚类之间的差异？已经开发出许多不同的簇集方法 <strong>cluster agglomeration methods</strong>（即，链接方法 <strong>Linkage</strong>）来回答这个问题。</p>
+<ul>
+<li><strong>Maximum or complete linkage clustering:</strong> Computes all pairwise dissimilarities between the elements in cluster 1 and the elements in cluster 2, and considers the largest value of these dissimilarities as the distance between the two clusters. It tends to produce more <strong>compact </strong>clusters.</li>
+<li><strong>Minimum or single linkage clustering:</strong> Computes all pairwise dissimilarities between the elements in cluster 1 and the elements in cluster 2, and considers the smallest of these dissimilarities as a linkage criterion. It tends to produce long, “<strong>loose</strong>” clusters.</li>
+<li><strong>Mean or average linkage clustering:</strong> Computes all pairwise dissimilarities between the elements in cluster 1 and the elements in cluster 2, and considers the average of these dissimilarities as the distance between the two clusters. Can vary in the compactness of the clusters it creates.</li>
+<li><strong>Centroid linkage clustering:</strong> Computes the dissimilarity between the centroid for cluster 1 (a mean vector of length p, one element for each variable) and the centroid for cluster 2.</li>
+<li><strong>Ward’s minimum variance method:</strong> Minimizes the total within-cluster variance. At each step the pair of clusters with the smallest between-cluster distance are merged. Tends to produce more compact clusters.</li>
+</ul>
+<blockquote>
+<p>最大或完整的链接聚类：计算聚类1中的元素与聚类2中的元素之间的所有成对相异性，并将这些相异性的最大值视为两个聚类之间的距离。它倾向于产生更紧凑的簇。</p>
+<p>最小或单个链接聚类：计算群集1中的元素与群集2中的元素之间的所有成对差异，并将这些差异中的最小值视为链接标准。它倾向于产生长的“松散”簇。</p>
+<p>均值或平均连锁聚类：计算聚类1中的元素与聚类2中的元素之间的所有成对差异，并将这些差异的平均值视为两个聚类之间的距离。可以改变它创建的集群的紧凑性。</p>
+<p>质心连锁聚类：计算聚类1的质心和聚类2的质心之间的差异（长度的平均向量 p ，每个变量一个元素。</p>
+<p>Ward的最小方差方法：最小化集群内的总方差。在每个步骤中，将群集间距离最小的一对群集合并。倾向于生产更紧凑的簇。</p>
+</blockquote>
+</div>
+</div>
+<div id="k-means-clustering" class="section level2 hasAnchor" number="7.2">
+<h2><span class="header-section-number">7.2</span> K-means Clustering<a href="cluster-analysis.html#k-means-clustering" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>像其他聚类算法一样，k均值试图将观察分为互斥组（或簇），以使同一聚类中的观察尽可能相似（即，类内相似度很高），而来自不同聚类的观察则尽可能不相似（即，类间相似度低）。在k均值聚类中，每个聚类都由其中心（即质心）表示，该中心对应于分配给该聚类的观测值的平均值。查找这些聚类的过程类似于k最近邻居（KNN）算法。</p>
+<p>但是，K-Means是无监督学习的聚类算法，没有样本输出；而KNN是监督学习的分类算法，有对应的类别输出。KNN基本不需要训练，对测试集里面的点，只需要找到在训练集中最近的k个点，用这最近的k个点的类别来决定测试点的类别。而K-Means则有明显的训练过程，找到k个类别的最佳质心，从而决定样本的簇类别。两者也有一些相似点，两个算法都包含一个过程，即找出和某一个点最近的点。两者都利用了最近邻(nearest neighbors)的思想</p>
+<p>K-Means算法的思想很简单，对于给定的样本集，按照样本之间的距离大小，将样本集划分为K个簇。让簇内的点尽量紧密的连在一起，而让簇间的距离尽量的大。如果用数据表达式表示，假设簇划分为 <span class="math inline">\((C_1,C_2,...C_k)\)</span> ，则我们的目标是最小化平方误差<span class="math inline">\(E\)</span>：</p>
+<p><span class="math display">\[
+E = \sum\limits_{i=1}^k\sum\limits_{x \in C_i} ||x-\mu_i||_2^2
+\]</span></p>
+<p>其中<span class="math inline">\(u_i\)</span>是簇<span class="math inline">\(C_i\)</span>的均值向量，有时也称为质心，表达式为：</p>
+<p><span class="math display">\[
+\mu_i = \frac{1}{|C_i|}\sum\limits_{x \in C_i}x
+\]</span></p>
+<p>直接求上式的最小值并不容易，只能采用迭代方法。假设<span class="math inline">\(k=2\)</span>。随机选择了两个k类所对应的类别质心，然后分别求样本中所有点到这两个质心的距离，并标记每个样本的类别为和该样本距离最小的质心的类别，经过计算样本和红色质心和蓝色质心的距离，我们得到了所有样本点的第一轮迭代后的类别。分别求其新的质心，新的质心位置已经发生了变动，即将所有点的类别标记为距离最近的质心的类别并求新的质心。</p>
+<div id="algorithm" class="section level3 hasAnchor" number="7.2.1">
+<h3><span class="header-section-number">7.2.1</span> Algorithm<a href="cluster-analysis.html#algorithm" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>使用K均值聚类时，需要明确指定所需的簇的数目，然后算法开始迭代，直到每个观测都属 于某个簇。算法的目标是使簇内的差异最小，簇内差异由欧氏距离的平方定义。所以，第k个簇 的簇内差异等于簇内所有两个观测之间的欧氏距离的平方和，再除以簇内观测的数量</p>
+<p>迭代过程:</p>
+<pre><code>1. 设定:你需要的簇的确切数量(k)。
+2. 初始化:随机选择k个观测作为初始均值。
+3. 迭代:
+   将每个观测分配给离它最近的簇中心点(使簇内平方和最小)，建立k个簇;
+   将每个簇的中心点作为新的均值;
+   重复上面两个步骤，直至收敛，即簇中心点不再改变。
+   </code></pre>
+<p>因为第1步中的初始分配是随机的，所以会造成每次聚类结果不一致。因此，重要 的一点是，要进行多次初始分配，让软件找出最优的解。</p>
+<p>更具体而言，对于K-Means算法，首先要注意的是k值的选择，一般来说，我们会根据对数据的先验经验选择一个合适的k值，如果没有什么先验知识，则可以通过交叉验证选择一个合适的k值。在确定了k的个数后，我们需要选择k个初始化的质心 (随机质心)。由于我们是启发式方法，k个初始化的质心的位置选择对最后的聚类结果和运行时间都有很大的影响，因此需要选择合适的k个质心，最好这些质心不能太近。</p>
+<p>初始分配是随机的，所以会造成每次聚类结果不一致。因此，重要的一点是，要进行多次初始分配，让软件找出最优的解。</p>
+<p>迭代过程: 输入是样本集 <span class="math inline">\(D=\left\{x_{1}, x_{2}, \ldots x_{m}\right\}\)</span>,聚类的族树k,最大迭代次数N 输出是族划分 <span class="math inline">\(C=\left\{C_{1}, C_{2}, \ldots C_{k}\right\}\)</span></p>
+<ol style="list-style-type: decimal">
+<li><p>从数据集D中随机选择k个样本作为初始的k个质心向量： <span class="math inline">\(\left\{\mu_{1}, \mu_{2}, \ldots, \mu_{k}\right\}\)</span></p></li>
+<li><p>对于 <span class="math inline">\(n=1,2, \ldots, N\)</span></p>
+<ol style="list-style-type: lower-alpha">
+<li>将族划分C初始化为 <span class="math inline">\(C_{t}=\varnothing t=1,2 \ldots k\)</span></li>
+<li>对于 <span class="math inline">\(i=1,2 \ldots\)</span>, 计算样本 <span class="math inline">\(x_{i}\)</span> 和各个质心向量 <span class="math inline">\(\mu_{j}(j=1,2, \ldots k)\)</span> 的距离: <span class="math inline">\(d_{i j}=\left\|x_{i}-\mu_{j}\right\|_{2}^{2},\)</span> 将 <span class="math inline">\(x_{i}\)</span> 标记最小的为 <span class="math inline">\(d_{i j}\)</span> 所对应的类别 <span class="math inline">\(\lambda_{i_{\circ}}\)</span> 此时 更新 <span class="math inline">\(C_{\lambda_{i}}=C_{\lambda_{i}} \cup\left\{x_{i}\right\}\)</span></li>
+<li>对于 <span class="math inline">\(j=1,2, \ldots, k,\)</span> 对 <span class="math inline">\(C_{j}\)</span> 中所有的样本点重新计算新的质心 <span class="math inline">\(\mu_{j}=\frac{1}{\left|C_{j}\right|} \sum_{x \in C_{j}} x\)</span></li>
+<li>如果所有的k个质心向量都没有发生变化, 则转到步骤3)</li>
+</ol></li>
+<li><p>输出族划分 <span class="math inline">\(C=\left\{C_{1}, C_{2}, \ldots C_{k}\right\}\)</span></p></li>
+</ol>
+</div>
+<div id="k-means" class="section level3 hasAnchor" number="7.2.2">
+<h3><span class="header-section-number">7.2.2</span> K-Means++<a href="cluster-analysis.html#k-means" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>初始化的质心的位置选择对最后的聚类结果和运行时间都有很大的影响，因此需要选择合适的k个质心。如果仅仅是完全随机的选择，有可能导致算法收敛很慢。K-Means++算法就是对K-Means随机初始化质心的方法的优化。</p>
+<p>K-Means++的对于初始化质心的优化策略如下：</p>
+<ul>
+<li><ol style="list-style-type: lower-alpha">
+<li>从输入的数据点集合中随机选择一个点作为第一个聚类中心 <span class="math inline">\(\mu_{1}\)</span></li>
+</ol></li>
+<li><ol start="2" style="list-style-type: lower-alpha">
+<li>对于数据集中的每一个点 <span class="math inline">\(x_{i},\)</span> 计算它与已选择的聚类中心中最近聚类中心的距离</li>
+</ol></li>
+</ul>
+<p><span class="math display">\[
+D\left(x_{i}\right)=\arg \min \left\|x_{i}-\mu_{r}\right\|_{2}^{2} r=1,2, \ldots k_{\text {selected }}
+\]</span></p>
+<ul>
+<li><ol start="3" style="list-style-type: lower-alpha">
+<li>选择一个新的数据点作为新的聚类中心, 选择的原则是: <span class="math inline">\(D(x)\)</span> 较大的点, 被选取作为聚类中心的概率较大</li>
+</ol></li>
+<li><ol start="4" style="list-style-type: lower-alpha">
+<li>重复b和c直到选择出k个聚类质心</li>
+</ol></li>
+<li><ol start="5" style="list-style-type: lower-alpha">
+<li>利用这k个质心来作为初始化质心去运行标准的K-Means算法</li>
+</ol></li>
+</ul>
+</div>
+<div id="elkan-k-means" class="section level3 hasAnchor" number="7.2.3">
+<h3><span class="header-section-number">7.2.3</span> elkan K-Means<a href="cluster-analysis.html#elkan-k-means" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>传统的K-Means算法中，我们在每轮迭代时，要计算所有的样本点到所有的质心的距离，这样会比较的耗时。elkan K-Means算法就是从这块入手加以改进。它的目标是减少不必要的距离的计算。如何定义不需要计算的距离。</p>
+<p>elkan K-Means利用了两边之和大于等于第三边,以及两边之差小于第三边的三角形性质, 来减少距离的计算。</p>
+<ol style="list-style-type: decimal">
+<li>第一种规律是对于一个样本点 <span class="math inline">\(x\)</span> 和两个质心 <span class="math inline">\(\mu_{j_{1}}, \mu_{j_{2} \circ}\)</span> 如果我们预先计算出了这两个质心之间的距离 <span class="math inline">\(D\left(j_{1}, j_{2}\right),\)</span> 则如果计算发现 <span class="math inline">\(2 D\left(x, j_{1}\right) \leq D\left(j_{1}, j_{2}\right)\)</span>,我们立即就可以知道 <span class="math inline">\(D\left(x, j_{1}\right) \leq D\left(x, j_{2}\right)\)</span> 。此时我们不需要再计算 <span class="math inline">\(D\left(x, j_{2}\right)\)</span>,也就是说省了一步距离计算。</li>
+<li>第二种规律是对于一个样本点 <span class="math inline">\(x\)</span> 和两个质心 <span class="math inline">\(\mu_{j_{1}}, \mu_{j_{2} \circ}\)</span> 我们可以得到 <span class="math inline">\(D\left(x, j_{2}\right) \geq \max \left\{0, D\left(x, j_{1}\right)-D\left(j_{1}, j_{2}\right)\right\}_{\circ}\)</span> 这个从三角形的性质也很容易得到。</li>
+</ol>
+<p>利用上边的两个规律，elkan K-Means比起传统的K-Means迭代速度有很大的提高。但是如果我们的样本的<strong>特征是稀疏的</strong>，<strong>有缺失值的话</strong>，这个方法就不使用了，此时某些距离无法计算，则不能使用该算法。</p>
+</div>
+<div id="mini-batch-k-means" class="section level3 hasAnchor" number="7.2.4">
+<h3><span class="header-section-number">7.2.4</span> Mini Batch K-Means<a href="cluster-analysis.html#mini-batch-k-means" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>传统的K-Means算法中，要计算所有的样本点到所有的质心的距离。如果样本量非常大，比如达到10万以上，特征有100以上，此时用传统的K-Means算法非常的耗时，就算加上elkan K-Means优化也依旧。在大数据时代，这样的场景越来越多。此时Mini Batch K-Means应运而生。</p>
+<p>Mini Batch，也就是用样本集中的一部分的样本来做传统的K-Means，这样可以避免样本量太大时的计算难题，算法收敛速度大大加快。当然此时的代价就是我们的聚类的精确度也会有一些降低。一般来说这个降低的幅度在可以接受的范围之内。</p>
+<p>在Mini Batch K-Means中，我们会选择一个合适的批样本大小batch size，我们仅仅用batch size个样本来做K-Means聚类。batch size一般是通过无放回的随机采样得到的。为了增加算法的准确性，一般会多跑几次Mini Batch K-Means算法，用得到不同的随机采样集来得到聚类簇，选择其中最优的聚类簇。</p>
+</div>
+</div>
+<div id="gowers-coefficient-and-pam" class="section level2 hasAnchor" number="7.3">
+<h2><span class="header-section-number">7.3</span> Gower’s coefficient and PAM<a href="cluster-analysis.html#gowers-coefficient-and-pam" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="gowers-coefficient" class="section level3 hasAnchor" number="7.3.1">
+<h3><span class="header-section-number">7.3.1</span> Gower’s coefficient<a href="cluster-analysis.html#gowers-coefficient" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><strong>果瓦系数与围绕中心的划分</strong></p>
+<p>无论层次聚类还是K均值聚类，都不是为分析混合数据(既包括定量数据又包括定性数据)而专门设计的</p>
+<p>使用果瓦相异度系数将混合数据转换为适当的特征 空间。在这种方法中，你甚至可以使用因子作为输入变量
+处理混合数据，比 如可以先进行主成分分析, 建立潜变量，然后使用潜变量作为聚类的输入
+聚类算法使用 PAM聚类算法，而不是K均值, PAM和K均值很相似, 有两个明显的优点</p>
+<pre><code>    1. PAM可以接受相异度矩阵作为输入，这样即可处理混合数据
+    2. PAM对于异常值和不对称数据的鲁棒性更好，因为它最小化的是相异度总和，而不是欧氏距离的平方和</code></pre>
+<p>果瓦系数比较两个成对的实例，并计算它们之间的相异度，实质上就是每个变量的贡献的加
+权平均值。对于两个实例i与j，果瓦系数定义如下</p>
+<p><span class="math display">\[S_{ij} = sum(W_{ijk} * S_{ijk}) / sum(W_{ijk})\]</span></p>
+<p><span class="math inline">\(S_{ijk}\)</span>是第k个变量的贡献。如果第k个变量是有效的，<span class="math inline">\(W_{ijk}\)</span>是1，否则是0</p>
+</div>
+<div id="不同数据类型的相异度计算-距离法" class="section level3 hasAnchor" number="7.3.2">
+<h3><span class="header-section-number">7.3.2</span> 不同数据类型的相异度计算 (距离法)<a href="cluster-analysis.html#不同数据类型的相异度计算-距离法" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>把一个观测看做M维空间中的一个点，并在空间中定义距离。基于距离的聚类算法是把距离较近的点可以归入同一类，距离远的点归入不同的类。常见的距离度量方法有欧几里得距离、切比雪夫距离、曼哈顿距离、兰氏距离等方法。</p>
+<div id="欧几里得距离" class="section level4 hasAnchor" number="7.3.2.1">
+<h4><span class="header-section-number">7.3.2.1</span> 欧几里得距离<a href="cluster-analysis.html#欧几里得距离" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="cluster-analysis.html#cb3-1" tabindex="-1"></a>a<span class="ot">=</span><span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">15</span>,<span class="dv">0</span>,<span class="dv">1</span>),<span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">5</span>))</span>
+<span id="cb3-2"><a href="cluster-analysis.html#cb3-2" tabindex="-1"></a>a</span></code></pre></div>
+<pre><code>##            [,1]       [,2]      [,3]       [,4]      [,5]
+## [1,]  0.3338712 -0.7225623 0.3726854  0.2914192 0.2840056
+## [2,]  0.7404156  0.8378785 0.8265053  0.3121176 1.0589243
+## [3,] -1.3334057 -0.5909941 0.3950604 -1.4451768 0.9707263</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="cluster-analysis.html#cb5-1" tabindex="-1"></a><span class="fu">dist</span>(a,<span class="at">p=</span><span class="dv">2</span>)</span></code></pre></div>
+<pre><code>##          1        2
+## 2 1.845842         
+## 3 2.506985 3.102325</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="cluster-analysis.html#cb7-1" tabindex="-1"></a><span class="do">## 第一个行与第二行的距离为2.174710；第二行与第三行的距离为3.966592</span></span></code></pre></div>
+</div>
+<div id="切比雪夫距离" class="section level4 hasAnchor" number="7.3.2.2">
+<h4><span class="header-section-number">7.3.2.2</span> 切比雪夫距离<a href="cluster-analysis.html#切比雪夫距离" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>国际象棋中，国王可以直行、横行、斜行，所以国王走一步可以移动到相邻8个方格中的任意一个。国王从格子(x1,y1)走到格子(x2,y2)最少需要多少步？这个距离就叫切比雪夫距离。</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="cluster-analysis.html#cb8-1" tabindex="-1"></a>a<span class="ot">=</span><span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">15</span>,<span class="dv">0</span>,<span class="dv">1</span>),<span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">5</span>))</span>
+<span id="cb8-2"><a href="cluster-analysis.html#cb8-2" tabindex="-1"></a>a</span></code></pre></div>
+<pre><code>##           [,1]       [,2]       [,3]       [,4]       [,5]
+## [1,] 0.1117122  0.8403100 -0.6520138 -2.3940580  1.0728330
+## [2,] 0.3572810  1.0303105 -1.9769264 -2.2479159  0.3013864
+## [3,] 0.9981739 -0.1852447  0.5170461  0.6402833 -0.5679983</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="cluster-analysis.html#cb10-1" tabindex="-1"></a><span class="fu">dist</span>(a,<span class="st">&quot;maximum&quot;</span>)</span></code></pre></div>
+<pre><code>##          1        2
+## 2 1.324913         
+## 3 3.034341 2.888199</code></pre>
+</div>
+<div id="曼哈顿距离" class="section level4 hasAnchor" number="7.3.2.3">
+<h4><span class="header-section-number">7.3.2.3</span> 曼哈顿距离<a href="cluster-analysis.html#曼哈顿距离" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>顾名思义，在曼哈顿街区要从一个十字路口开车到另一个十字路口，驾驶距离显然不是两点间的直线距离。这个实际驾驶距离就是“曼哈顿距离”。曼哈顿距离也称为“城市街区距离”(City Block distance)。</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="cluster-analysis.html#cb12-1" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">15</span>,<span class="dv">0</span>,<span class="dv">1</span>),<span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">5</span>))</span>
+<span id="cb12-2"><a href="cluster-analysis.html#cb12-2" tabindex="-1"></a><span class="fu">dist</span>(aa,<span class="st">&quot;manhattan&quot;</span>)</span></code></pre></div>
+<pre><code>##          1        2
+## 2 6.582910         
+## 3 4.302595 6.719444</code></pre>
+</div>
+<div id="兰氏距离" class="section level4 hasAnchor" number="7.3.2.4">
+<h4><span class="header-section-number">7.3.2.4</span> 兰氏距离<a href="cluster-analysis.html#兰氏距离" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>兰氏距离对数据的量纲不敏感。不过兰氏距离假定变量之间相互独立，没有考虑变量之间的相关性。</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="cluster-analysis.html#cb14-1" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">15</span>,<span class="dv">0</span>,<span class="dv">1</span>),<span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">5</span>))</span>
+<span id="cb14-2"><a href="cluster-analysis.html#cb14-2" tabindex="-1"></a><span class="fu">dist</span>(aa, <span class="at">method =</span> <span class="st">&quot;canberra&quot;</span>)</span></code></pre></div>
+<pre><code>##          1        2
+## 2 3.563766         
+## 3 3.092767 2.351222</code></pre>
+</div>
+</div>
+<div id="pam" class="section level3 hasAnchor" number="7.3.3">
+<h3><span class="header-section-number">7.3.3</span> PAM<a href="cluster-analysis.html#pam" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>中心点是簇内所有观测中，使相异度(使用果瓦系数表示)最小的那个观测。所
+以，同K均值一样，如果指定5个簇，就可以将数据划分为5份。</p>
+<p>PAM算法的目标是，使所有观测与离它们最近的中心点的相异度最小。该算法按照下面的步骤迭代:</p>
+<pre><code>1. 随机选择k个观测作为初始中心点;
+2. 将每个观测分配至最近的中心点;
+3. 用非中心点观测替换中心点，并计算相异度的变化;
+4. 选择能使总相异度最小的配置;
+5. 重复第(2)步~第(4)步，直至中心点不再变化。</code></pre>
+<p>果瓦系数和PAM都可以使用R中的cluster包实现。使用daisy()函数计算相异度矩阵，从而 计算果瓦系数，然后使用pam()函数进行实际的数据划分</p>
+</div>
+</div>
+<div id="birch-clustering" class="section level2 hasAnchor" number="7.4">
+<h2><span class="header-section-number">7.4</span> BIRCH Clustering<a href="cluster-analysis.html#birch-clustering" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="birch-introduction" class="section level3 hasAnchor" number="7.4.1">
+<h3><span class="header-section-number">7.4.1</span> BIRCH Introduction<a href="cluster-analysis.html#birch-introduction" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>BIRCH的全称是利用层次方法的平衡迭代规约和聚类（Balanced Iterative Reducing and Clustering Using Hierarchies）. BIRCH算法比较适合于数据量大，类别数K也比较多的情况。它运行速度很快，只需要单遍扫描数据集就能进行聚类.</p>
+<p>BIRCH算法利用了一个树结构来帮助我们快速的聚类，这个数结构类似于平衡B+树，一般将它称之为聚类特征树(Clustering Feature Tree，简称CF Tree)。这颗树的每一个节点是由若干个聚类特征(Clustering Feature，简称CF)组成。个节点包括叶子节点都有若干个CF，而内部节点的CF有指向孩子节点的指针，所有的叶子节点用一个双向链表链接起来。</p>
+</div>
+<div id="聚类特征cf与聚类特征树cf-tree" class="section level3 hasAnchor" number="7.4.2">
+<h3><span class="header-section-number">7.4.2</span> 聚类特征CF与聚类特征树CF Tree<a href="cluster-analysis.html#聚类特征cf与聚类特征树cf-tree" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>在聚类特征树中，一个聚类特征CF是这样定义的：每一个CF是一个三元组，可以用（N，LS，SS）表示。其中N代表了这个CF中拥有的样本点的数量；LS代表了这个CF中拥有的样本点各特征维度的和向量，SS代表了这个CF中拥有的样本点各特征维度的平方和。</p>
+<p>例子，在CF Tree中的某一个节点的某一个CF中，有下面5个样本(3,4), (2,6), (4,5), (4,7), (3,8)。则它对应的N=5， <span class="math inline">\(LS=(3+2+4+4+3, 4+6+5+7+8) = (16,30)\)</span>$ , $<span class="math inline">\(SS=(3^2+2^2+4^2 +4^2+3^2 + 4^2+6^2+5^2 +7^2+8^2) = (54 + 190) = 244\)</span></p>
+<p>CF有一个很好的性质，就是满足线性关系， <span class="math inline">\(CF1+CF2 = (N_1+N_2, LS_1+LS_2, SS_1 +SS_2)\)</span> 如果把这个性质放在CF Tree上，对于每个父节点中的CF节点，它的(N,LS,SS)三元组的值等于这个CF节点所指向的所有子节点的三元组之和。</p>
+<p>对于CF Tree，我们一般有几个重要参数，第一个参数是每个内部节点的最大CF数B，第二个参数是每个叶子节点的最大CF数L，第三个参数是针对叶子节点中某个CF中的样本点来说的，它是叶节点每个CF的最大样本半径阈值T，也就是说，在这个CF中的所有样本点一定要在半径小于T的一个超球体内。</p>
+</div>
+<div id="cf-tree的生成" class="section level3 hasAnchor" number="7.4.3">
+<h3><span class="header-section-number">7.4.3</span> CF Tree的生成<a href="cluster-analysis.html#cf-tree的生成" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ol style="list-style-type: decimal">
+<li>从根节点向下寻找和新样本距离最近的叶子节点和叶子节点里最近的CF节点</li>
+<li>如果新样本加入后，这个CF节点对应的超球体半径仍然满足小于阈值T，则更新路径上所有的CF三元组，插入结束。否则转入3.</li>
+<li>如果当前叶子节点的CF节点个数小于阈值L，则创建一个新的CF节点，放入新样本，将新的CF节点放入这个叶子节点，更新路径上所有的CF三元组，插入结束。否则转入4。</li>
+<li>将当前叶子节点划分为两个新叶子节点，选择旧叶子节点中所有CF元组里超球体距离最远的两个CF元组，分布作为两个新叶子节点的第一个CF节点。将其他元组和新样本元组按照距离远近原则放入对应的叶子节点。依次向上检查父节点是否也要分裂，如果需要按和叶子节点分裂方式相同。</li>
+</ol>
+</div>
+<div id="birch算法" class="section level3 hasAnchor" number="7.4.4">
+<h3><span class="header-section-number">7.4.4</span> BIRCH算法<a href="cluster-analysis.html#birch算法" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>将所有的训练集样本建立了CF Tree，一个基本的BIRCH算法就完成了，对应的输出就是若干个CF节点，每个节点里的样本点就是一个聚类的簇。也就是说BIRCH算法的主要过程，就是建立CF Tree的过程。(有一些可选的算法步骤)</p>
+<ol style="list-style-type: decimal">
+<li>将所有的样本依次读入，在内存中建立一颗CF Tree</li>
+<li>（可选）将第一步建立的CF Tree进行筛选，去除一些异常CF节点，这些节点一般里面的样本点很少。对于一些超球体距离非常近的元组进行合并</li>
+<li>（可选）利用其它的一些聚类算法比如K-Means对所有的CF元组进行聚类，得到一颗比较好的CF Tree.这一步的主要目的是消除由于样本读入顺序导致的不合理的树结构，以及一些由于节点CF个数限制导致的树结构分裂。</li>
+<li>（可选）利用第三步生成的CF Tree的所有CF节点的质心，作为初始质心点，对所有的样本点按距离远近进行聚类。这样进一步减少了由于CF Tree的一些限制导致的聚类不合理的情况。</li>
+</ol>
+</div>
+</div>
+<div id="application-3" class="section level2 hasAnchor" number="7.5">
+<h2><span class="header-section-number">7.5</span> Application<a href="cluster-analysis.html#application-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="data-preparation-5" class="section level3 hasAnchor" number="7.5.1">
+<h3><span class="header-section-number">7.5.1</span> Data preparation<a href="cluster-analysis.html#data-preparation-5" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="cluster-analysis.html#cb17-1" tabindex="-1"></a><span class="fu">library</span>(cluster)       <span class="co"># conduct cluster analysis</span></span>
+<span id="cb17-2"><a href="cluster-analysis.html#cb17-2" tabindex="-1"></a><span class="fu">library</span>(compareGroups) <span class="co"># build descriptive statistic tables</span></span>
+<span id="cb17-3"><a href="cluster-analysis.html#cb17-3" tabindex="-1"></a><span class="fu">library</span>(HDclassif)     <span class="co"># contains the dataset</span></span>
+<span id="cb17-4"><a href="cluster-analysis.html#cb17-4" tabindex="-1"></a><span class="fu">library</span>(NbClust)       <span class="co"># cluster validity measures</span></span>
+<span id="cb17-5"><a href="cluster-analysis.html#cb17-5" tabindex="-1"></a><span class="fu">library</span>(sparcl)        <span class="co"># colored dendrogram</span></span>
+<span id="cb17-6"><a href="cluster-analysis.html#cb17-6" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="cluster-analysis.html#cb17-7" tabindex="-1"></a><span class="do">## 数据集位于HDclassif包</span></span>
+<span id="cb17-8"><a href="cluster-analysis.html#cb17-8" tabindex="-1"></a><span class="do">## 数据包括178种葡萄酒，有13个变量表示酒中的化学成分，还有一个标号变量Class，表示品 种等级或葡萄种植品种。在聚类过程中，我们不会使用这个标号变量，而是用它验证模型性能。</span></span>
+<span id="cb17-9"><a href="cluster-analysis.html#cb17-9" tabindex="-1"></a><span class="fu">data</span>(wine)</span>
+<span id="cb17-10"><a href="cluster-analysis.html#cb17-10" tabindex="-1"></a><span class="fu">str</span>(wine)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    178 obs. of  14 variables:
+##  $ class: int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ V1   : num  14.2 13.2 13.2 14.4 13.2 ...
+##  $ V2   : num  1.71 1.78 2.36 1.95 2.59 1.76 1.87 2.15 1.64 1.35 ...
+##  $ V3   : num  2.43 2.14 2.67 2.5 2.87 2.45 2.45 2.61 2.17 2.27 ...
+##  $ V4   : num  15.6 11.2 18.6 16.8 21 15.2 14.6 17.6 14 16 ...
+##  $ V5   : int  127 100 101 113 118 112 96 121 97 98 ...
+##  $ V6   : num  2.8 2.65 2.8 3.85 2.8 3.27 2.5 2.6 2.8 2.98 ...
+##  $ V7   : num  3.06 2.76 3.24 3.49 2.69 3.39 2.52 2.51 2.98 3.15 ...
+##  $ V8   : num  0.28 0.26 0.3 0.24 0.39 0.34 0.3 0.31 0.29 0.22 ...
+##  $ V9   : num  2.29 1.28 2.81 2.18 1.82 1.97 1.98 1.25 1.98 1.85 ...
+##  $ V10  : num  5.64 4.38 5.68 7.8 4.32 6.75 5.25 5.05 5.2 7.22 ...
+##  $ V11  : num  1.04 1.05 1.03 0.86 1.04 1.05 1.02 1.06 1.08 1.01 ...
+##  $ V12  : num  3.92 3.4 3.17 3.45 2.93 2.85 3.58 3.58 2.85 3.55 ...
+##  $ V13  : int  1065 1050 1185 1480 735 1450 1290 1295 1045 1045 ...</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="cluster-analysis.html#cb19-1" tabindex="-1"></a><span class="fu">names</span>(wine) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Class&quot;</span>, <span class="st">&quot;Alcohol&quot;</span>, <span class="st">&quot;MalicAcid&quot;</span>, <span class="st">&quot;Ash&quot;</span>, <span class="st">&quot;Alk_ash&quot;</span>,</span>
+<span id="cb19-2"><a href="cluster-analysis.html#cb19-2" tabindex="-1"></a>                 <span class="st">&quot;magnesium&quot;</span>, <span class="st">&quot;T_phenols&quot;</span>, <span class="st">&quot;Flavanoids&quot;</span>, <span class="st">&quot;Non_flav&quot;</span>,</span>
+<span id="cb19-3"><a href="cluster-analysis.html#cb19-3" tabindex="-1"></a>                 <span class="st">&quot;Proantho&quot;</span>, <span class="st">&quot;C_Intensity&quot;</span>, <span class="st">&quot;Hue&quot;</span>, <span class="st">&quot;OD280_315&quot;</span>, <span class="st">&quot;Proline&quot;</span>)</span>
+<span id="cb19-4"><a href="cluster-analysis.html#cb19-4" tabindex="-1"></a><span class="fu">names</span>(wine)</span></code></pre></div>
+<pre><code>##  [1] &quot;Class&quot;       &quot;Alcohol&quot;     &quot;MalicAcid&quot;   &quot;Ash&quot;         &quot;Alk_ash&quot;    
+##  [6] &quot;magnesium&quot;   &quot;T_phenols&quot;   &quot;Flavanoids&quot;  &quot;Non_flav&quot;    &quot;Proantho&quot;   
+## [11] &quot;C_Intensity&quot; &quot;Hue&quot;         &quot;OD280_315&quot;   &quot;Proline&quot;</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="cluster-analysis.html#cb21-1" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">scale</span>(wine[, <span class="sc">-</span><span class="dv">1</span>]))</span>
+<span id="cb21-2"><a href="cluster-analysis.html#cb21-2" tabindex="-1"></a><span class="fu">str</span>(df)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    178 obs. of  13 variables:
+##  $ Alcohol    : num  1.514 0.246 0.196 1.687 0.295 ...
+##  $ MalicAcid  : num  -0.5607 -0.498 0.0212 -0.3458 0.2271 ...
+##  $ Ash        : num  0.231 -0.826 1.106 0.487 1.835 ...
+##  $ Alk_ash    : num  -1.166 -2.484 -0.268 -0.807 0.451 ...
+##  $ magnesium  : num  1.9085 0.0181 0.0881 0.9283 1.2784 ...
+##  $ T_phenols  : num  0.807 0.567 0.807 2.484 0.807 ...
+##  $ Flavanoids : num  1.032 0.732 1.212 1.462 0.661 ...
+##  $ Non_flav   : num  -0.658 -0.818 -0.497 -0.979 0.226 ...
+##  $ Proantho   : num  1.221 -0.543 2.13 1.029 0.4 ...
+##  $ C_Intensity: num  0.251 -0.292 0.268 1.183 -0.318 ...
+##  $ Hue        : num  0.361 0.405 0.317 -0.426 0.361 ...
+##  $ OD280_315  : num  1.843 1.11 0.786 1.181 0.448 ...
+##  $ Proline    : num  1.0102 0.9625 1.3912 2.328 -0.0378 ...</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="cluster-analysis.html#cb23-1" tabindex="-1"></a><span class="fu">table</span>(wine<span class="sc">$</span>Class)</span></code></pre></div>
+<pre><code>## 
+##  1  2  3 
+## 59 71 48</code></pre>
+</div>
+<div id="hierarchical-clustering-1" class="section level3 hasAnchor" number="7.5.2">
+<h3><span class="header-section-number">7.5.2</span> Hierarchical Clustering<a href="cluster-analysis.html#hierarchical-clustering-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>要在R中建立层次聚类模型，可以使用stats包中的hclust()函数。这个函数需要两个基本输 入:距离矩阵和聚类方法。使用dist()函数可以轻松生成距离矩阵，我们使用的是欧氏距离。 可以使用的聚类方法有若干种，hclust()函数使用的默认方法是最大距离法</p>
+<p>30种不同的聚类有效性指标。表现最好的前5种指标是CH指数、Duda指数、Cindex、Gamma 和Beale指数。另外一种确定簇数目的著名方法是gap统计量</p>
+<p>在R中，我们可以使用NbClust包中的NbClust()函数，求出23种聚类有效性指标的结果，包 括Miligan和Cooper论文中最好的5种和gap统计量</p>
+<p>使用这个函数时，你需要指定簇的最小值和最大值、距离类型、测距方式和有效性指标。在以下的代码中可以看到，我们要建立一个名 为numComplete的对象，函数指定使用欧氏距离，簇的最小数量为2，最大数量为6，测距方式为 最大距离法，并使用所有有效性指标。</p>
+<p>Hubert指数图:
+在左侧的图中，你要找出一 个明显的拐点;在右侧的图中，你要找到峰值.左图在3个簇的地方有个拐点，右图在3个簇的时候达到峰值</p>
+<p>Dindex图:提供了同样的信息</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="cluster-analysis.html#cb25-1" tabindex="-1"></a>numComplete <span class="ot">&lt;-</span> <span class="fu">NbClust</span>(df, <span class="at">distance =</span> <span class="st">&quot;euclidean&quot;</span>, </span>
+<span id="cb25-2"><a href="cluster-analysis.html#cb25-2" tabindex="-1"></a>                       <span class="at">min.nc =</span> <span class="dv">2</span>, <span class="at">max.nc =</span> <span class="dv">6</span>, </span>
+<span id="cb25-3"><a href="cluster-analysis.html#cb25-3" tabindex="-1"></a>                       <span class="at">method =</span> <span class="st">&quot;complete&quot;</span>, <span class="at">index =</span> <span class="st">&quot;all&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/Hierarchical%20Clustering-1.png" width="672" /></p>
+<pre><code>## *** : The Hubert index is a graphical method of determining the number of clusters.
+##                 In the plot of Hubert index, we seek a significant knee that corresponds to a 
+##                 significant increase of the value of the measure i.e the significant peak in Hubert
+##                 index second differences plot. 
+## </code></pre>
+<p><img src="bookdown_files/figure-html/Hierarchical%20Clustering-2.png" width="672" /></p>
+<pre><code>## *** : The D index is a graphical method of determining the number of clusters. 
+##                 In the plot of D index, we seek a significant knee (the significant peak in Dindex
+##                 second differences plot) that corresponds to a significant increase of the value of
+##                 the measure. 
+##  
+## ******************************************************************* 
+## * Among all indices:                                                
+## * 1 proposed 2 as the best number of clusters 
+## * 11 proposed 3 as the best number of clusters 
+## * 6 proposed 5 as the best number of clusters 
+## * 5 proposed 6 as the best number of clusters 
+## 
+##                    ***** Conclusion *****                            
+##  
+## * According to the majority rule, the best number of clusters is  3 
+##  
+##  
+## *******************************************************************</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="cluster-analysis.html#cb28-1" tabindex="-1"></a><span class="do">## 每种有效性指标的最优簇数 量和与之对应的指标值</span></span>
+<span id="cb28-2"><a href="cluster-analysis.html#cb28-2" tabindex="-1"></a><span class="do">## 第一个指标(KL)的最优簇数量是5，第二个指标(CH)的最优簇数量是3</span></span>
+<span id="cb28-3"><a href="cluster-analysis.html#cb28-3" tabindex="-1"></a>numComplete<span class="sc">$</span>Best.nc</span></code></pre></div>
+<pre><code>##                      KL      CH Hartigan   CCC    Scott      Marriot   TrCovW
+## Number_clusters  5.0000  3.0000   3.0000 5.000   3.0000 3.000000e+00     3.00
+## Value_Index     14.2227 48.9898  27.8971 1.148 340.9634 6.872632e+25 22389.83
+##                   TraceW Friedman   Rubin Cindex     DB Silhouette   Duda
+## Number_clusters   3.0000   3.0000  5.0000 3.0000 6.0000     3.0000 5.0000
+## Value_Index     256.4861  10.6941 -0.1489 0.3551 1.6018     0.2038 0.8856
+##                 PseudoT2  Beale Ratkowsky     Ball PtBiserial Frey McClain
+## Number_clusters   5.0000 5.0000    3.0000   3.0000     6.0000    1  2.0000
+## Value_Index       6.3314 1.1253    0.3318 462.0304     0.5877   NA  0.7687
+##                   Dunn Hubert SDindex Dindex   SDbw
+## Number_clusters 6.0000      0  6.0000      0 6.0000
+## Value_Index     0.1892      0  0.9951      0 0.5031</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="cluster-analysis.html#cb30-1" tabindex="-1"></a><span class="do">## 选择3个簇进行聚类，现在计算距离矩阵，并建立层次聚类模型</span></span>
+<span id="cb30-2"><a href="cluster-analysis.html#cb30-2" tabindex="-1"></a>dis <span class="ot">&lt;-</span> <span class="fu">dist</span>(df, <span class="at">method =</span> <span class="st">&quot;euclidean&quot;</span>)</span>
+<span id="cb30-3"><a href="cluster-analysis.html#cb30-3" tabindex="-1"></a>hc <span class="ot">&lt;-</span> <span class="fu">hclust</span>(dis, <span class="at">method =</span> <span class="st">&quot;complete&quot;</span>)</span>
+<span id="cb30-4"><a href="cluster-analysis.html#cb30-4" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="cluster-analysis.html#cb30-5" tabindex="-1"></a><span class="do">## 可视化的通用方式是画出树状图，可以用plot函数实现。注意，参数hang=-1表示 将观测排列在图的底部</span></span>
+<span id="cb30-6"><a href="cluster-analysis.html#cb30-6" tabindex="-1"></a><span class="do">## 树状图表明了观测是如何聚集的，图中的连接(也可称为分支)告诉我们哪些观测是相 似的。分支的高度表示观测之间相似或相异的程度</span></span>
+<span id="cb30-7"><a href="cluster-analysis.html#cb30-7" tabindex="-1"></a><span class="fu">plot</span>(hc, <span class="at">hang =</span> <span class="sc">-</span><span class="dv">1</span>,<span class="at">labels =</span> <span class="cn">FALSE</span>, <span class="at">main =</span> <span class="st">&quot;Complete-Linkage&quot;</span>)</span>
+<span id="cb30-8"><a href="cluster-analysis.html#cb30-8" tabindex="-1"></a></span>
+<span id="cb30-9"><a href="cluster-analysis.html#cb30-9" tabindex="-1"></a><span class="do">## 想使聚类可视化效果更好，可以使用sparcl包生成彩色树状图。要对合适数目的簇上色， 需要使用cutree()函数对树状图进行剪枝，以得到合适的簇的数目。这个函数还可以为每个观 测生成簇标号:</span></span>
+<span id="cb30-10"><a href="cluster-analysis.html#cb30-10" tabindex="-1"></a>comp3 <span class="ot">&lt;-</span> <span class="fu">cutree</span>(hc, <span class="dv">3</span>)</span>
+<span id="cb30-11"><a href="cluster-analysis.html#cb30-11" tabindex="-1"></a><span class="fu">ColorDendrogram</span>(hc, <span class="at">y =</span> comp3, <span class="at">main =</span> <span class="st">&quot;Complete&quot;</span>, <span class="at">branchlength =</span> <span class="dv">50</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/Hierarchical%20Clustering-3.png" width="672" /></p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="cluster-analysis.html#cb31-1" tabindex="-1"></a><span class="do">## 我指定了参数branchlength=50，这个值要根据你自己的数据确定。因为我们已 经有了簇标号，所以可以建立一个表格查看每个簇中观测的数量</span></span>
+<span id="cb31-2"><a href="cluster-analysis.html#cb31-2" tabindex="-1"></a><span class="fu">table</span>(comp3)</span></code></pre></div>
+<pre><code>## comp3
+##  1  2  3 
+## 69 58 51</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="cluster-analysis.html#cb33-1" tabindex="-1"></a><span class="fu">table</span>(comp3, wine<span class="sc">$</span>Class)</span></code></pre></div>
+<pre><code>##      
+## comp3  1  2  3
+##     1 51 18  0
+##     2  8 50  0
+##     3  0  3 48</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="cluster-analysis.html#cb35-1" tabindex="-1"></a><span class="do">## 行是簇标号，列是品种等级标号。聚类结果匹配了84%的品种等级</span></span>
+<span id="cb35-2"><a href="cluster-analysis.html#cb35-2" tabindex="-1"></a>(<span class="dv">51</span><span class="sc">+</span><span class="dv">50</span><span class="sc">+</span><span class="dv">48</span>)<span class="sc">/</span><span class="dv">178</span></span></code></pre></div>
+<pre><code>## [1] 0.8370787</code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="cluster-analysis.html#cb37-1" tabindex="-1"></a><span class="do">## Ward距离法。代码和前面的一样，首先确定簇的数目，应该将method的值改为 Ward.D2</span></span>
+<span id="cb37-2"><a href="cluster-analysis.html#cb37-2" tabindex="-1"></a>numWard <span class="ot">&lt;-</span> <span class="fu">NbClust</span>(df, <span class="at">diss =</span> <span class="cn">NULL</span>, <span class="at">distance =</span> <span class="st">&quot;euclidean&quot;</span>, </span>
+<span id="cb37-3"><a href="cluster-analysis.html#cb37-3" tabindex="-1"></a>        <span class="at">min.nc =</span> <span class="dv">2</span>, </span>
+<span id="cb37-4"><a href="cluster-analysis.html#cb37-4" tabindex="-1"></a>        <span class="at">max.nc =</span> <span class="dv">6</span>, </span>
+<span id="cb37-5"><a href="cluster-analysis.html#cb37-5" tabindex="-1"></a>        <span class="at">method=</span> <span class="st">&quot;ward.D2&quot;</span>, </span>
+<span id="cb37-6"><a href="cluster-analysis.html#cb37-6" tabindex="-1"></a>        <span class="at">index =</span> <span class="st">&quot;all&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/Hierarchical%20Clustering-4.png" width="672" /></p>
+<pre><code>## *** : The Hubert index is a graphical method of determining the number of clusters.
+##                 In the plot of Hubert index, we seek a significant knee that corresponds to a 
+##                 significant increase of the value of the measure i.e the significant peak in Hubert
+##                 index second differences plot. 
+## </code></pre>
+<p><img src="bookdown_files/figure-html/Hierarchical%20Clustering-5.png" width="672" /></p>
+<pre><code>## *** : The D index is a graphical method of determining the number of clusters. 
+##                 In the plot of D index, we seek a significant knee (the significant peak in Dindex
+##                 second differences plot) that corresponds to a significant increase of the value of
+##                 the measure. 
+##  
+## ******************************************************************* 
+## * Among all indices:                                                
+## * 2 proposed 2 as the best number of clusters 
+## * 18 proposed 3 as the best number of clusters 
+## * 2 proposed 6 as the best number of clusters 
+## 
+##                    ***** Conclusion *****                            
+##  
+## * According to the majority rule, the best number of clusters is  3 
+##  
+##  
+## *******************************************************************</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="cluster-analysis.html#cb40-1" tabindex="-1"></a>hcWard <span class="ot">&lt;-</span> <span class="fu">hclust</span>(dis, <span class="at">method =</span> <span class="st">&quot;ward.D2&quot;</span>)</span>
+<span id="cb40-2"><a href="cluster-analysis.html#cb40-2" tabindex="-1"></a><span class="fu">plot</span>(hcWard, <span class="at">hang =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">labels =</span> <span class="cn">FALSE</span>, <span class="at">main =</span> <span class="st">&quot;Ward&#39;s-Linkage&quot;</span>)</span>
+<span id="cb40-3"><a href="cluster-analysis.html#cb40-3" tabindex="-1"></a></span>
+<span id="cb40-4"><a href="cluster-analysis.html#cb40-4" tabindex="-1"></a><span class="do">## 图中显示的3个簇区别十分明显，每个簇中观测的数量大致相同。计算每个簇的大小，并与 品种等级标号进行比较</span></span>
+<span id="cb40-5"><a href="cluster-analysis.html#cb40-5" tabindex="-1"></a>ward3 <span class="ot">&lt;-</span> <span class="fu">cutree</span>(hcWard, <span class="dv">3</span>)</span>
+<span id="cb40-6"><a href="cluster-analysis.html#cb40-6" tabindex="-1"></a><span class="fu">table</span>(ward3, wine<span class="sc">$</span>Class)  </span></code></pre></div>
+<pre><code>##      
+## ward3  1  2  3
+##     1 59  5  0
+##     2  0 58  0
+##     3  0  8 48</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="cluster-analysis.html#cb42-1" tabindex="-1"></a><span class="do">## 另一个表比较两种方法的观测匹配情况</span></span>
+<span id="cb42-2"><a href="cluster-analysis.html#cb42-2" tabindex="-1"></a><span class="fu">table</span>(comp3, ward3)</span></code></pre></div>
+<pre><code>##      ward3
+## comp3  1  2  3
+##     1 53 11  5
+##     2 11 47  0
+##     3  0  0 51</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="cluster-analysis.html#cb44-1" tabindex="-1"></a><span class="do">## 箱线图可以很好地比较变量的分布，它可以展示最小值、第一四分位数、中位数、第三四分 位数、最大值和可能的离群点</span></span>
+<span id="cb44-2"><a href="cluster-analysis.html#cb44-2" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/Hierarchical%20Clustering-6.png" width="672" /></p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="cluster-analysis.html#cb45-1" tabindex="-1"></a><span class="fu">boxplot</span>(wine<span class="sc">$</span>Proline <span class="sc">~</span> comp3, </span>
+<span id="cb45-2"><a href="cluster-analysis.html#cb45-2" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">&quot;Proline by Complete Linkage&quot;</span>)</span>
+<span id="cb45-3"><a href="cluster-analysis.html#cb45-3" tabindex="-1"></a><span class="fu">boxplot</span>(wine<span class="sc">$</span>Proline <span class="sc">~</span> ward3, </span>
+<span id="cb45-4"><a href="cluster-analysis.html#cb45-4" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">&quot;Proline by Ward&#39;s Linkage&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/Hierarchical%20Clustering-7.png" width="672" /></p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="cluster-analysis.html#cb46-1" tabindex="-1"></a><span class="do">## Ward距离法中 的第一个和第二个簇具有更紧凑的四分位距，没有疑似离群点</span></span></code></pre></div>
+</div>
+<div id="k-means-clustering-1" class="section level3 hasAnchor" number="7.5.3">
+<h3><span class="header-section-number">7.5.3</span> K-means Clustering<a href="cluster-analysis.html#k-means-clustering-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="cluster-analysis.html#cb47-1" tabindex="-1"></a><span class="do">## 函数中将method的值设定为kmeans即可，同时将最大簇数目放大到15</span></span>
+<span id="cb47-2"><a href="cluster-analysis.html#cb47-2" tabindex="-1"></a>numKMeans <span class="ot">&lt;-</span> <span class="fu">NbClust</span>(df, <span class="at">min.nc =</span> <span class="dv">2</span>, <span class="at">max.nc =</span> <span class="dv">15</span>, <span class="at">method =</span> <span class="st">&quot;kmeans&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre><code>## *** : The Hubert index is a graphical method of determining the number of clusters.
+##                 In the plot of Hubert index, we seek a significant knee that corresponds to a 
+##                 significant increase of the value of the measure i.e the significant peak in Hubert
+##                 index second differences plot. 
+## </code></pre>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
+<pre><code>## *** : The D index is a graphical method of determining the number of clusters. 
+##                 In the plot of D index, we seek a significant knee (the significant peak in Dindex
+##                 second differences plot) that corresponds to a significant increase of the value of
+##                 the measure. 
+##  
+## ******************************************************************* 
+## * Among all indices:                                                
+## * 2 proposed 2 as the best number of clusters 
+## * 19 proposed 3 as the best number of clusters 
+## * 1 proposed 14 as the best number of clusters 
+## * 1 proposed 15 as the best number of clusters 
+## 
+##                    ***** Conclusion *****                            
+##  
+## * According to the majority rule, the best number of clusters is  3 
+##  
+##  
+## *******************************************************************</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="cluster-analysis.html#cb50-1" tabindex="-1"></a><span class="do">## 3个簇再次成为最优解</span></span>
+<span id="cb50-2"><a href="cluster-analysis.html#cb50-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb50-3"><a href="cluster-analysis.html#cb50-3" tabindex="-1"></a>km <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(df, <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
+<span id="cb50-4"><a href="cluster-analysis.html#cb50-4" tabindex="-1"></a><span class="fu">table</span>(km<span class="sc">$</span>cluster)</span></code></pre></div>
+<pre><code>## 
+##  1  2  3 
+## 62 65 51</code></pre>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="cluster-analysis.html#cb52-1" tabindex="-1"></a><span class="do">## 簇之间的观测数量分布得非常均衡。我曾经不止一次遇到过这种情况，在一个有很多变量的 大数据集中，不管使用多少个簇的K均值聚类，都得不到有价值且令人信服的结果。对聚类结果 的另一种分析方式是查看簇中心点矩阵，它保存了每个簇中每个变量的中心点值:</span></span>
+<span id="cb52-2"><a href="cluster-analysis.html#cb52-2" tabindex="-1"></a>km<span class="sc">$</span>centers</span></code></pre></div>
+<pre><code>##      Alcohol  MalicAcid        Ash    Alk_ash   magnesium   T_phenols
+## 1  0.8328826 -0.3029551  0.3636801 -0.6084749  0.57596208  0.88274724
+## 2 -0.9234669 -0.3929331 -0.4931257  0.1701220 -0.49032869 -0.07576891
+## 3  0.1644436  0.8690954  0.1863726  0.5228924 -0.07526047 -0.97657548
+##    Flavanoids    Non_flav    Proantho C_Intensity        Hue  OD280_315
+## 1  0.97506900 -0.56050853  0.57865427   0.1705823  0.4726504  0.7770551
+## 2  0.02075402 -0.03343924  0.05810161  -0.8993770  0.4605046  0.2700025
+## 3 -1.21182921  0.72402116 -0.77751312   0.9388902 -1.1615122 -1.2887761
+##      Proline
+## 1  1.1220202
+## 2 -0.7517257
+## 3 -0.4059428</code></pre>
+</div>
+<div id="gowers-coefficient-and-pam-1" class="section level3 hasAnchor" number="7.5.4">
+<h3><span class="header-section-number">7.5.4</span> Gower’s coefficient and PAM<a href="cluster-analysis.html#gowers-coefficient-and-pam-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="cluster-analysis.html#cb54-1" tabindex="-1"></a><span class="do">## 处理因子变量，所以可以将酒 精函数转换为因子，它有两个水平:高/低</span></span>
+<span id="cb54-2"><a href="cluster-analysis.html#cb54-2" tabindex="-1"></a>wine<span class="sc">$</span>Alcohol <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(<span class="fu">ifelse</span>(df<span class="sc">$</span>Alcohol <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="st">&quot;High&quot;</span>, <span class="st">&quot;Low&quot;</span>))</span>
+<span id="cb54-3"><a href="cluster-analysis.html#cb54-3" tabindex="-1"></a><span class="do">## 建立相异度矩阵，使用cluster包中的daisy()函数</span></span>
+<span id="cb54-4"><a href="cluster-analysis.html#cb54-4" tabindex="-1"></a>disMatrix <span class="ot">&lt;-</span> <span class="fu">daisy</span>(wine[, <span class="sc">-</span><span class="dv">1</span>], <span class="at">metric =</span> <span class="st">&quot;gower&quot;</span>)  </span>
+<span id="cb54-5"><a href="cluster-analysis.html#cb54-5" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb54-6"><a href="cluster-analysis.html#cb54-6" tabindex="-1"></a>pamFit <span class="ot">&lt;-</span> <span class="fu">pam</span>(disMatrix, <span class="at">k =</span> <span class="dv">3</span>)</span>
+<span id="cb54-7"><a href="cluster-analysis.html#cb54-7" tabindex="-1"></a><span class="fu">table</span>(pamFit<span class="sc">$</span>clustering)</span></code></pre></div>
+<pre><code>## 
+##  1  2  3 
+## 62 71 45</code></pre>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="cluster-analysis.html#cb56-1" tabindex="-1"></a><span class="fu">table</span>(pamFit<span class="sc">$</span>clustering, wine<span class="sc">$</span>Class)</span></code></pre></div>
+<pre><code>##    
+##      1  2  3
+##   1 57  5  0
+##   2  2 64  5
+##   3  0  2 43</code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="cluster-analysis.html#cb58-1" tabindex="-1"></a>wine<span class="sc">$</span>cluster <span class="ot">&lt;-</span> pamFit<span class="sc">$</span>clustering</span>
+<span id="cb58-2"><a href="cluster-analysis.html#cb58-2" tabindex="-1"></a></span>
+<span id="cb58-3"><a href="cluster-analysis.html#cb58-3" tabindex="-1"></a></span>
+<span id="cb58-4"><a href="cluster-analysis.html#cb58-4" tabindex="-1"></a><span class="do">## 使用compareGroups包建立一张描述性统计表</span></span>
+<span id="cb58-5"><a href="cluster-analysis.html#cb58-5" tabindex="-1"></a>group <span class="ot">&lt;-</span> <span class="fu">compareGroups</span>(cluster <span class="sc">~</span> ., <span class="at">data =</span> wine) </span>
+<span id="cb58-6"><a href="cluster-analysis.html#cb58-6" tabindex="-1"></a>clustab <span class="ot">&lt;-</span> <span class="fu">createTable</span>(group) </span>
+<span id="cb58-7"><a href="cluster-analysis.html#cb58-7" tabindex="-1"></a>clustab</span></code></pre></div>
+<pre><code>## 
+## --------Summary descriptives table by &#39;cluster&#39;---------
+## 
+## _________________________________________________________ 
+##                  1           2           3      p.overall 
+##                N=62        N=71        N=45               
+## ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ 
+## Class       1.08 (0.27) 2.04 (0.31) 2.96 (0.21)  &lt;0.001   
+## Alcohol:                                         &lt;0.001   
+##     High     62 (100%)   1 (1.41%)  29 (64.4%)            
+##     Low      0 (0.00%)  70 (98.6%)  16 (35.6%)            
+## MalicAcid   2.00 (0.83) 1.95 (0.91) 3.41 (1.09)  &lt;0.001   
+## Ash         2.42 (0.27) 2.28 (0.30) 2.44 (0.18)   0.002   
+## Alk_ash     17.2 (2.75) 20.2 (3.20) 21.6 (2.26)  &lt;0.001   
+## magnesium   105 (11.7)  95.6 (16.8) 99.1 (10.8)   0.001   
+## T_phenols   2.83 (0.36) 2.20 (0.56) 1.71 (0.37)  &lt;0.001   
+## Flavanoids  2.96 (0.42) 1.99 (0.76) 0.81 (0.31)  &lt;0.001   
+## Non_flav    0.29 (0.07) 0.36 (0.12) 0.46 (0.12)  &lt;0.001   
+## Proantho    1.89 (0.43) 1.60 (0.60) 1.18 (0.43)  &lt;0.001   
+## C_Intensity 5.44 (1.29) 3.17 (1.01) 7.51 (2.36)  &lt;0.001   
+## Hue         1.07 (0.13) 1.03 (0.21) 0.69 (0.13)  &lt;0.001   
+## OD280_315   3.12 (0.36) 2.75 (0.58) 1.70 (0.26)  &lt;0.001   
+## Proline     1070 (279)   535 (167)   635 (119)   &lt;0.001   
+## ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯</code></pre>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="cluster-analysis.html#cb60-1" tabindex="-1"></a><span class="co"># export2csv(clustab,file = &quot;wine_clusters.csv&quot;)</span></span>
+<span id="cb60-2"><a href="cluster-analysis.html#cb60-2" tabindex="-1"></a><span class="co"># export2pdf(clustab, file = &quot;wine_clusters.pdf&quot;)</span></span></code></pre></div>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="pca.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="linear-discriminant-analysis-lda.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/yihui/bookdown-crc/edit/master/09-Cluster-Analysis.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["bookdown.pdf", "bookdown.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "none"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 1 Regularization Penalized Regression | ML Project Using bookdown</title>
+  <meta name="description" content="A book example for a Chapman &amp; Hall book." />
+  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 1 Regularization Penalized Regression | ML Project Using bookdown" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="A book example for a Chapman &amp; Hall book." />
+  <meta name="github-repo" content="yihui/bookdown-crc" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 1 Regularization Penalized Regression | ML Project Using bookdown" />
+  
+  <meta name="twitter:description" content="A book example for a Chapman &amp; Hall book." />
+  
+
+<meta name="author" content="Zehui Bai" />
+
+
+<meta name="date" content="2023-12-06" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="index.html"/>
+<link rel="next" href="smoothing.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="libs/d3-3.5.17/d3.min.js"></script>
+<link href="libs/markmap-0.3.3/view.mindmap.css" rel="stylesheet" />
+<script src="libs/markmap-0.3.3/view.mindmap.js"></script>
+<script src="libs/markmap-0.3.3/plugins/parsemd.min.js"></script>
+<script src="libs/markmap-binding-1.3.2/markmap.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">ML Project</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#why-read-this-book"><i class="fa fa-check"></i>Why read this book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#structure-of-the-book"><i class="fa fa-check"></i>Structure of the book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information-and-conventions"><i class="fa fa-check"></i>Software information and conventions</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html"><i class="fa fa-check"></i><b>1</b> Regularization Penalized Regression</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#motivation"><i class="fa fa-check"></i><b>1.1.1</b> Motivation</a></li>
+<li class="chapter" data-level="1.1.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#data-preparation"><i class="fa fa-check"></i><b>1.1.2</b> Data preparation</a></li>
+<li class="chapter" data-level="1.1.3" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#best-subset-regression"><i class="fa fa-check"></i><b>1.1.3</b> Best subset regression</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#ridge-regression"><i class="fa fa-check"></i><b>1.2</b> Ridge Regression</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modeling"><i class="fa fa-check"></i><b>1.2.1</b> Modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#lasso-regression"><i class="fa fa-check"></i><b>1.3</b> Lasso Regression</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#glmnet-cross-validation"><i class="fa fa-check"></i><b>1.3.1</b> glmnet cross validation</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#elasticnet"><i class="fa fa-check"></i><b>1.4</b> ElasticNet</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modelling"><i class="fa fa-check"></i><b>1.4.1</b> Modelling</a></li>
+<li class="chapter" data-level="1.4.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#classification"><i class="fa fa-check"></i><b>1.4.2</b> Classification</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="smoothing.html"><a href="smoothing.html"><i class="fa fa-check"></i><b>2</b> Smoothing</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="smoothing.html"><a href="smoothing.html#smoothing-1"><i class="fa fa-check"></i><b>2.1</b> Smoothing</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="smoothing.html"><a href="smoothing.html#bin-smoothing"><i class="fa fa-check"></i><b>2.1.1</b> Bin smoothing</a></li>
+<li class="chapter" data-level="2.1.2" data-path="smoothing.html"><a href="smoothing.html#kernels"><i class="fa fa-check"></i><b>2.1.2</b> Kernels</a></li>
+<li class="chapter" data-level="2.1.3" data-path="smoothing.html"><a href="smoothing.html#local-weighted-regression-loess"><i class="fa fa-check"></i><b>2.1.3</b> Local weighted regression (loess)</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="smoothing.html"><a href="smoothing.html#loess-regression"><i class="fa fa-check"></i><b>2.2</b> Loess Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="knn.html"><a href="knn.html"><i class="fa fa-check"></i><b>3</b> KNN</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="knn.html"><a href="knn.html#introduction-1"><i class="fa fa-check"></i><b>3.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="knn.html"><a href="knn.html#idee"><i class="fa fa-check"></i><b>3.1.1</b> Idee</a></li>
+<li class="chapter" data-level="3.1.2" data-path="knn.html"><a href="knn.html#加权最近邻法"><i class="fa fa-check"></i><b>3.1.2</b> 加权最近邻法</a></li>
+<li class="chapter" data-level="3.1.3" data-path="knn.html"><a href="knn.html#knn算法三要素"><i class="fa fa-check"></i><b>3.1.3</b> KNN算法三要素</a></li>
+<li class="chapter" data-level="3.1.4" data-path="knn.html"><a href="knn.html#优缺点"><i class="fa fa-check"></i><b>3.1.4</b> 优缺点</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="knn.html"><a href="knn.html#knn算法的实现方式"><i class="fa fa-check"></i><b>3.2</b> KNN算法的实现方式</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="knn.html"><a href="knn.html#brute-force"><i class="fa fa-check"></i><b>3.2.1</b> Brute-force</a></li>
+<li class="chapter" data-level="3.2.2" data-path="knn.html"><a href="knn.html#kd树实现"><i class="fa fa-check"></i><b>3.2.2</b> KD树实现</a></li>
+<li class="chapter" data-level="3.2.3" data-path="knn.html"><a href="knn.html#球树实现"><i class="fa fa-check"></i><b>3.2.3</b> 球树实现</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="knn.html"><a href="knn.html#application"><i class="fa fa-check"></i><b>3.3</b> Application</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="knn.html"><a href="knn.html#data-preparation-1"><i class="fa fa-check"></i><b>3.3.1</b> Data Preparation</a></li>
+<li class="chapter" data-level="3.3.2" data-path="knn.html"><a href="knn.html#knn-modelling"><i class="fa fa-check"></i><b>3.3.2</b> KNN Modelling</a></li>
+<li class="chapter" data-level="3.3.3" data-path="knn.html"><a href="knn.html#加权最近邻法-1"><i class="fa fa-check"></i><b>3.3.3</b> 加权最近邻法</a></li>
+<li class="chapter" data-level="3.3.4" data-path="knn.html"><a href="knn.html#over-training"><i class="fa fa-check"></i><b>3.3.4</b> Over-training</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="svm.html"><a href="svm.html"><i class="fa fa-check"></i><b>4</b> SVM</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="svm.html"><a href="svm.html#introduction-2"><i class="fa fa-check"></i><b>4.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="svm.html"><a href="svm.html#perceptron"><i class="fa fa-check"></i><b>4.1.1</b> Perceptron</a></li>
+<li class="chapter" data-level="4.1.2" data-path="svm.html"><a href="svm.html#函数间隔与几何间隔"><i class="fa fa-check"></i><b>4.1.2</b> 函数间隔与几何间隔</a></li>
+<li class="chapter" data-level="4.1.3" data-path="svm.html"><a href="svm.html#svm支持向量"><i class="fa fa-check"></i><b>4.1.3</b> SVM支持向量</a></li>
+<li class="chapter" data-level="4.1.4" data-path="svm.html"><a href="svm.html#svm模型目标函数与优化"><i class="fa fa-check"></i><b>4.1.4</b> SVM模型目标函数与优化</a></li>
+<li class="chapter" data-level="4.1.5" data-path="svm.html"><a href="svm.html#线性可分svm的算法过程"><i class="fa fa-check"></i><b>4.1.5</b> 线性可分SVM的算法过程</a></li>
+<li class="chapter" data-level="4.1.6" data-path="svm.html"><a href="svm.html#线性svm的软间隔最大化"><i class="fa fa-check"></i><b>4.1.6</b> 线性SVM的软间隔最大化</a></li>
+<li class="chapter" data-level="4.1.7" data-path="svm.html"><a href="svm.html#线性不可分支持向量机与核函数"><i class="fa fa-check"></i><b>4.1.7</b> 线性不可分支持向量机与核函数</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="svm.html"><a href="svm.html#application-1"><i class="fa fa-check"></i><b>4.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="svm.html"><a href="svm.html#data-preparation-2"><i class="fa fa-check"></i><b>4.2.1</b> Data Preparation</a></li>
+<li class="chapter" data-level="4.2.2" data-path="svm.html"><a href="svm.html#svm-modelling"><i class="fa fa-check"></i><b>4.2.2</b> SVM Modelling</a></li>
+<li class="chapter" data-level="4.2.3" data-path="svm.html"><a href="svm.html#model-selection"><i class="fa fa-check"></i><b>4.2.3</b> Model Selection</a></li>
+<li class="chapter" data-level="4.2.4" data-path="svm.html"><a href="svm.html#character-selection"><i class="fa fa-check"></i><b>4.2.4</b> Character selection</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="tree-models.html"><a href="tree-models.html"><i class="fa fa-check"></i><b>5</b> Tree models</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="tree-models.html"><a href="tree-models.html#decision-tree-model"><i class="fa fa-check"></i><b>5.1</b> Decision Tree Model</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="tree-models.html"><a href="tree-models.html#decision-tree-algorithm"><i class="fa fa-check"></i><b>5.1.1</b> Decision tree algorithm</a></li>
+<li class="chapter" data-level="5.1.2" data-path="tree-models.html"><a href="tree-models.html#id3-algorithm"><i class="fa fa-check"></i><b>5.1.2</b> ID3 Algorithm</a></li>
+<li class="chapter" data-level="5.1.3" data-path="tree-models.html"><a href="tree-models.html#c4.5-algorithm"><i class="fa fa-check"></i><b>5.1.3</b> C4.5 Algorithm</a></li>
+<li class="chapter" data-level="5.1.4" data-path="tree-models.html"><a href="tree-models.html#cart-algorithm"><i class="fa fa-check"></i><b>5.1.4</b> CART Algorithm</a></li>
+<li class="chapter" data-level="5.1.5" data-path="tree-models.html"><a href="tree-models.html#pruning"><i class="fa fa-check"></i><b>5.1.5</b> Pruning</a></li>
+<li class="chapter" data-level="5.1.6" data-path="tree-models.html"><a href="tree-models.html#package-rpart"><i class="fa fa-check"></i><b>5.1.6</b> Package ‘rpart’</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="tree-models.html"><a href="tree-models.html#random-forest"><i class="fa fa-check"></i><b>5.2</b> Random Forest</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="tree-models.html"><a href="tree-models.html#bootstrap-bagging"><i class="fa fa-check"></i><b>5.2.1</b> Bootstrap (Bagging)</a></li>
+<li class="chapter" data-level="5.2.2" data-path="tree-models.html"><a href="tree-models.html#bagging算法流程"><i class="fa fa-check"></i><b>5.2.2</b> bagging算法流程</a></li>
+<li class="chapter" data-level="5.2.3" data-path="tree-models.html"><a href="tree-models.html#random-forest-algorithm"><i class="fa fa-check"></i><b>5.2.3</b> Random Forest Algorithm</a></li>
+<li class="chapter" data-level="5.2.4" data-path="tree-models.html"><a href="tree-models.html#random-forest-promotion"><i class="fa fa-check"></i><b>5.2.4</b> Random forest promotion</a></li>
+<li class="chapter" data-level="5.2.5" data-path="tree-models.html"><a href="tree-models.html#package-randomforest"><i class="fa fa-check"></i><b>5.2.5</b> Package ‘randomForest’</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="tree-models.html"><a href="tree-models.html#modelling-1"><i class="fa fa-check"></i><b>5.3</b> Modelling</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="tree-models.html"><a href="tree-models.html#data-preparation-3"><i class="fa fa-check"></i><b>5.3.1</b> Data preparation</a></li>
+<li class="chapter" data-level="5.3.2" data-path="tree-models.html"><a href="tree-models.html#regression-tree-1"><i class="fa fa-check"></i><b>5.3.2</b> Regression tree</a></li>
+<li class="chapter" data-level="5.3.3" data-path="tree-models.html"><a href="tree-models.html#classification-tree-1"><i class="fa fa-check"></i><b>5.3.3</b> Classification tree</a></li>
+<li class="chapter" data-level="5.3.4" data-path="tree-models.html"><a href="tree-models.html#random-forest-for-regression"><i class="fa fa-check"></i><b>5.3.4</b> Random forest for regression</a></li>
+<li class="chapter" data-level="5.3.5" data-path="tree-models.html"><a href="tree-models.html#random-forest-for-classification"><i class="fa fa-check"></i><b>5.3.5</b> Random forest for classification</a></li>
+<li class="chapter" data-level="5.3.6" data-path="tree-models.html"><a href="tree-models.html#皮玛印第安人糖尿病数据集"><i class="fa fa-check"></i><b>5.3.6</b> 皮玛印第安人糖尿病数据集</a></li>
+<li class="chapter" data-level="5.3.7" data-path="tree-models.html"><a href="tree-models.html#使用随机森林进行特征选择"><i class="fa fa-check"></i><b>5.3.7</b> 使用随机森林进行特征选择</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="tree-models.html"><a href="tree-models.html#gradient-boosting"><i class="fa fa-check"></i><b>5.4</b> Gradient Boosting</a></li>
+<li class="chapter" data-level="5.5" data-path="tree-models.html"><a href="tree-models.html#gradient-descent"><i class="fa fa-check"></i><b>5.5</b> Gradient Descent</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="tree-models.html"><a href="tree-models.html#gradient"><i class="fa fa-check"></i><b>5.5.1</b> Gradient</a></li>
+<li class="chapter" data-level="5.5.2" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-1"><i class="fa fa-check"></i><b>5.5.2</b> Gradient Descent</a></li>
+<li class="chapter" data-level="5.5.3" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-algorithm"><i class="fa fa-check"></i><b>5.5.3</b> Gradient Descent Algorithm</a></li>
+<li class="chapter" data-level="5.5.4" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-familiy"><i class="fa fa-check"></i><b>5.5.4</b> Gradient Descent Familiy</a></li>
+<li class="chapter" data-level="5.5.5" data-path="tree-models.html"><a href="tree-models.html#gbdt分类算法"><i class="fa fa-check"></i><b>5.5.5</b> GBDT分类算法</a></li>
+<li class="chapter" data-level="5.5.6" data-path="tree-models.html"><a href="tree-models.html#package-gbm"><i class="fa fa-check"></i><b>5.5.6</b> Package ‘gbm’</a></li>
+<li class="chapter" data-level="5.5.7" data-path="tree-models.html"><a href="tree-models.html#极限梯度提升分类"><i class="fa fa-check"></i><b>5.5.7</b> 极限梯度提升——分类</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="tree-models.html"><a href="tree-models.html#cubist-model"><i class="fa fa-check"></i><b>5.6</b> Cubist Model</a>
+<ul>
+<li class="chapter" data-level="5.6.1" data-path="tree-models.html"><a href="tree-models.html#introduction-3"><i class="fa fa-check"></i><b>5.6.1</b> Introduction</a></li>
+<li class="chapter" data-level="5.6.2" data-path="tree-models.html"><a href="tree-models.html#application-data-preparation"><i class="fa fa-check"></i><b>5.6.2</b> Application Data Preparation</a></li>
+<li class="chapter" data-level="5.6.3" data-path="tree-models.html"><a href="tree-models.html#fit-continious-outcome"><i class="fa fa-check"></i><b>5.6.3</b> Fit Continious Outcome</a></li>
+<li class="chapter" data-level="5.6.4" data-path="tree-models.html"><a href="tree-models.html#variable-importance"><i class="fa fa-check"></i><b>5.6.4</b> Variable Importance</a></li>
+<li class="chapter" data-level="5.6.5" data-path="tree-models.html"><a href="tree-models.html#summary-display"><i class="fa fa-check"></i><b>5.6.5</b> Summary display</a></li>
+<li class="chapter" data-level="5.6.6" data-path="tree-models.html"><a href="tree-models.html#specific-parts"><i class="fa fa-check"></i><b>5.6.6</b> specific parts</a></li>
+<li class="chapter" data-level="5.6.7" data-path="tree-models.html"><a href="tree-models.html#ensembles-by-committees"><i class="fa fa-check"></i><b>5.6.7</b> Ensembles By Committees</a></li>
+<li class="chapter" data-level="5.6.8" data-path="tree-models.html"><a href="tree-models.html#nearestneighbors-adjustmemt"><i class="fa fa-check"></i><b>5.6.8</b> Nearest–neighbors Adjustmemt</a></li>
+<li class="chapter" data-level="5.6.9" data-path="tree-models.html"><a href="tree-models.html#optimize-parameters"><i class="fa fa-check"></i><b>5.6.9</b> Optimize parameters</a></li>
+<li class="chapter" data-level="5.6.10" data-path="tree-models.html"><a href="tree-models.html#logistic-cv"><i class="fa fa-check"></i><b>5.6.10</b> Logistic CV</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="pca.html"><a href="pca.html"><i class="fa fa-check"></i><b>6</b> PCA</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="pca.html"><a href="pca.html#introduction-4"><i class="fa fa-check"></i><b>6.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="pca.html"><a href="pca.html#component"><i class="fa fa-check"></i><b>6.1.1</b> Component</a></li>
+<li class="chapter" data-level="6.1.2" data-path="pca.html"><a href="pca.html#pca算法"><i class="fa fa-check"></i><b>6.1.2</b> PCA算法</a></li>
+<li class="chapter" data-level="6.1.3" data-path="pca.html"><a href="pca.html#主成分旋转"><i class="fa fa-check"></i><b>6.1.3</b> 主成分旋转</a></li>
+<li class="chapter" data-level="6.1.4" data-path="pca.html"><a href="pca.html#kernelized-pca"><i class="fa fa-check"></i><b>6.1.4</b> Kernelized PCA</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="pca.html"><a href="pca.html#application-2"><i class="fa fa-check"></i><b>6.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="pca.html"><a href="pca.html#data-preparation-4"><i class="fa fa-check"></i><b>6.2.1</b> Data preparation</a></li>
+<li class="chapter" data-level="6.2.2" data-path="pca.html"><a href="pca.html#modeling-1"><i class="fa fa-check"></i><b>6.2.2</b> Modeling</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="cluster-analysis.html"><a href="cluster-analysis.html"><i class="fa fa-check"></i><b>7</b> Cluster Analysis</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering"><i class="fa fa-check"></i><b>7.1</b> Hierarchical Clustering</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#introduction-5"><i class="fa fa-check"></i><b>7.1.1</b> Introduction</a></li>
+<li class="chapter" data-level="7.1.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering-algorithms"><i class="fa fa-check"></i><b>7.1.2</b> Hierarchical clustering algorithms</a></li>
+<li class="chapter" data-level="7.1.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#measure-the-dissimilarity-between-two-clusters-of-observations"><i class="fa fa-check"></i><b>7.1.3</b> Measure the dissimilarity between two clusters of observations</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering"><i class="fa fa-check"></i><b>7.2</b> K-means Clustering</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#algorithm"><i class="fa fa-check"></i><b>7.2.1</b> Algorithm</a></li>
+<li class="chapter" data-level="7.2.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means"><i class="fa fa-check"></i><b>7.2.2</b> K-Means++</a></li>
+<li class="chapter" data-level="7.2.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#elkan-k-means"><i class="fa fa-check"></i><b>7.2.3</b> elkan K-Means</a></li>
+<li class="chapter" data-level="7.2.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#mini-batch-k-means"><i class="fa fa-check"></i><b>7.2.4</b> Mini Batch K-Means</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient-and-pam"><i class="fa fa-check"></i><b>7.3</b> Gower’s coefficient and PAM</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient"><i class="fa fa-check"></i><b>7.3.1</b> Gower’s coefficient</a></li>
+<li class="chapter" data-level="7.3.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#不同数据类型的相异度计算-距离法"><i class="fa fa-check"></i><b>7.3.2</b> 不同数据类型的相异度计算 (距离法)</a></li>
+<li class="chapter" data-level="7.3.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#pam"><i class="fa fa-check"></i><b>7.3.3</b> PAM</a></li>
+</ul></li>
+<li class="chapter" data-level="7.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch-clustering"><i class="fa fa-check"></i><b>7.4</b> BIRCH Clustering</a>
+<ul>
+<li class="chapter" data-level="7.4.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch-introduction"><i class="fa fa-check"></i><b>7.4.1</b> BIRCH Introduction</a></li>
+<li class="chapter" data-level="7.4.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#聚类特征cf与聚类特征树cf-tree"><i class="fa fa-check"></i><b>7.4.2</b> 聚类特征CF与聚类特征树CF Tree</a></li>
+<li class="chapter" data-level="7.4.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#cf-tree的生成"><i class="fa fa-check"></i><b>7.4.3</b> CF Tree的生成</a></li>
+<li class="chapter" data-level="7.4.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch算法"><i class="fa fa-check"></i><b>7.4.4</b> BIRCH算法</a></li>
+</ul></li>
+<li class="chapter" data-level="7.5" data-path="cluster-analysis.html"><a href="cluster-analysis.html#application-3"><i class="fa fa-check"></i><b>7.5</b> Application</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#data-preparation-5"><i class="fa fa-check"></i><b>7.5.1</b> Data preparation</a></li>
+<li class="chapter" data-level="7.5.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering-1"><i class="fa fa-check"></i><b>7.5.2</b> Hierarchical Clustering</a></li>
+<li class="chapter" data-level="7.5.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering-1"><i class="fa fa-check"></i><b>7.5.3</b> K-means Clustering</a></li>
+<li class="chapter" data-level="7.5.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient-and-pam-1"><i class="fa fa-check"></i><b>7.5.4</b> Gower’s coefficient and PAM</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html"><i class="fa fa-check"></i><b>8</b> linear discriminant analysis (LDA)</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#introduction-6"><i class="fa fa-check"></i><b>8.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#naive-bayes"><i class="fa fa-check"></i><b>8.1.1</b> Naive Bayes</a></li>
+<li class="chapter" data-level="8.1.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#controlling-prevalence"><i class="fa fa-check"></i><b>8.1.2</b> Controlling prevalence</a></li>
+<li class="chapter" data-level="8.1.3" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#qda"><i class="fa fa-check"></i><b>8.1.3</b> QDA</a></li>
+<li class="chapter" data-level="8.1.4" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda"><i class="fa fa-check"></i><b>8.1.4</b> LDA</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#discriminant-analysis-algorithm"><i class="fa fa-check"></i><b>8.2</b> Discriminant analysis algorithm</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#idee-1"><i class="fa fa-check"></i><b>8.2.1</b> Idee</a></li>
+<li class="chapter" data-level="8.2.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#瑞利商rayleigh-quotient"><i class="fa fa-check"></i><b>8.2.2</b> 瑞利商（Rayleigh quotient）</a></li>
+<li class="chapter" data-level="8.2.3" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#广义瑞利商-genralized-rayleigh-quotient"><i class="fa fa-check"></i><b>8.2.3</b> 广义瑞利商 genralized Rayleigh quotient</a></li>
+<li class="chapter" data-level="8.2.4" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda算法流程"><i class="fa fa-check"></i><b>8.2.4</b> LDA算法流程</a></li>
+<li class="chapter" data-level="8.2.5" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda-application"><i class="fa fa-check"></i><b>8.2.5</b> LDA Application</a></li>
+<li class="chapter" data-level="8.2.6" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#qda-1"><i class="fa fa-check"></i><b>8.2.6</b> QDA</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="neural-network.html"><a href="neural-network.html"><i class="fa fa-check"></i><b>9</b> Neural Network</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="neural-network.html"><a href="neural-network.html#introduction-7"><i class="fa fa-check"></i><b>9.1</b> Introduction</a></li>
+<li class="chapter" data-level="9.2" data-path="neural-network.html"><a href="neural-network.html#反向传播方法进行训练的前馈神经网络"><i class="fa fa-check"></i><b>9.2</b> 反向传播方法进行训练的前馈神经网络</a></li>
+<li class="chapter" data-level="9.3" data-path="neural-network.html"><a href="neural-network.html#application-4"><i class="fa fa-check"></i><b>9.3</b> Application</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="neural-network.html"><a href="neural-network.html#数据准备"><i class="fa fa-check"></i><b>9.3.1</b> 数据准备</a></li>
+<li class="chapter" data-level="9.3.2" data-path="neural-network.html"><a href="neural-network.html#模型构建"><i class="fa fa-check"></i><b>9.3.2</b> 模型构建</a></li>
+</ul></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="more-to-say.html"><a href="more-to-say.html"><i class="fa fa-check"></i><b>A</b> More to Say</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://bookdown.org" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">ML Project Using bookdown</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="regularization-penalized-regression" class="section level1 hasAnchor" number="1">
+<h1><span class="header-section-number">Chapter 1</span> Regularization Penalized Regression<a href="regularization-penalized-regression.html#regularization-penalized-regression" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div class="markmap html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-4e691076d79018e89673" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-4e691076d79018e89673">{"x":{"data":"# \n## Regularization Penalized Regression \n### Introduction\n#### Motivation\n#### Data preparation\n#### Best subset regression \n### Ridge Regression\n#### Modeling\n### Lasso Regression\n#### Modelling\n#### glmnet cross validation\n### ElasticNet\n#### Modelling\n#### Classification ","options":{"preset":"colorful","autoFit":true}},"evals":[],"jsHooks":[]}</script>
+<div id="introduction" class="section level2 hasAnchor" number="1.1">
+<h2><span class="header-section-number">1.1</span> Introduction<a href="regularization-penalized-regression.html#introduction" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="motivation" class="section level3 hasAnchor" number="1.1.1">
+<h3><span class="header-section-number">1.1.1</span> Motivation<a href="regularization-penalized-regression.html#motivation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ul>
+<li>当今很多数据集具有数量庞大的特征，即 使与观测值的数量相比也毫不逊色，这正如人们所称——高维性</li>
+<li>随着我们要处理的数据规模不断增大，最优子集和逐步特征选择这样的技术会造成难以承受的时间成本——即使使用高速计算机。在很多情况下，要得到一个最优子集的解需要花费数小时。</li>
+<li>在过去的二十多年中，人们已经开发和提炼了更新的技术，它们提供的预测能力和解释性已经远远超过了我们在前面章节中讨论过的线性模型.</li>
+</ul>
+<p>正则化会对系数进行限制，甚至 将其缩减到0</p>
+<ul>
+<li>岭回归</li>
+<li>最小化绝对收缩</li>
+<li>选择算子</li>
+<li>弹性网络</li>
+</ul>
+<p>Regularization for linear regression
+<span class="math display">\[Y ≈ β0 + β1X1 + β2X2 + …+ βpXp\]</span>
+拟合过程涉及损失函数，称为残差平方和或RSS。
+<span class="math display">\[{\displaystyle \operatorname {RSS} =\sum _{i=1}^{n}(y_{i}-f(x_{i}))^{2}}\]</span>
+<span class="math display">\[{\displaystyle \operatorname {RSS} =\sum _{i=1}^{n}(\varepsilon _{i})^{2}=\sum _{i=1}^{n}(y_{i}-(\alpha +\beta x_{i}))^{2}}\]</span></p>
+<p>通过正则化，我们会在RSS的最小化过程中加入一个新项，称之为收缩惩罚
+<span class="math display">\[y = β0 + β1x1 + β2x2 + ··· βkxk + λ(slope) ²\]</span>
+λ被称为调优参数。如果λ = 0，模型就等价于OLS，因为规范化项目都被抵消了。</p>
+<p><strong>Strengthness</strong></p>
+<ul>
+<li>正则化方法在计算上 非常有效。如果使用最优子集法，我们需要在一个大数据集上测试<span class="math inline">\(2^p\)</span>个模型，如果使用正则化方法，对于每个λ值，我们只需拟合一个模型，因此效率会有极大提升</li>
+<li>偏差-方差权衡问题。在线性模型中，响应变量和预测变量之间的关系接近于线性，最小二乘估计接近于无偏，但可能有很高的方差。这意味着，训练集中的微小变动会导致最小二乘系数估计结果的巨大变动(James，2013)。正则化通过恰当地选择λ和规范化， 可以使偏差方差权衡达到最优，从而提高模型拟合的效果</li>
+<li>系数的正则化还可以用来解 决多重共线性的问题。</li>
+</ul>
+<p><strong>Sources of Multicollinearity</strong></p>
+<ul>
+<li>数据收集。在这种情况下，数据是从自变量的狭窄子空间中收集的。多重共线性是通过抽样方法创建的，它在总体中不存在。在扩展范围内获得更多数据将解决此多重共线性问题。极端的例子是当您尝试将一条线拟合到单个点时。</li>
+<li>过度定义的模型。在这里，变量多于观察值。应该避免这种情况。</li>
+<li>模型选择或规格。多重共线性的来源来自使用独立变量，这些变量是原始变量集的幂或相互作用。应该注意的是，如果自变量的采样子空间很窄，那么这些变量的任何组合都将进一步加剧多重共线性问题。</li>
+<li>离群值。 X空间中的极值或离群值会导致多重共线性以及隐藏多重共线性。我们称此为异常值引起的多重共线性。在应用岭回归之前，应通过除去异常值来进行纠正。</li>
+</ul>
+</div>
+<div id="data-preparation" class="section level3 hasAnchor" number="1.1.2">
+<h3><span class="header-section-number">1.1.2</span> Data preparation<a href="regularization-penalized-regression.html#data-preparation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ul>
+<li>lcavol:肿瘤体积的对数值</li>
+<li>lweight:前列腺重量的对数值</li>
+<li>age:患者年龄(以年计)</li>
+<li>lbph:良性前列腺增生(BPH)量的对数值，非癌症性质的前列腺增生。</li>
+<li>svi:贮精囊侵入，一个指标变量，表示癌细胞是否已经透过前列腺壁侵入贮精囊(1=是，0=否)。</li>
+<li>lcp:包膜穿透度的对数值，表示癌细胞扩散到前列腺包膜之外的程度。</li>
+<li>gleason:患者的Gleason评分;由病理学家进行活体检查后给出(2~10)，表示癌细胞的变异程度——评分越高，程度越危险。</li>
+<li>pgg45:Gleason评分为4或5所占的百分比(高等级癌症)。</li>
+<li>lpsa:PSA值的对数值，响应变量。</li>
+<li>train:一个逻辑向量(TRUE或FALSE，用来区分训练数据和测试数据)</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="regularization-penalized-regression.html#cb1-1" tabindex="-1"></a><span class="fu">library</span>(car)      <span class="co"># package to calculate Variance Inflation Factor</span></span>
+<span id="cb1-2"><a href="regularization-penalized-regression.html#cb1-2" tabindex="-1"></a><span class="fu">library</span>(corrplot) <span class="co"># correlation plots</span></span>
+<span id="cb1-3"><a href="regularization-penalized-regression.html#cb1-3" tabindex="-1"></a><span class="fu">library</span>(leaps)    <span class="co"># best subsets regression</span></span>
+<span id="cb1-4"><a href="regularization-penalized-regression.html#cb1-4" tabindex="-1"></a><span class="fu">library</span>(glmnet)   <span class="co"># allows ridge regression, LASSO and elastic net</span></span>
+<span id="cb1-5"><a href="regularization-penalized-regression.html#cb1-5" tabindex="-1"></a><span class="fu">library</span>(caret)    <span class="co"># this will help identify the appropriate parameters</span></span>
+<span id="cb1-6"><a href="regularization-penalized-regression.html#cb1-6" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="regularization-penalized-regression.html#cb1-7" tabindex="-1"></a>prostate <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">&quot;./01_Datasets/prostate.txt&quot;</span>, <span class="at">header=</span>T)</span>
+<span id="cb1-8"><a href="regularization-penalized-regression.html#cb1-8" tabindex="-1"></a><span class="do">## 统计图或表格来理解数据</span></span>
+<span id="cb1-9"><a href="regularization-penalized-regression.html#cb1-9" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="regularization-penalized-regression.html#cb1-10" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="regularization-penalized-regression.html#cb1-11" tabindex="-1"></a><span class="do">## 可以看出，结果变 量lpsa和预测变量lcavol之间确实存在明显的线性关系</span></span>
+<span id="cb1-12"><a href="regularization-penalized-regression.html#cb1-12" tabindex="-1"></a><span class="fu">plot</span>(prostate)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="regularization-penalized-regression.html#cb2-1" tabindex="-1"></a><span class="do">## 专门为特征Gleason建立一个统计图</span></span>
+<span id="cb2-2"><a href="regularization-penalized-regression.html#cb2-2" tabindex="-1"></a><span class="fu">plot</span>(prostate<span class="sc">$</span>gleason, <span class="at">ylab =</span> <span class="st">&quot;Gleason Score&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="regularization-penalized-regression.html#cb3-1" tabindex="-1"></a><span class="fu">table</span>(prostate<span class="sc">$</span>gleason)</span></code></pre></div>
+<pre><code>## 
+##  6  7  8  9 
+## 35 56  1  5</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="regularization-penalized-regression.html#cb5-1" tabindex="-1"></a><span class="do">## 解决方法</span></span>
+<span id="cb5-2"><a href="regularization-penalized-regression.html#cb5-2" tabindex="-1"></a><span class="co">#  完全删除这个特征;</span></span>
+<span id="cb5-3"><a href="regularization-penalized-regression.html#cb5-3" tabindex="-1"></a><span class="co">#  仅删除值为8.0和9.0的那些评分;</span></span>
+<span id="cb5-4"><a href="regularization-penalized-regression.html#cb5-4" tabindex="-1"></a><span class="co">#  对特征重新编码，建立一个指标变量。</span></span>
+<span id="cb5-5"><a href="regularization-penalized-regression.html#cb5-5" tabindex="-1"></a><span class="co">#  建立一个横轴为Gleason Score，纵轴为Log of PSA的箱线图，会对我们的选择有所帮助</span></span>
+<span id="cb5-6"><a href="regularization-penalized-regression.html#cb5-6" tabindex="-1"></a><span class="co">#  最好的选择是，将这个特征转换为一个指标变量，0表示评分为6，1表示评分为7或更高。删除特征可能会损失模型的预测能力。缺失值也可能会在我们将要使用的 glmnet包中引起问题。</span></span>
+<span id="cb5-7"><a href="regularization-penalized-regression.html#cb5-7" tabindex="-1"></a><span class="fu">boxplot</span>(prostate<span class="sc">$</span>lpsa <span class="sc">~</span> prostate<span class="sc">$</span>gleason, <span class="at">xlab =</span> <span class="st">&quot;Gleason Score&quot;</span>, </span>
+<span id="cb5-8"><a href="regularization-penalized-regression.html#cb5-8" tabindex="-1"></a>        <span class="at">ylab =</span> <span class="st">&quot;Log of PSA&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-1-3.png" width="672" /></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="regularization-penalized-regression.html#cb6-1" tabindex="-1"></a><span class="do">## 对指标变量的编码使用ifelse()命令</span></span>
+<span id="cb6-2"><a href="regularization-penalized-regression.html#cb6-2" tabindex="-1"></a>prostate<span class="sc">$</span>gleason <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(prostate<span class="sc">$</span>gleason <span class="sc">==</span> <span class="dv">6</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb6-3"><a href="regularization-penalized-regression.html#cb6-3" tabindex="-1"></a><span class="fu">table</span>(prostate<span class="sc">$</span>gleason)</span></code></pre></div>
+<pre><code>## 
+##  0  1 
+## 35 62</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="regularization-penalized-regression.html#cb8-1" tabindex="-1"></a><span class="do">## 相关性统计图，表示特征之间是否存在相关性或依赖</span></span>
+<span id="cb8-2"><a href="regularization-penalized-regression.html#cb8-2" tabindex="-1"></a><span class="do">## 发现问题：PSA和肿瘤体积的对数(lcavol)高度相关 0.73, 多重共线: 肿瘤体积还与包膜穿透相关，而包膜穿透还与贮精囊侵入相关</span></span>
+<span id="cb8-3"><a href="regularization-penalized-regression.html#cb8-3" tabindex="-1"></a>p.cor <span class="ot">=</span> <span class="fu">cor</span>(prostate[,<span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb8-4"><a href="regularization-penalized-regression.html#cb8-4" tabindex="-1"></a><span class="fu">corrplot.mixed</span>(p.cor)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-1-4.png" width="672" /></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="regularization-penalized-regression.html#cb9-1" tabindex="-1"></a><span class="do">## 开始机器学习之前，必须先建立训练数据集和测试数据集</span></span>
+<span id="cb9-2"><a href="regularization-penalized-regression.html#cb9-2" tabindex="-1"></a><span class="do">## 观测值中已经有一个特征指 明这个观测值是否属于训练集，我们就可以使用subset()命令将train值为TRUE的观测值分到 训练集中，将train值为FALSE的观测值分到测试集</span></span>
+<span id="cb9-3"><a href="regularization-penalized-regression.html#cb9-3" tabindex="-1"></a>train <span class="ot">&lt;-</span> <span class="fu">subset</span>(prostate, train <span class="sc">==</span> <span class="cn">TRUE</span>)[, <span class="dv">2</span><span class="sc">:</span><span class="dv">10</span>]</span>
+<span id="cb9-4"><a href="regularization-penalized-regression.html#cb9-4" tabindex="-1"></a><span class="fu">str</span>(train)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    67 obs. of  9 variables:
+##  $ lcavol : num  -0.58 -0.994 -0.511 -1.204 0.751 ...
+##  $ lweight: num  2.77 3.32 2.69 3.28 3.43 ...
+##  $ age    : int  50 58 74 58 62 50 58 65 63 63 ...
+##  $ lbph   : num  -1.39 -1.39 -1.39 -1.39 -1.39 ...
+##  $ svi    : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ lcp    : num  -1.39 -1.39 -1.39 -1.39 -1.39 ...
+##  $ gleason: num  0 0 1 0 0 0 0 0 0 1 ...
+##  $ pgg45  : int  0 0 20 0 0 0 0 0 0 30 ...
+##  $ lpsa   : num  -0.431 -0.163 -0.163 -0.163 0.372 ...</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="regularization-penalized-regression.html#cb11-1" tabindex="-1"></a>test <span class="ot">=</span> <span class="fu">subset</span>(prostate, train<span class="sc">==</span><span class="cn">FALSE</span>)[,<span class="dv">2</span><span class="sc">:</span><span class="dv">10</span>]</span>
+<span id="cb11-2"><a href="regularization-penalized-regression.html#cb11-2" tabindex="-1"></a><span class="fu">str</span>(test)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    30 obs. of  9 variables:
+##  $ lcavol : num  0.737 -0.777 0.223 1.206 2.059 ...
+##  $ lweight: num  3.47 3.54 3.24 3.44 3.5 ...
+##  $ age    : int  64 47 63 57 60 69 68 67 65 54 ...
+##  $ lbph   : num  0.615 -1.386 -1.386 -1.386 1.475 ...
+##  $ svi    : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ lcp    : num  -1.386 -1.386 -1.386 -0.431 1.348 ...
+##  $ gleason: num  0 0 0 1 1 0 0 1 0 0 ...
+##  $ pgg45  : int  0 0 0 5 20 0 0 20 0 0 ...
+##  $ lpsa   : num  0.765 1.047 1.047 1.399 1.658 ...</code></pre>
+</div>
+<div id="best-subset-regression" class="section level3 hasAnchor" number="1.1.3">
+<h3><span class="header-section-number">1.1.3</span> Best subset regression<a href="regularization-penalized-regression.html#best-subset-regression" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="regularization-penalized-regression.html#cb13-1" tabindex="-1"></a><span class="do">## 通过regsubsets()命令建立一个最小子集对象</span></span>
+<span id="cb13-2"><a href="regularization-penalized-regression.html#cb13-2" tabindex="-1"></a>subfit <span class="ot">&lt;-</span> <span class="fu">regsubsets</span>(lpsa <span class="sc">~</span> ., <span class="at">data =</span> train)</span>
+<span id="cb13-3"><a href="regularization-penalized-regression.html#cb13-3" tabindex="-1"></a>b.sum <span class="ot">&lt;-</span> <span class="fu">summary</span>(subfit)</span>
+<span id="cb13-4"><a href="regularization-penalized-regression.html#cb13-4" tabindex="-1"></a><span class="do">## 使用贝叶斯信息准则，三特征模型具有最小的BIC值</span></span>
+<span id="cb13-5"><a href="regularization-penalized-regression.html#cb13-5" tabindex="-1"></a><span class="fu">which.min</span>(b.sum<span class="sc">$</span>bic)</span></code></pre></div>
+<pre><code>## [1] 3</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="regularization-penalized-regression.html#cb15-1" tabindex="-1"></a><span class="do">## 通过一个统计图查看模型性能和子集组合之间的关系</span></span>
+<span id="cb15-2"><a href="regularization-penalized-regression.html#cb15-2" tabindex="-1"></a><span class="fu">plot</span>(b.sum<span class="sc">$</span>bic, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;# of Features&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;BIC&quot;</span>, </span>
+<span id="cb15-3"><a href="regularization-penalized-regression.html#cb15-3" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;BIC score by Feature Inclusion&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="regularization-penalized-regression.html#cb16-1" tabindex="-1"></a><span class="do">## 对实际模型做出统计图，进行更详细的检查，上图告诉我们具有最小BIC值的模型中的3个特征是:lcavol、lweight和gleason</span></span>
+<span id="cb16-2"><a href="regularization-penalized-regression.html#cb16-2" tabindex="-1"></a><span class="fu">plot</span>(subfit, <span class="at">scale =</span> <span class="st">&quot;bic&quot;</span>, <span class="at">main =</span> <span class="st">&quot;Best Subset Features&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="regularization-penalized-regression.html#cb17-1" tabindex="-1"></a><span class="do">## 用以上3个变量建立一个线性模型</span></span>
+<span id="cb17-2"><a href="regularization-penalized-regression.html#cb17-2" tabindex="-1"></a>ols <span class="ot">&lt;-</span> <span class="fu">lm</span>(lpsa <span class="sc">~</span> lcavol <span class="sc">+</span> lweight <span class="sc">+</span> gleason, <span class="at">data =</span> train)</span>
+<span id="cb17-3"><a href="regularization-penalized-regression.html#cb17-3" tabindex="-1"></a><span class="do">## 线性拟合表现得很好，也不存在异方差性</span></span>
+<span id="cb17-4"><a href="regularization-penalized-regression.html#cb17-4" tabindex="-1"></a><span class="fu">plot</span>(ols<span class="sc">$</span>fitted.values, train<span class="sc">$</span>lpsa, <span class="at">xlab =</span> <span class="st">&quot;Predicted&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Actual&quot;</span>, </span>
+<span id="cb17-5"><a href="regularization-penalized-regression.html#cb17-5" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Predicted vs Actual&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-2-3.png" width="672" /></p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="regularization-penalized-regression.html#cb18-1" tabindex="-1"></a><span class="do">## 模型在测试集上的表现</span></span>
+<span id="cb18-2"><a href="regularization-penalized-regression.html#cb18-2" tabindex="-1"></a>pred.subfit <span class="ot">=</span> <span class="fu">predict</span>(ols, <span class="at">newdata=</span>test)</span>
+<span id="cb18-3"><a href="regularization-penalized-regression.html#cb18-3" tabindex="-1"></a><span class="fu">plot</span>(pred.subfit, test<span class="sc">$</span>lpsa , <span class="at">xlab =</span> <span class="st">&quot;Predicted&quot;</span>, </span>
+<span id="cb18-4"><a href="regularization-penalized-regression.html#cb18-4" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">&quot;Actual&quot;</span>, <span class="at">main =</span> <span class="st">&quot;Predicted vs Actual&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-2-4.png" width="672" /></p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="regularization-penalized-regression.html#cb19-1" tabindex="-1"></a><span class="do">## 计算均方误差MSE，以便在不同模型构建技术之间进行比较</span></span>
+<span id="cb19-2"><a href="regularization-penalized-regression.html#cb19-2" tabindex="-1"></a>resid.subfit <span class="ot">=</span> test<span class="sc">$</span>lpsa <span class="sc">-</span> pred.subfit</span>
+<span id="cb19-3"><a href="regularization-penalized-regression.html#cb19-3" tabindex="-1"></a><span class="fu">mean</span>(resid.subfit<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
+<pre><code>## [1] 0.5084126</code></pre>
+</div>
+</div>
+<div id="ridge-regression" class="section level2 hasAnchor" number="1.2">
+<h2><span class="header-section-number">1.2</span> Ridge Regression<a href="regularization-penalized-regression.html#ridge-regression" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>岭回归(Ridge regression, Tikhonov regularization) 是一种专用于<strong>共线性数据分析</strong>的有偏估计回归方法，实质上是一种改良的最小二乘估计法，通过放弃最小二乘法的无偏性，以损失部分信息、降低精度为代价获得回归系数更为符合实际、更可靠的回归方法，对病态数据的拟合要强于最小二乘法。</p>
+<p>在岭回归中，规范化项是所有 系数的平方和，称为L2-norm(L2范数)。在我们的模型中就是试图最小化RSS + λ(sumβj2)。
+当λ增加时，系数会缩小，趋向于0但永远不会为0。
+岭回归的优点是可以提高预测准确度，但因为它不能使任何一个特征的系数为0，所以在模型解释性上会有些问题</p>
+<p>Hoerl and Kennard (1970) proposed that potential instability in the LS estimator
+<span class="math display">\[
+\hat{\beta}=\left(X^{\prime} X\right)^{-1} X^{\prime} Y,
+\]</span>
+could be improved by adding a small constant value <span class="math inline">\(\lambda\)</span> to the diagonal entries of the matrix <span class="math inline">\(X^{\prime} X\)</span> before taking its inverse.
+The result is the ridge regression estimator
+<span class="math display">\[
+\hat{\beta}_{\text {ridge }}=\left(X^{\prime} X+\lambda I_{p}\right)^{-1} X^{\prime} Y
+\]</span>
+Ridge regression places a particular form of constraint on the parameters <span class="math inline">\(\left(\beta^{\prime} \mathrm{s}\right): \hat{\beta}_{\text {ridge }}\)</span> is chosen to minimize the penalized sum of squares:
+<span class="math display">\[
+\sum_{i=1}^{n}\left(y_{i}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2}+\lambda \sum_{j=1}^{p} \beta_{j}^{2}
+\]</span>
+which is equivalent to minimization of <span class="math inline">\(\sum_{i=1}^{n}\left(y_{i}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2}\)</span> subject to, for some <span class="math inline">\(c&gt;0, \sum_{j=1}^{p} \beta_{j}^{2}&lt;c\)</span>, i.e. constraining the sum of the squared coefficients.
+Therefore, ridge regression puts further constraints on the parameters, <span class="math inline">\(\beta_{j}\)</span> ’s, in the linear model. In this case, what we are doing is that instead of just minimizing the residual sum values, the optimization function is penalized. We would prefer to take smaller <span class="math inline">\(\beta_{j}\)</span> ’s, or <span class="math inline">\(\beta_{j}\)</span> ’s that are close to zero to drive the penalty term small.</p>
+<div id="modeling" class="section level3 hasAnchor" number="1.2.1">
+<h3><span class="header-section-number">1.2.1</span> Modeling<a href="regularization-penalized-regression.html#modeling" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>岭回归的命令形式为glmnet(x=输入矩阵, y=响应变量, family= 分布函数, alpha=0)。
+* alpha为0时，表示进行岭回归;
+* alpha为1时，表示进行LASSO</p>
+<p>glmnet包会在计算λ值之前首先对输入进行标准化， 然后计算非标准化系数。 需要指定响应变量的分布为gaussian，因为它是连续的;还要指定 alpha = 0，表示进行岭回归。</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="regularization-penalized-regression.html#cb21-1" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(train[, <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>])</span>
+<span id="cb21-2"><a href="regularization-penalized-regression.html#cb21-2" tabindex="-1"></a>y <span class="ot">&lt;-</span> train[, <span class="dv">9</span>]</span>
+<span id="cb21-3"><a href="regularization-penalized-regression.html#cb21-3" tabindex="-1"></a>ridge <span class="ot">&lt;-</span> <span class="fu">glmnet</span>(x, y, <span class="at">family =</span> <span class="st">&quot;gaussian&quot;</span>, <span class="at">alpha =</span> <span class="dv">0</span>)</span>
+<span id="cb21-4"><a href="regularization-penalized-regression.html#cb21-4" tabindex="-1"></a><span class="do">## print()命令，它会展示非0 系数的数量，解释偏差百分比以及相应的λ值。程序包中算法默认的计算次数是100，但如果偏差 百分比在两个λ值之间的提高不是很显著的话，算法会在100次计算之前停止。也就是说，算法收 敛于最优解</span></span>
+<span id="cb21-5"><a href="regularization-penalized-regression.html#cb21-5" tabindex="-1"></a><span class="do">## 第100行为例。可以看出非0系数，即模型中包含的特征的数量为8。在岭回归中，这个数是不变的。还可以看出解释偏差百分比为0.6971，以及这一行的调优系数λ的值为0.08789。</span></span>
+<span id="cb21-6"><a href="regularization-penalized-regression.html#cb21-6" tabindex="-1"></a><span class="fu">print</span>(ridge)</span></code></pre></div>
+<pre><code>## 
+## Call:  glmnet(x = x, y = y, family = &quot;gaussian&quot;, alpha = 0) 
+## 
+##     Df  %Dev Lambda
+## 1    8  0.00 878.90
+## 2    8  0.56 800.80
+## 3    8  0.61 729.70
+## 4    8  0.67 664.80
+## 5    8  0.74 605.80
+## 6    8  0.81 552.00
+## 7    8  0.89 502.90
+## 8    8  0.97 458.20
+## 9    8  1.07 417.50
+## 10   8  1.17 380.40
+## 11   8  1.28 346.60
+## 12   8  1.40 315.90
+## 13   8  1.54 287.80
+## 14   8  1.68 262.20
+## 15   8  1.84 238.90
+## 16   8  2.02 217.70
+## 17   8  2.21 198.40
+## 18   8  2.42 180.70
+## 19   8  2.64 164.70
+## 20   8  2.89 150.10
+## 21   8  3.16 136.70
+## 22   8  3.46 124.60
+## 23   8  3.78 113.50
+## 24   8  4.13 103.40
+## 25   8  4.50  94.24
+## 26   8  4.91  85.87
+## 27   8  5.36  78.24
+## 28   8  5.84  71.29
+## 29   8  6.36  64.96
+## 30   8  6.93  59.19
+## 31   8  7.54  53.93
+## 32   8  8.19  49.14
+## 33   8  8.90  44.77
+## 34   8  9.65  40.79
+## 35   8 10.46  37.17
+## 36   8 11.33  33.87
+## 37   8 12.25  30.86
+## 38   8 13.24  28.12
+## 39   8 14.28  25.62
+## 40   8 15.39  23.34
+## 41   8 16.55  21.27
+## 42   8 17.78  19.38
+## 43   8 19.07  17.66
+## 44   8 20.41  16.09
+## 45   8 21.81  14.66
+## 46   8 23.27  13.36
+## 47   8 24.77  12.17
+## 48   8 26.31  11.09
+## 49   8 27.90  10.10
+## 50   8 29.51   9.21
+## 51   8 31.15   8.39
+## 52   8 32.81   7.64
+## 53   8 34.47   6.96
+## 54   8 36.14   6.35
+## 55   8 37.80   5.78
+## 56   8 39.45   5.27
+## 57   8 41.08   4.80
+## 58   8 42.68   4.37
+## 59   8 44.24   3.99
+## 60   8 45.76   3.63
+## 61   8 47.24   3.31
+## 62   8 48.66   3.02
+## 63   8 50.03   2.75
+## 64   8 51.34   2.50
+## 65   8 52.60   2.28
+## 66   8 53.80   2.08
+## 67   8 54.93   1.89
+## 68   8 56.01   1.73
+## 69   8 57.03   1.57
+## 70   8 58.00   1.43
+## 71   8 58.91   1.30
+## 72   8 59.76   1.19
+## 73   8 60.57   1.08
+## 74   8 61.33   0.99
+## 75   8 62.04   0.90
+## 76   8 62.70   0.82
+## 77   8 63.33   0.75
+## 78   8 63.91   0.68
+## 79   8 64.45   0.62
+## 80   8 64.96   0.56
+## 81   8 65.43   0.51
+## 82   8 65.87   0.47
+## 83   8 66.28   0.43
+## 84   8 66.66   0.39
+## 85   8 67.01   0.35
+## 86   8 67.33   0.32
+## 87   8 67.63   0.29
+## 88   8 67.90   0.27
+## 89   8 68.15   0.24
+## 90   8 68.38   0.22
+## 91   8 68.59   0.20
+## 92   8 68.77   0.18
+## 93   8 68.94   0.17
+## 94   8 69.09   0.15
+## 95   8 69.23   0.14
+## 96   8 69.35   0.13
+## 97   8 69.46   0.12
+## 98   8 69.55   0.11
+## 99   8 69.64   0.10
+## 100  8 69.71   0.09</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="regularization-penalized-regression.html#cb23-1" tabindex="-1"></a><span class="do">## Y轴是系数值，X轴是L1范数，图中显示了系数值和L1范数之间的关系</span></span>
+<span id="cb23-2"><a href="regularization-penalized-regression.html#cb23-2" tabindex="-1"></a><span class="fu">plot</span>(ridge, <span class="at">label =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="regularization-penalized-regression.html#cb24-1" tabindex="-1"></a><span class="do">## 看系数值 如何随着λ的变化而变化</span></span>
+<span id="cb24-2"><a href="regularization-penalized-regression.html#cb24-2" tabindex="-1"></a><span class="fu">plot</span>(ridge, <span class="at">xvar =</span> <span class="st">&quot;lambda&quot;</span>, <span class="at">label =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="regularization-penalized-regression.html#cb25-1" tabindex="-1"></a><span class="do">## 看系数值如何随解释偏差百分比变化，将lamda换成dev</span></span>
+<span id="cb25-2"><a href="regularization-penalized-regression.html#cb25-2" tabindex="-1"></a><span class="do">## 当λ减小时，系数会增大，解释偏差百分比也 会增大。如果将λ值设为0，就会忽略收缩惩罚，模型将等价于OLS</span></span>
+<span id="cb25-3"><a href="regularization-penalized-regression.html#cb25-3" tabindex="-1"></a><span class="fu">plot</span>(ridge, <span class="at">xvar =</span> <span class="st">&quot;dev&quot;</span>, <span class="at">label =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-3-3.png" width="672" /></p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="regularization-penalized-regression.html#cb26-1" tabindex="-1"></a><span class="do">## 在测试集上证明</span></span>
+<span id="cb26-2"><a href="regularization-penalized-regression.html#cb26-2" tabindex="-1"></a>newx <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(test[, <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>])</span>
+<span id="cb26-3"><a href="regularization-penalized-regression.html#cb26-3" tabindex="-1"></a>ridge.y <span class="ot">=</span> <span class="fu">predict</span>(ridge, <span class="at">newx =</span> newx, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>, <span class="at">s=</span><span class="fl">0.1</span>)</span>
+<span id="cb26-4"><a href="regularization-penalized-regression.html#cb26-4" tabindex="-1"></a><span class="do">## 画出表示预测值和实际值关系的统计图</span></span>
+<span id="cb26-5"><a href="regularization-penalized-regression.html#cb26-5" tabindex="-1"></a><span class="fu">plot</span>(ridge.y, test<span class="sc">$</span>lpsa, <span class="at">xlab =</span> <span class="st">&quot;Predicted&quot;</span>, </span>
+<span id="cb26-6"><a href="regularization-penalized-regression.html#cb26-6" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">&quot;Actual&quot;</span>, <span class="at">main =</span> <span class="st">&quot;Ridge Regression&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-3-4.png" width="672" /></p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="regularization-penalized-regression.html#cb27-1" tabindex="-1"></a><span class="do">## 计算MSE</span></span>
+<span id="cb27-2"><a href="regularization-penalized-regression.html#cb27-2" tabindex="-1"></a>ridge.resid <span class="ot">&lt;-</span> ridge.y <span class="sc">-</span> test<span class="sc">$</span>lpsa </span>
+<span id="cb27-3"><a href="regularization-penalized-regression.html#cb27-3" tabindex="-1"></a><span class="fu">mean</span>(ridge.resid<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
+<pre><code>## [1] 0.4783559</code></pre>
+</div>
+</div>
+<div id="lasso-regression" class="section level2 hasAnchor" number="1.3">
+<h2><span class="header-section-number">1.3</span> Lasso Regression<a href="regularization-penalized-regression.html#lasso-regression" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>区别于岭回归中的L2-norm，LASSO使用L1-norm，即所有特征权重的绝对值之和，
+也就是要最小化RSS + λ(sum|βj|)。这个收缩惩罚项确实可以使特征权重收缩到0.
+相对于岭回归，这是 L2-norm 一个明显的优势，因为可以极大地提高模型的解释性。
+但是，存在高共线性或高度两两相关 的情况下，LASSO可能会将某个预测特征强制删除，这会损失模型的预测能力.
+如果 特征A和B都应该存在于模型之中，那么LASSO可能会将其中一个的系数缩减到0。</p>
+<p>如果较少数目的预测变量有实际系数，其余预测变量的系数要么非常小，要么为0， 那么在这样的情况下，LASSO性能更好。
+当响应变量是很多预测变量的函数，而且预测变量的系数大小都差不多时，岭回归表现得更好
+两全其美的机会: 弹性网络既能做到岭回归不能做的特征提取，也能实现LASSO不能做的 特征分组。</p>
+<p>A ridge solution can be hard to interpret because it is not sparse (no <span class="math inline">\(\beta\)</span> ’s are set exactly to 0 ).</p>
+<ul>
+<li>Ridge subject to: <span class="math inline">\(\sum_{j=1}^{p}\left(\beta_{j}\right)^{2}&lt;c\)</span>.</li>
+<li>Lasso subject to: <span class="math inline">\(\sum_{j=1}^{p}\left|\beta_{j}\right|&lt;c\)</span>.</li>
+</ul>
+<p>This is a subtle, but important change. Some of the coefficients may be shrunk exactly to zero.
+The least absolute shrinkage and selection operator, or lasso, as described in Tibshirani (1996) is a technique that has received a great deal of interest.
+As with ridge regression we assume the covariates are standardized. Lasso estimates of the coefficients (Tibshirani, 1996) achieve min <span class="math inline">\((Y-X \beta)^{\prime}(Y-X \beta)+\lambda \sum_{j=1}^{p}\left|\beta_{j}\right|\)</span>, so that the L2 penalty of ridge regression <span class="math inline">\(\sum_{j=1}^{p} \beta_{j}^{2}\)</span> is replaced by an L1 penalty, <span class="math inline">\(\sum_{j=1}^{p}\left|\beta_{j}\right|\)</span>.
+4
+### Modelling</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="regularization-penalized-regression.html#cb29-1" tabindex="-1"></a>lasso <span class="ot">&lt;-</span> <span class="fu">glmnet</span>(x, y, <span class="at">family =</span> <span class="st">&quot;gaussian&quot;</span>, <span class="at">alpha =</span> <span class="dv">1</span>)</span>
+<span id="cb29-2"><a href="regularization-penalized-regression.html#cb29-2" tabindex="-1"></a><span class="fu">print</span>(lasso)</span></code></pre></div>
+<pre><code>## 
+## Call:  glmnet(x = x, y = y, family = &quot;gaussian&quot;, alpha = 1) 
+## 
+##    Df  %Dev  Lambda
+## 1   0  0.00 0.87890
+## 2   1  9.13 0.80080
+## 3   1 16.70 0.72970
+## 4   1 22.99 0.66480
+## 5   1 28.22 0.60580
+## 6   1 32.55 0.55200
+## 7   1 36.15 0.50290
+## 8   1 39.14 0.45820
+## 9   2 42.81 0.41750
+## 10  2 45.98 0.38040
+## 11  3 48.77 0.34660
+## 12  3 51.31 0.31590
+## 13  4 53.49 0.28780
+## 14  4 55.57 0.26220
+## 15  4 57.30 0.23890
+## 16  4 58.74 0.21770
+## 17  4 59.93 0.19840
+## 18  5 61.17 0.18070
+## 19  5 62.20 0.16470
+## 20  5 63.05 0.15010
+## 21  5 63.76 0.13670
+## 22  5 64.35 0.12460
+## 23  5 64.84 0.11350
+## 24  5 65.24 0.10340
+## 25  6 65.58 0.09424
+## 26  6 65.87 0.08587
+## 27  6 66.11 0.07824
+## 28  6 66.31 0.07129
+## 29  7 66.63 0.06496
+## 30  7 66.96 0.05919
+## 31  7 67.24 0.05393
+## 32  7 67.46 0.04914
+## 33  7 67.65 0.04477
+## 34  8 67.97 0.04079
+## 35  8 68.34 0.03717
+## 36  8 68.66 0.03387
+## 37  8 68.92 0.03086
+## 38  8 69.13 0.02812
+## 39  8 69.31 0.02562
+## 40  8 69.46 0.02334
+## 41  8 69.58 0.02127
+## 42  8 69.68 0.01938
+## 43  8 69.77 0.01766
+## 44  8 69.84 0.01609
+## 45  8 69.90 0.01466
+## 46  8 69.95 0.01336
+## 47  8 69.99 0.01217
+## 48  8 70.02 0.01109
+## 49  8 70.05 0.01010
+## 50  8 70.07 0.00921
+## 51  8 70.09 0.00839
+## 52  8 70.11 0.00764
+## 53  8 70.12 0.00696
+## 54  8 70.13 0.00635
+## 55  8 70.14 0.00578
+## 56  8 70.15 0.00527
+## 57  8 70.15 0.00480
+## 58  8 70.16 0.00437
+## 59  8 70.16 0.00399
+## 60  8 70.17 0.00363
+## 61  8 70.17 0.00331
+## 62  8 70.17 0.00301
+## 63  8 70.17 0.00275
+## 64  8 70.18 0.00250
+## 65  8 70.18 0.00228
+## 66  8 70.18 0.00208
+## 67  8 70.18 0.00189
+## 68  8 70.18 0.00172
+## 69  8 70.18 0.00157</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="regularization-penalized-regression.html#cb31-1" tabindex="-1"></a><span class="do">## 模型构建过程在69步之后停止了，因为解释偏差不再随着λ值的增加而减小。还要 注意，Df列现在也随着λ变化。初看上去，当λ值为0.001572时，所有8个特征都应该包括在模型 中。然而，出于测试的目的，我们先用更少特征的模型进行测试，比如7特征模型。从下面的结 果行中可以看到，λ值大约为0.045时，模型从7个特征变为8个特征。因此，使用测试集评价模型 时要使用这个λ值</span></span>
+<span id="cb31-2"><a href="regularization-penalized-regression.html#cb31-2" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="regularization-penalized-regression.html#cb31-3" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="regularization-penalized-regression.html#cb31-4" tabindex="-1"></a><span class="fu">plot</span>(lasso, <span class="at">xvar =</span> <span class="st">&quot;lambda&quot;</span>, <span class="at">label =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="regularization-penalized-regression.html#cb32-1" tabindex="-1"></a>lasso.coef <span class="ot">&lt;-</span> <span class="fu">coef</span>(lasso, <span class="at">s =</span> <span class="fl">0.045</span>)</span>
+<span id="cb32-2"><a href="regularization-penalized-regression.html#cb32-2" tabindex="-1"></a>lasso.coef</span></code></pre></div>
+<pre><code>## 9 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                        s1
+## (Intercept) -0.1305900670
+## lcavol       0.4479592050
+## lweight      0.5910476764
+## age         -0.0073162861
+## lbph         0.0974103575
+## svi          0.4746790830
+## lcp          .           
+## gleason      0.2968768129
+## pgg45        0.0009788059</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="regularization-penalized-regression.html#cb34-1" tabindex="-1"></a><span class="do">## LASSO算法在λ值为0.045时，将lcp的系数归零</span></span>
+<span id="cb34-2"><a href="regularization-penalized-regression.html#cb34-2" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="regularization-penalized-regression.html#cb34-3" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="regularization-penalized-regression.html#cb34-4" tabindex="-1"></a><span class="do">## LASSO模型在测试集上的表现</span></span>
+<span id="cb34-5"><a href="regularization-penalized-regression.html#cb34-5" tabindex="-1"></a>lasso.y <span class="ot">&lt;-</span> <span class="fu">predict</span>(lasso, <span class="at">newx =</span> newx, </span>
+<span id="cb34-6"><a href="regularization-penalized-regression.html#cb34-6" tabindex="-1"></a>                   <span class="at">type =</span> <span class="st">&quot;response&quot;</span>, <span class="at">s =</span> <span class="fl">0.045</span>)</span>
+<span id="cb34-7"><a href="regularization-penalized-regression.html#cb34-7" tabindex="-1"></a><span class="fu">plot</span>(lasso.y, test<span class="sc">$</span>lpsa, <span class="at">xlab =</span> <span class="st">&quot;Predicted&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Actual&quot;</span>, </span>
+<span id="cb34-8"><a href="regularization-penalized-regression.html#cb34-8" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;LASSO&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="regularization-penalized-regression.html#cb35-1" tabindex="-1"></a>lasso.resid <span class="ot">&lt;-</span> lasso.y <span class="sc">-</span> test<span class="sc">$</span>lpsa</span>
+<span id="cb35-2"><a href="regularization-penalized-regression.html#cb35-2" tabindex="-1"></a><span class="fu">mean</span>(lasso.resid<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
+<pre><code>## [1] 0.4437209</code></pre>
+<div id="glmnet-cross-validation" class="section level3 hasAnchor" number="1.3.1">
+<h3><span class="header-section-number">1.3.1</span> glmnet cross validation<a href="regularization-penalized-regression.html#glmnet-cross-validation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>glmnet包在使用cv.glmnet()估计 λ值时，默认使用10折交叉验证。
+在K折交叉验证中，数据被划分成k个相同的子集(折)，每次使 用k  1个子集拟合模型，然后使用剩下的那个子集做测试集，最后将k次拟合的结果综合起来(一 般取平均数)，确定最后的参数。</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="regularization-penalized-regression.html#cb37-1" tabindex="-1"></a><span class="do">## 3折交叉验证</span></span>
+<span id="cb37-2"><a href="regularization-penalized-regression.html#cb37-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">317</span>)</span>
+<span id="cb37-3"><a href="regularization-penalized-regression.html#cb37-3" tabindex="-1"></a>lasso.cv <span class="ot">=</span> <span class="fu">cv.glmnet</span>(x, y, <span class="at">nfolds =</span> <span class="dv">3</span>)</span>
+<span id="cb37-4"><a href="regularization-penalized-regression.html#cb37-4" tabindex="-1"></a><span class="fu">plot</span>(lasso.cv)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="regularization-penalized-regression.html#cb38-1" tabindex="-1"></a><span class="do">## Interpretation</span></span>
+<span id="cb38-2"><a href="regularization-penalized-regression.html#cb38-2" tabindex="-1"></a><span class="do">## CV统计图和glmnet中其他统计图有很大区别，它表示λ的对数值和均方误差之间的关系，还 带有模型中特征的数量。图中两条垂直的虚线表示取得MSE最小值的logλ(左侧虚线)和距离最 小值一个标准误差的logλ。如果有过拟合问题，那么距离最小值一个标准误的位置是非常好的解决问题的起点。</span></span>
+<span id="cb38-3"><a href="regularization-penalized-regression.html#cb38-3" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="regularization-penalized-regression.html#cb38-4" tabindex="-1"></a><span class="do">## 得到这两个λ的具体值</span></span>
+<span id="cb38-5"><a href="regularization-penalized-regression.html#cb38-5" tabindex="-1"></a>lasso.cv<span class="sc">$</span>lambda.min <span class="co"># minimum</span></span></code></pre></div>
+<pre><code>## [1] 0.007644054</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="regularization-penalized-regression.html#cb40-1" tabindex="-1"></a>lasso.cv<span class="sc">$</span>lambda<span class="fl">.1</span>se <span class="co"># one standard error away</span></span></code></pre></div>
+<pre><code>## [1] 0.3158532</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="regularization-penalized-regression.html#cb42-1" tabindex="-1"></a><span class="do">## 查看系数并在测试集上进行模型验证</span></span>
+<span id="cb42-2"><a href="regularization-penalized-regression.html#cb42-2" tabindex="-1"></a><span class="do">## 模型的误差为0.45，只有5个特征，排除了age、lcp和pgg45</span></span>
+<span id="cb42-3"><a href="regularization-penalized-regression.html#cb42-3" tabindex="-1"></a><span class="fu">coef</span>(lasso.cv, <span class="at">s =</span> <span class="st">&quot;lambda.1se&quot;</span>)</span></code></pre></div>
+<pre><code>## 9 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                     s1
+## (Intercept) 1.07462462
+## lcavol      0.41767273
+## lweight     0.22464383
+## age         .         
+## lbph        .         
+## svi         0.06489231
+## lcp         .         
+## gleason     .         
+## pgg45       .</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="regularization-penalized-regression.html#cb44-1" tabindex="-1"></a>lasso.y.cv <span class="ot">=</span> <span class="fu">predict</span>(lasso.cv, <span class="at">newx=</span>newx, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>, </span>
+<span id="cb44-2"><a href="regularization-penalized-regression.html#cb44-2" tabindex="-1"></a>                     <span class="at">s =</span> <span class="st">&quot;lambda.1se&quot;</span>)</span>
+<span id="cb44-3"><a href="regularization-penalized-regression.html#cb44-3" tabindex="-1"></a>lasso.cv.resid <span class="ot">=</span> lasso.y.cv <span class="sc">-</span> test<span class="sc">$</span>lpsa</span>
+<span id="cb44-4"><a href="regularization-penalized-regression.html#cb44-4" tabindex="-1"></a><span class="fu">mean</span>(lasso.cv.resid<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
+<pre><code>## [1] 0.5508264</code></pre>
+<!-- 通过对数据集的分析和研究，我们得出5个不同模型。下面是这些模型在测试集上的误差。 -->
+<!-- *  最优子集模型:0.51 -->
+<!-- *  岭回归模型:0.48 -->
+<!-- *  LASSO模型:0.44 -->
+<!-- *  弹性网络模型:0.48 -->
+<!-- *  LASSO交叉验证模型:0.45 -->
+<!-- 仅看误差的话，7特征LASSO模型表现最好。通过交叉验证得到λ值约为0.125的模型，它更简约，也可能更加合适，因为其解释性更好。 -->
+</div>
+</div>
+<div id="elasticnet" class="section level2 hasAnchor" number="1.4">
+<h2><span class="header-section-number">1.4</span> ElasticNet<a href="regularization-penalized-regression.html#elasticnet" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>弹性网络(ElasticNet)</p>
+<ul>
+<li>既能做到岭回归不能做的特征提取，也能实现LASSO不能做的 特征分组。</li>
+<li>LASSO倾向于在一组相关的特征中选择一个，忽略其他。弹性网络包含了 一个混合参数α，它和λ同时起作用。
+α是一个0和1之间的数，λ和前面一样，用来调节惩罚项的大小。
+当α等于0时，弹性网络等价于岭回归;当α等于1时，弹性网络等价于LASSO。</li>
+<li>实质上，通过对β系数的二次项引入一个第二调优参数，将L1惩罚项和L2惩罚项混合在一起。 通过最小化(RSS + λ[(1-α)(sum|βj|2)/2 + α(sum|βj|)]/N)完成目标。</li>
+</ul>
+<div id="modelling" class="section level3 hasAnchor" number="1.4.1">
+<h3><span class="header-section-number">1.4.1</span> Modelling<a href="regularization-penalized-regression.html#modelling" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>弹性网络参数α。回忆一下，α = 0表示岭回归惩罚，α = 1表示LASSO惩罚，
+弹性网络参数为0≤α≤1。同时解出两个不同的参数会非常麻烦，求助于R中的老朋友——caret包。</p>
+<p>caret包旨在解决分类问题和训练回归模型，它配有一个很棒的网站，帮助人们掌握其所有功能:<a href="http://topepo.github.io/caret/index.html" class="uri">http://topepo.github.io/caret/index.html</a></p>
+<ul>
+<li><ol style="list-style-type: decimal">
+<li>使用R基础包中的expand.grid()函数，建立一个向量存储我们要研究的α和λ的所有 组合。</li>
+</ol></li>
+<li><ol start="2" style="list-style-type: decimal">
+<li>使用caret包中的trainControl()函数确定重取样方法，像第2章一样，使用LOOCV。</li>
+</ol></li>
+<li><ol start="3" style="list-style-type: decimal">
+<li>P在caret包的train()函数中使用glmnet()训练模型来选择α和λ。</li>
+</ol></li>
+</ul>
+<p>规则试验:
+* α从0到1，每次增加0.2;请记住，α被绑定在0和1之间。
+* λ从0到0.20，每次增加0.02;0.2的λ值是岭回归λ值(λ = 0.1)和LASSOλ值(λ = 0.045)之间的一个中间值。
+* expand.grid()函数建立这个向量并生成一系列数值，caret包会自动使用这些数值</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="regularization-penalized-regression.html#cb46-1" tabindex="-1"></a>grid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">.alpha =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>, <span class="at">by=</span>.<span class="dv">2</span>), </span>
+<span id="cb46-2"><a href="regularization-penalized-regression.html#cb46-2" tabindex="-1"></a>                    <span class="at">.lambda =</span> <span class="fu">seq</span>(<span class="fl">0.00</span>, <span class="fl">0.2</span>, <span class="at">by =</span> <span class="fl">0.02</span>))</span>
+<span id="cb46-3"><a href="regularization-penalized-regression.html#cb46-3" tabindex="-1"></a><span class="fu">table</span>(grid)</span></code></pre></div>
+<pre><code>##       .lambda
+## .alpha 0 0.02 0.04 0.06 0.08 0.1 0.12 0.14 0.16 0.18 0.2
+##    0   1    1    1    1    1   1    1    1    1    1   1
+##    0.2 1    1    1    1    1   1    1    1    1    1   1
+##    0.4 1    1    1    1    1   1    1    1    1    1   1
+##    0.6 1    1    1    1    1   1    1    1    1    1   1
+##    0.8 1    1    1    1    1   1    1    1    1    1   1
+##    1   1    1    1    1    1   1    1    1    1    1   1</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="regularization-penalized-regression.html#cb48-1" tabindex="-1"></a><span class="fu">head</span>(grid)</span></code></pre></div>
+<pre><code>##   .alpha .lambda
+## 1    0.0       0
+## 2    0.2       0
+## 3    0.4       0
+## 4    0.6       0
+## 5    0.8       0
+## 6    1.0       0</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="regularization-penalized-regression.html#cb50-1" tabindex="-1"></a><span class="do">## 对于定量型响应变量，使用算法的默认选择均方根误差即可完美实现</span></span>
+<span id="cb50-2"><a href="regularization-penalized-regression.html#cb50-2" tabindex="-1"></a>control <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;LOOCV&quot;</span>) <span class="co"># selectionFunction=&quot;best&quot;</span></span>
+<span id="cb50-3"><a href="regularization-penalized-regression.html#cb50-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">701</span>)                             <span class="co"># our random seed</span></span>
+<span id="cb50-4"><a href="regularization-penalized-regression.html#cb50-4" tabindex="-1"></a>enet.train <span class="ot">=</span> <span class="fu">train</span>(lpsa <span class="sc">~</span> ., <span class="at">data =</span> train, </span>
+<span id="cb50-5"><a href="regularization-penalized-regression.html#cb50-5" tabindex="-1"></a>                   <span class="at">method =</span> <span class="st">&quot;glmnet&quot;</span>, </span>
+<span id="cb50-6"><a href="regularization-penalized-regression.html#cb50-6" tabindex="-1"></a>                   <span class="at">trControl =</span> control, </span>
+<span id="cb50-7"><a href="regularization-penalized-regression.html#cb50-7" tabindex="-1"></a>                   <span class="at">tuneGrid =</span> grid)</span>
+<span id="cb50-8"><a href="regularization-penalized-regression.html#cb50-8" tabindex="-1"></a>enet.train</span></code></pre></div>
+<pre><code>## glmnet 
+## 
+## 67 samples
+##  8 predictor
+## 
+## No pre-processing
+## Resampling: Leave-One-Out Cross-Validation 
+## Summary of sample sizes: 66, 66, 66, 66, 66, 66, ... 
+## Resampling results across tuning parameters:
+## 
+##   alpha  lambda  RMSE       Rsquared   MAE      
+##   0.0    0.00    0.7498311  0.6091434  0.5684548
+##   0.0    0.02    0.7498311  0.6091434  0.5684548
+##   0.0    0.04    0.7498311  0.6091434  0.5684548
+##   0.0    0.06    0.7498311  0.6091434  0.5684548
+##   0.0    0.08    0.7498311  0.6091434  0.5684548
+##   0.0    0.10    0.7508038  0.6079576  0.5691343
+##   0.0    0.12    0.7512303  0.6073484  0.5692774
+##   0.0    0.14    0.7518536  0.6066518  0.5694451
+##   0.0    0.16    0.7526409  0.6058786  0.5696155
+##   0.0    0.18    0.7535502  0.6050559  0.5699154
+##   0.0    0.20    0.7545583  0.6041945  0.5709377
+##   0.2    0.00    0.7550170  0.6073913  0.5746434
+##   0.2    0.02    0.7542648  0.6065770  0.5713633
+##   0.2    0.04    0.7550427  0.6045111  0.5738111
+##   0.2    0.06    0.7571893  0.6015388  0.5764117
+##   0.2    0.08    0.7603394  0.5978544  0.5793641
+##   0.2    0.10    0.7642219  0.5936131  0.5846567
+##   0.2    0.12    0.7684937  0.5890900  0.5898445
+##   0.2    0.14    0.7713716  0.5861699  0.5939008
+##   0.2    0.16    0.7714681  0.5864527  0.5939535
+##   0.2    0.18    0.7726979  0.5856865  0.5948039
+##   0.2    0.20    0.7744041  0.5845281  0.5959671
+##   0.4    0.00    0.7551309  0.6072931  0.5746628
+##   0.4    0.02    0.7559055  0.6044693  0.5737468
+##   0.4    0.04    0.7599608  0.5989266  0.5794120
+##   0.4    0.06    0.7667450  0.5911506  0.5875213
+##   0.4    0.08    0.7746900  0.5824231  0.5979116
+##   0.4    0.10    0.7760605  0.5809784  0.6001763
+##   0.4    0.12    0.7784160  0.5788024  0.6024102
+##   0.4    0.14    0.7792216  0.5786250  0.6035698
+##   0.4    0.16    0.7784433  0.5806388  0.6024696
+##   0.4    0.18    0.7779134  0.5828322  0.6014095
+##   0.4    0.20    0.7797721  0.5826306  0.6020934
+##   0.6    0.00    0.7553016  0.6071317  0.5748038
+##   0.6    0.02    0.7579330  0.6020021  0.5766881
+##   0.6    0.04    0.7665234  0.5917067  0.5863966
+##   0.6    0.06    0.7778600  0.5790948  0.6021629
+##   0.6    0.08    0.7801170  0.5765439  0.6049216
+##   0.6    0.10    0.7819242  0.5750003  0.6073379
+##   0.6    0.12    0.7800315  0.5782365  0.6053700
+##   0.6    0.14    0.7813077  0.5785548  0.6059119
+##   0.6    0.16    0.7846753  0.5770307  0.6075899
+##   0.6    0.18    0.7886388  0.5753101  0.6104210
+##   0.6    0.20    0.7931549  0.5734018  0.6140249
+##   0.8    0.00    0.7553734  0.6070686  0.5748255
+##   0.8    0.02    0.7603679  0.5991567  0.5797001
+##   0.8    0.04    0.7747753  0.5827275  0.5975303
+##   0.8    0.06    0.7812784  0.5752601  0.6065340
+##   0.8    0.08    0.7832103  0.5734172  0.6092662
+##   0.8    0.10    0.7811248  0.5769787  0.6071341
+##   0.8    0.12    0.7847355  0.5750115  0.6093756
+##   0.8    0.14    0.7894184  0.5725728  0.6122536
+##   0.8    0.16    0.7951091  0.5696205  0.6158407
+##   0.8    0.18    0.8018475  0.5659672  0.6205741
+##   0.8    0.20    0.8090352  0.5622252  0.6256726
+##   1.0    0.00    0.7554439  0.6070354  0.5749409
+##   1.0    0.02    0.7632577  0.5958706  0.5827830
+##   1.0    0.04    0.7813519  0.5754986  0.6065914
+##   1.0    0.06    0.7843882  0.5718847  0.6103528
+##   1.0    0.08    0.7819175  0.5755415  0.6082954
+##   1.0    0.10    0.7860004  0.5731009  0.6107923
+##   1.0    0.12    0.7921572  0.5692525  0.6146159
+##   1.0    0.14    0.7999326  0.5642789  0.6198758
+##   1.0    0.16    0.8089248  0.5583637  0.6265797
+##   1.0    0.18    0.8185327  0.5521348  0.6343174
+##   1.0    0.20    0.8259445  0.5494268  0.6411104
+## 
+## RMSE was used to select the optimal model using the smallest value.
+## The final values used for the model were alpha = 0 and lambda = 0.08.</code></pre>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="regularization-penalized-regression.html#cb52-1" tabindex="-1"></a><span class="do">## 选择最优模型的原则是RMSE值最小，模型最后选定的最优参数组合是α = 0，λ = 0.08。</span></span>
+<span id="cb52-2"><a href="regularization-penalized-regression.html#cb52-2" tabindex="-1"></a><span class="do">## 实验设计得到的最优调优参数是α = 0和λ = 0.08，相当于glmnet中s = 0.08的岭回归</span></span>
+<span id="cb52-3"><a href="regularization-penalized-regression.html#cb52-3" tabindex="-1"></a></span>
+<span id="cb52-4"><a href="regularization-penalized-regression.html#cb52-4" tabindex="-1"></a><span class="do">## 在测试集上验证模型</span></span>
+<span id="cb52-5"><a href="regularization-penalized-regression.html#cb52-5" tabindex="-1"></a><span class="co"># enet &lt;- glmnet(x, y,family = &quot;gaussian&quot;, </span></span>
+<span id="cb52-6"><a href="regularization-penalized-regression.html#cb52-6" tabindex="-1"></a><span class="co">#                alpha = 0, </span></span>
+<span id="cb52-7"><a href="regularization-penalized-regression.html#cb52-7" tabindex="-1"></a><span class="co">#                lambda = .08)</span></span>
+<span id="cb52-8"><a href="regularization-penalized-regression.html#cb52-8" tabindex="-1"></a><span class="co"># enet.coef &lt;- coef(enet, s = .08, exact = TRUE)</span></span>
+<span id="cb52-9"><a href="regularization-penalized-regression.html#cb52-9" tabindex="-1"></a><span class="co"># enet.coef</span></span>
+<span id="cb52-10"><a href="regularization-penalized-regression.html#cb52-10" tabindex="-1"></a><span class="co"># enet.y &lt;- predict(enet, newx = newx, type = &quot;response&quot;,  s= .08)</span></span>
+<span id="cb52-11"><a href="regularization-penalized-regression.html#cb52-11" tabindex="-1"></a><span class="co"># plot(enet.y, test$lpsa, xlab = &quot;Predicted&quot;, </span></span>
+<span id="cb52-12"><a href="regularization-penalized-regression.html#cb52-12" tabindex="-1"></a><span class="co">#      ylab = &quot;Actual&quot;, main = &quot;Elastic Net&quot;)</span></span>
+<span id="cb52-13"><a href="regularization-penalized-regression.html#cb52-13" tabindex="-1"></a><span class="co"># enet.resid &lt;- enet.y - test$lpsa</span></span>
+<span id="cb52-14"><a href="regularization-penalized-regression.html#cb52-14" tabindex="-1"></a><span class="co"># mean(enet.resid^2)</span></span></code></pre></div>
+</div>
+<div id="classification" class="section level3 hasAnchor" number="1.4.2">
+<h3><span class="header-section-number">1.4.2</span> Classification<a href="regularization-penalized-regression.html#classification" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<!-- 正则化技术同样适用于分类问题，二值分类和多值分类. -->
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="regularization-penalized-regression.html#cb53-1" tabindex="-1"></a><span class="do">## 用于逻辑斯蒂回归</span></span>
+<span id="cb53-2"><a href="regularization-penalized-regression.html#cb53-2" tabindex="-1"></a><span class="do">## 加载准备乳腺癌数据</span></span>
+<span id="cb53-3"><a href="regularization-penalized-regression.html#cb53-3" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb53-4"><a href="regularization-penalized-regression.html#cb53-4" tabindex="-1"></a>biopsy<span class="sc">$</span>ID <span class="ot">=</span> <span class="cn">NULL</span></span>
+<span id="cb53-5"><a href="regularization-penalized-regression.html#cb53-5" tabindex="-1"></a><span class="fu">names</span>(biopsy) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;thick&quot;</span>, <span class="st">&quot;u.size&quot;</span>, <span class="st">&quot;u.shape&quot;</span>, <span class="st">&quot;adhsn&quot;</span>,</span>
+<span id="cb53-6"><a href="regularization-penalized-regression.html#cb53-6" tabindex="-1"></a>                  <span class="st">&quot;s.size&quot;</span>, <span class="st">&quot;nucl&quot;</span>, <span class="st">&quot;chrom&quot;</span>, <span class="st">&quot;n.nuc&quot;</span>, <span class="st">&quot;mit&quot;</span>, <span class="st">&quot;class&quot;</span>)</span>
+<span id="cb53-7"><a href="regularization-penalized-regression.html#cb53-7" tabindex="-1"></a>biopsy.v2 <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(biopsy)</span>
+<span id="cb53-8"><a href="regularization-penalized-regression.html#cb53-8" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) <span class="co">#random number generator</span></span>
+<span id="cb53-9"><a href="regularization-penalized-regression.html#cb53-9" tabindex="-1"></a>ind <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">2</span>, <span class="fu">nrow</span>(biopsy.v2), <span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="fl">0.3</span>))</span>
+<span id="cb53-10"><a href="regularization-penalized-regression.html#cb53-10" tabindex="-1"></a>train <span class="ot">&lt;-</span> biopsy.v2[ind<span class="sc">==</span><span class="dv">1</span>, ] <span class="co">#the training data set</span></span>
+<span id="cb53-11"><a href="regularization-penalized-regression.html#cb53-11" tabindex="-1"></a>test <span class="ot">&lt;-</span> biopsy.v2[ind<span class="sc">==</span><span class="dv">2</span>, ] <span class="co">#the test data set</span></span>
+<span id="cb53-12"><a href="regularization-penalized-regression.html#cb53-12" tabindex="-1"></a></span>
+<span id="cb53-13"><a href="regularization-penalized-regression.html#cb53-13" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(train[, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>])</span>
+<span id="cb53-14"><a href="regularization-penalized-regression.html#cb53-14" tabindex="-1"></a>y <span class="ot">&lt;-</span> train[, <span class="dv">10</span>]</span>
+<span id="cb53-15"><a href="regularization-penalized-regression.html#cb53-15" tabindex="-1"></a></span>
+<span id="cb53-16"><a href="regularization-penalized-regression.html#cb53-16" tabindex="-1"></a></span>
+<span id="cb53-17"><a href="regularization-penalized-regression.html#cb53-17" tabindex="-1"></a><span class="do">## 函数cv.glmnet中，将family的值设定为binomial，将measure的值设定为曲线下面积 (auc)，并使用5折交叉验证</span></span>
+<span id="cb53-18"><a href="regularization-penalized-regression.html#cb53-18" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">3</span>)</span>
+<span id="cb53-19"><a href="regularization-penalized-regression.html#cb53-19" tabindex="-1"></a>fitCV <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(x, y, <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>,</span>
+<span id="cb53-20"><a href="regularization-penalized-regression.html#cb53-20" tabindex="-1"></a>                   <span class="at">type.measure =</span> <span class="st">&quot;auc&quot;</span>,</span>
+<span id="cb53-21"><a href="regularization-penalized-regression.html#cb53-21" tabindex="-1"></a>                   <span class="at">nfolds =</span> <span class="dv">5</span>)</span>
+<span id="cb53-22"><a href="regularization-penalized-regression.html#cb53-22" tabindex="-1"></a><span class="do">## 绘制fitCV，可以看出AUC和λ的关系</span></span>
+<span id="cb53-23"><a href="regularization-penalized-regression.html#cb53-23" tabindex="-1"></a><span class="fu">plot</span>(fitCV)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="regularization-penalized-regression.html#cb54-1" tabindex="-1"></a><span class="do">## 模型系数,选择出的5个特征是thickness、u.size、u.shape, nucl, n.nuc</span></span>
+<span id="cb54-2"><a href="regularization-penalized-regression.html#cb54-2" tabindex="-1"></a>fitCV<span class="sc">$</span>lambda<span class="fl">.1</span>se</span></code></pre></div>
+<pre><code>## [1] 0.1710154</code></pre>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="regularization-penalized-regression.html#cb56-1" tabindex="-1"></a><span class="fu">coef</span>(fitCV, <span class="at">s =</span> <span class="st">&quot;lambda.1se&quot;</span>)</span></code></pre></div>
+<pre><code>## 10 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                      s1
+## (Intercept) -2.01180454
+## thick        0.03320390
+## u.size       0.10789382
+## u.shape      0.08617195
+## adhsn        .         
+## s.size       .         
+## nucl         0.15038212
+## chrom        .         
+## n.nuc        0.00483271
+## mit          .</code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="regularization-penalized-regression.html#cb58-1" tabindex="-1"></a><span class="do">## 通过误差和auc，查看这个模型在测试集上的表现</span></span>
+<span id="cb58-2"><a href="regularization-penalized-regression.html#cb58-2" tabindex="-1"></a><span class="fu">library</span>(InformationValue)</span>
+<span id="cb58-3"><a href="regularization-penalized-regression.html#cb58-3" tabindex="-1"></a>predCV <span class="ot">&lt;-</span> <span class="fu">predict</span>(fitCV, <span class="at">newx =</span> <span class="fu">as.matrix</span>(test[, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>]),</span>
+<span id="cb58-4"><a href="regularization-penalized-regression.html#cb58-4" tabindex="-1"></a>                  <span class="at">s =</span> <span class="st">&quot;lambda.1se&quot;</span>,</span>
+<span id="cb58-5"><a href="regularization-penalized-regression.html#cb58-5" tabindex="-1"></a>                  <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb58-6"><a href="regularization-penalized-regression.html#cb58-6" tabindex="-1"></a>actuals <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(test<span class="sc">$</span>class <span class="sc">==</span> <span class="st">&quot;malignant&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb58-7"><a href="regularization-penalized-regression.html#cb58-7" tabindex="-1"></a><span class="fu">misClassError</span>(actuals, predCV)</span></code></pre></div>
+<pre><code>## [1] 0.0574</code></pre>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="regularization-penalized-regression.html#cb60-1" tabindex="-1"></a><span class="fu">plotROC</span>(actuals, predCV)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="smoothing.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/yihui/bookdown-crc/edit/master/03-Regularization-Penalized-Regression.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["bookdown.pdf", "bookdown.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "none"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

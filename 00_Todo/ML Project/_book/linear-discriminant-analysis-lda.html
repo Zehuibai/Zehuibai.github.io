@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 8 linear discriminant analysis (LDA) | ML Project Using bookdown</title>
+  <meta name="description" content="A book example for a Chapman &amp; Hall book." />
+  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 8 linear discriminant analysis (LDA) | ML Project Using bookdown" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="A book example for a Chapman &amp; Hall book." />
+  <meta name="github-repo" content="yihui/bookdown-crc" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 8 linear discriminant analysis (LDA) | ML Project Using bookdown" />
+  
+  <meta name="twitter:description" content="A book example for a Chapman &amp; Hall book." />
+  
+
+<meta name="author" content="Zehui Bai" />
+
+
+<meta name="date" content="2023-12-06" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="cluster-analysis.html"/>
+<link rel="next" href="neural-network.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="libs/d3-3.5.17/d3.min.js"></script>
+<link href="libs/markmap-0.3.3/view.mindmap.css" rel="stylesheet" />
+<script src="libs/markmap-0.3.3/view.mindmap.js"></script>
+<script src="libs/markmap-0.3.3/plugins/parsemd.min.js"></script>
+<script src="libs/markmap-binding-1.3.2/markmap.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">ML Project</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#why-read-this-book"><i class="fa fa-check"></i>Why read this book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#structure-of-the-book"><i class="fa fa-check"></i>Structure of the book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information-and-conventions"><i class="fa fa-check"></i>Software information and conventions</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html"><i class="fa fa-check"></i><b>1</b> Regularization Penalized Regression</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#motivation"><i class="fa fa-check"></i><b>1.1.1</b> Motivation</a></li>
+<li class="chapter" data-level="1.1.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#data-preparation"><i class="fa fa-check"></i><b>1.1.2</b> Data preparation</a></li>
+<li class="chapter" data-level="1.1.3" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#best-subset-regression"><i class="fa fa-check"></i><b>1.1.3</b> Best subset regression</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#ridge-regression"><i class="fa fa-check"></i><b>1.2</b> Ridge Regression</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modeling"><i class="fa fa-check"></i><b>1.2.1</b> Modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#lasso-regression"><i class="fa fa-check"></i><b>1.3</b> Lasso Regression</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modelling"><i class="fa fa-check"></i><b>1.3.1</b> Modelling</a></li>
+<li class="chapter" data-level="1.3.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#glmnet-cross-validation"><i class="fa fa-check"></i><b>1.3.2</b> glmnet cross validation</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#elasticnet"><i class="fa fa-check"></i><b>1.4</b> ElasticNet</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modelling-1"><i class="fa fa-check"></i><b>1.4.1</b> Modelling</a></li>
+<li class="chapter" data-level="1.4.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#classification"><i class="fa fa-check"></i><b>1.4.2</b> Classification</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="smoothing.html"><a href="smoothing.html"><i class="fa fa-check"></i><b>2</b> Smoothing</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="smoothing.html"><a href="smoothing.html#smoothing-1"><i class="fa fa-check"></i><b>2.1</b> Smoothing</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="smoothing.html"><a href="smoothing.html#bin-smoothing"><i class="fa fa-check"></i><b>2.1.1</b> Bin smoothing</a></li>
+<li class="chapter" data-level="2.1.2" data-path="smoothing.html"><a href="smoothing.html#kernels"><i class="fa fa-check"></i><b>2.1.2</b> Kernels</a></li>
+<li class="chapter" data-level="2.1.3" data-path="smoothing.html"><a href="smoothing.html#local-weighted-regression-loess"><i class="fa fa-check"></i><b>2.1.3</b> Local weighted regression (loess)</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="smoothing.html"><a href="smoothing.html#loess-regression"><i class="fa fa-check"></i><b>2.2</b> Loess Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="knn.html"><a href="knn.html"><i class="fa fa-check"></i><b>3</b> KNN</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="knn.html"><a href="knn.html#introduction-1"><i class="fa fa-check"></i><b>3.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="knn.html"><a href="knn.html#idee"><i class="fa fa-check"></i><b>3.1.1</b> Idee</a></li>
+<li class="chapter" data-level="3.1.2" data-path="knn.html"><a href="knn.html#加权最近邻法"><i class="fa fa-check"></i><b>3.1.2</b> 加权最近邻法</a></li>
+<li class="chapter" data-level="3.1.3" data-path="knn.html"><a href="knn.html#knn算法三要素"><i class="fa fa-check"></i><b>3.1.3</b> KNN算法三要素</a></li>
+<li class="chapter" data-level="3.1.4" data-path="knn.html"><a href="knn.html#优缺点"><i class="fa fa-check"></i><b>3.1.4</b> 优缺点</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="knn.html"><a href="knn.html#knn算法的实现方式"><i class="fa fa-check"></i><b>3.2</b> KNN算法的实现方式</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="knn.html"><a href="knn.html#brute-force"><i class="fa fa-check"></i><b>3.2.1</b> Brute-force</a></li>
+<li class="chapter" data-level="3.2.2" data-path="knn.html"><a href="knn.html#kd树实现"><i class="fa fa-check"></i><b>3.2.2</b> KD树实现</a></li>
+<li class="chapter" data-level="3.2.3" data-path="knn.html"><a href="knn.html#球树实现"><i class="fa fa-check"></i><b>3.2.3</b> 球树实现</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="knn.html"><a href="knn.html#application"><i class="fa fa-check"></i><b>3.3</b> Application</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="knn.html"><a href="knn.html#data-preparation-1"><i class="fa fa-check"></i><b>3.3.1</b> Data Preparation</a></li>
+<li class="chapter" data-level="3.3.2" data-path="knn.html"><a href="knn.html#knn-modelling"><i class="fa fa-check"></i><b>3.3.2</b> KNN Modelling</a></li>
+<li class="chapter" data-level="3.3.3" data-path="knn.html"><a href="knn.html#加权最近邻法-1"><i class="fa fa-check"></i><b>3.3.3</b> 加权最近邻法</a></li>
+<li class="chapter" data-level="3.3.4" data-path="knn.html"><a href="knn.html#over-training"><i class="fa fa-check"></i><b>3.3.4</b> Over-training</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="svm.html"><a href="svm.html"><i class="fa fa-check"></i><b>4</b> SVM</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="svm.html"><a href="svm.html#introduction-2"><i class="fa fa-check"></i><b>4.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="svm.html"><a href="svm.html#perceptron"><i class="fa fa-check"></i><b>4.1.1</b> Perceptron</a></li>
+<li class="chapter" data-level="4.1.2" data-path="svm.html"><a href="svm.html#函数间隔与几何间隔"><i class="fa fa-check"></i><b>4.1.2</b> 函数间隔与几何间隔</a></li>
+<li class="chapter" data-level="4.1.3" data-path="svm.html"><a href="svm.html#svm支持向量"><i class="fa fa-check"></i><b>4.1.3</b> SVM支持向量</a></li>
+<li class="chapter" data-level="4.1.4" data-path="svm.html"><a href="svm.html#svm模型目标函数与优化"><i class="fa fa-check"></i><b>4.1.4</b> SVM模型目标函数与优化</a></li>
+<li class="chapter" data-level="4.1.5" data-path="svm.html"><a href="svm.html#线性可分svm的算法过程"><i class="fa fa-check"></i><b>4.1.5</b> 线性可分SVM的算法过程</a></li>
+<li class="chapter" data-level="4.1.6" data-path="svm.html"><a href="svm.html#线性svm的软间隔最大化"><i class="fa fa-check"></i><b>4.1.6</b> 线性SVM的软间隔最大化</a></li>
+<li class="chapter" data-level="4.1.7" data-path="svm.html"><a href="svm.html#线性不可分支持向量机与核函数"><i class="fa fa-check"></i><b>4.1.7</b> 线性不可分支持向量机与核函数</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="svm.html"><a href="svm.html#application-1"><i class="fa fa-check"></i><b>4.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="svm.html"><a href="svm.html#data-preparation-2"><i class="fa fa-check"></i><b>4.2.1</b> Data Preparation</a></li>
+<li class="chapter" data-level="4.2.2" data-path="svm.html"><a href="svm.html#svm-modelling"><i class="fa fa-check"></i><b>4.2.2</b> SVM Modelling</a></li>
+<li class="chapter" data-level="4.2.3" data-path="svm.html"><a href="svm.html#model-selection"><i class="fa fa-check"></i><b>4.2.3</b> Model Selection</a></li>
+<li class="chapter" data-level="4.2.4" data-path="svm.html"><a href="svm.html#character-selection"><i class="fa fa-check"></i><b>4.2.4</b> Character selection</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="tree-models.html"><a href="tree-models.html"><i class="fa fa-check"></i><b>5</b> Tree models</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="tree-models.html"><a href="tree-models.html#decision-tree-model"><i class="fa fa-check"></i><b>5.1</b> Decision Tree Model</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="tree-models.html"><a href="tree-models.html#decision-tree-algorithm"><i class="fa fa-check"></i><b>5.1.1</b> Decision tree algorithm</a></li>
+<li class="chapter" data-level="5.1.2" data-path="tree-models.html"><a href="tree-models.html#id3-algorithm"><i class="fa fa-check"></i><b>5.1.2</b> ID3 Algorithm</a></li>
+<li class="chapter" data-level="5.1.3" data-path="tree-models.html"><a href="tree-models.html#c4.5-algorithm"><i class="fa fa-check"></i><b>5.1.3</b> C4.5 Algorithm</a></li>
+<li class="chapter" data-level="5.1.4" data-path="tree-models.html"><a href="tree-models.html#cart-algorithm"><i class="fa fa-check"></i><b>5.1.4</b> CART Algorithm</a></li>
+<li class="chapter" data-level="5.1.5" data-path="tree-models.html"><a href="tree-models.html#pruning"><i class="fa fa-check"></i><b>5.1.5</b> Pruning</a></li>
+<li class="chapter" data-level="5.1.6" data-path="tree-models.html"><a href="tree-models.html#package-rpart"><i class="fa fa-check"></i><b>5.1.6</b> Package ‘rpart’</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="tree-models.html"><a href="tree-models.html#random-forest"><i class="fa fa-check"></i><b>5.2</b> Random Forest</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="tree-models.html"><a href="tree-models.html#bootstrap-bagging"><i class="fa fa-check"></i><b>5.2.1</b> Bootstrap (Bagging)</a></li>
+<li class="chapter" data-level="5.2.2" data-path="tree-models.html"><a href="tree-models.html#bagging算法流程"><i class="fa fa-check"></i><b>5.2.2</b> bagging算法流程</a></li>
+<li class="chapter" data-level="5.2.3" data-path="tree-models.html"><a href="tree-models.html#random-forest-algorithm"><i class="fa fa-check"></i><b>5.2.3</b> Random Forest Algorithm</a></li>
+<li class="chapter" data-level="5.2.4" data-path="tree-models.html"><a href="tree-models.html#random-forest-promotion"><i class="fa fa-check"></i><b>5.2.4</b> Random forest promotion</a></li>
+<li class="chapter" data-level="5.2.5" data-path="tree-models.html"><a href="tree-models.html#package-randomforest"><i class="fa fa-check"></i><b>5.2.5</b> Package ‘randomForest’</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="tree-models.html"><a href="tree-models.html#modelling-2"><i class="fa fa-check"></i><b>5.3</b> Modelling</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="tree-models.html"><a href="tree-models.html#data-preparation-3"><i class="fa fa-check"></i><b>5.3.1</b> Data preparation</a></li>
+<li class="chapter" data-level="5.3.2" data-path="tree-models.html"><a href="tree-models.html#regression-tree-1"><i class="fa fa-check"></i><b>5.3.2</b> Regression tree</a></li>
+<li class="chapter" data-level="5.3.3" data-path="tree-models.html"><a href="tree-models.html#classification-tree-1"><i class="fa fa-check"></i><b>5.3.3</b> Classification tree</a></li>
+<li class="chapter" data-level="5.3.4" data-path="tree-models.html"><a href="tree-models.html#random-forest-for-regression"><i class="fa fa-check"></i><b>5.3.4</b> Random forest for regression</a></li>
+<li class="chapter" data-level="5.3.5" data-path="tree-models.html"><a href="tree-models.html#random-forest-for-classification"><i class="fa fa-check"></i><b>5.3.5</b> Random forest for classification</a></li>
+<li class="chapter" data-level="5.3.6" data-path="tree-models.html"><a href="tree-models.html#皮玛印第安人糖尿病数据集"><i class="fa fa-check"></i><b>5.3.6</b> 皮玛印第安人糖尿病数据集</a></li>
+<li class="chapter" data-level="5.3.7" data-path="tree-models.html"><a href="tree-models.html#使用随机森林进行特征选择"><i class="fa fa-check"></i><b>5.3.7</b> 使用随机森林进行特征选择</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="tree-models.html"><a href="tree-models.html#gradient-boosting"><i class="fa fa-check"></i><b>5.4</b> Gradient Boosting</a></li>
+<li class="chapter" data-level="5.5" data-path="tree-models.html"><a href="tree-models.html#gradient-descent"><i class="fa fa-check"></i><b>5.5</b> Gradient Descent</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="tree-models.html"><a href="tree-models.html#gradient"><i class="fa fa-check"></i><b>5.5.1</b> Gradient</a></li>
+<li class="chapter" data-level="5.5.2" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-1"><i class="fa fa-check"></i><b>5.5.2</b> Gradient Descent</a></li>
+<li class="chapter" data-level="5.5.3" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-algorithm"><i class="fa fa-check"></i><b>5.5.3</b> Gradient Descent Algorithm</a></li>
+<li class="chapter" data-level="5.5.4" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-familiy"><i class="fa fa-check"></i><b>5.5.4</b> Gradient Descent Familiy</a></li>
+<li class="chapter" data-level="5.5.5" data-path="tree-models.html"><a href="tree-models.html#gbdt分类算法"><i class="fa fa-check"></i><b>5.5.5</b> GBDT分类算法</a></li>
+<li class="chapter" data-level="5.5.6" data-path="tree-models.html"><a href="tree-models.html#package-gbm"><i class="fa fa-check"></i><b>5.5.6</b> Package ‘gbm’</a></li>
+<li class="chapter" data-level="5.5.7" data-path="tree-models.html"><a href="tree-models.html#极限梯度提升分类"><i class="fa fa-check"></i><b>5.5.7</b> 极限梯度提升——分类</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="tree-models.html"><a href="tree-models.html#cubist-model"><i class="fa fa-check"></i><b>5.6</b> Cubist Model</a>
+<ul>
+<li class="chapter" data-level="5.6.1" data-path="tree-models.html"><a href="tree-models.html#introduction-3"><i class="fa fa-check"></i><b>5.6.1</b> Introduction</a></li>
+<li class="chapter" data-level="5.6.2" data-path="tree-models.html"><a href="tree-models.html#application-data-preparation"><i class="fa fa-check"></i><b>5.6.2</b> Application Data Preparation</a></li>
+<li class="chapter" data-level="5.6.3" data-path="tree-models.html"><a href="tree-models.html#fit-continious-outcome"><i class="fa fa-check"></i><b>5.6.3</b> Fit Continious Outcome</a></li>
+<li class="chapter" data-level="5.6.4" data-path="tree-models.html"><a href="tree-models.html#variable-importance"><i class="fa fa-check"></i><b>5.6.4</b> Variable Importance</a></li>
+<li class="chapter" data-level="5.6.5" data-path="tree-models.html"><a href="tree-models.html#summary-display"><i class="fa fa-check"></i><b>5.6.5</b> Summary display</a></li>
+<li class="chapter" data-level="5.6.6" data-path="tree-models.html"><a href="tree-models.html#specific-parts"><i class="fa fa-check"></i><b>5.6.6</b> specific parts</a></li>
+<li class="chapter" data-level="5.6.7" data-path="tree-models.html"><a href="tree-models.html#ensembles-by-committees"><i class="fa fa-check"></i><b>5.6.7</b> Ensembles By Committees</a></li>
+<li class="chapter" data-level="5.6.8" data-path="tree-models.html"><a href="tree-models.html#nearestneighbors-adjustmemt"><i class="fa fa-check"></i><b>5.6.8</b> Nearest–neighbors Adjustmemt</a></li>
+<li class="chapter" data-level="5.6.9" data-path="tree-models.html"><a href="tree-models.html#optimize-parameters"><i class="fa fa-check"></i><b>5.6.9</b> Optimize parameters</a></li>
+<li class="chapter" data-level="5.6.10" data-path="tree-models.html"><a href="tree-models.html#logistic-cv"><i class="fa fa-check"></i><b>5.6.10</b> Logistic CV</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="pca.html"><a href="pca.html"><i class="fa fa-check"></i><b>6</b> PCA</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="pca.html"><a href="pca.html#introduction-4"><i class="fa fa-check"></i><b>6.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="pca.html"><a href="pca.html#component"><i class="fa fa-check"></i><b>6.1.1</b> Component</a></li>
+<li class="chapter" data-level="6.1.2" data-path="pca.html"><a href="pca.html#pca算法"><i class="fa fa-check"></i><b>6.1.2</b> PCA算法</a></li>
+<li class="chapter" data-level="6.1.3" data-path="pca.html"><a href="pca.html#主成分旋转"><i class="fa fa-check"></i><b>6.1.3</b> 主成分旋转</a></li>
+<li class="chapter" data-level="6.1.4" data-path="pca.html"><a href="pca.html#kernelized-pca"><i class="fa fa-check"></i><b>6.1.4</b> Kernelized PCA</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="pca.html"><a href="pca.html#application-2"><i class="fa fa-check"></i><b>6.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="pca.html"><a href="pca.html#data-preparation-4"><i class="fa fa-check"></i><b>6.2.1</b> Data preparation</a></li>
+<li class="chapter" data-level="6.2.2" data-path="pca.html"><a href="pca.html#modeling-1"><i class="fa fa-check"></i><b>6.2.2</b> Modeling</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="cluster-analysis.html"><a href="cluster-analysis.html"><i class="fa fa-check"></i><b>7</b> Cluster Analysis</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering"><i class="fa fa-check"></i><b>7.1</b> Hierarchical Clustering</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#introduction-5"><i class="fa fa-check"></i><b>7.1.1</b> Introduction</a></li>
+<li class="chapter" data-level="7.1.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering-algorithms"><i class="fa fa-check"></i><b>7.1.2</b> Hierarchical clustering algorithms</a></li>
+<li class="chapter" data-level="7.1.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#measure-the-dissimilarity-between-two-clusters-of-observations"><i class="fa fa-check"></i><b>7.1.3</b> Measure the dissimilarity between two clusters of observations</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering"><i class="fa fa-check"></i><b>7.2</b> K-means Clustering</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#algorithm"><i class="fa fa-check"></i><b>7.2.1</b> Algorithm</a></li>
+<li class="chapter" data-level="7.2.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means"><i class="fa fa-check"></i><b>7.2.2</b> K-Means++</a></li>
+<li class="chapter" data-level="7.2.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#elkan-k-means"><i class="fa fa-check"></i><b>7.2.3</b> elkan K-Means</a></li>
+<li class="chapter" data-level="7.2.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#mini-batch-k-means"><i class="fa fa-check"></i><b>7.2.4</b> Mini Batch K-Means</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient-and-pam"><i class="fa fa-check"></i><b>7.3</b> Gower’s coefficient and PAM</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient"><i class="fa fa-check"></i><b>7.3.1</b> Gower’s coefficient</a></li>
+<li class="chapter" data-level="7.3.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#不同数据类型的相异度计算-距离法"><i class="fa fa-check"></i><b>7.3.2</b> 不同数据类型的相异度计算 (距离法)</a></li>
+<li class="chapter" data-level="7.3.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#pam"><i class="fa fa-check"></i><b>7.3.3</b> PAM</a></li>
+</ul></li>
+<li class="chapter" data-level="7.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch-clustering"><i class="fa fa-check"></i><b>7.4</b> BIRCH Clustering</a>
+<ul>
+<li class="chapter" data-level="7.4.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch-introduction"><i class="fa fa-check"></i><b>7.4.1</b> BIRCH Introduction</a></li>
+<li class="chapter" data-level="7.4.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#聚类特征cf与聚类特征树cf-tree"><i class="fa fa-check"></i><b>7.4.2</b> 聚类特征CF与聚类特征树CF Tree</a></li>
+<li class="chapter" data-level="7.4.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#cf-tree的生成"><i class="fa fa-check"></i><b>7.4.3</b> CF Tree的生成</a></li>
+<li class="chapter" data-level="7.4.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch算法"><i class="fa fa-check"></i><b>7.4.4</b> BIRCH算法</a></li>
+</ul></li>
+<li class="chapter" data-level="7.5" data-path="cluster-analysis.html"><a href="cluster-analysis.html#application-3"><i class="fa fa-check"></i><b>7.5</b> Application</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#data-preparation-5"><i class="fa fa-check"></i><b>7.5.1</b> Data preparation</a></li>
+<li class="chapter" data-level="7.5.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering-1"><i class="fa fa-check"></i><b>7.5.2</b> Hierarchical Clustering</a></li>
+<li class="chapter" data-level="7.5.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering-1"><i class="fa fa-check"></i><b>7.5.3</b> K-means Clustering</a></li>
+<li class="chapter" data-level="7.5.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient-and-pam-1"><i class="fa fa-check"></i><b>7.5.4</b> Gower’s coefficient and PAM</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html"><i class="fa fa-check"></i><b>8</b> linear discriminant analysis (LDA)</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#introduction-6"><i class="fa fa-check"></i><b>8.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#naive-bayes"><i class="fa fa-check"></i><b>8.1.1</b> Naive Bayes</a></li>
+<li class="chapter" data-level="8.1.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#controlling-prevalence"><i class="fa fa-check"></i><b>8.1.2</b> Controlling prevalence</a></li>
+<li class="chapter" data-level="8.1.3" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#qda"><i class="fa fa-check"></i><b>8.1.3</b> QDA</a></li>
+<li class="chapter" data-level="8.1.4" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda"><i class="fa fa-check"></i><b>8.1.4</b> LDA</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#discriminant-analysis-algorithm"><i class="fa fa-check"></i><b>8.2</b> Discriminant analysis algorithm</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#idee-1"><i class="fa fa-check"></i><b>8.2.1</b> Idee</a></li>
+<li class="chapter" data-level="8.2.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#瑞利商rayleigh-quotient"><i class="fa fa-check"></i><b>8.2.2</b> 瑞利商（Rayleigh quotient）</a></li>
+<li class="chapter" data-level="8.2.3" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#广义瑞利商-genralized-rayleigh-quotient"><i class="fa fa-check"></i><b>8.2.3</b> 广义瑞利商 genralized Rayleigh quotient</a></li>
+<li class="chapter" data-level="8.2.4" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda算法流程"><i class="fa fa-check"></i><b>8.2.4</b> LDA算法流程</a></li>
+<li class="chapter" data-level="8.2.5" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda-application"><i class="fa fa-check"></i><b>8.2.5</b> LDA Application</a></li>
+<li class="chapter" data-level="8.2.6" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#qda-1"><i class="fa fa-check"></i><b>8.2.6</b> QDA</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="neural-network.html"><a href="neural-network.html"><i class="fa fa-check"></i><b>9</b> Neural Network</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="neural-network.html"><a href="neural-network.html#introduction-7"><i class="fa fa-check"></i><b>9.1</b> Introduction</a></li>
+<li class="chapter" data-level="9.2" data-path="neural-network.html"><a href="neural-network.html#反向传播方法进行训练的前馈神经网络"><i class="fa fa-check"></i><b>9.2</b> 反向传播方法进行训练的前馈神经网络</a></li>
+<li class="chapter" data-level="9.3" data-path="neural-network.html"><a href="neural-network.html#application-4"><i class="fa fa-check"></i><b>9.3</b> Application</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="neural-network.html"><a href="neural-network.html#数据准备"><i class="fa fa-check"></i><b>9.3.1</b> 数据准备</a></li>
+<li class="chapter" data-level="9.3.2" data-path="neural-network.html"><a href="neural-network.html#模型构建"><i class="fa fa-check"></i><b>9.3.2</b> 模型构建</a></li>
+</ul></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="more-to-say.html"><a href="more-to-say.html"><i class="fa fa-check"></i><b>A</b> More to Say</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://bookdown.org" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">ML Project Using bookdown</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="linear-discriminant-analysis-lda" class="section level1 hasAnchor" number="8">
+<h1><span class="header-section-number">Chapter 8</span> linear discriminant analysis (LDA)<a href="linear-discriminant-analysis-lda.html#linear-discriminant-analysis-lda" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div class="markmap html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-8212512dabc366a25e06" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-8212512dabc366a25e06">{"x":{"data":"# \n##  linear discriminant analysis (LDA)\n### Introduction\n#### Naive Bayes\n#### Controlling prevalence\n#### QDA\n#### LDA\n### Discriminant analysis algorithm\n#### Idee\n#### 瑞利商（Rayleigh quotient）\n#### 广义瑞利商 genralized Rayleigh quotient\n#### LDA算法流程\n#### LDA Application\n#### QDA","options":{"preset":"colorful","autoFit":true}},"evals":[],"jsHooks":[]}</script>
+<p>Predict qualitative response variables using probability-based linear models, three methods:</p>
+<ul>
+<li><strong>Logistic regression</strong></li>
+<li><strong>Linear discriminant analysis (线性判别分析)</strong></li>
+<li><strong>Multivariate adaptive regression spline (多元自适应回归样条)</strong></li>
+</ul>
+<div id="introduction-6" class="section level2 hasAnchor" number="8.1">
+<h2><span class="header-section-number">8.1</span> Introduction<a href="linear-discriminant-analysis-lda.html#introduction-6" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In a binary case, the smallest true error we can achieve is determined by Bayes’ rule, which is a decision rule based on the true conditional probability:</p>
+<p><span class="math display">\[
+p(\mathbf{x})=\operatorname{Pr}(Y=1 \mid \mathbf{X}=\mathbf{x})
+\]</span></p>
+<p>We have described several approaches to estimating <span class="math inline">\(p(\mathbf{x})\)</span>. In all these approaches, we estimate the conditional probability directly and do not consider the distribution of the predictors. In machine learning, these are referred to as discriminative approaches.
+However, Bayes’ theorem tells us that knowing the distribution of the predictors <span class="math inline">\(\mathbf{X}\)</span> may be useful. Methods that model the joint distribution of <span class="math inline">\(Y\)</span> and <span class="math inline">\(\mathbf{X}\)</span> are referred to as generative models (we model how the entire data, <span class="math inline">\(\mathbf{X}\)</span> and <span class="math inline">\(Y\)</span>, are generated). We start by describing the most general generative model, Naive Bayes, and then proceed to describe two specific cases, quadratic discriminant analysis (QDA) and linear discriminant analysis (LDA).</p>
+<div id="naive-bayes" class="section level3 hasAnchor" number="8.1.1">
+<h3><span class="header-section-number">8.1.1</span> Naive Bayes<a href="linear-discriminant-analysis-lda.html#naive-bayes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>在统计学中，朴素贝叶斯分类器是一系列简单的“概率分类器”，它们基于应用贝叶斯定理和特征之间的强（朴素）独立假设（strong (naive) independence assumptions）。它们是最简单的贝叶斯网络模型之一，但与核密度估计相结合，它们可以达到很高的准确度水平。在统计文献中，朴素贝叶斯模型有多种名称，包括简单贝叶斯和独立贝叶斯。</p>
+<p>朴素贝叶斯是一种构建分类器的简单技术：将类标签分配给问题实例的模型，表示为特征值的向量，其中类标签是从某个有限集合中提取的。训练此类分类器的算法不是单一的，而是基于一个共同原则的一系列算法：所有朴素贝叶斯分类器都假定在给定类变量的情况下，特定特征的值独立于任何其他特征的值。例如，如果水果是红色的、圆形的、直径约 10 厘米，则可以认为它是苹果。朴素贝叶斯分类器认为这些特征中的每一个都独立地贡献于该水果是苹果的概率，而不管颜色、圆度和直径特征之间的任何可能相关性。</p>
+<p>朴素贝叶斯的一个优点是它只需要少量的训练数据来估计分类所需的参数。尽管影响深远的独立性假设通常是不准确的，但朴素贝叶斯分类器有几个特性使其在实践中非常有用。特别是，类条件特征分布的解耦意味着每个分布都可以独立估计为一维分布。这有助于缓解因维度灾难而产生的问题，例如需要随特征数量呈指数增长的数据集。虽然朴素贝叶斯通常无法对正确的类概率产生良好的估计， 这可能不是许多应用程序的要求。例如，只要正确的类比任何其他类更有可能，朴素贝叶斯分类器就会做出正确的 MAP 决策规则分类(最大后验概率(maximum a posteriori -MAP)。
+无论概率估计是否稍微不准确，甚至严重不准确，这都是正确的。通过这种方式，整个分类器可以足够健壮，可以忽略其潜在的朴素概率模型中的严重缺陷。</p>
+<p>Recall that Bayes rule tells us that we can rewrite <span class="math inline">\(p(\mathbf{x})\)</span> like this:
+<span class="math display">\[
+p(\mathbf{x})=\operatorname{Pr}(Y=1 \mid \mathbf{X}=\mathbf{x})=\frac{f_{\mathbf{X} \mid Y=1}(\mathbf{x}) \operatorname{Pr}(Y=1)}{f_{\mathbf{X} \mid Y=0}(\mathbf{x}) \operatorname{Pr}(Y=0)+f_{\mathbf{X} \mid Y=1}(\mathbf{x}) \operatorname{Pr}(Y=1)}
+\]</span>
+with <span class="math inline">\(f_{\mathbf{X} \mid Y=1}\)</span> and <span class="math inline">\(f_{\mathbf{X} \mid Y=0}\)</span> representing the distribution functions of the predictor <span class="math inline">\(\mathbf{X}\)</span> for the two classes <span class="math inline">\(Y=1\)</span> and <span class="math inline">\(Y=0\)</span>.</p>
+<p>The formula implies that if we can estimate these conditional distributions of the predictors, we can develop a powerful decision rule. However, this is a big if. As we go forward, we will encounter examples in which <span class="math inline">\(\mathbf{X}\)</span> has many dimensions and we do not have much information about the distribution. In these cases, Naive Bayes will be practically impossible to implement. However, there are instances in which we have a small number of predictors (not much more than 2) and many categories in which generative models can be quite powerful.</p>
+<p>该公式意味着，如果我们可以估计预测变量的这些条件分布，我们就可以制定一个强大的决策规则。但是，这是一个很大的如果。在我们继续前进的过程中，我们会遇到 <span class="math inline">\(\mathbf{X}\)</span> 有很多维度并且我们没有太多关于分布的信息的例子。在这些情况下，朴素贝叶斯实际上是不可能实现的。但是，在某些情况下，我们有少量的预测变量（不超过 2 个）和许多类别，其中生成模型可能非常强大。</p>
+<p>Good case: the example related to predicting sex from height.</p>
+<p>在这种情况下，朴素贝叶斯方法特别合适，因为我们知道正态分布是给定性别 <span class="math inline">\(Y=1\)</span>（女性）和 <span class="math inline">\(Y=0\)</span>（男性）的高度条件分布的一个很好的近似值 . 这意味着我们可以通过简单地估计数据的平均值和标准偏差来近似条件分布 <span class="math inline">\(f_{X \mid Y=1}\)</span> 和 <span class="math inline">\(f_{X \mid Y=0}\)</span>：</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="linear-discriminant-analysis-lda.html#cb1-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="linear-discriminant-analysis-lda.html#cb1-2" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb1-3"><a href="linear-discriminant-analysis-lda.html#cb1-3" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="linear-discriminant-analysis-lda.html#cb1-4" tabindex="-1"></a><span class="fu">library</span>(dslabs)</span>
+<span id="cb1-5"><a href="linear-discriminant-analysis-lda.html#cb1-5" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;heights&quot;</span>)</span>
+<span id="cb1-6"><a href="linear-discriminant-analysis-lda.html#cb1-6" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="linear-discriminant-analysis-lda.html#cb1-7" tabindex="-1"></a>y <span class="ot">&lt;-</span> heights<span class="sc">$</span>height</span>
+<span id="cb1-8"><a href="linear-discriminant-analysis-lda.html#cb1-8" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1995</span>)</span>
+<span id="cb1-9"><a href="linear-discriminant-analysis-lda.html#cb1-9" tabindex="-1"></a>test_index <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(y, <span class="at">times =</span> <span class="dv">1</span>, <span class="at">p =</span> <span class="fl">0.5</span>, <span class="at">list =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-10"><a href="linear-discriminant-analysis-lda.html#cb1-10" tabindex="-1"></a>train_set <span class="ot">&lt;-</span> heights <span class="sc">%&gt;%</span> <span class="fu">slice</span>(<span class="sc">-</span>test_index)</span>
+<span id="cb1-11"><a href="linear-discriminant-analysis-lda.html#cb1-11" tabindex="-1"></a>test_set <span class="ot">&lt;-</span> heights <span class="sc">%&gt;%</span> <span class="fu">slice</span>(test_index)</span>
+<span id="cb1-12"><a href="linear-discriminant-analysis-lda.html#cb1-12" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="linear-discriminant-analysis-lda.html#cb1-13" tabindex="-1"></a>params <span class="ot">&lt;-</span> train_set <span class="sc">%&gt;%</span> </span>
+<span id="cb1-14"><a href="linear-discriminant-analysis-lda.html#cb1-14" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-15"><a href="linear-discriminant-analysis-lda.html#cb1-15" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">avg =</span> <span class="fu">mean</span>(height), <span class="at">sd =</span> <span class="fu">sd</span>(height))</span>
+<span id="cb1-16"><a href="linear-discriminant-analysis-lda.html#cb1-16" tabindex="-1"></a>params</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 3
+##   sex      avg    sd
+##   &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt;
+## 1 Female  64.8  4.14
+## 2 Male    69.2  3.57</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="linear-discriminant-analysis-lda.html#cb3-1" tabindex="-1"></a><span class="do">## prevalence, which we will denote with  π=Pr(Y=1), </span></span>
+<span id="cb3-2"><a href="linear-discriminant-analysis-lda.html#cb3-2" tabindex="-1"></a>pi <span class="ot">&lt;-</span> train_set <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="at">pi=</span><span class="fu">mean</span>(sex<span class="sc">==</span><span class="st">&quot;Female&quot;</span>)) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(pi)</span>
+<span id="cb3-3"><a href="linear-discriminant-analysis-lda.html#cb3-3" tabindex="-1"></a>pi</span></code></pre></div>
+<pre><code>## [1] 0.2118321</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="linear-discriminant-analysis-lda.html#cb5-1" tabindex="-1"></a><span class="do">## Now we can use our estimates of average and standard deviation to get an actual rule:</span></span>
+<span id="cb5-2"><a href="linear-discriminant-analysis-lda.html#cb5-2" tabindex="-1"></a>x <span class="ot">&lt;-</span> test_set<span class="sc">$</span>height</span>
+<span id="cb5-3"><a href="linear-discriminant-analysis-lda.html#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="linear-discriminant-analysis-lda.html#cb5-4" tabindex="-1"></a>f0 <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x, params<span class="sc">$</span>avg[<span class="dv">2</span>], params<span class="sc">$</span>sd[<span class="dv">2</span>])</span>
+<span id="cb5-5"><a href="linear-discriminant-analysis-lda.html#cb5-5" tabindex="-1"></a>f1 <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x, params<span class="sc">$</span>avg[<span class="dv">1</span>], params<span class="sc">$</span>sd[<span class="dv">1</span>])</span>
+<span id="cb5-6"><a href="linear-discriminant-analysis-lda.html#cb5-6" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="linear-discriminant-analysis-lda.html#cb5-7" tabindex="-1"></a>p_hat_bayes <span class="ot">&lt;-</span> f1<span class="sc">*</span>pi <span class="sc">/</span> (f1<span class="sc">*</span>pi <span class="sc">+</span> f0<span class="sc">*</span>(<span class="dv">1</span> <span class="sc">-</span> pi))</span>
+<span id="cb5-8"><a href="linear-discriminant-analysis-lda.html#cb5-8" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="linear-discriminant-analysis-lda.html#cb5-9" tabindex="-1"></a><span class="fu">qplot</span>(x,p_hat_bayes,<span class="at">xlab =</span><span class="st">&quot;x&quot;</span>, <span class="at">ylab=</span><span class="st">&quot;prob&quot;</span> ) </span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>总而言之，贝叶斯分类器特点为:</p>
+<ol style="list-style-type: decimal">
+<li><strong>需要知道先验概率先验概率是计算后验概率的基础</strong></li>
+</ol>
+<p>在传统的概率理论中，先验概率可以由大量的重复实验所获得的各类样本出现的频率来近似获得，其基础是“大数定律”，这一思想称为“频率主义”。而在称为“贝叶斯主义”的数理统计学派中，他们认为时间是单向的，许多事件的发生不具有可重复性，因此先验概率只能根据对置信度的主观判定来给出，也可以说由“信仰”来确定。</p>
+<ol start="2" style="list-style-type: decimal">
+<li><strong>按照获得的信息对先验概率进行修正</strong></li>
+</ol>
+<p>在没有获得任何信息的时候，如果要进行分类判别，只能依据各类存在的先验概率，将样本划分到先验概率大的一类中。而在获得了更多关于样本特征的信息后，可以依照贝叶斯公式对先验概率进行修正，得到后验概率，提高分类决策的准确性和置信度。</p>
+<ol start="3" style="list-style-type: decimal">
+<li><strong>分类决策存在错误率</strong></li>
+</ol>
+<p>由于贝叶斯分类是在样本取得某特征值时对它属于各类的概率进行推测，并无法获得样本真实的类别归属情况，所以分类决策一定存在错误率，即使错误率很低，分类错误的情况也可能发生。</p>
+</div>
+<div id="controlling-prevalence" class="section level3 hasAnchor" number="8.1.2">
+<h3><span class="header-section-number">8.1.2</span> Controlling prevalence<a href="linear-discriminant-analysis-lda.html#controlling-prevalence" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>朴素贝叶斯方法的一个有用特征是它包含一个参数来解释流行率的差异。</p>
+<p><span class="math display">\[
+\hat{p}(x)= \frac{\hat{f}_{X|Y=1}(x) \hat{\pi}}
+{ \hat{f}_{X|Y=0}(x)(1-\hat{\pi}) + \hat{f}_{X|Y=1}(x)\hat{\pi} }
+\]</span></p>
+<p>As we discussed earlier, our sample has a much lower prevalence, <span class="math inline">\(0.21\)</span>, than the general population. So if we use the rule <span class="math inline">\(\hat{p}(x)&gt;0.5\)</span> to predict females, our accuracy will be affected due to the low sensitivity:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="linear-discriminant-analysis-lda.html#cb6-1" tabindex="-1"></a>y_hat_bayes <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(p_hat_bayes <span class="sc">&gt;</span> <span class="fl">0.5</span>, <span class="st">&quot;Female&quot;</span>, <span class="st">&quot;Male&quot;</span>)</span>
+<span id="cb6-2"><a href="linear-discriminant-analysis-lda.html#cb6-2" tabindex="-1"></a><span class="fu">sensitivity</span>(<span class="at">data =</span> <span class="fu">factor</span>(y_hat_bayes), <span class="at">reference =</span> <span class="fu">factor</span>(test_set<span class="sc">$</span>sex))</span></code></pre></div>
+<pre><code>## [1] 0.2125984</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="linear-discriminant-analysis-lda.html#cb8-1" tabindex="-1"></a><span class="fu">specificity</span>(<span class="at">data =</span> <span class="fu">factor</span>(y_hat_bayes), <span class="at">reference =</span> <span class="fu">factor</span>(test_set<span class="sc">$</span>sex))</span></code></pre></div>
+<pre><code>## [1] 0.9674185</code></pre>
+<p>这主要是因为 π 远小于 0.5，因此我们倾向于更频繁地预测 Male。 机器学习算法在我们的样本中这样做是有意义的，因为我们确实有更高比例的男性。 但是，如果我们将此推断到一般人群，我们的整体准确性将受到低灵敏度的影响。</p>
+<p>朴素贝叶斯方法为我们提供了一种直接的方法来纠正这个问题，因为我们可以简单地强制 π 成为我们想要的任何值。 因此，为了平衡特异性和敏感性，我们可以简单地将 p_hat 更改，而不是更改决策规则中的截止值，如下所示：</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="linear-discriminant-analysis-lda.html#cb10-1" tabindex="-1"></a>p_hat_bayes_unbiased <span class="ot">&lt;-</span> f1 <span class="sc">*</span> <span class="fl">0.5</span> <span class="sc">/</span> (f1 <span class="sc">*</span> <span class="fl">0.5</span> <span class="sc">+</span> f0 <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.5</span>)) </span>
+<span id="cb10-2"><a href="linear-discriminant-analysis-lda.html#cb10-2" tabindex="-1"></a>y_hat_bayes_unbiased <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(p_hat_bayes_unbiased<span class="sc">&gt;</span> <span class="fl">0.5</span>, <span class="st">&quot;Female&quot;</span>, <span class="st">&quot;Male&quot;</span>)</span>
+<span id="cb10-3"><a href="linear-discriminant-analysis-lda.html#cb10-3" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="linear-discriminant-analysis-lda.html#cb10-4" tabindex="-1"></a><span class="fu">sensitivity</span>(<span class="fu">factor</span>(y_hat_bayes_unbiased), <span class="fu">factor</span>(test_set<span class="sc">$</span>sex))</span></code></pre></div>
+<pre><code>## [1] 0.6929134</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="linear-discriminant-analysis-lda.html#cb12-1" tabindex="-1"></a><span class="fu">specificity</span>(<span class="fu">factor</span>(y_hat_bayes_unbiased), <span class="fu">factor</span>(test_set<span class="sc">$</span>sex))</span></code></pre></div>
+<pre><code>## [1] 0.8320802</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="linear-discriminant-analysis-lda.html#cb14-1" tabindex="-1"></a><span class="fu">qplot</span>(x, p_hat_bayes_unbiased, <span class="at">geom =</span> <span class="st">&quot;line&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb14-2"><a href="linear-discriminant-analysis-lda.html#cb14-2" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">0.5</span>, <span class="at">lty =</span> <span class="dv">2</span>) <span class="sc">+</span> </span>
+<span id="cb14-3"><a href="linear-discriminant-analysis-lda.html#cb14-3" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">67</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+<div id="qda" class="section level3 hasAnchor" number="8.1.3">
+<h3><span class="header-section-number">8.1.3</span> QDA<a href="linear-discriminant-analysis-lda.html#qda" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>二次判别分析 (QDA) 是朴素贝叶斯的一个版本，其中我们假设分布 <span class="math inline">\(p_{\mathbf{X} \mid Y=1}(x)\)</span> 和 <span class="math inline">\(p_{\mathbf{X} \mid Y= 0}(\mathbf{x})\)</span> 是多元正态的。</p>
+<p>在这种情况下，我们有两个预测变量，因此我们假设每个都是二元正态的。 这意味着我们需要估计每个案例 <span class="math inline">\(Y=1\)</span> 和 <span class="math inline">\(Y=0\)</span> 的两个平均值、两个标准差和一个相关性。 一旦我们有了这些，我们就可以近似分布 <span class="math inline">\(f_{X_{1}, X_{2} \mid Y=1}\)</span> 和 <span class="math inline">\(f_{X_{1}, X_{2} \mid Y=0}\)</span>。</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="linear-discriminant-analysis-lda.html#cb15-1" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;mnist_27&quot;</span>)</span>
+<span id="cb15-2"><a href="linear-discriminant-analysis-lda.html#cb15-2" tabindex="-1"></a>params <span class="ot">&lt;-</span> mnist_27<span class="sc">$</span>train <span class="sc">%&gt;%</span> </span>
+<span id="cb15-3"><a href="linear-discriminant-analysis-lda.html#cb15-3" tabindex="-1"></a>  <span class="fu">group_by</span>(y) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-4"><a href="linear-discriminant-analysis-lda.html#cb15-4" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">avg_1 =</span> <span class="fu">mean</span>(x_1), <span class="at">avg_2 =</span> <span class="fu">mean</span>(x_2), </span>
+<span id="cb15-5"><a href="linear-discriminant-analysis-lda.html#cb15-5" tabindex="-1"></a>            <span class="at">sd_1=</span> <span class="fu">sd</span>(x_1), <span class="at">sd_2 =</span> <span class="fu">sd</span>(x_2), </span>
+<span id="cb15-6"><a href="linear-discriminant-analysis-lda.html#cb15-6" tabindex="-1"></a>            <span class="at">r =</span> <span class="fu">cor</span>(x_1, x_2))</span>
+<span id="cb15-7"><a href="linear-discriminant-analysis-lda.html#cb15-7" tabindex="-1"></a>params</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 6
+##   y     avg_1 avg_2   sd_1   sd_2     r
+##   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
+## 1 2     0.129 0.283 0.0702 0.0578 0.401
+## 2 7     0.234 0.288 0.0719 0.105  0.455</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="linear-discriminant-analysis-lda.html#cb17-1" tabindex="-1"></a><span class="do">### 绘制数据并使用等高线图来了解两个估计的正常密度的样子（我们显示的曲线代表一个包含 95% 点的区域）</span></span>
+<span id="cb17-2"><a href="linear-discriminant-analysis-lda.html#cb17-2" tabindex="-1"></a>mnist_27<span class="sc">$</span>train <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">y =</span> <span class="fu">factor</span>(y)) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-3"><a href="linear-discriminant-analysis-lda.html#cb17-3" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(x_1, x_2, <span class="at">fill =</span> y, <span class="at">color=</span>y)) <span class="sc">+</span> </span>
+<span id="cb17-4"><a href="linear-discriminant-analysis-lda.html#cb17-4" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span> </span>
+<span id="cb17-5"><a href="linear-discriminant-analysis-lda.html#cb17-5" tabindex="-1"></a>  <span class="fu">stat_ellipse</span>(<span class="at">type=</span><span class="st">&quot;norm&quot;</span>, <span class="at">lwd =</span> <span class="fl">1.5</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="linear-discriminant-analysis-lda.html#cb18-1" tabindex="-1"></a><span class="do">### We can use the train function from the caret package to fit the model and obtain predictors:</span></span>
+<span id="cb18-2"><a href="linear-discriminant-analysis-lda.html#cb18-2" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb18-3"><a href="linear-discriminant-analysis-lda.html#cb18-3" tabindex="-1"></a>train_qda <span class="ot">&lt;-</span> <span class="fu">train</span>(y <span class="sc">~</span> ., <span class="at">method =</span> <span class="st">&quot;qda&quot;</span>, <span class="at">data =</span> mnist_27<span class="sc">$</span>train)</span>
+<span id="cb18-4"><a href="linear-discriminant-analysis-lda.html#cb18-4" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="linear-discriminant-analysis-lda.html#cb18-5" tabindex="-1"></a><span class="do">### We see that we obtain relatively good accuracy:</span></span>
+<span id="cb18-6"><a href="linear-discriminant-analysis-lda.html#cb18-6" tabindex="-1"></a>y_hat <span class="ot">&lt;-</span> <span class="fu">predict</span>(train_qda, mnist_27<span class="sc">$</span>test)</span>
+<span id="cb18-7"><a href="linear-discriminant-analysis-lda.html#cb18-7" tabindex="-1"></a><span class="fu">confusionMatrix</span>(y_hat, mnist_27<span class="sc">$</span>test<span class="sc">$</span>y)<span class="sc">$</span>overall[<span class="st">&quot;Accuracy&quot;</span>]</span></code></pre></div>
+<pre><code>## Accuracy 
+##     0.82</code></pre>
+<p>QDA 在这里可以很好地工作，但随着预测变量数量的增加，它变得越来越难以使用。 在这里，我们有 2 个预测变量，必须计算 4 个均值、4 个 SD 和 2 个相关性。 如果我们有 10 个预测变量而不是 2 个预测变量，我们会有多少个参数？ 主要问题来自估计 10 个预测变量的相关性。 有 10 个，每个类有 45 个相关性。<strong>一旦参数的数量接近我们数据的大小，该方法就会由于过度拟合而变得不切实际。</strong></p>
+</div>
+<div id="lda" class="section level3 hasAnchor" number="8.1.4">
+<h3><span class="header-section-number">8.1.4</span> LDA<a href="linear-discriminant-analysis-lda.html#lda" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>A relatively simple solution to the problem of having too many parameters is to assume that the correlation structure is the same for all classes, which reduces the number of parameters we need to estimate. In this case, we would compute just one pair of standard deviations and one correlation</p>
+<blockquote>
+<p>对于参数过多的问题，一个相对简单的解决方案是假设所有类的相关结构都相同，这样可以减少我们需要估计的参数数量。在这种情况下，我们将只计算一对标准差和一个相关性</p>
+</blockquote>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="linear-discriminant-analysis-lda.html#cb20-1" tabindex="-1"></a><span class="do">### The accuracy for LDA, 0.629, is much worse because the model is more rigid. </span></span>
+<span id="cb20-2"><a href="linear-discriminant-analysis-lda.html#cb20-2" tabindex="-1"></a>train_lda <span class="ot">&lt;-</span> <span class="fu">train</span>(y <span class="sc">~</span> ., <span class="at">method =</span> <span class="st">&quot;lda&quot;</span>, <span class="at">data =</span> mnist_27<span class="sc">$</span>train)</span>
+<span id="cb20-3"><a href="linear-discriminant-analysis-lda.html#cb20-3" tabindex="-1"></a>y_hat <span class="ot">&lt;-</span> <span class="fu">predict</span>(train_lda, mnist_27<span class="sc">$</span>test)</span>
+<span id="cb20-4"><a href="linear-discriminant-analysis-lda.html#cb20-4" tabindex="-1"></a><span class="fu">confusionMatrix</span>(y_hat, mnist_27<span class="sc">$</span>test<span class="sc">$</span>y)<span class="sc">$</span>overall[<span class="st">&quot;Accuracy&quot;</span>]</span></code></pre></div>
+<pre><code>## Accuracy 
+##     0.75</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="linear-discriminant-analysis-lda.html#cb22-1" tabindex="-1"></a><span class="do">### Compare with knn</span></span>
+<span id="cb22-2"><a href="linear-discriminant-analysis-lda.html#cb22-2" tabindex="-1"></a>train_lda <span class="ot">&lt;-</span> <span class="fu">train</span>(y <span class="sc">~</span> ., <span class="at">method =</span> <span class="st">&quot;knn&quot;</span>, <span class="at">data =</span> mnist_27<span class="sc">$</span>train)</span>
+<span id="cb22-3"><a href="linear-discriminant-analysis-lda.html#cb22-3" tabindex="-1"></a>y_hat <span class="ot">&lt;-</span> <span class="fu">predict</span>(train_lda, mnist_27<span class="sc">$</span>test)</span>
+<span id="cb22-4"><a href="linear-discriminant-analysis-lda.html#cb22-4" tabindex="-1"></a><span class="fu">confusionMatrix</span>(y_hat, mnist_27<span class="sc">$</span>test<span class="sc">$</span>y)<span class="sc">$</span>overall[<span class="st">&quot;Accuracy&quot;</span>]</span></code></pre></div>
+<pre><code>## Accuracy 
+##     0.84</code></pre>
+</div>
+</div>
+<div id="discriminant-analysis-algorithm" class="section level2 hasAnchor" number="8.2">
+<h2><span class="header-section-number">8.2</span> Discriminant analysis algorithm<a href="linear-discriminant-analysis-lda.html#discriminant-analysis-algorithm" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>判别分析又称<strong>费舍尔判别分析</strong>，也是一项常用的分类技术. 因为，<strong>分类结果很确定时</strong>，逻辑斯蒂回归的估计结果可能是不稳定的， 即<strong>置信区间很宽</strong>，不同样本之间的估计值会有很大变化. 判别分析 不会受到这个问题的困扰，泛化能力更强。 反之，如果特征 和结果变量之间具有错综复杂的关系，判别分析在分类任务上的表现就会非常差。</p>
+<p>判别分析使用<strong>贝叶斯定理确定每个观测属于某个类别的概率</strong>。 如果你有两个类别，比如良性和恶性， 判别分析会计算观测分别属于两个类别的概率，然后选择高概率的类别作为正确的类别。 贝叶斯定理定义了在X已经发生的条件下Y发生的概率——等于Y和X同时发生的概率除以X 发生的概率</p>
+<p><span class="math display">\[P(X|Y)=P(X+Y)/P(X)\]</span></p>
+<p>同样地，分类原则认为如果X和Y的联合分布已知， 那么给定X后，决定观测属于哪个类别的最佳决策是选择那个有更大概率(后验概率)的类别</p>
+<p>获得后验概率的过程如下所示。 </p>
+<ul>
+<li><ol style="list-style-type: decimal">
+<li>收集已知类别的数据。 </li>
+</ol></li>
+<li><ol start="2" style="list-style-type: decimal">
+<li>计算先验概率——代表属于某个类别的样本的比例。 </li>
+</ol></li>
+<li><ol start="3" style="list-style-type: decimal">
+<li>按类别计算每个特征的均值。 </li>
+</ol></li>
+<li><ol start="4" style="list-style-type: decimal">
+<li>计算每个特征的方差-协方差矩阵。在线性判别分析中，这会是一个所有类别的混合矩阵， 给出线性分类器;在二次判别分析中，会对每个分类建立一个方差协方差矩阵。 </li>
+</ol></li>
+<li><ol start="5" style="list-style-type: decimal">
+<li>估计每个分类的正态分布(高斯密度)。 </li>
+</ol></li>
+<li><ol start="6" style="list-style-type: decimal">
+<li>计算discriminant函数，作为一个新对象的分类原则。 </li>
+</ol></li>
+<li><ol start="7" style="list-style-type: decimal">
+<li>根据discriminant函数，将观测分配到某个分类。</li>
+</ol></li>
+</ul>
+<p>第k个分类的先验概率: <span class="math inline">\(\pi_k=\)</span>分类k中的样本数/总体样本数, 一个观测属于第k个分类的概率密度函数。假设概率服从正态分布(高斯分布)。如果有多个特征，假设概率服从多元高斯分布<span class="math display">\[f_k(X)=P(X=x|Y=k)\]</span></p>
+<p>给定一个观测的特征值时，这个观测属于第k个分类的后验概率:</p>
+<p><span class="math display">\[
+P_x(X)=-\frac{\pi_kf_k(X)}{\sum_{l=1}^k\pi_lf_l(X)}
+\]</span></p>
+<p>判别分析会生成k-1个决策边界，也就是说，如果有三个类别(k = 3)，那么就会有两个决策边界。 当k=2时，生成1个决策边界： z.B，当<span class="math display">\[\pi_1=\pi_2\]</span>时，if <span class="math display">\[2x(\mu_1-\mu_2)\gt\mu_1^2-\mu_2^2\]</span>, 观测值被分配到第3个分类中，否则就被分配到第二个分类</p>
+<div id="idee-1" class="section level3 hasAnchor" number="8.2.1">
+<h3><span class="header-section-number">8.2.1</span> Idee<a href="linear-discriminant-analysis-lda.html#idee-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>LDA是一种监督学习的降维技术，也就是说它的数据集的每个样本是有类别输出的。这点和PCA不同。PCA是不考虑样本类别输出的无监督降维技术。DA的思想可以用一句话概括，就是“<strong>投影后类内方差最小，类间方差最大</strong>”。——- 将数据在低维度上进行投影，投影后希望每一种类别数据的投影点尽可能的接近，而不同类别的数据的类别中心之间的距离尽可能的大。</p>
+</div>
+<div id="瑞利商rayleigh-quotient" class="section level3 hasAnchor" number="8.2.2">
+<h3><span class="header-section-number">8.2.2</span> 瑞利商（Rayleigh quotient）<a href="linear-discriminant-analysis-lda.html#瑞利商rayleigh-quotient" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>瑞利商是指这样的函数 <span class="math inline">\(R(A,x)\)</span></p>
+<p><span class="math display">\[
+R(A,x) = \frac{x^HAx}{x^Hx}
+\]</span></p>
+<p>其中 <span class="math inline">\(x\)</span> 为非零向量, 而A$为 <span class="math inline">\(n \times n\)</span> 的Hermitan矩阵。所谓的Hermitan矩阵就是满足共轩转置矩阵和自己相等的矩阵, 即 <span class="math inline">\(A^{H}=A_{\circ}\)</span> 如果我们的矩阵A 是实矩阵, 则满足 <span class="math inline">\(A^{T}=A\)</span> 的矩阵即为Hermitan矩阵。</p>
+<p>瑞利商 <span class="math inline">\(R(A, x)\)</span>有一个非常重要的性质, 即它的最大值等于矩阵 <span class="math inline">\(A\)</span> 最大的特征值, 而最小值等于矩阵 <span class="math inline">\(A\)</span> 的最小的特征值, 也就是满足</p>
+<p><span class="math display">\[
+\lambda_{\min } \leq \frac{x^{H} A x}{x^{H} x} \leq \lambda_{\max }
+\]</span></p>
+<p>当向量<span class="math inline">\(x\)</span>是标准正交基时, 即满足 <span class="math inline">\(x^{H} x=1\)</span> 时, 瑞利商退化为: <span class="math inline">\(R(A, x)=x^{H} A x\)</span></p>
+</div>
+<div id="广义瑞利商-genralized-rayleigh-quotient" class="section level3 hasAnchor" number="8.2.3">
+<h3><span class="header-section-number">8.2.3</span> 广义瑞利商 genralized Rayleigh quotient<a href="linear-discriminant-analysis-lda.html#广义瑞利商-genralized-rayleigh-quotient" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>广义瑞利商是指这样的函数 <span class="math inline">\(R(A,B,x)\)</span>;</p>
+<p><span class="math display">\[
+R(A,x) = \frac{x^HAx}{x^HBx}
+\]</span></p>
+<p>通过将其通过标准化就可以转化为瑞利商的格式。令 <span class="math inline">\(x=B^{-1/2}x&#39;\)</span>, 则分母转化为：</p>
+<p><span class="math display">\[
+x^HBx = x&#39;^H(B^{-1/2})^HBB^{-1/2}x&#39; = x&#39;^HB^{-1/2}BB^{-1/2}x&#39; = x&#39;^Hx&#39;
+\]</span></p>
+<p>而分子转化为</p>
+<p><span class="math display">\[
+x^HAx =  x&#39;^HB^{-1/2}AB^{-1/2}x&#39;
+\]</span></p>
+<p>此时</p>
+<p><span class="math display">\[
+R(A,B,x&#39;) = \frac{x&#39;^HB^{-1/2}AB^{-1/2}x&#39;}{x&#39;^Hx&#39;}
+\]</span></p>
+<p>利用前面的瑞利商的性质， <span class="math inline">\(R(A,B,x&#39;)\)</span>的最大值为矩阵 <span class="math inline">\(B^{-1/2}AB^{-1/2}\)</span> 的最大特征值，或者说矩阵 <span class="math inline">\(B^{-1}A\)</span> 的最大特征值，而最小值为矩阵 <span class="math inline">\(B^{-1}A\)</span> 的最小特征值。</p>
+</div>
+<div id="lda算法流程" class="section level3 hasAnchor" number="8.2.4">
+<h3><span class="header-section-number">8.2.4</span> LDA算法流程<a href="linear-discriminant-analysis-lda.html#lda算法流程" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>输入：数据集 <span class="math display">\[D=\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right), \ldots,\left(\left(x_{m}, y_{m}\right)\right)\right\}\]</span>,其中任意样本 <span class="math inline">\(x_{i}\)</span> 为n维向量, <span class="math inline">\(y_{i} \in\left\{C_{1}, C_{2}, \ldots, C_{k}\right\},\)</span> 降维到的维度<span class="math inline">\(d\)</span>。
+输出：降维后的样本集<span class="math inline">\(D&#39;\)</span>;</p>
+<ol style="list-style-type: decimal">
+<li>计算类内散度矩阵 <span class="math inline">\(S_{w}\)</span>;</li>
+<li>计算类间散度矩阵 <span class="math inline">\(S_{b}\)</span></li>
+<li>计算矩阵 <span class="math inline">\(S_{w}^{-1} S_{b}\)</span></li>
+<li>计算 <span class="math inline">\(S_{w}^{-1} S_{b}\)</span> 的最大的<span class="math inline">\(d\)</span>个特征值和对应的<span class="math inline">\(d\)</span>个特征向量 <span class="math inline">\(\left(w_{1}, w_{2}, \ldots w_{d}\right),\)</span> 得到投影矩阵<span class="math inline">\(W^{T}\)</span>;</li>
+<li>对样本集中的每一个样本特征 <span class="math inline">\(x_{i}\)</span>,转化为新的样本 <span class="math inline">\(z_{i}=W^{T} x_{i}\)</span></li>
+<li>得到输出样本集 <span class="math inline">\(D^{\prime}=\left\{\left(z_{1}, y_{1}\right),\left(z_{2}, y_{2}\right), \ldots,\left(\left(z_{m}, y_{m}\right)\right)\right\}\)</span></li>
+</ol>
+</div>
+<div id="lda-application" class="section level3 hasAnchor" number="8.2.5">
+<h3><span class="header-section-number">8.2.5</span> LDA Application<a href="linear-discriminant-analysis-lda.html#lda-application" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>线性判别分析假设每种类别中的观测 服从多元正态分布，并且不同类别之间的具有同样的协方差。 二次判别分析仍然假设观测服从正 态分布，但假设每种类别都有自己的协方差。线性判别分析(LDA)可以用MASS包实现</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="linear-discriminant-analysis-lda.html#cb24-1" tabindex="-1"></a><span class="do">## Data Preparation</span></span>
+<span id="cb24-2"><a href="linear-discriminant-analysis-lda.html#cb24-2" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb24-3"><a href="linear-discriminant-analysis-lda.html#cb24-3" tabindex="-1"></a><span class="fu">data</span>(biopsy)</span>
+<span id="cb24-4"><a href="linear-discriminant-analysis-lda.html#cb24-4" tabindex="-1"></a>biopsy<span class="sc">$</span>ID <span class="ot">=</span> <span class="cn">NULL</span></span>
+<span id="cb24-5"><a href="linear-discriminant-analysis-lda.html#cb24-5" tabindex="-1"></a><span class="fu">names</span>(biopsy) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;thick&quot;</span>, <span class="st">&quot;u.size&quot;</span>, <span class="st">&quot;u.shape&quot;</span>, <span class="st">&quot;adhsn&quot;</span>, </span>
+<span id="cb24-6"><a href="linear-discriminant-analysis-lda.html#cb24-6" tabindex="-1"></a>                  <span class="st">&quot;s.size&quot;</span>, <span class="st">&quot;nucl&quot;</span>, <span class="st">&quot;chrom&quot;</span>, <span class="st">&quot;n.nuc&quot;</span>, <span class="st">&quot;mit&quot;</span>, <span class="st">&quot;class&quot;</span>)</span>
+<span id="cb24-7"><a href="linear-discriminant-analysis-lda.html#cb24-7" tabindex="-1"></a>biopsy.v2 <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(biopsy)</span>
+<span id="cb24-8"><a href="linear-discriminant-analysis-lda.html#cb24-8" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="linear-discriminant-analysis-lda.html#cb24-9" tabindex="-1"></a><span class="do">## 为了满 足这个要求，可以创建一个变量y，用0表示良性，用1表示恶性</span></span>
+<span id="cb24-10"><a href="linear-discriminant-analysis-lda.html#cb24-10" tabindex="-1"></a><span class="do">## 使用ifelse()函数为y赋 值，如下所示:</span></span>
+<span id="cb24-11"><a href="linear-discriminant-analysis-lda.html#cb24-11" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(biopsy.v2<span class="sc">$</span>class <span class="sc">==</span> <span class="st">&quot;malignant&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb24-12"><a href="linear-discriminant-analysis-lda.html#cb24-12" tabindex="-1"></a></span>
+<span id="cb24-13"><a href="linear-discriminant-analysis-lda.html#cb24-13" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) <span class="co">#random number generator</span></span>
+<span id="cb24-14"><a href="linear-discriminant-analysis-lda.html#cb24-14" tabindex="-1"></a>ind <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">2</span>, <span class="fu">nrow</span>(biopsy.v2), <span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="fl">0.3</span>))</span>
+<span id="cb24-15"><a href="linear-discriminant-analysis-lda.html#cb24-15" tabindex="-1"></a>train <span class="ot">&lt;-</span> biopsy.v2[ind<span class="sc">==</span><span class="dv">1</span>, ] <span class="co">#the training data set</span></span>
+<span id="cb24-16"><a href="linear-discriminant-analysis-lda.html#cb24-16" tabindex="-1"></a>test <span class="ot">&lt;-</span> biopsy.v2[ind<span class="sc">==</span><span class="dv">2</span>, ] <span class="co">#the test data set</span></span>
+<span id="cb24-17"><a href="linear-discriminant-analysis-lda.html#cb24-17" tabindex="-1"></a>trainY <span class="ot">&lt;-</span> y[ind<span class="sc">==</span><span class="dv">1</span>]</span>
+<span id="cb24-18"><a href="linear-discriminant-analysis-lda.html#cb24-18" tabindex="-1"></a>testY <span class="ot">&lt;-</span> y[ind<span class="sc">==</span><span class="dv">2</span>]</span>
+<span id="cb24-19"><a href="linear-discriminant-analysis-lda.html#cb24-19" tabindex="-1"></a></span>
+<span id="cb24-20"><a href="linear-discriminant-analysis-lda.html#cb24-20" tabindex="-1"></a></span>
+<span id="cb24-21"><a href="linear-discriminant-analysis-lda.html#cb24-21" tabindex="-1"></a>lda.fit <span class="ot">&lt;-</span> <span class="fu">lda</span>(class <span class="sc">~</span> ., <span class="at">data =</span> train)</span>
+<span id="cb24-22"><a href="linear-discriminant-analysis-lda.html#cb24-22" tabindex="-1"></a>lda.fit</span></code></pre></div>
+<pre><code>## Call:
+## lda(class ~ ., data = train)
+## 
+## Prior probabilities of groups:
+##    benign malignant 
+## 0.6371308 0.3628692 
+## 
+## Group means:
+##             thick   u.size  u.shape    adhsn   s.size     nucl    chrom
+## benign    2.92053 1.304636 1.413907 1.324503 2.115894 1.397351 2.082781
+## malignant 7.19186 6.697674 6.686047 5.668605 5.500000 7.674419 5.959302
+##              n.nuc      mit
+## benign    1.225166 1.092715
+## malignant 5.906977 2.639535
+## 
+## Coefficients of linear discriminants:
+##                 LD1
+## thick    0.19557291
+## u.size   0.10555201
+## u.shape  0.06327200
+## adhsn    0.04752757
+## s.size   0.10678521
+## nucl     0.26196145
+## chrom    0.08102965
+## n.nuc    0.11691054
+## mit     -0.01665454</code></pre>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="linear-discriminant-analysis-lda.html#cb26-1" tabindex="-1"></a><span class="do">## 在分组先验概率中，良性概率大约为64%，恶性概率大约为36%</span></span>
+<span id="cb26-2"><a href="linear-discriminant-analysis-lda.html#cb26-2" tabindex="-1"></a><span class="do">## 线性判别系数是标准线性组合，用来确定观 测的判别评分的特征。评分越高，越可能被分入恶性组</span></span>
+<span id="cb26-3"><a href="linear-discriminant-analysis-lda.html#cb26-3" tabindex="-1"></a><span class="do">## 画出判别评分的直方图和密度图</span></span>
+<span id="cb26-4"><a href="linear-discriminant-analysis-lda.html#cb26-4" tabindex="-1"></a><span class="do">## 组间有些重合，这表明有些观测被错误分类</span></span>
+<span id="cb26-5"><a href="linear-discriminant-analysis-lda.html#cb26-5" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb26-6"><a href="linear-discriminant-analysis-lda.html#cb26-6" tabindex="-1"></a><span class="fu">plot</span>(lda.fit, <span class="at">type=</span><span class="st">&quot;both&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="linear-discriminant-analysis-lda.html#cb27-1" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code></pre></div>
+<pre><code>## null device 
+##           1</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="linear-discriminant-analysis-lda.html#cb29-1" tabindex="-1"></a><span class="do">## 在训练集上表现</span></span>
+<span id="cb29-2"><a href="linear-discriminant-analysis-lda.html#cb29-2" tabindex="-1"></a><span class="do">## LDA模型可以用predict()函数得到3种元素(class、posterior和x)的列表。</span></span>
+<span id="cb29-3"><a href="linear-discriminant-analysis-lda.html#cb29-3" tabindex="-1"></a><span class="do">## class元素是对 良性或恶性的预测，posterior是值为x的评分可能属于某个类别的概率</span></span>
+<span id="cb29-4"><a href="linear-discriminant-analysis-lda.html#cb29-4" tabindex="-1"></a><span class="do">## x是线性判别评分, 仅提取恶性观测的概率</span></span>
+<span id="cb29-5"><a href="linear-discriminant-analysis-lda.html#cb29-5" tabindex="-1"></a><span class="fu">library</span>(InformationValue)</span>
+<span id="cb29-6"><a href="linear-discriminant-analysis-lda.html#cb29-6" tabindex="-1"></a>train.lda.probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(lda.fit)<span class="sc">$</span>posterior[, <span class="dv">2</span>]</span>
+<span id="cb29-7"><a href="linear-discriminant-analysis-lda.html#cb29-7" tabindex="-1"></a><span class="fu">misClassError</span>(trainY, train.lda.probs)</span></code></pre></div>
+<pre><code>## [1] 0.0401</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="linear-discriminant-analysis-lda.html#cb31-1" tabindex="-1"></a><span class="fu">confusionMatrix</span>(trainY, train.lda.probs)</span></code></pre></div>
+<pre><code>##     0   1
+## 0 296  13
+## 1   6 159</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="linear-discriminant-analysis-lda.html#cb33-1" tabindex="-1"></a><span class="do">## 在测试集上的表现</span></span>
+<span id="cb33-2"><a href="linear-discriminant-analysis-lda.html#cb33-2" tabindex="-1"></a>test.lda.probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(lda.fit, <span class="at">newdata =</span> test)<span class="sc">$</span>posterior[, <span class="dv">2</span>]</span>
+<span id="cb33-3"><a href="linear-discriminant-analysis-lda.html#cb33-3" tabindex="-1"></a><span class="fu">misClassError</span>(testY, test.lda.probs)</span></code></pre></div>
+<pre><code>## [1] 0.0383</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="linear-discriminant-analysis-lda.html#cb35-1" tabindex="-1"></a><span class="fu">confusionMatrix</span>(testY, test.lda.probs)</span></code></pre></div>
+<pre><code>##     0  1
+## 0 140  6
+## 1   2 61</code></pre>
+</div>
+<div id="qda-1" class="section level3 hasAnchor" number="8.2.6">
+<h3><span class="header-section-number">8.2.6</span> QDA<a href="linear-discriminant-analysis-lda.html#qda-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="linear-discriminant-analysis-lda.html#cb37-1" tabindex="-1"></a><span class="do">## 二次判别分析(QDA)模型来拟合数据, QDA也是MASS包的一部分</span></span>
+<span id="cb37-2"><a href="linear-discriminant-analysis-lda.html#cb37-2" tabindex="-1"></a>qda.fit <span class="ot">&lt;-</span> <span class="fu">qda</span>(class <span class="sc">~</span> ., <span class="at">data =</span>train)</span>
+<span id="cb37-3"><a href="linear-discriminant-analysis-lda.html#cb37-3" tabindex="-1"></a>qda.fit</span></code></pre></div>
+<pre><code>## Call:
+## qda(class ~ ., data = train)
+## 
+## Prior probabilities of groups:
+##    benign malignant 
+## 0.6371308 0.3628692 
+## 
+## Group means:
+##             thick   u.size  u.shape    adhsn   s.size     nucl    chrom
+## benign    2.92053 1.304636 1.413907 1.324503 2.115894 1.397351 2.082781
+## malignant 7.19186 6.697674 6.686047 5.668605 5.500000 7.674419 5.959302
+##              n.nuc      mit
+## benign    1.225166 1.092715
+## malignant 5.906977 2.639535</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="linear-discriminant-analysis-lda.html#cb39-1" tabindex="-1"></a><span class="do">## 结果中有分组均值，和LDA一样;但是没有系数，因为这是二次函数</span></span>
+<span id="cb39-2"><a href="linear-discriminant-analysis-lda.html#cb39-2" tabindex="-1"></a>train.qda.probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(qda.fit)<span class="sc">$</span>posterior[, <span class="dv">2</span>]</span>
+<span id="cb39-3"><a href="linear-discriminant-analysis-lda.html#cb39-3" tabindex="-1"></a><span class="fu">misClassError</span>(trainY, train.qda.probs)</span></code></pre></div>
+<pre><code>## [1] 0.0422</code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="linear-discriminant-analysis-lda.html#cb41-1" tabindex="-1"></a><span class="fu">confusionMatrix</span>(trainY, train.qda.probs)</span></code></pre></div>
+<pre><code>##     0   1
+## 0 287   5
+## 1  15 167</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="linear-discriminant-analysis-lda.html#cb43-1" tabindex="-1"></a>test.qda.probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(qda.fit, <span class="at">newdata =</span> test)<span class="sc">$</span>posterior[, <span class="dv">2</span>]</span>
+<span id="cb43-2"><a href="linear-discriminant-analysis-lda.html#cb43-2" tabindex="-1"></a><span class="fu">misClassError</span>(testY, test.qda.probs)</span></code></pre></div>
+<pre><code>## [1] 0.0526</code></pre>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="linear-discriminant-analysis-lda.html#cb45-1" tabindex="-1"></a><span class="fu">confusionMatrix</span>(testY, test.qda.probs)</span></code></pre></div>
+<pre><code>##     0  1
+## 0 132  1
+## 1  10 66</code></pre>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="cluster-analysis.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="neural-network.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/yihui/bookdown-crc/edit/master/10-LDA.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["bookdown.pdf", "bookdown.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "none"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

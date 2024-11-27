@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Bayesian Analysis</title>
+
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Biosimilar-Trials.html">Statistical Considerations for the Design and Analysis of Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Alternatives-to-Power.html">Bayesian methods - Alternatives to Power</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Continuous-Endpoint.html">Sample Size Determination for Continuous Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Categorical-Endpoint.html">Sample Size Determination for Categorical Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Survival-Endpoint.html">Sample Size Determination for Survival Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Repeated-Measures.html">Sample Size Determination for Repeated Measures</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Sequential-Design.html">Statistical Considerations for Group Sequential Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Adaptive-Design.html">Statistical Considerations for Adaptive Design</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-Estimands.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot-Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Time-To-Event.html">Time to Event Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-PRO-Data.html">Patient Reported Outcome Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-SSC-and-Power-Calculation.html">Sample Size and Power Calculations Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Correlation.html">Correlation Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Model-Table.html">Clinical Data and Model visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-ScatterPlot.html">Scatter and Line Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-BarPlot.html">Bar Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-PieChart.html">Pie Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-BoxPlot.html">Box Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Histogram.html">Histogram</a>
+    </li>
+    <li>
+      <a href="05-Plot-Forest-Plot.html">Forest Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Flow-Chart.html">Flow Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-calculator"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Linear-Regression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Meta-Analysis.html">Meta Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Time-Series-Analysis.html">Time Series Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-SEM.html">Structural Equation Modeling</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Factor-Analysis.html">Factor Analysis</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-bar-chart"></span>
+     
+    Machine Learning
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="07-ML-Bayesian-Theory.html">Bayesian Theory</a>
+    </li>
+    <li>
+      <a href="07-ML-Bayesian-Analysis.html">Bayesian Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Regularization-Penalized-Regression.html">Regularization Penalized Regression</a>
+    </li>
+    <li>
+      <a href="07-ML-Loss-Regression.html">Loss Functions in Machine Learning</a>
+    </li>
+    <li>
+      <a href="07-ML-PCA.html">Principal Component Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-KNN.html">K-Nearest Neighbors</a>
+    </li>
+    <li>
+      <a href="07-ML-SVM.html">Support Vector Machine</a>
+    </li>
+    <li>
+      <a href="07-ML-Tree-Models.html">Tree Models</a>
+    </li>
+    <li>
+      <a href="07-ML-LDA.html">Linear Discriminant Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Cluster-Analysis.html">Cluster Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Neural-Networks.html">Neural Network</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="08-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+<li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Bayesian Analysis</p></h1>
+
+</div>
+
+
+<div id="regression-and-variable-selection" class="section level1"
+number="1">
+<h1><span class="header-section-number">1</span> Regression and Variable
+Selection</h1>
+<div id="classical-least-squares-estimator" class="section level2"
+number="1.1">
+<h2><span class="header-section-number">1.1</span> Classical Least
+Squares Estimator</h2>
+<p>毛毛虫数据集是从 1973
+年对松林毛虫的研究中提取的：它评估了一些森林聚落特征对毛毛虫群落发展的影响。响应变量是在
+500
+平方米（对应于毛虫的最后一列）面积内每棵树的平均毛虫巢数的对数变换。在 n
+= 33 个区域上定义了 p = 8 个潜在的解释变量， x1 是海拔（米），x2
+是坡度（度），x3 是该地区的松树数量，x4
+是在中心采样的树的高度（米）区域，x5 是该区域的方向（从 1 如果向南则为
+2，否则为 2），x6 是优势树的高度（以米为单位），x7 是植被层数，x8
+是混合沉降指数（如果是从 1如果混合，则不混合为
+2）。回归分析的目标是确定哪些解释变量对巢的数量有很大影响，以及这些影响如何相互重叠。</p>
+<p>For caterpillar, where <span class="math inline">\(n=33\)</span> and
+<span class="math inline">\(p=8\)</span>, we thus assume that the
+expected lognumber <span class="math inline">\(y_{i}\)</span> of
+caterpillar nests per tree over an area is modeled as a linear
+combination of an intercept and eight predictor variables <span
+class="math inline">\((i=1, \ldots, n)\)</span>,</p>
+<p><span class="math display">\[
+\mathbb{E}\left[y_{i} \mid \alpha, \boldsymbol{\beta},
+\sigma^{2}\right]=\alpha+\sum_{j=1}^{8} \beta_{j} x_{i j}
+\]</span></p>
+<pre class="r"><code>library(bayess)
+# Demo code https://rdrr.io/cran/bayess/f/
+
+data(caterpillar)
+y=log(caterpillar$y)
+X=as.matrix(caterpillar[,1:8])
+vnames=names(caterpillar)
+
+par(mfrow=c(2,4),mar=c(4.2,2,2,1.2))
+for (i in 1:8) plot(X[,i],y,xlab=vnames[i],pch=19, col=&quot;sienna4&quot;,xaxt=&quot;n&quot;,yaxt=&quot;n&quot;)</code></pre>
+<p><img src="07-ML-Bayesian-Analysis_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>S=readline(prompt=&quot;Type  &lt;Return&gt;   to continue : &quot;)</code></pre>
+<pre><code>## Type  &lt;Return&gt;   to continue :</code></pre>
+<p>The parameter <span class="math inline">\(\boldsymbol{\beta}\)</span>
+can obviously be estimated via maximum likelihood estimation. In order
+to avoid non-identifiability and uniqueness problems, we assume that
+<span class="math inline">\(\left[\mathbf{1}_{n} \quad
+\mathbf{X}\right]\)</span> is of full <span
+class="math inline">\(\operatorname{rank}\)</span>, that is, <span
+class="math inline">\(\operatorname{rank}\left[\mathbf{1}_{n} \quad
+\mathbf{X}\right]=p+1\)</span>. This also means that there is no
+redundant structure among the explanatory variables. We suppose in
+addition that <span class="math inline">\(p+\)</span> <span
+class="math inline">\(1&lt;n\)</span> in order to obtain well-defined
+estimates for all parameters.</p>
+<!-- 通过最大似然估计来估计参数 β。 为了避免不可识别性和唯一性问题，我们假设[1n X]是满秩的，即秩[1n X] = p+1。 这也意味着解释变量之间没有冗余结构。我们另外假设 p + 1 < n 以获得所有参数的明确估计。 -->
+<p>The likelihood <span class="math inline">\(\ell\left(\alpha,
+\boldsymbol{\beta}, \sigma^{2} \mid \mathbf{y}\right)\)</span> of the
+standard normal linear model is provided by the following matrix
+representation: <span class="math display">\[
+\frac{1}{\left(2 \pi \sigma^{2}\right)^{n / 2}} \exp \left\{-\frac{1}{2
+\sigma^{2}}\left(\mathbf{y}-\alpha \mathbf{1}_{n}-\mathbf{X}
+\boldsymbol{\beta}\right)^{\mathrm{T}}\left(\mathbf{y}-\alpha
+\mathbf{1}_{n}-\mathbf{X} \boldsymbol{\beta}\right)\right\}
+\]</span> The maximum likelihood estimators of <span
+class="math inline">\(\alpha\)</span> and <span
+class="math inline">\(\boldsymbol{\beta}\)</span> are then the solution
+of the (least squares) minimization problem <span
+class="math display">\[
+\begin{array}{l}
+\min _{\alpha, \boldsymbol{\beta}}\left(\mathbf{y}-\alpha
+\mathbf{1}_{n}-\mathbf{X}
+\boldsymbol{\beta}\right)^{\mathrm{T}}\left(\mathbf{y}-\alpha
+\mathbf{1}_{n}-\mathbf{X} \boldsymbol{\beta}\right) \\
+\quad=\min _{\alpha, \boldsymbol{\beta}}
+\sum_{i=1}^{n}\left(y_{i}-\alpha-\beta_{1} x_{i 1}-\ldots-\beta_{p} x_{i
+p}\right)^{2}
+\end{array}
+\]</span> We get solutions <span class="math display">\[
+\hat{\alpha}=\overline{\mathbf{y}}, \quad
+\hat{\boldsymbol{\beta}}=\left(\mathbf{X}^{\top} \mathbf{X}\right)^{-1}
+\mathbf{X}^{\top}(\mathbf{y}-\bar{y})
+\]</span></p>
+<p><strong>best linear unbiased estimator</strong></p>
+<p>(see, e.g., Christensen, 2002) states that <span
+class="math inline">\((\hat{\alpha}, \hat{\beta})\)</span> is the best
+linear unbiased estimator of <span class="math inline">\((\alpha,
+\beta)\)</span>. This means that, for all <span class="math inline">\(a
+\in \mathbb{R}^{p+1}\)</span>, and with the abuse of notation that,
+here, <span class="math inline">\((\hat{\alpha}, \hat{\beta})\)</span>
+represents a column vector, <span class="math display">\[
+\mathbb{V}\left(a^{\top}(\hat{\alpha}, \hat{\beta}) \mid \alpha,
+\boldsymbol{\beta}, \sigma^{2}\right) \leq
+\mathbb{V}\left(a^{\top}(\tilde{\alpha}, \tilde{\beta}) \mid \alpha,
+\boldsymbol{\beta}, \sigma^{2}\right)
+\]</span> for any unbiased linear estimator <span
+class="math inline">\((\tilde{\alpha}, \tilde{\beta})\)</span> of <span
+class="math inline">\((\alpha, \beta)\)</span>.</p>
+<p>An unbiased estimator of <span
+class="math inline">\(\sigma^{2}\)</span> is <span
+class="math display">\[
+\hat{\sigma}^{2}=\frac{1}{n-p-1}\left(\mathbf{y}-\hat{\alpha}
+\mathbf{1}_{n}-\mathbf{X}
+\hat{\boldsymbol{\beta}}\right)^{\top}\left(\mathbf{y}-\hat{\alpha}
+\mathbf{1}_{n}-\mathbf{X}
+\hat{\boldsymbol{\beta}}\right)=\frac{s^{2}}{n-p-1}
+\]</span> and <span
+class="math inline">\(\hat{\sigma}^{2}\left(\mathbf{X}^{\top}
+\mathbf{X}\right)^{-1}\)</span> approximates the covariance matrix of
+<span class="math inline">\(\hat{\boldsymbol{\beta}}\)</span>. Note that
+the MLE of <span class="math inline">\(\sigma^{2}\)</span> is <span
+class="math inline">\(\operatorname{not} \hat{\sigma}^{2}\)</span> but
+<span class="math inline">\(\tilde{\sigma}^{2}=s^{2} / n\)</span></p>
+<pre><code>X=scale(X)
+summary(lm(y~X))
+# S=readline(prompt=&quot;Type  &lt;Return&gt;   to continue : &quot;)</code></pre>
+</div>
+<div id="the-jeffreys-prior-analysis" class="section level2"
+number="1.2">
+<h2><span class="header-section-number">1.2</span> The Jeffreys Prior
+Analysis</h2>
+<!-- 仅考虑线性模型参数完全缺乏先验信息的情况，我们首先描述基于 Jeffreys 先验的非信息性解决方案   -->
+<p>Considering only the case of a complete lack of prior information on
+the parameters of the linear model, we first describe a noninformative
+solution based on the Jeffreys prior. It is rather easy to show that the
+Jeffreys prior in this case is <span class="math display">\[
+\pi^{J}\left(\alpha, \boldsymbol{\beta}, \sigma^{2}\right) \propto
+\sigma^{-2}
+\]</span> which is equivalent to a flat prior on <span
+class="math inline">\(\left(\alpha, \boldsymbol{\beta}, \log
+\sigma^{2}\right)\)</span>.</p>
+<p>We could deduce the following (conditional and marginal) posterior
+distributions</p>
+<p><span class="math display">\[
+\begin{aligned}
+\alpha \mid \sigma^{2}, \mathbf{y} \sim \mathscr{N}
+&amp;\left(\hat{\alpha}, \sigma^{2} / n\right) \\
+\boldsymbol{\beta} \mid \sigma^{2}, \mathbf{y} &amp; \sim
+\mathscr{N}_{p}\left(\hat{\boldsymbol{\beta}},
+\sigma^{2}\left(\mathbf{X}^{\top} \mathbf{X}\right)^{-1}\right) \\
+\sigma^{2} \mid \mathbf{y} &amp; \sim \mathscr{I}
+\mathscr{G}\left((n-p-1) / 2, s^{2} / 2\right)
+\end{aligned}
+\]</span></p>
+<p>The corresponding Bayesian estimates of <span
+class="math inline">\(\alpha, \boldsymbol{\beta}\)</span> and <span
+class="math inline">\(\sigma^{2}\)</span> are thus given by <span
+class="math display">\[
+\mathbb{E}^{\pi}[\alpha \mid \mathbf{y}]=\hat{\alpha}, \quad
+\mathbb{E}^{\pi}[\boldsymbol{\beta} \mid
+\mathbf{y}]=\hat{\boldsymbol{\beta}} \quad \text { and } \quad
+\mathbb{E}^{\pi}\left[\sigma^{2} \mid
+\mathbf{y}\right]=\frac{s^{2}}{n-p-3}
+\]</span> respectively. Unsurprisingly, the Jeffreys prior estimate of
+<span class="math inline">\(\alpha\)</span> is the empirical mean.
+Further, the posterior expectation of <span
+class="math inline">\(\boldsymbol{\beta}\)</span> is the maximum
+likelihood estimate. Note also that the Jeffreys prior estimate of <span
+class="math inline">\(\sigma^{2}\)</span> is larger (and thus more
+pessimistic) than both the maximum likelihood estimate <span
+class="math inline">\(s^{2} / n\)</span> and the classical unbiased
+estimate <span class="math inline">\(s^{2} /(n-p-1)\)</span>.</p>
+<p>不出所料，Jeffreys 对 <span class="math inline">\(\alpha\)</span>
+的先验估计是经验平均值。 此外，<span
+class="math inline">\(\boldsymbol{\beta}\)</span>
+的后验期望是最大似然估计。 另请注意，Jeffreys 对 <span
+class="math inline">\(\sigma^{2}\)</span> 的先验估计比最大似然估计 <span
+class="math inline">\(s^{2}/n\)</span> 和经典无偏估计 <span
+class="math inline">\(s^{2}\)</span> 更大（因此更悲观） <span
+class="math inline">\(/(np-1)\)</span>。</p>
+</div>
+<div id="zellners-g-prior-analysis" class="section level2" number="1.3">
+<h2><span class="header-section-number">1.3</span> Zellner’s G-prior
+analysis</h2>
+<p>Zellner提出的一种不同的非信息性方法，用于从贝叶斯角度处理线性回归。
+这种方法是一种中间观点，其中一些关于 β 的先验信息可能可用，它被称为
+Zellner 的 G-prior，“G”是 Zellner 在先验方差中使用的符号。</p>
+<p><strong>Semi-noninformative Solution</strong></p>
+<p>虑到线性回归模型的自然共轭先验具有严重的局限性，需要更精细的策略。
+Zellner 的 G-prior
+建模的核心思想是允许实验者引入（可能很弱）关于回归位置参数的信息，但绕过先验规范中最困难的方面，即先验相关结构的推导.这个结构在
+Zellner 的提议中是固定的. Zellner 的 G-prior 因此被分解为 β
+的（条件）高斯先验和 (α, σ2) 的inproper (Jeffreys) 先验。</p>
+<p>We could deduce that, conditionally on <span
+class="math inline">\(\mathbf{y}, \mathbf{X}\)</span> and <span
+class="math inline">\(\sigma^{2}\)</span>, the parameters <span
+class="math inline">\(\alpha\)</span> and <span
+class="math inline">\(\boldsymbol{\beta}\)</span> are independent and
+such that <span class="math display">\[
+\begin{array}{c}
+\alpha \mid \sigma^{2}, \mathbf{y} \sim
+\mathscr{N}_{1}\left(\overline{\mathbf{y}}, \sigma^{2} / n\right) \\
+\boldsymbol{\beta} \mid \mathbf{y}, \sigma^{2} \sim
+\mathscr{N}_{p}\left(\frac{g}{g+1}(\hat{\boldsymbol{\beta}}+\mathbf{X}
+\tilde{\boldsymbol{\beta}} / g), \frac{\sigma^{2}
+g}{g+1}\left\{\mathbf{X}^{\mathrm{T}} \mathbf{X}\right\}^{-1}\right)
+\end{array}
+\]</span> where <span
+class="math inline">\(\hat{\boldsymbol{\beta}}=\left\{\mathbf{X}^{\mathrm{T}}
+\mathbf{X}\right\}^{-1} \mathbf{X}^{\mathrm{T}} \mathbf{y}\)</span> is
+the maximum likelihood (and least squares) estimator of <span
+class="math inline">\(\boldsymbol{\beta}\)</span>. The posterior
+independence between <span class="math inline">\(\alpha\)</span> and
+<span class="math inline">\(\boldsymbol{\beta}\)</span> is due to the
+fact that <span class="math inline">\(\mathbf{X}\)</span> is centered
+and that <span class="math inline">\(\alpha\)</span> and <span
+class="math inline">\(\boldsymbol{\beta}\)</span> are a priori
+independent. Moreover, the posterior distribution of <span
+class="math inline">\(\sigma^{2}\)</span> is given by <span
+class="math display">\[
+\sigma^{2} \mid \mathbf{y} \sim I \mathscr{G}\left[(n-1) / 2,
+s^{2}+(\tilde{\boldsymbol{\beta}}-\hat{\boldsymbol{\beta}})^{\mathrm{T}}
+\mathbf{X}^{\mathrm{T}}
+\mathbf{X}(\tilde{\boldsymbol{\beta}}-\hat{\boldsymbol{\beta}})
+/(g+1)\right]
+\]</span> where <span class="math inline">\(I \mathscr{G}(a, b)\)</span>
+is an inverse Gamma distribution with mean <span class="math inline">\(b
+/(a-1)\)</span> and where <span
+class="math inline">\(s^{2}=\left(\mathbf{y}-\overline{\mathbf{y}}
+\mathbf{1}_{n}-\mathbf{X}
+\hat{\boldsymbol{\beta}}\right)^{\mathrm{T}}\left(\mathbf{y}-\overline{\mathbf{y}}
+\mathbf{1}_{n}-\mathbf{X} \hat{\boldsymbol{\beta}}\right)\)</span>
+corresponds to the (classical) residual sum of squares.</p>
+<pre class="r"><code>library(bayess)
+# Demo code https://rdrr.io/cran/bayess/f/
+
+# postmeancoeff posterior mean of the regression coefficients
+# postsqrtcoeff posterior standard deviation of the regression coefficients
+# log10bf log-Bayes factors against the full model
+# postmeansigma2 posterior mean of the variance of the model
+# postvarsigma2 posterior variance of the variance of the model
+data(faithful)
+BayesReg(faithful[,1],faithful[,2])</code></pre>
+<pre><code>## 
+##           PostMean PostStError Log10bf EvidAgaH0
+## Intercept   3.4878      0.0304                  
+## x1          1.0225      0.0303     Inf    (****)
+## 
+## 
+## Posterior Mean of Sigma2: 0.2513
+## Posterior StError of Sigma2: 0.3561</code></pre>
+<pre><code>## $postmeancoeff
+## [1] 3.487783 1.022509
+## 
+## $postsqrtcoeff
+## [1] 0.03039825 0.03034252
+## 
+## $log10bf
+##      [,1]
+## [1,]  Inf
+## 
+## $postmeansigma2
+## [1] 0.2513425
+## 
+## $postvarsigma2
+## [1] 0.1268176</code></pre>
+</div>
+</div>
+<div id="bayesian-linear-regression" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Bayesian Linear
+Regression</h1>
+<pre class="r"><code># suppressPackageStartupMessages(library(rstanarm))
+# suppressPackageStartupMessages(library(bayestestR))
+# suppressPackageStartupMessages(library(bayesplot))
+# suppressPackageStartupMessages(library(insight))
+ 
+
+# use the BostonHousing data from mlbench package
+library(mlbench)
+data(&quot;BostonHousing&quot;)
+str(BostonHousing)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    506 obs. of  14 variables:
+##  $ crim   : num  0.00632 0.02731 0.02729 0.03237 0.06905 ...
+##  $ zn     : num  18 0 0 0 0 0 12.5 12.5 12.5 12.5 ...
+##  $ indus  : num  2.31 7.07 7.07 2.18 2.18 2.18 7.87 7.87 7.87 7.87 ...
+##  $ chas   : Factor w/ 2 levels &quot;0&quot;,&quot;1&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ nox    : num  0.538 0.469 0.469 0.458 0.458 0.458 0.524 0.524 0.524 0.524 ...
+##  $ rm     : num  6.58 6.42 7.18 7 7.15 ...
+##  $ age    : num  65.2 78.9 61.1 45.8 54.2 58.7 66.6 96.1 100 85.9 ...
+##  $ dis    : num  4.09 4.97 4.97 6.06 6.06 ...
+##  $ rad    : num  1 2 2 3 3 3 5 5 5 5 ...
+##  $ tax    : num  296 242 242 222 222 222 311 311 311 311 ...
+##  $ ptratio: num  15.3 17.8 17.8 18.7 18.7 18.7 15.2 15.2 15.2 15.2 ...
+##  $ b      : num  397 397 393 395 397 ...
+##  $ lstat  : num  4.98 9.14 4.03 2.94 5.33 ...
+##  $ medv   : num  24 21.6 34.7 33.4 36.2 28.7 22.9 27.1 16.5 18.9 ...</code></pre>
+<pre class="r"><code>bost &lt;- BostonHousing[,c(&quot;medv&quot;,&quot;age&quot;,&quot;dis&quot;,&quot;chas&quot;)]
+summary(bost)</code></pre>
+<pre><code>##       medv            age              dis         chas   
+##  Min.   : 5.00   Min.   :  2.90   Min.   : 1.130   0:471  
+##  1st Qu.:17.02   1st Qu.: 45.02   1st Qu.: 2.100   1: 35  
+##  Median :21.20   Median : 77.50   Median : 3.207          
+##  Mean   :22.53   Mean   : 68.57   Mean   : 3.795          
+##  3rd Qu.:25.00   3rd Qu.: 94.08   3rd Qu.: 5.188          
+##  Max.   :50.00   Max.   :100.00   Max.   :12.127</code></pre>
+<pre class="r"><code># Classical linear regression model
+model_freq&lt;-lm(medv~., data=bost)
+library(broom)
+tidy(model_freq)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["term"],"name":[1],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"(Intercept)","2":"32.7397914","3":"2.24704611","4":"14.5701467","5":"2.328480e-40"},{"1":"age","2":"-0.1427996","3":"0.01981039","4":"-7.2083181","5":"2.093624e-12"},{"1":"dis","2":"-0.2461603","3":"0.26513688","4":"-0.9284273","5":"3.536322e-01"},{"1":"chas1","2":"7.5129712","3":"1.46465652","4":"5.1295106","5":"4.156897e-07"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code># # Bayesian regression
+# library(rstanarm)
+# https://www.r-bloggers.com/2020/04/bayesian-linear-regression/</code></pre>
+</div>
+<div id="item-response-theory" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Item Response
+Theory</h1>
+<div id="item-response-theory-1" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Item response
+theory</h2>
+<p>IRT (item response theory 项目反映理论)
+楻型。IRT模型用来描述被试者能力和项目特性之间的关系。在现实生活中，由于
+被试者的能力不能通过可观测的数据进行描述，所以IRT楛型用一个潛变量 <span
+class="math inline">\(\theta\)</span>
+来表示，并考虑与项目相关的一组参数来分析正确回答
+测试项目的概率。目前常见的IRT楛型有2-PL楻型和3-PL楻型。其具体表达式如下:</p>
+<p><strong>two-parameter logistic (2-PL) Model</strong></p>
+<p>2-PL楻型的表达式如下: <span class="math display">\[
+p_{i, j}\left(\theta_{i}\right)=\frac{1}{1+\exp \left[-D
+a_{j}\left(\theta_{i}-b_{j}\right)\right]}
+\]</span> 其种 <span class="math inline">\(\theta_{i}\)</span>
+是被试者能力的参数， <span class="math inline">\(a_{j}\)</span> 和 <span
+class="math inline">\(b_{j}\)</span>
+分别代表的是题目的区分度参数和难度参数，D是为 <span
+class="math inline">\(1.7\)</span> 的常数。</p>
+<p><strong>3-PL Model</strong></p>
+<p>3-PL模型是在模型中引入了预测参数 <span
+class="math inline">\(c_{j}\)</span>
+，该参数的含义是描述被试者在没有任何先验知识的情况下，回答正确某项目的概率。
+常见的例子有学生在做选择题时，即使对该问题没有任何相关知识的获取，也有一定的概率答对该题目。
+3-PL模型的表达式如下: <span class="math display">\[
+p_{i, j}\left(\theta_{i}\right)=c_{j}+\frac{1-c_{j}}{1+\exp \left[-D
+a_{j}\left(\theta_{i}-b_{j}\right)\right]}
+\]</span> <span class="math inline">\(c_{j}\)</span>
+表示的是预测参数，其余的参数含义和2-PL模型中的一致。</p>
+<p><strong>Assumptions</strong></p>
+<p>IRT模型满足三条基本假设：</p>
+<ol style="list-style-type: decimal">
+<li>潜在单调性，IRT㮛型是连续严格单调的函数。</li>
+<li>条件独立性，IRT模型认为给定 <span
+class="math inline">\(\theta_{i}\)</span> ，对于第 <span
+class="math inline">\(i\)</span> 个被试者， <span
+class="math inline">\(Y_{i, j}\)</span> 是独立的;
+而对于不同的被试者，其各自的答莞 <span
+class="math inline">\(Y_{i}\)</span> 也是相互独 立的。</li>
+<li>单维性假设，IRT模型认为某个测试的所有项目都是测量同一个潜在特质。</li>
+</ol>
+</div>
+<div id="em-algorithm" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> EM algorithm</h2>
+<p>极大似然估计是利用已知的样本结果，去反推最有可能（最大概率）导致这样结果的参数值，也就是在给定的观测变量下去估计参数值。然而现实中可能存在这样的问题，除了观测变量之外，还存在着未知的隐变量，因为变量未知，因此无法直接通过最大似然估计直接求参数值。EM算法是一种迭代算法，用于含有隐变量的概率模型的极大似然估计，或者说是极大后验概率估计。</p>
+<p>引入一个例子来说明隐变量存在的问题。假设有3枚硬币，分别记作A，B，C。这些硬币正面出现的概率分别是π，p，q。我们的实验过程如下，先投掷硬币A，根据其结果选出硬币B和硬币C，正面选B，反面选C；然后投掷选出的硬币，此时出现正面记作1，出现反面记作0。在这个例子中我们观察到的变量只是B或者C的结果，而对A的结果并不知道，在这里A的结果也就是我们的隐变量。A的结果对最终的结果是有影响的，因此在估计参数时必须将A的结果考虑进去。</p>
+<p>我们将观测变量表示为<span
+class="math inline">\(\mathrm{Y}=\left(\mathrm{Y}_{1}, \mathrm{Y}_{2},
+\ldots, \mathrm{Y}_{\mathrm{n}}\right)\)</span>, 隐变量表示为<span
+class="math inline">\(\mathrm{Z}=\left(\mathrm{Z} 1, \mathrm{Z}_{2},
+\ldots, \mathrm{Z}_{\mathrm{n}}\right)\)</span>,
+则观测数据的似然函数可以表示为 <span class="math inline">\(P(Y \mid
+\theta)=\sum_{\mathrm{Z}} P(Z \mid \theta) P(Y \mid Z,
+\theta)\)</span></p>
+<p>在这里 <span class="math inline">\(P(Y \mid \theta)\)</span> 是 <span
+class="math inline">\(P(Y, Z \mid \theta)\)</span>
+的边缘概率，通过转换后可以表示成右边的形式，我们将其转换成对数形式，这样便于求联合概率
+<span class="math display">\[
+\begin{aligned}
+L(\theta) &amp;=\log P(Y \mid \theta)=\log \sum_{Z} P(Y, Z \mid \theta)
+\\
+&amp;=\log \left(\sum_{Z} P(Y \mid Z, \theta) P(Z \mid \theta)\right)
+\end{aligned}
+\]</span> 然而对于这样的式子直接根据极大化求 <span
+class="math inline">\(\theta\)</span>
+的值是很困难的，因为这里还存在隐变量 <span
+class="math inline">\(\mathrm{Z}\)</span> ，在这里引入 <span
+class="math inline">\(\mathrm{EM}\)</span> 算法，通过迭代求解，假设
+在第i 次迭代后 <span class="math inline">\(\theta\)</span> 的估计值为
+<span class="math inline">\(\theta^{(i)}\)</span> 。我们希望新估计值能是
+<span class="math inline">\(L(\theta)\)</span>
+增加，通过迭代逐步的达到最大值。为此我们考豦第 <span
+class="math inline">\(+1\)</span> 步迭代后两者的 差: <span
+class="math display">\[
+L(\theta)-L\left(\theta^{(i)}\right)=\log \left(\sum_{Z} P(Y \mid Z,
+\theta) P(Z \mid \theta)\right)-\log P\left(Y \mid \theta^{(i)}\right)
+\]</span>
+利用Jensen不等式将上述式子展开并得到其下界（对数函数是凹函数）： <span
+class="math display">\[
+\begin{aligned}
+L(\theta)-L\left(\theta^{(i)}\right) &amp;=\log \left(\sum_{Z} P\left(Y
+\mid Z, \theta^{(i)}\right) \frac{P(Y \mid Z, \theta) P(Z \mid
+\theta)}{P\left(Y \mid Z, \theta^{(i)}\right)}\right)-\log P\left(Y \mid
+\theta^{(i)}\right) \\
+&amp; \geqslant \sum_{Z} P\left(Z \mid Y, \theta^{(i)}\right) \log
+\frac{P(Y \mid Z, \theta) P(Z \mid \theta)}{P\left(Z \mid Y,
+\theta^{(i)}\right)}-\log P\left(Y \mid \theta^{(i)}\right) \\
+&amp;=\sum_{Z} P\left(Z \mid Y, \theta^{(i)}\right) \log \frac{P(Y \mid
+Z, \theta) P(Z \mid \theta)}{P\left(Z \mid Y, \theta^{(i)}\right)
+P\left(Y \mid \theta^{(i)}\right)}
+\end{aligned}
+\]</span> <span class="math display">\[
+B\left(\theta, \theta^{(i)}\right) \triangleq
+L\left(\theta^{(i)}\right)+\sum_{Z} P\left(Z \mid Y, \theta^{(i)}\right)
+\log \frac{P(Y \mid Z, \theta) P(Z \mid \theta)}{P\left(Z \mid Y,
+\theta^{(i)}\right) P\left(Y \mid \theta^{(i)}\right)}
+\]</span> 则有 <span class="math display">\[
+L(\theta) \geqslant B\left(\theta, \theta^{(i)}\right)
+\]</span> 在这里 <span class="math inline">\(B\left(\theta,
+\theta^{(i)}\right)\)</span> 是 <span
+class="math inline">\(L(\theta)\)</span> 的一个下界，而且由的表达式可知
+<span class="math display">\[
+L\left(\theta^{(i)}\right)=B\left(\theta^{(i)}, \theta^{(i)}\right)
+\]</span></p>
+<p>因此任何能使得 <span class="math inline">\(B\left(\theta,
+\theta^{(i)}\right)\)</span> 増大的 <span
+class="math inline">\(\theta\)</span> ，也能使得 <span
+class="math inline">\(L(\theta)\)</span> 增大。因此求 <span
+class="math inline">\(\theta\)</span> 值使得 <span
+class="math inline">\(B\left(\theta, \theta^{(i)}\right)\)</span>
+增大就可以转变成求 <span class="math inline">\(\theta\)</span> 使得
+<span class="math inline">\(L(\theta)\)</span> 增大，即求 <span
+class="math inline">\(\theta^{(i+1)}=\arg \max _{\theta} B\left(\theta,
+\theta^{(i)}\right)\)</span> 将上述式子展开可得
+(在这里去掉常数项，因为常数项不会影响最终的结果) <span
+class="math display">\[
+\begin{aligned}
+\theta^{(i+1)} &amp;=\arg \max
+_{\theta}\left(L\left(\theta^{(i)}\right)+\sum_{Z} P\left(Z \mid Y,
+\theta^{(i)}\right) \log \frac{P(Y \mid Z, \theta) P(Z \mid
+\theta)}{P\left(Z \mid Y, \theta^{(i)}\right) P\left(Y \mid
+\theta^{(i)}\right)}\right) \\
+&amp;=\arg \max _{\theta}\left(\sum_{Z} P\left(Z \mid Y,
+\theta^{(i)}\right) \log (P(Y \mid Z, \theta) P(Z \mid \theta))\right)
+\\
+&amp;=\arg \max _{\theta}\left(\sum_{Z} P\left(Z \mid Y,
+\theta^{(i)}\right) \log P(Y, Z \mid \theta)\right) \\
+&amp;=\arg \max _{\theta} Q\left(\theta, \theta^{(i)}\right)
+\end{aligned}
+\]</span> 因此问题就演变成了求 <span class="math inline">\(Q\)</span>
+函数的极大化。EM算法的整体思路就是初始化 <span
+class="math inline">\(\theta\)</span> 的值为 <span
+class="math inline">\(\theta^{(0)}\)</span> ，然后通过迭代去求得最终的
+<span class="math inline">\(\theta\)</span> 值，迭代的终 条件应该是
+<span class="math inline">\(L(\theta)\)</span> 的增加不明显
+(具体可以设定一个增加值来控制) 。
+下面的图可以形象的表示EM算法的迭代更新过程</p>
+<p><img src="02_Plots/Bayesian/Bayer_EMAlgorim.png" width="100%" style="display: block; margin: auto;" />
+EM算法分为 E步和 M步</p>
+<ul>
+<li>E步：计算联合分布的条件概率期望。</li>
+<li>M步：极大化对数似然函数的条件期望求解参数</li>
+</ul>
+<p>For 2-PL Model</p>
+<ul>
+<li>观测数据: 我们把被试者 <span class="math inline">\(i\)</span> 对项目
+<span class="math inline">\(j\)</span> 的作答反映记为 <span
+class="math inline">\(y_{i, j}\)</span> ，又记向量 <span
+class="math inline">\(y_{i}=\left(y_{i 1}, y_{i 2}, \ldots \ldots, y_{i
+m}\right)\)</span> ，称为观测数据，其中 <span
+class="math inline">\(i=1,2, \ldots, N, j=1,2, \ldots, m\)</span>
+。对于两级计分模型（在这里我们只考虑两级计分模型，即模型输出的结果只有二分类），
+<span class="math inline">\(y_{i j}\)</span> 的取值有 0 和 1
+，分别表示被试者答错和答对题目。除了两级计分模型，还会有多级计分模型（即输出的结果为多分类）。</li>
+<li>隐变量 (缺失数据) :
+我们把每个被试者的潜在的不可观测的能力值称为缺失数据，记为 <span
+class="math inline">\(\theta=\left(\theta_{1}, \theta_{2}, \ldots
+\ldots, \theta_{N}\right) ，\)</span> 其中 <span
+class="math inline">\(\theta_{i}\)</span> 是被试者 <span
+class="math inline">\(i\)</span> 的暳在能力值。</li>
+<li>完全数据: 完全数据对每一个被试者来说就是观宗数据加缺失数据，记作
+<span class="math inline">\(\left[\left(y_{1},
+\theta_{1}\right),\left(y_{2}, \theta_{2}\right), \ldots,\left(y_{N},
+\theta_{N}\right)\right]\)</span> 。</li>
+</ul>
+<p>将EM算法应用到IRT模型中来，则E步和M步可以描述为：</p>
+<ul>
+<li>E步：即在给定缺失数据的分布，观察数据和参数初值时，求完全数据的对数似然函数的条件期望。</li>
+<li>M步：即使用E步计算出的完全数据充分统计量的条件期望值，极大化完全数据的对数似然函数的条件期望求解参数的值。</li>
+<li>不断的循环迭代E步和M步，直到参数估计收敛。</li>
+</ul>
+<p>在IRT模型当中，我们通常认为能力参数 <span
+class="math inline">\(\theta\)</span>
+是连续随机变量，故可以取任意值。在EM算法估计参数的过程中，我们是能力参数
+<span class="math inline">\(\theta\)</span> 为离散分布。能力值只能取
+<span class="math inline">\(q_{1}, q_{2}, \ldots \ldots, q_{K},
+\mathrm{~K}\)</span> 个值中的一个，且 <span
+class="math inline">\(P\left(\theta=q_{k}\right)=\pi_{k}\)</span> 。
+在给定了反应矩阵 <span class="math inline">\(Y\)</span>
+的情况下，假设项目参数 <span
+class="math inline">\(\Delta=\left[\delta_{1}, \ldots \ldots,
+\delta_{J}\right]\)</span> ，能力分布参数 <span
+class="math inline">\(\pi=\left(\Pi_{1}, \ldots \ldots,
+\Pi_{K}\right)\)</span> 。则E步中计 算的条件期望推到如下: <span
+class="math display">\[
+\begin{aligned}
+Q\left(\Delta, \pi \mid \Delta^{(s)}, \pi^{(s)}\right)
+&amp;=\mathrm{E}_{Z_{\mathrm{mis}} \mid Z_{\mathrm{obs}}, \Delta^{(s)},
+\pi^{(s)}}\left[\log L\left(\Delta, \pi \mid Z_{\mathrm{obs}},
+Z_{\mathrm{mis}}\right)\right] \\
+&amp;=\mathrm{E}_{\theta \mid Y, \Delta^{(s)}, \pi^{(s)}}[\log L(\Delta,
+\pi \mid Y, \theta)] \\
+&amp;=\mathrm{E}_{\theta \mid Y, \Delta^{(s)}, \pi^{(s)}}\left[\log
+\prod_{i=1}^{N} f\left(\mathbf{y}_{i}, \theta_{i} \mid \Delta,
+\pi\right)\right] \\
+&amp;=\sum_{i=1}^{N} \mathrm{E}_{\theta_{i} \mid \mathbf{y}_{i},
+\Delta^{(s)}, \pi^{(s)}}\left[\log f\left(\mathbf{y}_{i}, \theta_{i}
+\mid \Delta, \pi\right)\right]
+\end{aligned}
+\]</span> 对上面的公式做一些转换表示为: <span class="math display">\[
+Q\left(\Delta, \pi \mid \Delta^{(s)},
+\pi^{(s)}\right)=\phi(\Delta)+\psi(\pi)
+\]</span> 其中 <span class="math inline">\(\phi(\Delta)\)</span> 和
+<span class="math inline">\(\psi(\pi)\)</span> 的表达式如下: <span
+class="math display">\[
+\begin{array}{c}
+\phi(\Delta)=\sum_{k=1}^{K} \sum_{j=1}^{J}\left\{\log
+\left[P\left(q_{k}, \delta_{j}\right)\right] r_{j k}^{(s)}+\log
+\left[Q\left(q_{k}, \delta_{j}\right)\right]\left(n_{k}^{(s)}-r_{j
+k}^{(s)}\right)\right\} \\
+\end{array}
+\]</span> <span class="math display">\[
+\psi(\pi)=\sum_{k=1}^{K} \log \left(\pi_{k}\right) n_{k}^{(s)}
+\]</span></p>
+<p>其中: <span class="math display">\[
+\begin{aligned}
+n_{k}^{(s)} &amp;=\sum_{i=1}^{N} \frac{f\left(\mathbf{y}_{i} \mid q_{k},
+\Delta^{(s)}\right) \pi_{k}^{(s)}}{\sum_{k^{\prime}=1}^{K}
+f\left(\mathbf{y}_{i} \mid q_{k^{\prime}}, \Delta^{(s)}\right)
+\pi_{k^{\prime}}^{(s)}} \\
+r_{j k}^{(s)} &amp;=\sum_{i=1}^{N} \frac{y_{i j} f\left(\mathbf{y}_{i}
+\mid q_{k}, \Delta^{(s)}\right) \pi_{k}^{(s)}}{\sum_{k^{\prime}=1}^{K}
+f\left(\mathbf{y}_{i} \mid q_{k^{\prime}}, \Delta^{(s)}\right)
+\pi_{k^{\prime}}^{(s)}} \\
+f\left(\mathbf{y}_{i} \mid q_{k}, \Delta^{(s)}\right)
+&amp;=\prod_{j=1}^{J} P\left(q_{k}, \delta_{j}^{(s)}\right)^{y_{i
+j}}\left[1-P\left(q_{k}, \delta_{j}^{(s)}\right)\right]^{1-y_{i j}}
+\end{aligned}
+\]</span> 在上面式子中的 <span
+class="math inline">\(n_{k}^{(s)}\)</span> 可以理解为在 <span
+class="math inline">\(N\)</span> 个被试者中能加水平为 <span
+class="math inline">\(q_{k}\)</span> 的被试数目的期望 (即能力为 <span
+class="math inline">\(q_{k}\)</span> 的被试者的个数)， <span
+class="math inline">\(r_{j k}^{(s)}\)</span> 可 以理解为在 <span
+class="math inline">\(N\)</span> 个被试者中具有能力水平 <span
+class="math inline">\(q_{k}\)</span> 的被试者答对第 <span
+class="math inline">\(j\)</span> 个项目的个数。 <span
+class="math inline">\(n_{k}^{(s)}\)</span> 和 <span
+class="math inline">\(r_{j k}^{(s)}\)</span> 都是人工数据。</p>
+<p>应用EM算法的第 <span class="math inline">\(s\)</span> 步迭代中 E步:
+利用第 <span class="math inline">\(s-1\)</span> 步得到的参数估计值 <span
+class="math inline">\(\Delta^{(s)}\)</span> 和 <span
+class="math inline">\(\pi_{k}^{(s)}\)</span> 计算 <span
+class="math inline">\(n_{k}^{(s)}\)</span> 和 <span
+class="math inline">\(r_{j k}^{(s)}\)</span> (首次迭代时初始化 <span
+class="math inline">\(\Delta^{(0)}\)</span> 和 <span
+class="math inline">\(\pi_{k}^{(0)}\)</span> 的值) 。 M步: 将E步计算出的
+<span class="math inline">\(n_{k}^{(s)}\)</span> 和 <span
+class="math inline">\(r_{j k}^{(s)}\)</span> 代入到 <span
+class="math inline">\(\phi(\Delta)\)</span> 和 <span
+class="math inline">\(\psi(\pi)\)</span> 中，对两项分别极大化可得参数
+<span class="math inline">\(\Delta\)</span> 和 <span
+class="math inline">\(\pi\)</span> 的估计值 <span
+class="math inline">\(\Delta^{(s+1)}\)</span> 和 <span
+class="math inline">\(\pi_{k}^{(s+1)}\)</span> 具体的求解如下: <span
+class="math display">\[
+\pi_{k}^{(s+1)}=\frac{n_{k}^{(s)}}{\sum_{k^{\prime}=1}^{K}
+n_{k^{\prime}}^{(s)}}
+\]</span> <span class="math inline">\(\pi_{k}^{(s+1)}\)</span>
+的值可以直接用上述表达式求出 而对于 <span
+class="math inline">\(\Delta^{(s+1)}\)</span>
+在这里要用牛顿-拉弗逊方法求解。</p>
+<p>EM算法估计IRT模型的步骤如下:</p>
+<ol style="list-style-type: decimal">
+<li>E步: 首先确定 <span class="math inline">\(q_{k}\)</span> 和 <span
+class="math inline">\(\pi_{k}\)</span>; 用前一次迭代参数 <span
+class="math inline">\(\Delta^{(s)}\)</span> 和 <span
+class="math inline">\(\pi_{k}^{(s)}\)</span> 求出 <span
+class="math inline">\(n_{k}^{(s)}\)</span> 和 <span
+class="math inline">\(r_{j k}^{(s)}\)</span> 。</li>
+<li>M步: 计算<span
+class="math inline">\(\delta_{j}^{(s+1)}\)</span>和<span
+class="math inline">\(\pi^{(s+1)}\)</span></li>
+<li>重曷E步和M步直到项目参数收敛为止。</li>
+</ol>
+</div>
+<div id="mcmc-algorithm" class="section level2" number="3.3">
+<h2><span class="header-section-number">3.3</span> MCMC algorithm</h2>
+<p>在MCMC算法中，为了在一个指定的分布上采样，根据马尔可夫过程，首先从任一状态出发，模拟马尔可夫过程，不断进行状态转移，最终收敛到平稳分布。用MCMC算法在这里估计参数，事实上就是建立一条参数的马尔科夫链，根据参数的状态转移矩阵来输出马尔科夫链上的样本，当马尔科夫链到一定长度时就会开始收敛于某一值。</p>
+<p>首先来看看MCMC算法在 <span
+class="math inline">\(2-\mathrm{PL}\)</span> 模型上的参数估计步骤: 1)
+取模型参数的先验分布: <span class="math inline">\(\theta N(0,1), \log
+(a) N(0,1), b N(0,1)\)</span> ，则初始化被试能力参数，项目参数的初始值
+<span class="math inline">\(\theta_{0}=0, a_{0}=1, b_{0}=0\)</span>
+。</p>
+<ol start="2" style="list-style-type: decimal">
+<li><p>根据项目参数初值 <span class="math inline">\(a_{0},
+b_{0}\)</span> ，估计被试者的能力参数 <span
+class="math inline">\(\theta_{1}\)</span> 。 各被试的能力参数 <span
+class="math inline">\(\theta_{*}\)</span> 独立地从建议性分布 <span
+class="math inline">\(q_{\theta}\)</span>
+中选取，我们去被试能力参数的建议分布为 <span
+class="math inline">\(\theta_{*} N\left(\theta_{0},
+c_{\theta}^{2}\right)\)</span> 。其中一般 <span
+class="math inline">\(c_{\theta}=1.1\)</span> 。 计算从状态 <span
+class="math inline">\(\theta_{0}\)</span> 转移到状态 <span
+class="math inline">\(\theta_{1}\)</span> 的接受概率 <span
+class="math inline">\(a\left(\theta_{0}, \theta_{*}\right)=\min \left(1,
+R_{\theta}^{0}\right)\)</span> ，由它来决定是否发生状态的转移。 <span
+class="math display">\[
+R_{\theta} 0=\frac{\left[\prod_{j} p_{i j}\left(\theta_{i}^{*},
+a_{j}^{0}, b_{j}^{0}\right)^{x_{i j}}\left(1-p_{i
+j}\left(\theta_{i}^{*}, a_{j}^{0}, b_{j}^{0}\right)\right)^{1-x_{i
+j}}\right] \exp -\frac{1}{2
+\sigma_{\theta}^{2}}\left(\theta_{i}^{*}\right)^{2}}{\left[\prod_{j}
+p_{i j}\left(\theta_{i}^{0}, a_{j}^{0},
+b_{j}^{0}\right)^{x_{y_{y}}}\left(1-p_{i j}\left(\theta_{i}^{0},
+a_{j}^{0}, b_{j}^{0}\right)\right)^{1-x_{y}}\right] \exp -\frac{1}{2
+\sigma_{\theta}^{2}}\left(\theta_{i}^{0}\right)^{2}}
+\]</span> 其中 <span class="math display">\[
+p_{i j}\left(\theta_{i}, a_{j}^{0}, b_{j}^{0}\right)=\frac{1}{1+\exp
+\left[-1.7 a_{i}^{0}\left(\theta_{i}+b_{i}^{0}\right)\right]}
+\]</span> 生成随机数 <span class="math inline">\(r_{1} U(0,1)\)</span>
+，比较 <span class="math inline">\(r_{1}\)</span> 与接受概率 <span
+class="math inline">\(a\left(\theta_{0}, \theta_{*}\right)\)</span>
+的大小，进行状态转移判断: 若 <span
+class="math inline">\(a\left(\theta_{0}, \theta_{*}\right) \geq
+r_{1}\)</span> ，则有 <span
+class="math inline">\(\theta_{1}=\theta_{*}\)</span> ；否则 <span
+class="math inline">\(\theta_{1}=\theta_{*}\)</span> 。</p></li>
+<li><p>根据止骤 (2) 计算出来的被试能力参数 <span
+class="math inline">\(\theta_{1}\)</span> ，估计项目参数 <span
+class="math inline">\(a_{1}, b_{1}\)</span> 。
+各项目的区分度参数和难度参数 <span class="math inline">\(a_{*},
+b_{*}\)</span> 分别独立地从建议分布 <span class="math inline">\(q_{a},
+q_{b}\)</span> 中选取，我们取区分度参数和难度参数的建议分布为 <span
+class="math inline">\(\log \left(a_{*}\right) N\left(a_{0},
+c_{a}^{2}\right), b * N\left(b_{0}, c_{b}^{2}\right)\)</span>, 其中
+<span class="math inline">\(c_{a}=0.3, c_{b}=0.3\)</span> 。 计算从状态
+<span class="math inline">\(\left(a_{0}, b_{0}\right)\)</span>
+转移至状态 <span class="math inline">\(\left(a_{*},
+b_{*}\right)\)</span> 的接收概率 <span
+class="math inline">\(\alpha\left(a_{0}, b_{0}, a_{*}, b_{*}\right)=\min
+\left(1, R_{a, b}^{0}\right)\)</span> ，由它来决定是否发生状态的 转移。
+<span class="math inline">\(R_{a, b} 0=\frac{\left[\prod_{j} p_{i
+j}\left(\theta_{i}^{1}, a_{j}^{*}, b_{j}^{*}\right)^{x_{j}}\left(1-p_{i
+j}\left(\theta_{i}^{1}, a_{j}^{*},
+b_{j}^{*}\right)\right)^{1-x_{j}}\right] \exp -\frac{1}{2
+\sigma_{b}^{2}}\left(b_{j}^{*}\right)^{2} \frac{1}{a_{j}^{*}} \exp
+-\frac{1}{2 \sigma_{a}^{2}} \log
+\left(a_{j}^{*}\right)^{2}}{\left[\prod_{j} p_{i j}\left(\theta_{i}^{1},
+a_{j}^{0}, b_{j}^{0}\right)^{x_{j}}\left(1-p_{i j}\left(\theta_{i}^{1},
+a_{j}^{0}, b_{j}^{0}\right)\right)^{1-x_{j}}\right] \exp -\frac{1}{2
+\sigma_{b}^{2}}\left(b_{j}^{0}\right)^{2} \frac{1}{a_{j}^{0}} \exp
+-\frac{1}{2 \sigma_{a}^{2}} \log \left(a_{j}^{0}\right)^{2}} \times
+\frac{a_{j}^{0}}{a_{j}^{*}}\)</span> 其中 <span class="math display">\[
+p_{i j}\left(\theta_{i}^{1}, a_{j}, b_{j}\right)=\frac{1}{1+\exp
+\left[-1.7 a_{j}\left(\theta_{i}^{1}+b_{j}\right)\right]}
+\]</span> 生成随机数 <span class="math inline">\(r_{2} U(0,1)\)</span>
+，比较 <span class="math inline">\(r_{2}\)</span> 与 <span
+class="math inline">\(\alpha\left(a_{0}, b_{0}, a_{*},
+b_{*}\right)\)</span> 的大小, 进行状态转移判断: 若 <span
+class="math inline">\(\alpha\left(a_{0}, b_{0}, a_{*}, b_{*}\right) \geq
+r_{2}\)</span> ，则 <span class="math inline">\(a_{1}=a_{*},
+b_{1}=b_{*}\)</span>; 否则 <span class="math inline">\(a_{1}=a_{0},
+b_{1}=b_{0}\)</span> 。</p></li>
+<li><p>重复步骤 (2) 和 (3) <span class="math inline">\(n\)</span>
+次，删除为首的 <span class="math inline">\(w\)</span> 次，取剩余的 <span
+class="math inline">\(m=n-w\)</span>
+次迭代所得结果的均值即为参数的估计值。</p></li>
+<li><p>步骤 (4) 会生成一条长度为 <span class="math inline">\(n\)</span>
+的 Markov 链，重复步骤 (4) <span class="math inline">\(i\)</span> 次 (
+<span class="math inline">\(i\)</span> 次一般小于 5 )，即可以得到 <span
+class="math inline">\(i\)</span> 条 Markov 链, 将这 <span
+class="math inline">\(i\)</span>
+条链得到的参数估计值的均值为最终的参数估计值。</p></li>
+</ol>
+</div>
+</div>
+<div id="bayesian-generalized-linear-models" class="section level1"
+number="4">
+<h1><span class="header-section-number">4</span> Bayesian Generalized
+Linear Models</h1>
+<div id="introduction" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Introduction</h2>
+<p>Bayesian Generalized Linear Models (GLMs) integrate Bayesian
+inference methods with generalized linear modeling techniques. These
+models are versatile in handling various types of response variables,
+including binary outcomes, normal distributions, Poisson rates, and
+more, making them suitable for a wide array of data analysis
+scenarios.</p>
+<p>In Bayesian GLMs, the response variable <span
+class="math inline">\(Y\)</span> is assumed to be generated from a
+distribution that is typically part of the exponential family (e.g.,
+binomial, normal, Poisson). The relationship between the response <span
+class="math inline">\(Y\)</span> and the predictors <span
+class="math inline">\(X\)</span> is modeled through a link function
+which relates the expected value of the response to the linear
+predictors. This is expressed as:</p>
+<p><span class="math display">\[
+g(E(Y)) = X\beta
+\]</span></p>
+<p>where <span class="math inline">\(g(\cdot)\)</span> is the link
+function, <span class="math inline">\(X\)</span> represents the matrix
+of input variables, and <span class="math inline">\(\beta\)</span> is a
+vector of coefficients that are treated as random variables with their
+own prior distributions.</p>
+<p>The Bayesian approach allows the incorporation of prior knowledge
+about the parameters in the form of distributions. This helps in
+addressing data sparsity or incorporating expert knowledge directly into
+the model. The model is then updated with data to produce posterior
+distributions of the parameters, rather than single-point estimates.
+This posterior distribution provides insights into the uncertainty of
+the estimates, which is a significant advantage over traditional
+frequentist methods.</p>
+<p>Computational techniques such as Markov Chain Monte Carlo (MCMC) are
+commonly used to estimate the posterior distributions of the model
+parameters since these distributions often do not have a closed-form
+solution.</p>
+<p>Bayesian GLMs are powerful because they provide a probabilistic
+framework for modeling complex phenomena and allow for more nuanced
+inference regarding the effects of predictors on the response variable,
+taking into account prior beliefs and the likelihood of observed
+data.</p>
+</div>
+<div id="likelihood-function-and-mle" class="section level2"
+number="4.2">
+<h2><span class="header-section-number">4.2</span> Likelihood Function
+and MLE</h2>
+<ol style="list-style-type: decimal">
+<li><p><strong>Likelihood Function</strong>: The likelihood function
+<span class="math inline">\(L(\theta|y)\)</span> is central to the
+process of estimation. It quantifies how probable a set of observed data
+<span class="math inline">\(y\)</span> is, given a set of parameters
+<span class="math inline">\(\theta\)</span>. The likelihood for a
+dataset <span class="math inline">\(y\)</span> under a model
+parameterized by <span class="math inline">\(\theta\)</span> is given by
+the product of the probability densities for each individual data
+point:</p>
+<p><span class="math display">\[
+L(\theta|y) = \prod_{i=1}^n p(y_i|\theta)
+\]</span></p>
+<p>where <span class="math inline">\(p(y_i|\theta)\)</span> is the
+probability of observing <span class="math inline">\(y_i\)</span> given
+the parameters <span class="math inline">\(\theta\)</span>.</p></li>
+<li><p><strong>Maximum Likelihood Estimation (MLE)</strong>: This method
+seeks the parameter set <span class="math inline">\(\theta\)</span> that
+maximizes the likelihood function. The estimate <span
+class="math inline">\(\hat{\theta}\)</span> is defined as:</p>
+<p><span class="math display">\[
+\hat{\theta} = \arg \max_{\theta} L(\theta|y)
+\]</span></p>
+<p>This is equivalent to maximizing the log-likelihood because the
+logarithm is a monotonic transformation, simplifying the multiplication
+of probabilities into a sum:</p>
+<p><span class="math display">\[
+\ell(\theta|y) = \log L(\theta|y) = \sum_{i=1}^n \log p(y_i|\theta)
+\]</span></p></li>
+<li><p><strong>Score Function</strong>: This is the derivative of the
+log-likelihood function with respect to the parameter <span
+class="math inline">\(\theta\)</span>, and it provides a measure of how
+sensitive the likelihood is to changes in the parameter. It is a crucial
+component in finding the maximum likelihood estimate through
+gradient-based optimization methods. The score function is given by:</p>
+<p><span class="math display">\[
+\frac{\partial \ell(\theta|y)}{\partial \theta}
+\]</span></p>
+<p>It helps identify the parameter values where the score is zero, which
+are potential candidates for maximum likelihood estimates if they
+correspond to a maximum on the likelihood surface.</p></li>
+</ol>
+</div>
+<div id="key-components-of-bayesian-glms" class="section level2"
+number="4.3">
+<h2><span class="header-section-number">4.3</span> Key Components of
+Bayesian GLMs:</h2>
+<ol style="list-style-type: decimal">
+<li><p><strong>Link Function and Linear Predictor</strong>:<br />
+The relationship between the mean of the dependent variable and the
+linear combination of predictors is specified through a link function.
+This function ensures that the model predictions stay within bounds
+suitable for the distribution of the dependent variable. For instance, a
+logit link function is used in logistic regression to keep the
+predictions between 0 and 1.</p></li>
+<li><p><strong>Prior Distributions</strong>:<br />
+Priors are set on the parameters (e.g., regression coefficients and
+scale parameters) to incorporate prior beliefs or external information
+about the values these parameters might take. These priors can influence
+the posterior distributions, especially when the data is
+sparse.</p></li>
+<li><p><strong>Likelihood</strong>:<br />
+The likelihood function is based on the assumed distribution of the
+response variable given the predictors (e.g., normal for linear
+regression, binomial for logistic regression). The likelihood integrates
+the observed data with the linear predictor through the link
+function.</p></li>
+<li><p><strong>Posterior Distributions</strong>:<br />
+The posterior distributions of the parameters are derived using Bayes’
+theorem, combining the prior distributions and the likelihood of the
+observed data. These posteriors provide a complete probabilistic
+description of the parameters after observing the data.</p></li>
+<li><p><strong>Predictive Distributions</strong>:<br />
+Bayesian GLMs also facilitate the generation of predictive distributions
+for new observations, which are derived from the posterior predictive
+distribution. This distribution takes into account both the uncertainty
+in the parameter estimates and the inherent variability in the response
+variable.</p></li>
+</ol>
+</div>
+</div>
+<div id="bayesian-survival-analysis" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Bayesian Survival
+Analysis</h1>
+<div id="cox-ph-model" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Cox PH Model</h2>
+<ol style="list-style-type: decimal">
+<li><p><strong>Cox PH Model Basics</strong>: The Cox Proportional
+Hazards model is a widely used statistical method for survival analysis,
+focusing on the time until an event occurs. It is characterized by the
+hazard function, which models the instantaneous risk of the event. The
+baseline hazard function, <span class="math inline">\(h_0(t)\)</span>,
+is not specified, which allows flexibility in modeling different types
+of hazard shapes.</p></li>
+<li><p><strong>Model Formulation</strong>: The model incorporates a
+linear predictor involving covariates, represented typically as: <span
+class="math display">\[
+h(t | \beta) = h_0(t) \exp(\beta^T X)
+\]</span> Here, <span class="math inline">\(\beta\)</span> represents
+the regression coefficients corresponding to the covariates <span
+class="math inline">\(X\)</span>, and <span
+class="math inline">\(h_0(t)\)</span> is the baseline hazard function.
+This formulation assumes that the covariates have a multiplicative
+effect on the hazard rate, which remains proportional over
+time.</p></li>
+<li><p><strong>Piecewise Constant Baseline Hazard</strong>: According to
+the content in the image, the baseline hazard, <span
+class="math inline">\(h_0(t)\)</span>, can be modeled as a piecewise
+constant function. This means that <span
+class="math inline">\(h_0(t)\)</span> is assumed constant within
+specified intervals. This is a common approach when the baseline hazard
+is not known a priori and needs to be estimated from the data. It
+simplifies calculations and allows for flexibility in the model. The
+hazard rate in each interval <span class="math inline">\([s_j,
+s_{j+1})\)</span> is denoted as <span
+class="math inline">\(\lambda_j\)</span>.</p></li>
+<li><p><strong>Bayesian Framework</strong>: In a Bayesian setting,
+priors are assigned to the parameters of the model, including the
+regression coefficients <span class="math inline">\(\beta\)</span> and
+the parameters defining the piecewise constant baseline hazard <span
+class="math inline">\(\lambda_j\)</span>. The priors could be guided by
+previous studies or expert knowledge. Common choices for priors on <span
+class="math inline">\(\beta\)</span> might include normal distributions,
+while <span class="math inline">\(\lambda_j\)</span> might have gamma
+priors due to their positive support.</p></li>
+<li><p><strong>Posterior Distributions</strong>: The Bayesian approach
+focuses on estimating the posterior distributions of the model
+parameters, which combine prior beliefs and the likelihood derived from
+the observed data. These posterior distributions provide a complete
+probabilistic description of the model parameters, offering insights
+into their uncertainty and variability.</p></li>
+<li><p><strong>Computational Methods</strong>: The analysis often
+involves using Markov Chain Monte Carlo (MCMC) methods to sample from
+the posterior distributions. This is particularly necessary in complex
+models where analytical solutions are infeasible.</p></li>
+</ol>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

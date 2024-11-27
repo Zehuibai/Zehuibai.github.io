@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 2 Smoothing | ML Project Using bookdown</title>
+  <meta name="description" content="A book example for a Chapman &amp; Hall book." />
+  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 2 Smoothing | ML Project Using bookdown" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="A book example for a Chapman &amp; Hall book." />
+  <meta name="github-repo" content="yihui/bookdown-crc" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 2 Smoothing | ML Project Using bookdown" />
+  
+  <meta name="twitter:description" content="A book example for a Chapman &amp; Hall book." />
+  
+
+<meta name="author" content="Zehui Bai" />
+
+
+<meta name="date" content="2023-12-06" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="regularization-penalized-regression.html"/>
+<link rel="next" href="knn.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="libs/d3-3.5.17/d3.min.js"></script>
+<link href="libs/markmap-0.3.3/view.mindmap.css" rel="stylesheet" />
+<script src="libs/markmap-0.3.3/view.mindmap.js"></script>
+<script src="libs/markmap-0.3.3/plugins/parsemd.min.js"></script>
+<script src="libs/markmap-binding-1.3.2/markmap.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">ML Project</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#why-read-this-book"><i class="fa fa-check"></i>Why read this book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#structure-of-the-book"><i class="fa fa-check"></i>Structure of the book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information-and-conventions"><i class="fa fa-check"></i>Software information and conventions</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html"><i class="fa fa-check"></i><b>1</b> Regularization Penalized Regression</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#motivation"><i class="fa fa-check"></i><b>1.1.1</b> Motivation</a></li>
+<li class="chapter" data-level="1.1.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#data-preparation"><i class="fa fa-check"></i><b>1.1.2</b> Data preparation</a></li>
+<li class="chapter" data-level="1.1.3" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#best-subset-regression"><i class="fa fa-check"></i><b>1.1.3</b> Best subset regression</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#ridge-regression"><i class="fa fa-check"></i><b>1.2</b> Ridge Regression</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modeling"><i class="fa fa-check"></i><b>1.2.1</b> Modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#lasso-regression"><i class="fa fa-check"></i><b>1.3</b> Lasso Regression</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modelling"><i class="fa fa-check"></i><b>1.3.1</b> Modelling</a></li>
+<li class="chapter" data-level="1.3.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#glmnet-cross-validation"><i class="fa fa-check"></i><b>1.3.2</b> glmnet cross validation</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#elasticnet"><i class="fa fa-check"></i><b>1.4</b> ElasticNet</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modelling-1"><i class="fa fa-check"></i><b>1.4.1</b> Modelling</a></li>
+<li class="chapter" data-level="1.4.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#classification"><i class="fa fa-check"></i><b>1.4.2</b> Classification</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="smoothing.html"><a href="smoothing.html"><i class="fa fa-check"></i><b>2</b> Smoothing</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="smoothing.html"><a href="smoothing.html#smoothing-1"><i class="fa fa-check"></i><b>2.1</b> Smoothing</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="smoothing.html"><a href="smoothing.html#bin-smoothing"><i class="fa fa-check"></i><b>2.1.1</b> Bin smoothing</a></li>
+<li class="chapter" data-level="2.1.2" data-path="smoothing.html"><a href="smoothing.html#kernels"><i class="fa fa-check"></i><b>2.1.2</b> Kernels</a></li>
+<li class="chapter" data-level="2.1.3" data-path="smoothing.html"><a href="smoothing.html#local-weighted-regression-loess"><i class="fa fa-check"></i><b>2.1.3</b> Local weighted regression (loess)</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="smoothing.html"><a href="smoothing.html#loess-regression"><i class="fa fa-check"></i><b>2.2</b> Loess Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="knn.html"><a href="knn.html"><i class="fa fa-check"></i><b>3</b> KNN</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="knn.html"><a href="knn.html#introduction-1"><i class="fa fa-check"></i><b>3.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="knn.html"><a href="knn.html#idee"><i class="fa fa-check"></i><b>3.1.1</b> Idee</a></li>
+<li class="chapter" data-level="3.1.2" data-path="knn.html"><a href="knn.html#加权最近邻法"><i class="fa fa-check"></i><b>3.1.2</b> 加权最近邻法</a></li>
+<li class="chapter" data-level="3.1.3" data-path="knn.html"><a href="knn.html#knn算法三要素"><i class="fa fa-check"></i><b>3.1.3</b> KNN算法三要素</a></li>
+<li class="chapter" data-level="3.1.4" data-path="knn.html"><a href="knn.html#优缺点"><i class="fa fa-check"></i><b>3.1.4</b> 优缺点</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="knn.html"><a href="knn.html#knn算法的实现方式"><i class="fa fa-check"></i><b>3.2</b> KNN算法的实现方式</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="knn.html"><a href="knn.html#brute-force"><i class="fa fa-check"></i><b>3.2.1</b> Brute-force</a></li>
+<li class="chapter" data-level="3.2.2" data-path="knn.html"><a href="knn.html#kd树实现"><i class="fa fa-check"></i><b>3.2.2</b> KD树实现</a></li>
+<li class="chapter" data-level="3.2.3" data-path="knn.html"><a href="knn.html#球树实现"><i class="fa fa-check"></i><b>3.2.3</b> 球树实现</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="knn.html"><a href="knn.html#application"><i class="fa fa-check"></i><b>3.3</b> Application</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="knn.html"><a href="knn.html#data-preparation-1"><i class="fa fa-check"></i><b>3.3.1</b> Data Preparation</a></li>
+<li class="chapter" data-level="3.3.2" data-path="knn.html"><a href="knn.html#knn-modelling"><i class="fa fa-check"></i><b>3.3.2</b> KNN Modelling</a></li>
+<li class="chapter" data-level="3.3.3" data-path="knn.html"><a href="knn.html#加权最近邻法-1"><i class="fa fa-check"></i><b>3.3.3</b> 加权最近邻法</a></li>
+<li class="chapter" data-level="3.3.4" data-path="knn.html"><a href="knn.html#over-training"><i class="fa fa-check"></i><b>3.3.4</b> Over-training</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="svm.html"><a href="svm.html"><i class="fa fa-check"></i><b>4</b> SVM</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="svm.html"><a href="svm.html#introduction-2"><i class="fa fa-check"></i><b>4.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="svm.html"><a href="svm.html#perceptron"><i class="fa fa-check"></i><b>4.1.1</b> Perceptron</a></li>
+<li class="chapter" data-level="4.1.2" data-path="svm.html"><a href="svm.html#函数间隔与几何间隔"><i class="fa fa-check"></i><b>4.1.2</b> 函数间隔与几何间隔</a></li>
+<li class="chapter" data-level="4.1.3" data-path="svm.html"><a href="svm.html#svm支持向量"><i class="fa fa-check"></i><b>4.1.3</b> SVM支持向量</a></li>
+<li class="chapter" data-level="4.1.4" data-path="svm.html"><a href="svm.html#svm模型目标函数与优化"><i class="fa fa-check"></i><b>4.1.4</b> SVM模型目标函数与优化</a></li>
+<li class="chapter" data-level="4.1.5" data-path="svm.html"><a href="svm.html#线性可分svm的算法过程"><i class="fa fa-check"></i><b>4.1.5</b> 线性可分SVM的算法过程</a></li>
+<li class="chapter" data-level="4.1.6" data-path="svm.html"><a href="svm.html#线性svm的软间隔最大化"><i class="fa fa-check"></i><b>4.1.6</b> 线性SVM的软间隔最大化</a></li>
+<li class="chapter" data-level="4.1.7" data-path="svm.html"><a href="svm.html#线性不可分支持向量机与核函数"><i class="fa fa-check"></i><b>4.1.7</b> 线性不可分支持向量机与核函数</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="svm.html"><a href="svm.html#application-1"><i class="fa fa-check"></i><b>4.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="svm.html"><a href="svm.html#data-preparation-2"><i class="fa fa-check"></i><b>4.2.1</b> Data Preparation</a></li>
+<li class="chapter" data-level="4.2.2" data-path="svm.html"><a href="svm.html#svm-modelling"><i class="fa fa-check"></i><b>4.2.2</b> SVM Modelling</a></li>
+<li class="chapter" data-level="4.2.3" data-path="svm.html"><a href="svm.html#model-selection"><i class="fa fa-check"></i><b>4.2.3</b> Model Selection</a></li>
+<li class="chapter" data-level="4.2.4" data-path="svm.html"><a href="svm.html#character-selection"><i class="fa fa-check"></i><b>4.2.4</b> Character selection</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="tree-models.html"><a href="tree-models.html"><i class="fa fa-check"></i><b>5</b> Tree models</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="tree-models.html"><a href="tree-models.html#decision-tree-model"><i class="fa fa-check"></i><b>5.1</b> Decision Tree Model</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="tree-models.html"><a href="tree-models.html#decision-tree-algorithm"><i class="fa fa-check"></i><b>5.1.1</b> Decision tree algorithm</a></li>
+<li class="chapter" data-level="5.1.2" data-path="tree-models.html"><a href="tree-models.html#id3-algorithm"><i class="fa fa-check"></i><b>5.1.2</b> ID3 Algorithm</a></li>
+<li class="chapter" data-level="5.1.3" data-path="tree-models.html"><a href="tree-models.html#c4.5-algorithm"><i class="fa fa-check"></i><b>5.1.3</b> C4.5 Algorithm</a></li>
+<li class="chapter" data-level="5.1.4" data-path="tree-models.html"><a href="tree-models.html#cart-algorithm"><i class="fa fa-check"></i><b>5.1.4</b> CART Algorithm</a></li>
+<li class="chapter" data-level="5.1.5" data-path="tree-models.html"><a href="tree-models.html#pruning"><i class="fa fa-check"></i><b>5.1.5</b> Pruning</a></li>
+<li class="chapter" data-level="5.1.6" data-path="tree-models.html"><a href="tree-models.html#package-rpart"><i class="fa fa-check"></i><b>5.1.6</b> Package ‘rpart’</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="tree-models.html"><a href="tree-models.html#random-forest"><i class="fa fa-check"></i><b>5.2</b> Random Forest</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="tree-models.html"><a href="tree-models.html#bootstrap-bagging"><i class="fa fa-check"></i><b>5.2.1</b> Bootstrap (Bagging)</a></li>
+<li class="chapter" data-level="5.2.2" data-path="tree-models.html"><a href="tree-models.html#bagging算法流程"><i class="fa fa-check"></i><b>5.2.2</b> bagging算法流程</a></li>
+<li class="chapter" data-level="5.2.3" data-path="tree-models.html"><a href="tree-models.html#random-forest-algorithm"><i class="fa fa-check"></i><b>5.2.3</b> Random Forest Algorithm</a></li>
+<li class="chapter" data-level="5.2.4" data-path="tree-models.html"><a href="tree-models.html#random-forest-promotion"><i class="fa fa-check"></i><b>5.2.4</b> Random forest promotion</a></li>
+<li class="chapter" data-level="5.2.5" data-path="tree-models.html"><a href="tree-models.html#package-randomforest"><i class="fa fa-check"></i><b>5.2.5</b> Package ‘randomForest’</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="tree-models.html"><a href="tree-models.html#modelling-2"><i class="fa fa-check"></i><b>5.3</b> Modelling</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="tree-models.html"><a href="tree-models.html#data-preparation-3"><i class="fa fa-check"></i><b>5.3.1</b> Data preparation</a></li>
+<li class="chapter" data-level="5.3.2" data-path="tree-models.html"><a href="tree-models.html#regression-tree-1"><i class="fa fa-check"></i><b>5.3.2</b> Regression tree</a></li>
+<li class="chapter" data-level="5.3.3" data-path="tree-models.html"><a href="tree-models.html#classification-tree-1"><i class="fa fa-check"></i><b>5.3.3</b> Classification tree</a></li>
+<li class="chapter" data-level="5.3.4" data-path="tree-models.html"><a href="tree-models.html#random-forest-for-regression"><i class="fa fa-check"></i><b>5.3.4</b> Random forest for regression</a></li>
+<li class="chapter" data-level="5.3.5" data-path="tree-models.html"><a href="tree-models.html#random-forest-for-classification"><i class="fa fa-check"></i><b>5.3.5</b> Random forest for classification</a></li>
+<li class="chapter" data-level="5.3.6" data-path="tree-models.html"><a href="tree-models.html#皮玛印第安人糖尿病数据集"><i class="fa fa-check"></i><b>5.3.6</b> 皮玛印第安人糖尿病数据集</a></li>
+<li class="chapter" data-level="5.3.7" data-path="tree-models.html"><a href="tree-models.html#使用随机森林进行特征选择"><i class="fa fa-check"></i><b>5.3.7</b> 使用随机森林进行特征选择</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="tree-models.html"><a href="tree-models.html#gradient-boosting"><i class="fa fa-check"></i><b>5.4</b> Gradient Boosting</a></li>
+<li class="chapter" data-level="5.5" data-path="tree-models.html"><a href="tree-models.html#gradient-descent"><i class="fa fa-check"></i><b>5.5</b> Gradient Descent</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="tree-models.html"><a href="tree-models.html#gradient"><i class="fa fa-check"></i><b>5.5.1</b> Gradient</a></li>
+<li class="chapter" data-level="5.5.2" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-1"><i class="fa fa-check"></i><b>5.5.2</b> Gradient Descent</a></li>
+<li class="chapter" data-level="5.5.3" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-algorithm"><i class="fa fa-check"></i><b>5.5.3</b> Gradient Descent Algorithm</a></li>
+<li class="chapter" data-level="5.5.4" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-familiy"><i class="fa fa-check"></i><b>5.5.4</b> Gradient Descent Familiy</a></li>
+<li class="chapter" data-level="5.5.5" data-path="tree-models.html"><a href="tree-models.html#gbdt分类算法"><i class="fa fa-check"></i><b>5.5.5</b> GBDT分类算法</a></li>
+<li class="chapter" data-level="5.5.6" data-path="tree-models.html"><a href="tree-models.html#package-gbm"><i class="fa fa-check"></i><b>5.5.6</b> Package ‘gbm’</a></li>
+<li class="chapter" data-level="5.5.7" data-path="tree-models.html"><a href="tree-models.html#极限梯度提升分类"><i class="fa fa-check"></i><b>5.5.7</b> 极限梯度提升——分类</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="tree-models.html"><a href="tree-models.html#cubist-model"><i class="fa fa-check"></i><b>5.6</b> Cubist Model</a>
+<ul>
+<li class="chapter" data-level="5.6.1" data-path="tree-models.html"><a href="tree-models.html#introduction-3"><i class="fa fa-check"></i><b>5.6.1</b> Introduction</a></li>
+<li class="chapter" data-level="5.6.2" data-path="tree-models.html"><a href="tree-models.html#application-data-preparation"><i class="fa fa-check"></i><b>5.6.2</b> Application Data Preparation</a></li>
+<li class="chapter" data-level="5.6.3" data-path="tree-models.html"><a href="tree-models.html#fit-continious-outcome"><i class="fa fa-check"></i><b>5.6.3</b> Fit Continious Outcome</a></li>
+<li class="chapter" data-level="5.6.4" data-path="tree-models.html"><a href="tree-models.html#variable-importance"><i class="fa fa-check"></i><b>5.6.4</b> Variable Importance</a></li>
+<li class="chapter" data-level="5.6.5" data-path="tree-models.html"><a href="tree-models.html#summary-display"><i class="fa fa-check"></i><b>5.6.5</b> Summary display</a></li>
+<li class="chapter" data-level="5.6.6" data-path="tree-models.html"><a href="tree-models.html#specific-parts"><i class="fa fa-check"></i><b>5.6.6</b> specific parts</a></li>
+<li class="chapter" data-level="5.6.7" data-path="tree-models.html"><a href="tree-models.html#ensembles-by-committees"><i class="fa fa-check"></i><b>5.6.7</b> Ensembles By Committees</a></li>
+<li class="chapter" data-level="5.6.8" data-path="tree-models.html"><a href="tree-models.html#nearestneighbors-adjustmemt"><i class="fa fa-check"></i><b>5.6.8</b> Nearest–neighbors Adjustmemt</a></li>
+<li class="chapter" data-level="5.6.9" data-path="tree-models.html"><a href="tree-models.html#optimize-parameters"><i class="fa fa-check"></i><b>5.6.9</b> Optimize parameters</a></li>
+<li class="chapter" data-level="5.6.10" data-path="tree-models.html"><a href="tree-models.html#logistic-cv"><i class="fa fa-check"></i><b>5.6.10</b> Logistic CV</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="pca.html"><a href="pca.html"><i class="fa fa-check"></i><b>6</b> PCA</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="pca.html"><a href="pca.html#introduction-4"><i class="fa fa-check"></i><b>6.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="pca.html"><a href="pca.html#component"><i class="fa fa-check"></i><b>6.1.1</b> Component</a></li>
+<li class="chapter" data-level="6.1.2" data-path="pca.html"><a href="pca.html#pca算法"><i class="fa fa-check"></i><b>6.1.2</b> PCA算法</a></li>
+<li class="chapter" data-level="6.1.3" data-path="pca.html"><a href="pca.html#主成分旋转"><i class="fa fa-check"></i><b>6.1.3</b> 主成分旋转</a></li>
+<li class="chapter" data-level="6.1.4" data-path="pca.html"><a href="pca.html#kernelized-pca"><i class="fa fa-check"></i><b>6.1.4</b> Kernelized PCA</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="pca.html"><a href="pca.html#application-2"><i class="fa fa-check"></i><b>6.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="pca.html"><a href="pca.html#data-preparation-4"><i class="fa fa-check"></i><b>6.2.1</b> Data preparation</a></li>
+<li class="chapter" data-level="6.2.2" data-path="pca.html"><a href="pca.html#modeling-1"><i class="fa fa-check"></i><b>6.2.2</b> Modeling</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="cluster-analysis.html"><a href="cluster-analysis.html"><i class="fa fa-check"></i><b>7</b> Cluster Analysis</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering"><i class="fa fa-check"></i><b>7.1</b> Hierarchical Clustering</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#introduction-5"><i class="fa fa-check"></i><b>7.1.1</b> Introduction</a></li>
+<li class="chapter" data-level="7.1.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering-algorithms"><i class="fa fa-check"></i><b>7.1.2</b> Hierarchical clustering algorithms</a></li>
+<li class="chapter" data-level="7.1.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#measure-the-dissimilarity-between-two-clusters-of-observations"><i class="fa fa-check"></i><b>7.1.3</b> Measure the dissimilarity between two clusters of observations</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering"><i class="fa fa-check"></i><b>7.2</b> K-means Clustering</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#algorithm"><i class="fa fa-check"></i><b>7.2.1</b> Algorithm</a></li>
+<li class="chapter" data-level="7.2.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means"><i class="fa fa-check"></i><b>7.2.2</b> K-Means++</a></li>
+<li class="chapter" data-level="7.2.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#elkan-k-means"><i class="fa fa-check"></i><b>7.2.3</b> elkan K-Means</a></li>
+<li class="chapter" data-level="7.2.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#mini-batch-k-means"><i class="fa fa-check"></i><b>7.2.4</b> Mini Batch K-Means</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient-and-pam"><i class="fa fa-check"></i><b>7.3</b> Gower’s coefficient and PAM</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient"><i class="fa fa-check"></i><b>7.3.1</b> Gower’s coefficient</a></li>
+<li class="chapter" data-level="7.3.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#不同数据类型的相异度计算-距离法"><i class="fa fa-check"></i><b>7.3.2</b> 不同数据类型的相异度计算 (距离法)</a></li>
+<li class="chapter" data-level="7.3.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#pam"><i class="fa fa-check"></i><b>7.3.3</b> PAM</a></li>
+</ul></li>
+<li class="chapter" data-level="7.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch-clustering"><i class="fa fa-check"></i><b>7.4</b> BIRCH Clustering</a>
+<ul>
+<li class="chapter" data-level="7.4.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch-introduction"><i class="fa fa-check"></i><b>7.4.1</b> BIRCH Introduction</a></li>
+<li class="chapter" data-level="7.4.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#聚类特征cf与聚类特征树cf-tree"><i class="fa fa-check"></i><b>7.4.2</b> 聚类特征CF与聚类特征树CF Tree</a></li>
+<li class="chapter" data-level="7.4.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#cf-tree的生成"><i class="fa fa-check"></i><b>7.4.3</b> CF Tree的生成</a></li>
+<li class="chapter" data-level="7.4.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch算法"><i class="fa fa-check"></i><b>7.4.4</b> BIRCH算法</a></li>
+</ul></li>
+<li class="chapter" data-level="7.5" data-path="cluster-analysis.html"><a href="cluster-analysis.html#application-3"><i class="fa fa-check"></i><b>7.5</b> Application</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#data-preparation-5"><i class="fa fa-check"></i><b>7.5.1</b> Data preparation</a></li>
+<li class="chapter" data-level="7.5.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering-1"><i class="fa fa-check"></i><b>7.5.2</b> Hierarchical Clustering</a></li>
+<li class="chapter" data-level="7.5.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering-1"><i class="fa fa-check"></i><b>7.5.3</b> K-means Clustering</a></li>
+<li class="chapter" data-level="7.5.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient-and-pam-1"><i class="fa fa-check"></i><b>7.5.4</b> Gower’s coefficient and PAM</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html"><i class="fa fa-check"></i><b>8</b> linear discriminant analysis (LDA)</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#introduction-6"><i class="fa fa-check"></i><b>8.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#naive-bayes"><i class="fa fa-check"></i><b>8.1.1</b> Naive Bayes</a></li>
+<li class="chapter" data-level="8.1.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#controlling-prevalence"><i class="fa fa-check"></i><b>8.1.2</b> Controlling prevalence</a></li>
+<li class="chapter" data-level="8.1.3" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#qda"><i class="fa fa-check"></i><b>8.1.3</b> QDA</a></li>
+<li class="chapter" data-level="8.1.4" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda"><i class="fa fa-check"></i><b>8.1.4</b> LDA</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#discriminant-analysis-algorithm"><i class="fa fa-check"></i><b>8.2</b> Discriminant analysis algorithm</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#idee-1"><i class="fa fa-check"></i><b>8.2.1</b> Idee</a></li>
+<li class="chapter" data-level="8.2.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#瑞利商rayleigh-quotient"><i class="fa fa-check"></i><b>8.2.2</b> 瑞利商（Rayleigh quotient）</a></li>
+<li class="chapter" data-level="8.2.3" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#广义瑞利商-genralized-rayleigh-quotient"><i class="fa fa-check"></i><b>8.2.3</b> 广义瑞利商 genralized Rayleigh quotient</a></li>
+<li class="chapter" data-level="8.2.4" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda算法流程"><i class="fa fa-check"></i><b>8.2.4</b> LDA算法流程</a></li>
+<li class="chapter" data-level="8.2.5" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda-application"><i class="fa fa-check"></i><b>8.2.5</b> LDA Application</a></li>
+<li class="chapter" data-level="8.2.6" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#qda-1"><i class="fa fa-check"></i><b>8.2.6</b> QDA</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="neural-network.html"><a href="neural-network.html"><i class="fa fa-check"></i><b>9</b> Neural Network</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="neural-network.html"><a href="neural-network.html#introduction-7"><i class="fa fa-check"></i><b>9.1</b> Introduction</a></li>
+<li class="chapter" data-level="9.2" data-path="neural-network.html"><a href="neural-network.html#反向传播方法进行训练的前馈神经网络"><i class="fa fa-check"></i><b>9.2</b> 反向传播方法进行训练的前馈神经网络</a></li>
+<li class="chapter" data-level="9.3" data-path="neural-network.html"><a href="neural-network.html#application-4"><i class="fa fa-check"></i><b>9.3</b> Application</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="neural-network.html"><a href="neural-network.html#数据准备"><i class="fa fa-check"></i><b>9.3.1</b> 数据准备</a></li>
+<li class="chapter" data-level="9.3.2" data-path="neural-network.html"><a href="neural-network.html#模型构建"><i class="fa fa-check"></i><b>9.3.2</b> 模型构建</a></li>
+</ul></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="more-to-say.html"><a href="more-to-say.html"><i class="fa fa-check"></i><b>A</b> More to Say</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://bookdown.org" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">ML Project Using bookdown</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="smoothing" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">Chapter 2</span> Smoothing<a href="smoothing.html#smoothing" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div class="markmap html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-eb4962ab838a35126e5e" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-eb4962ab838a35126e5e">{"x":{"data":"# \n## Smoothing\n### Smoothing\n#### Bin smoothing\n#### Kernels\n#### Local weighted regression (loess)  \n### Loess Regression","options":{"preset":"colorful","autoFit":true}},"evals":[],"jsHooks":[]}</script>
+<div id="smoothing-1" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> Smoothing<a href="smoothing.html#smoothing-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Smoothing is a very powerful technique used all across data analysis. Other names given to this technique are curve fitting and low pass filtering. It is designed to detect trends in the presence of noisy data in cases in which the shape of the trend is unknown. The smoothing name comes from the fact that to accomplish this feat, we assume that the trend is smooth, as in a smooth surface. In contrast, the noise, or deviation from the trend, is unpredictably wobbly</p>
+<blockquote>
+<p>平滑是一种非常强大的技术，用于所有数据分析。 该技术的其他名称是曲线拟合和低通滤波。 它旨在在趋势形状未知的情况下检测存在噪声数据的趋势。 平滑的名称来自于这样一个事实，即为了完成这一壮举，我们假设趋势是平滑的，就像在平滑的表面中一样。 相比之下，噪声或趋势偏差是不可预测的摇摆不定：</p>
+</blockquote>
+<p><strong>concepts behind smoothing techniques</strong></p>
+<p>because conditional expectations/probabilities can be thought of as trends of unknown shapes that we need to estimate in the presence of uncertainty.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="smoothing.html#cb1-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="smoothing.html#cb1-2" tabindex="-1"></a><span class="fu">library</span>(dslabs)</span>
+<span id="cb1-3"><a href="smoothing.html#cb1-3" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;polls_2008&quot;</span>)</span>
+<span id="cb1-4"><a href="smoothing.html#cb1-4" tabindex="-1"></a><span class="fu">qplot</span>(day, margin, <span class="at">data =</span> polls_2008)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<div id="bin-smoothing" class="section level3 hasAnchor" number="2.1.1">
+<h3><span class="header-section-number">2.1.1</span> Bin smoothing<a href="smoothing.html#bin-smoothing" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The general idea of smoothing is to group data points into strata in which the value of <span class="math inline">\(f(x)\)</span> can be assumed to be constant. We can make this assumption because we think <span class="math inline">\(f(x)\)</span> changes slowly and, as a result, <span class="math inline">\(f(x)\)</span> is almost constant in small windows of time.</p>
+<p>平滑的一般思想是将数据点分组到层中，其中<span class="math inline">\(f(x)\)</span>的值可以假设为常数。 我们可以做出这个假设是因为我们认为 <span class="math inline">\(f(x)\)</span> 变化缓慢，因此 <span class="math inline">\(f(x)\)</span> 在小时间窗口内几乎是恒定的。</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="smoothing.html#cb2-1" tabindex="-1"></a>span <span class="ot">&lt;-</span> <span class="dv">7</span> </span>
+<span id="cb2-2"><a href="smoothing.html#cb2-2" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">with</span>(polls_2008, </span>
+<span id="cb2-3"><a href="smoothing.html#cb2-3" tabindex="-1"></a>            <span class="fu">ksmooth</span>(day, margin, <span class="at">kernel =</span> <span class="st">&quot;box&quot;</span>, <span class="at">bandwidth =</span> span))</span>
+<span id="cb2-4"><a href="smoothing.html#cb2-4" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="smoothing.html#cb2-5" tabindex="-1"></a>polls_2008 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">smooth =</span> fit<span class="sc">$</span>y) <span class="sc">%&gt;%</span></span>
+<span id="cb2-6"><a href="smoothing.html#cb2-6" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(day, margin)) <span class="sc">+</span></span>
+<span id="cb2-7"><a href="smoothing.html#cb2-7" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">alpha =</span> .<span class="dv">5</span>, <span class="at">color =</span> <span class="st">&quot;grey&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb2-8"><a href="smoothing.html#cb2-8" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(day, smooth), <span class="at">color=</span><span class="st">&quot;red&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+<div id="kernels" class="section level3 hasAnchor" number="2.1.2">
+<h3><span class="header-section-number">2.1.2</span> Kernels<a href="smoothing.html#kernels" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The final result from the bin smoother is quite wiggly. One reason for this is that each time the window moves, two points change. We can attenuate this somewhat by taking weighted averages that give the center point more weight than far away points, with the two points at the edges receiving very little weight.</p>
+<blockquote>
+<p>bin smoother 的最终结果非常不稳定。 造成这种情况的一个原因是，每次窗口移动时，都会改变两个点。 我们可以通过采用加权平均值来稍微减弱这种情况，使中心点的权重比远处的点要大，边缘的两个点的权重很小。</p>
+</blockquote>
+<p>You can think of the bin smoother approach as a weighted average:
+<span class="math display">\[\hat{f}(x_0) = \sum_{i=1}^N w_0(x_i) Y_i\]</span></p>
+<!-- 在上面的代码中，我们在调用函数 ksmooth 时使用了参数 kernel="box"。 这是因为权重函数看起来像一个盒子。 ksmooth 函数提供了一个“更平滑”的选项，它使用正态的密度来分配权重。 -->
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="smoothing.html#cb3-1" tabindex="-1"></a>span <span class="ot">&lt;-</span> <span class="dv">7</span></span>
+<span id="cb3-2"><a href="smoothing.html#cb3-2" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">with</span>(polls_2008, </span>
+<span id="cb3-3"><a href="smoothing.html#cb3-3" tabindex="-1"></a>            <span class="fu">ksmooth</span>(day, margin, <span class="at">kernel =</span> <span class="st">&quot;normal&quot;</span>, <span class="at">bandwidth =</span> span))</span>
+<span id="cb3-4"><a href="smoothing.html#cb3-4" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="smoothing.html#cb3-5" tabindex="-1"></a>polls_2008 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">smooth =</span> fit<span class="sc">$</span>y) <span class="sc">%&gt;%</span></span>
+<span id="cb3-6"><a href="smoothing.html#cb3-6" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(day, margin)) <span class="sc">+</span></span>
+<span id="cb3-7"><a href="smoothing.html#cb3-7" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">alpha =</span> .<span class="dv">5</span>, <span class="at">color =</span> <span class="st">&quot;grey&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb3-8"><a href="smoothing.html#cb3-8" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(day, smooth), <span class="at">color=</span><span class="st">&quot;red&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+<div id="local-weighted-regression-loess" class="section level3 hasAnchor" number="2.1.3">
+<h3><span class="header-section-number">2.1.3</span> Local weighted regression (loess)<a href="smoothing.html#local-weighted-regression-loess" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<blockquote>
+<p>刚刚描述的 bin 更平滑方法的一个限制是我们需要小窗口来保持近似恒定的假设。 结果，我们最终得到少量数据点来平均并获得不精确的估计. 在这里，我们描述了局部加权回归（loess）如何允许我们考虑更大的窗口大小。</p>
+</blockquote>
+<p>There are three other differences between loess and the typical bin smoother.</p>
+<ol style="list-style-type: decimal">
+<li>Rather than keeping the bin size the same, loess keeps the number of points used in the local fit the same. This number is controlled via the span argument, which expects a proportion. For example, if N is the number of data points and span=0.5, then for a given x, loess will use the 0.5 * N closest points to x for the fit.</li>
+</ol>
+<blockquote>
+<p>loess 不是保持 bin 大小相同，而是保持局部拟合中使用的点数相同。 这个数字是通过 span 参数控制的，它需要一个比例。 例如，如果 N 是数据点的数量并且 span=0.5，那么对于给定的 x，loess 将使用 0.5 * N 最接近 x 的点进行拟合。</p>
+</blockquote>
+<ol start="2" style="list-style-type: decimal">
+<li>When fitting a line locally, loess uses a weighted approach. Basically, instead of using least squares, we minimize a weighted version:</li>
+</ol>
+<p><span class="math display">\[
+\sum_{i=1}^{N} w_{0}\left(x_{i}\right)\left[Y_{i}-\left\{\beta_{0}+\beta_{1}\left(x_{i}-x_{0}\right)\right\}\right]^{2}
+\]</span>
+However, instead of the Gaussian kernel, loess uses a function called the Tukey tri-weight:
+<span class="math display">\[
+W(u)=\left(1-|u|^{3}\right)^{3} \text { if }|u| \leq 1 \text { and } W(u)=0 \text { if }|u|&gt;1
+\]</span>
+To define the weights, we denote <span class="math inline">\(2 h\)</span> as the window size and define:
+<span class="math display">\[
+w_{0}\left(x_{i}\right)=W\left(\frac{x_{i}-x_{0}}{h}\right)
+\]</span></p>
+<ol start="3" style="list-style-type: decimal">
+<li>loess has the option of fitting the local model robustly. An iterative algorithm is implemented in which, after fitting a model in one iteration, outliers are detected and down-weighted for the next iteration. To use this option, we use the argument family=“symmetric”.</li>
+</ol>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="smoothing.html#cb4-1" tabindex="-1"></a>total_days <span class="ot">&lt;-</span> <span class="fu">diff</span>(<span class="fu">range</span>(polls_2008<span class="sc">$</span>day))</span>
+<span id="cb4-2"><a href="smoothing.html#cb4-2" tabindex="-1"></a>span <span class="ot">&lt;-</span> <span class="dv">21</span><span class="sc">/</span>total_days</span>
+<span id="cb4-3"><a href="smoothing.html#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="smoothing.html#cb4-4" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">loess</span>(margin <span class="sc">~</span> day, <span class="at">degree=</span><span class="dv">1</span>, <span class="at">span =</span> span, <span class="at">data=</span>polls_2008)</span>
+<span id="cb4-5"><a href="smoothing.html#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="smoothing.html#cb4-6" tabindex="-1"></a>polls_2008 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">smooth =</span> fit<span class="sc">$</span>fitted) <span class="sc">%&gt;%</span></span>
+<span id="cb4-7"><a href="smoothing.html#cb4-7" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(day, margin)) <span class="sc">+</span></span>
+<span id="cb4-8"><a href="smoothing.html#cb4-8" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">alpha =</span> .<span class="dv">5</span>, <span class="at">color =</span> <span class="st">&quot;grey&quot;</span>) <span class="sc">+</span></span>
+<span id="cb4-9"><a href="smoothing.html#cb4-9" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(day, smooth), <span class="at">color=</span><span class="st">&quot;red&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="smoothing.html#cb5-1" tabindex="-1"></a><span class="do">## set degree = 1. This tells loess to fit polynomials of degree 1, a fancy name for lines. If you read the help page for loess, you will see that the argument degree defaults to 2. By default, loess fits parabolas not lines.</span></span>
+<span id="cb5-2"><a href="smoothing.html#cb5-2" tabindex="-1"></a>total_days <span class="ot">&lt;-</span> <span class="fu">diff</span>(<span class="fu">range</span>(polls_2008<span class="sc">$</span>day))</span>
+<span id="cb5-3"><a href="smoothing.html#cb5-3" tabindex="-1"></a>span <span class="ot">&lt;-</span> <span class="dv">28</span><span class="sc">/</span>total_days</span>
+<span id="cb5-4"><a href="smoothing.html#cb5-4" tabindex="-1"></a>fit_1 <span class="ot">&lt;-</span> <span class="fu">loess</span>(margin <span class="sc">~</span> day, <span class="at">degree=</span><span class="dv">1</span>, <span class="at">span =</span> span, <span class="at">data=</span>polls_2008)</span>
+<span id="cb5-5"><a href="smoothing.html#cb5-5" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="smoothing.html#cb5-6" tabindex="-1"></a>fit_2 <span class="ot">&lt;-</span> <span class="fu">loess</span>(margin <span class="sc">~</span> day, <span class="at">span =</span> span, <span class="at">data=</span>polls_2008)</span>
+<span id="cb5-7"><a href="smoothing.html#cb5-7" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="smoothing.html#cb5-8" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="smoothing.html#cb5-9" tabindex="-1"></a>polls_2008 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">smooth_1 =</span> fit_1<span class="sc">$</span>fitted, <span class="at">smooth_2 =</span> fit_2<span class="sc">$</span>fitted) <span class="sc">%&gt;%</span></span>
+<span id="cb5-10"><a href="smoothing.html#cb5-10" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(day, margin)) <span class="sc">+</span></span>
+<span id="cb5-11"><a href="smoothing.html#cb5-11" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">alpha =</span> .<span class="dv">5</span>, <span class="at">color =</span> <span class="st">&quot;grey&quot;</span>) <span class="sc">+</span></span>
+<span id="cb5-12"><a href="smoothing.html#cb5-12" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(day, smooth_1), <span class="at">color=</span><span class="st">&quot;red&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb5-13"><a href="smoothing.html#cb5-13" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(day, smooth_2), <span class="at">color=</span><span class="st">&quot;orange&quot;</span>, <span class="at">lty =</span> <span class="dv">1</span>) </span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+</div>
+</div>
+<div id="loess-regression" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> Loess Regression<a href="smoothing.html#loess-regression" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The loess (locally estimated scatterplot smoothing) method evaluates f near each data point, and draws a piecewise polynomial curve connecting the fitted points on the scatter plot. In more than two dimensions, the loess regression method constructs a flat surface by fitting points. Locally Estimated Scatterplot Smoothing (LOESS) does not need to determine the number of parameters in advance. In each prediction, the sample points around the specified sample points are used for temporary training to determine the parameters.</p>
+<blockquote>
+<p>loess（局部估计散点图平滑）方法在每个数据点附近评估 f，并在散点图上绘制连接拟合点的分段多项式曲线。在两个以上的维度上，黄土回归方法通过拟合点来构造一个平面。 Locally Estimated Scatterplot Smoothing (LOESS) 不需要预先确定参数的数量。在每次预测中，将指定样本点周围的样本点用于临时训练以确定参数。</p>
+</blockquote>
+<p>By fitting a polynomial regression function in the local neighborhood of each point, the response function at the data point can be estimated. The radius of the neighborhood is determined by the predetermined proportion of the data points contained in these neighborhoods (called smoothing parameters). Polynomial regression (usually linear or quadratic) is fitted by the weighted least squares method, and the smaller the weight, the farther the point is from the center.</p>
+<blockquote>
+<p>通过在每个点的局部邻域拟合多项式回归函数，可以估计数据点处的响应函数。邻域的半径由这些邻域中包含的数据点的预定比例决定（称为平滑参数）。多项式回归（通常是线性或二次）通过加权最小二乘法拟合，权重越小，点离中心越远。</p>
+</blockquote>
+<p>First, specify the value of the smoothing parameter as <span class="math inline">\(\mathrm{p} / \mathrm{n}\)</span>. This means that for each fixed point <span class="math inline">\(\mathbf{x}^{0}=\left(x_{1}^{0}, \ldots, x_{k}^{0}\right),\)</span>, linear function Fitting through the <span class="math inline">\(p\)</span> points in the local neighborhood <span class="math inline">\(\mathscr{N}_{p}\left(\mathbf{x}^{0}\right)\)</span>. The linear function is defined as</p>
+<p><span class="math display">\[
+l(\mathbf{x})=l\left(x_{1}, \ldots, x_{k}\right)=\beta_{0}+\beta_{1}\left(x_{1}-x_{1}^{0}\right)+\cdots+\beta_{k}\left(x_{k}-x_{k}^{0}\right)
+\]</span>
+for every <span class="math inline">\(\mathbf{x}=\left(x_{1}, \ldots, x_{k}\right)\)</span> in <span class="math inline">\(\mathscr{N}_{p}\left(\mathbf{x}^{0}\right)\)</span>
+The weighted least-squares predicted line <span class="math inline">\(\hat{l}(\mathbf{x})=\hat{\beta}_{0}+\hat{\beta}_{1}\left(x_{1}-x_{1}^{0}\right)+\cdots+\hat{\beta}_{k}\left(x_{k}-x_{k}^{0}\right)\)</span> minimizes
+<span class="math display">\[
+\sum_{\mathbf{x}_{i} \in \mathscr{N}_{p}\left(\mathbf{x}^{0}\right)}\left[y_{i}-l\left(\mathbf{x}_{i}\right)\right]^{2} w\left(\frac{\left\|\mathbf{x}_{i}-\mathbf{x}^{0}\right\|}{r\left(\mathbf{x}^{0}\right)}\right)
+\]</span>
+where <span class="math inline">\(\mathbf{x}_{i}=\left(x_{1 i}, \ldots, x_{k i}\right), i=1, \ldots, p .\)</span> Here <span class="math inline">\(\left\|\mathbf{x}_{i}-\mathbf{x}^{0}\right\|\)</span> denotes the Euclidean distance, that is,
+<span class="math display">\[\left\|\mathbf{x}_{i}-\mathbf{x}^{0}\right\|=\sqrt{\left(x_{1 i}-x_{1}^{0}\right)^{2}+\cdots+\left(x_{k i}-x_{k}^{0}\right)^{2}}\]</span>
+<span class="math inline">\(r\left(\mathbf{x}^{0}\right)=\max _{\mathbf{x}_{i} \in \mathscr{N}_{p}\left(\mathbf{x}^{0}\right)}\left\|\mathbf{x}_{i}-\mathbf{x}^{0}\right\|\)</span> is the radius of the neighborhood, and <span class="math inline">\(w(\cdot)\)</span> is the weight function.</p>
+<p>Finally, by predicting the corresponding value on the line <span class="math inline">\(\hat{l}\)</span>, that is, <span class="math inline">\(\hat{f}\left(\mathbf{x}^{0}\right)=\hat{l}\left(\mathbf {x}^{0}\right)=\hat{\beta}_{0}. \$\)</span>, estimate the response function <span class="math inline">\(f\)</span> at the point <span class="math inline">\(\mathbf{x}^{0}\)</span>. Please note that only the value of the matching intercept will work.
+Once the loess estimation of the response function for each data point is completed, the loess curve can be drawn on the scatter plot by connecting the fitted points with the straight line. If a significant curve relationship is displayed on the scatter plot, then the quadratic function</p>
+<p><span class="math display">\[
+q\left(x_{1}, \ldots, x_{k}\right)=\beta_{0}+\beta_{1,1}\left(x_{1}-x_{1}^{0}\right)+\beta_{1,2}\left(x_{1}-x_{1}^{0}\right)^{2}+\cdots+\beta_{k, 1}\left(x_{k}-x_{k}^{0}\right)+\beta_{k, 2}\left(x_{k}-x_{k}^{0}\right)^{2}
+\]</span>
+Instead of the linear function <span class="math inline">\(l\)</span>. The loess regression method proposes different weight functions. The most commonly used is</p>
+<ul>
+<li>the bisquare function
+<span class="math display">\[
+w(\mathbf{x})=\left\{\begin{array}{ll}
+\left(1-\|\mathbf{x}\|^{2}\right)^{2}, &amp; \text { if }\|\mathbf{x}\| \leq 1 \\
+0, &amp; \text { otherwise }
+\end{array}\right.
+\]</span></li>
+<li>and the tricube function
+<span class="math display">\[
+w(\mathbf{x})=\left\{\begin{array}{ll}
+\left(1-\|\mathbf{x}\|^{3}\right)^{3}, &amp; \text { if }\|\mathbf{x}\| \leq 1 \\
+0, &amp; \text { otherwise }
+\end{array}\right.
+\]</span>
+In both cases <span class="math inline">\(\|\mathbf{x}\|\)</span> denotes the Euclidean norm of <span class="math inline">\(\mathbf{x}=\left(x_{1}, \ldots, x_{k}\right),\|\mathbf{x}\|=\sqrt{x_{1}^{2}+\cdots+x_{k}^{2}}\)</span></li>
+</ul>
+<p><strong>Comparison</strong></p>
+<p>Using linear regression will cause underfitting. In this case, Loess can solve this problem well. Compared with linear regression:
+-The goal of linear regression is to minimize <span class="math inline">\(\sum\left(y^{(i)}-\theta^{T} x^{(i)}\right)^{2}\)</span>
+-Loess’s goal is to minimize <span class="math inline">\(\left(y^{(i)}-\theta^{T} x^{(i)}\right)^{2}\)</span>, where <span class="math inline">\(\quad \omega^{( i)}=\exp \left(-\frac{\left(x^{(i)}-x\right)^{2}}{2 \iota^{2}}\right)\)</span></p>
+<p>The function of <span class="math inline">\(\omega\)</span> is to make the neighboring points of the predicted point contribute a lot in minimizing the objective function:</p>
+<p>-<span class="math inline">\(\left|x^{(i)}-x\right|\)</span> small <span class="math inline">\(\Rightarrow \omega^{(i)} \approx 1\)</span>
+-<span class="math inline">\(\left|x^{(i)}-x\right|\)</span> large <span class="math inline">\(\Rightarrow \omega^{(i)} \approx 0\)</span></p>
+<p><strong>Disadvantages</strong>:</p>
+<p>Can not solve the problems of under-fitting and over-fitting, when the amount of data is large, it is costly to fit each predicted data once.</p>
+<p><strong>Smoothing Parameter Selection Criterion</strong></p>
+<!-- 已经提出了许多标准来选择一组数据的最佳平滑参数。 在这里，最常用的，经偏差校正的赤池信息准则（AICC）the bias corrected Akaike information criterion。 该准则是选择使AICC最小化的平滑参数。 -->
+<p>Many criteria have been proposed to select the best smoothing parameter for a set of data. Here, the most commonly used is the bias corrected Akaike information criterion (AICC). The criterion is to choose a smoothing parameter that minimizes AICC.</p>
+<p><span class="math display">\[A I C C=\ln \hat{\sigma}^{2}+\frac{2(\operatorname{Trace}(\mathbb{L})+1)}{n-\operatorname{Trace}(\mathbb{L})-2}\]</span></p>
+<p>where <span class="math inline">\(\hat{\sigma}^{2}\)</span> is an estimate of the variance of random error <span class="math inline">\(\varepsilon\)</span>. The matrix <span class="math inline">\(\mathbb{L}\)</span> is an <span class="math inline">\(n \times n\)</span> smoothing matrix that satisfies <span class="math inline">\(\mathbf{y}=\mathbb{L} \hat{\mathbf{y}}\)</span> where <span class="math inline">\(\mathbf{y}\)</span> is the vector of observed <span class="math inline">\(y\)</span>-values, and <span class="math inline">\(\hat{\mathbf{y}}\)</span> is the vector of the corresponding predicted values. he trace of a matrix is defined as the sum of the elements on the main diagonal.</p>
+<pre><code>data unempl_rates;
+input rate @@;
+month= _N_ ;
+datalines;
+6.0 6.7 4.9 4.4 5.8 4.8 5.5 6.7 4.7 5.6 6.5 6.0
+4.7 5.1 7.2 6.1 7.7 5.7 7.1 4.2 5.8 5.1 6.3 5.1
+3.9 4.7 4.4 5.9 4.1 5.8 4.9 5.4 3.9 6.0 4.1 4.6
+5.7 5.0 4.5 6.9 5.6 4.6 4.4 4.1 3.2 6.3 4.2 4.7
+4.3 4.3 4.5 6.7 3.9 4.6 5.8 3.8 5.5 4.7 5.0 4.2
+5.0 4.5 3.7 5.5 5.4 2.6 5.0 4.9 5.7 4.3 5.3 7.1
+7.5 4.1 5.1 5.7 4.8 6.1 6.3 4.1 5.7 7.2 6.0 7.2
+8.0 8.7 8.5 9.1 7.5 10.5 8.5 7.4 10.5 8.9 8.5 9.9
+8.3 9.9 7.2 9.5 10.5 11.9 11.4 8.0 10.5 11.2 9.2 9.5
+10.0 10.3 9.1 8.1 7.9 9.5 10.7 8.5 9.1 8.7 9.0 8.6
+;
+proc loess data=unempl_rates;
+model rate=month/clm;
+ods output OutputStatistics=results;
+run;
+proc print data=results;
+run;
+symbol1 color=black value=dot;
+symbol2 color=black value=none interpol=join line=1;
+symbol3 color=black value=none interpol=join line=2;
+symbol4 color=black value=none interpol=join line=2;
+proc gplot data=results;
+by SmoothingParameter;
+plot (DepVar Pred LowerCL UpperCL)*month/ overlay;
+run;</code></pre>
+<p><strong>Compare the smoothing parameters</strong></p>
+<pre><code>proc loess data=unempl_rates;
+model rate=month/ clm smooth=0.05 0.08 0.1 0.12;
+ods output OutputStatistics=results;
+run;
+proc gplot data=results;
+by SmoothingParameter;
+plot (DepVar Pred LowerCL UpperCL)*month/ overlay name=’graph’;
+run;
+proc greplay igout=work.gseg tc=sashelp.templt template=l2r2 nofs;
+treplay 1:graph 2:graph2 3:graph1 4:graph3;
+run;</code></pre>
+<p><strong>R implementation</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="smoothing.html#cb8-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb8-2"><a href="smoothing.html#cb8-2" tabindex="-1"></a><span class="fu">data</span>(economics, <span class="at">package=</span><span class="st">&quot;ggplot2&quot;</span>)  <span class="co"># load data</span></span>
+<span id="cb8-3"><a href="smoothing.html#cb8-3" tabindex="-1"></a>economics<span class="sc">$</span>index <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(economics)  <span class="co"># create index variable</span></span>
+<span id="cb8-4"><a href="smoothing.html#cb8-4" tabindex="-1"></a>economics <span class="ot">&lt;-</span> economics[<span class="dv">1</span><span class="sc">:</span><span class="dv">80</span>, ]  <span class="co"># retail 80rows for better graphical understanding</span></span>
+<span id="cb8-5"><a href="smoothing.html#cb8-5" tabindex="-1"></a>loessMod10 <span class="ot">&lt;-</span> <span class="fu">loess</span>(uempmed <span class="sc">~</span> index, <span class="at">data=</span>economics, <span class="at">span=</span><span class="fl">0.10</span>) <span class="co"># 10% smoothing span</span></span>
+<span id="cb8-6"><a href="smoothing.html#cb8-6" tabindex="-1"></a>loessMod25 <span class="ot">&lt;-</span> <span class="fu">loess</span>(uempmed <span class="sc">~</span> index, <span class="at">data=</span>economics, <span class="at">span=</span><span class="fl">0.25</span>) <span class="co"># 25% smoothing span</span></span>
+<span id="cb8-7"><a href="smoothing.html#cb8-7" tabindex="-1"></a>loessMod50 <span class="ot">&lt;-</span> <span class="fu">loess</span>(uempmed <span class="sc">~</span> index, <span class="at">data=</span>economics, <span class="at">span=</span><span class="fl">0.50</span>) <span class="co"># 50% smoothing span</span></span>
+<span id="cb8-8"><a href="smoothing.html#cb8-8" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="smoothing.html#cb8-9" tabindex="-1"></a><span class="do">### Predict Loess </span></span>
+<span id="cb8-10"><a href="smoothing.html#cb8-10" tabindex="-1"></a><span class="do">### get smoothed output</span></span>
+<span id="cb8-11"><a href="smoothing.html#cb8-11" tabindex="-1"></a>economics<span class="sc">$</span>smoothed10 <span class="ot">&lt;-</span> <span class="fu">predict</span>(loessMod10) </span>
+<span id="cb8-12"><a href="smoothing.html#cb8-12" tabindex="-1"></a>economics<span class="sc">$</span>smoothed25 <span class="ot">&lt;-</span> <span class="fu">predict</span>(loessMod25) </span>
+<span id="cb8-13"><a href="smoothing.html#cb8-13" tabindex="-1"></a>economics<span class="sc">$</span>smoothed50 <span class="ot">&lt;-</span> <span class="fu">predict</span>(loessMod50) </span>
+<span id="cb8-14"><a href="smoothing.html#cb8-14" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="smoothing.html#cb8-15" tabindex="-1"></a><span class="do">## plot(economics$uempmed, x=economics$date, type=&quot;l&quot;, main=&quot;Loess Smoothing and Prediction&quot;, xlab=&quot;Date&quot;, ylab=&quot;Unemployment (Median)&quot;)</span></span>
+<span id="cb8-16"><a href="smoothing.html#cb8-16" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> economics) <span class="sc">+</span> </span>
+<span id="cb8-17"><a href="smoothing.html#cb8-17" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> smoothed10), <span class="at">color=</span><span class="st">&quot;#fc9272&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb8-18"><a href="smoothing.html#cb8-18" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> smoothed25), <span class="at">color=</span><span class="st">&quot;#de2d26&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb8-19"><a href="smoothing.html#cb8-19" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> smoothed10), <span class="at">color=</span><span class="st">&quot;#fc9272&quot;</span>, <span class="at">fill=</span><span class="cn">NA</span>) <span class="sc">+</span> </span>
+<span id="cb8-20"><a href="smoothing.html#cb8-20" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> smoothed25), <span class="at">color=</span><span class="st">&quot;#de2d26&quot;</span>, <span class="at">fill=</span><span class="cn">NA</span>) <span class="sc">+</span> </span>
+<span id="cb8-21"><a href="smoothing.html#cb8-21" tabindex="-1"></a>  <span class="fu">theme_bw</span>()<span class="sc">+</span></span>
+<span id="cb8-22"><a href="smoothing.html#cb8-22" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">&quot;Unemployment (Median)&quot;</span>, </span>
+<span id="cb8-23"><a href="smoothing.html#cb8-23" tabindex="-1"></a>       <span class="at">x=</span><span class="st">&quot;Date&quot;</span>, </span>
+<span id="cb8-24"><a href="smoothing.html#cb8-24" tabindex="-1"></a>       <span class="at">title=</span><span class="st">&quot;Loess Smoothing and Prediction&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/losse_inR-1.png" width="672" /></p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="regularization-penalized-regression.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="knn.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/yihui/bookdown-crc/edit/master/04-Loss.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["bookdown.pdf", "bookdown.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "none"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

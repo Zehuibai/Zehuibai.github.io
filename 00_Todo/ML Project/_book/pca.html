@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 6 PCA | ML Project Using bookdown</title>
+  <meta name="description" content="A book example for a Chapman &amp; Hall book." />
+  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 6 PCA | ML Project Using bookdown" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="A book example for a Chapman &amp; Hall book." />
+  <meta name="github-repo" content="yihui/bookdown-crc" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 6 PCA | ML Project Using bookdown" />
+  
+  <meta name="twitter:description" content="A book example for a Chapman &amp; Hall book." />
+  
+
+<meta name="author" content="Zehui Bai" />
+
+
+<meta name="date" content="2023-12-06" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="tree-models.html"/>
+<link rel="next" href="cluster-analysis.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="libs/d3-3.5.17/d3.min.js"></script>
+<link href="libs/markmap-0.3.3/view.mindmap.css" rel="stylesheet" />
+<script src="libs/markmap-0.3.3/view.mindmap.js"></script>
+<script src="libs/markmap-0.3.3/plugins/parsemd.min.js"></script>
+<script src="libs/markmap-binding-1.3.2/markmap.js"></script>
+
+
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">ML Project</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#why-read-this-book"><i class="fa fa-check"></i>Why read this book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#structure-of-the-book"><i class="fa fa-check"></i>Structure of the book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information-and-conventions"><i class="fa fa-check"></i>Software information and conventions</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html"><i class="fa fa-check"></i><b>1</b> Regularization Penalized Regression</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#motivation"><i class="fa fa-check"></i><b>1.1.1</b> Motivation</a></li>
+<li class="chapter" data-level="1.1.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#data-preparation"><i class="fa fa-check"></i><b>1.1.2</b> Data preparation</a></li>
+<li class="chapter" data-level="1.1.3" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#best-subset-regression"><i class="fa fa-check"></i><b>1.1.3</b> Best subset regression</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#ridge-regression"><i class="fa fa-check"></i><b>1.2</b> Ridge Regression</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modeling"><i class="fa fa-check"></i><b>1.2.1</b> Modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#lasso-regression"><i class="fa fa-check"></i><b>1.3</b> Lasso Regression</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modelling"><i class="fa fa-check"></i><b>1.3.1</b> Modelling</a></li>
+<li class="chapter" data-level="1.3.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#glmnet-cross-validation"><i class="fa fa-check"></i><b>1.3.2</b> glmnet cross validation</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#elasticnet"><i class="fa fa-check"></i><b>1.4</b> ElasticNet</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modelling-1"><i class="fa fa-check"></i><b>1.4.1</b> Modelling</a></li>
+<li class="chapter" data-level="1.4.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#classification"><i class="fa fa-check"></i><b>1.4.2</b> Classification</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="smoothing.html"><a href="smoothing.html"><i class="fa fa-check"></i><b>2</b> Smoothing</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="smoothing.html"><a href="smoothing.html#smoothing-1"><i class="fa fa-check"></i><b>2.1</b> Smoothing</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="smoothing.html"><a href="smoothing.html#bin-smoothing"><i class="fa fa-check"></i><b>2.1.1</b> Bin smoothing</a></li>
+<li class="chapter" data-level="2.1.2" data-path="smoothing.html"><a href="smoothing.html#kernels"><i class="fa fa-check"></i><b>2.1.2</b> Kernels</a></li>
+<li class="chapter" data-level="2.1.3" data-path="smoothing.html"><a href="smoothing.html#local-weighted-regression-loess"><i class="fa fa-check"></i><b>2.1.3</b> Local weighted regression (loess)</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="smoothing.html"><a href="smoothing.html#loess-regression"><i class="fa fa-check"></i><b>2.2</b> Loess Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="knn.html"><a href="knn.html"><i class="fa fa-check"></i><b>3</b> KNN</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="knn.html"><a href="knn.html#introduction-1"><i class="fa fa-check"></i><b>3.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="knn.html"><a href="knn.html#idee"><i class="fa fa-check"></i><b>3.1.1</b> Idee</a></li>
+<li class="chapter" data-level="3.1.2" data-path="knn.html"><a href="knn.html#加权最近邻法"><i class="fa fa-check"></i><b>3.1.2</b> 加权最近邻法</a></li>
+<li class="chapter" data-level="3.1.3" data-path="knn.html"><a href="knn.html#knn算法三要素"><i class="fa fa-check"></i><b>3.1.3</b> KNN算法三要素</a></li>
+<li class="chapter" data-level="3.1.4" data-path="knn.html"><a href="knn.html#优缺点"><i class="fa fa-check"></i><b>3.1.4</b> 优缺点</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="knn.html"><a href="knn.html#knn算法的实现方式"><i class="fa fa-check"></i><b>3.2</b> KNN算法的实现方式</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="knn.html"><a href="knn.html#brute-force"><i class="fa fa-check"></i><b>3.2.1</b> Brute-force</a></li>
+<li class="chapter" data-level="3.2.2" data-path="knn.html"><a href="knn.html#kd树实现"><i class="fa fa-check"></i><b>3.2.2</b> KD树实现</a></li>
+<li class="chapter" data-level="3.2.3" data-path="knn.html"><a href="knn.html#球树实现"><i class="fa fa-check"></i><b>3.2.3</b> 球树实现</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="knn.html"><a href="knn.html#application"><i class="fa fa-check"></i><b>3.3</b> Application</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="knn.html"><a href="knn.html#data-preparation-1"><i class="fa fa-check"></i><b>3.3.1</b> Data Preparation</a></li>
+<li class="chapter" data-level="3.3.2" data-path="knn.html"><a href="knn.html#knn-modelling"><i class="fa fa-check"></i><b>3.3.2</b> KNN Modelling</a></li>
+<li class="chapter" data-level="3.3.3" data-path="knn.html"><a href="knn.html#加权最近邻法-1"><i class="fa fa-check"></i><b>3.3.3</b> 加权最近邻法</a></li>
+<li class="chapter" data-level="3.3.4" data-path="knn.html"><a href="knn.html#over-training"><i class="fa fa-check"></i><b>3.3.4</b> Over-training</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="svm.html"><a href="svm.html"><i class="fa fa-check"></i><b>4</b> SVM</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="svm.html"><a href="svm.html#introduction-2"><i class="fa fa-check"></i><b>4.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="svm.html"><a href="svm.html#perceptron"><i class="fa fa-check"></i><b>4.1.1</b> Perceptron</a></li>
+<li class="chapter" data-level="4.1.2" data-path="svm.html"><a href="svm.html#函数间隔与几何间隔"><i class="fa fa-check"></i><b>4.1.2</b> 函数间隔与几何间隔</a></li>
+<li class="chapter" data-level="4.1.3" data-path="svm.html"><a href="svm.html#svm支持向量"><i class="fa fa-check"></i><b>4.1.3</b> SVM支持向量</a></li>
+<li class="chapter" data-level="4.1.4" data-path="svm.html"><a href="svm.html#svm模型目标函数与优化"><i class="fa fa-check"></i><b>4.1.4</b> SVM模型目标函数与优化</a></li>
+<li class="chapter" data-level="4.1.5" data-path="svm.html"><a href="svm.html#线性可分svm的算法过程"><i class="fa fa-check"></i><b>4.1.5</b> 线性可分SVM的算法过程</a></li>
+<li class="chapter" data-level="4.1.6" data-path="svm.html"><a href="svm.html#线性svm的软间隔最大化"><i class="fa fa-check"></i><b>4.1.6</b> 线性SVM的软间隔最大化</a></li>
+<li class="chapter" data-level="4.1.7" data-path="svm.html"><a href="svm.html#线性不可分支持向量机与核函数"><i class="fa fa-check"></i><b>4.1.7</b> 线性不可分支持向量机与核函数</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="svm.html"><a href="svm.html#application-1"><i class="fa fa-check"></i><b>4.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="svm.html"><a href="svm.html#data-preparation-2"><i class="fa fa-check"></i><b>4.2.1</b> Data Preparation</a></li>
+<li class="chapter" data-level="4.2.2" data-path="svm.html"><a href="svm.html#svm-modelling"><i class="fa fa-check"></i><b>4.2.2</b> SVM Modelling</a></li>
+<li class="chapter" data-level="4.2.3" data-path="svm.html"><a href="svm.html#model-selection"><i class="fa fa-check"></i><b>4.2.3</b> Model Selection</a></li>
+<li class="chapter" data-level="4.2.4" data-path="svm.html"><a href="svm.html#character-selection"><i class="fa fa-check"></i><b>4.2.4</b> Character selection</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="tree-models.html"><a href="tree-models.html"><i class="fa fa-check"></i><b>5</b> Tree models</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="tree-models.html"><a href="tree-models.html#decision-tree-model"><i class="fa fa-check"></i><b>5.1</b> Decision Tree Model</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="tree-models.html"><a href="tree-models.html#decision-tree-algorithm"><i class="fa fa-check"></i><b>5.1.1</b> Decision tree algorithm</a></li>
+<li class="chapter" data-level="5.1.2" data-path="tree-models.html"><a href="tree-models.html#id3-algorithm"><i class="fa fa-check"></i><b>5.1.2</b> ID3 Algorithm</a></li>
+<li class="chapter" data-level="5.1.3" data-path="tree-models.html"><a href="tree-models.html#c4.5-algorithm"><i class="fa fa-check"></i><b>5.1.3</b> C4.5 Algorithm</a></li>
+<li class="chapter" data-level="5.1.4" data-path="tree-models.html"><a href="tree-models.html#cart-algorithm"><i class="fa fa-check"></i><b>5.1.4</b> CART Algorithm</a></li>
+<li class="chapter" data-level="5.1.5" data-path="tree-models.html"><a href="tree-models.html#pruning"><i class="fa fa-check"></i><b>5.1.5</b> Pruning</a></li>
+<li class="chapter" data-level="5.1.6" data-path="tree-models.html"><a href="tree-models.html#package-rpart"><i class="fa fa-check"></i><b>5.1.6</b> Package ‘rpart’</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="tree-models.html"><a href="tree-models.html#random-forest"><i class="fa fa-check"></i><b>5.2</b> Random Forest</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="tree-models.html"><a href="tree-models.html#bootstrap-bagging"><i class="fa fa-check"></i><b>5.2.1</b> Bootstrap (Bagging)</a></li>
+<li class="chapter" data-level="5.2.2" data-path="tree-models.html"><a href="tree-models.html#bagging算法流程"><i class="fa fa-check"></i><b>5.2.2</b> bagging算法流程</a></li>
+<li class="chapter" data-level="5.2.3" data-path="tree-models.html"><a href="tree-models.html#random-forest-algorithm"><i class="fa fa-check"></i><b>5.2.3</b> Random Forest Algorithm</a></li>
+<li class="chapter" data-level="5.2.4" data-path="tree-models.html"><a href="tree-models.html#random-forest-promotion"><i class="fa fa-check"></i><b>5.2.4</b> Random forest promotion</a></li>
+<li class="chapter" data-level="5.2.5" data-path="tree-models.html"><a href="tree-models.html#package-randomforest"><i class="fa fa-check"></i><b>5.2.5</b> Package ‘randomForest’</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="tree-models.html"><a href="tree-models.html#modelling-2"><i class="fa fa-check"></i><b>5.3</b> Modelling</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="tree-models.html"><a href="tree-models.html#data-preparation-3"><i class="fa fa-check"></i><b>5.3.1</b> Data preparation</a></li>
+<li class="chapter" data-level="5.3.2" data-path="tree-models.html"><a href="tree-models.html#regression-tree-1"><i class="fa fa-check"></i><b>5.3.2</b> Regression tree</a></li>
+<li class="chapter" data-level="5.3.3" data-path="tree-models.html"><a href="tree-models.html#classification-tree-1"><i class="fa fa-check"></i><b>5.3.3</b> Classification tree</a></li>
+<li class="chapter" data-level="5.3.4" data-path="tree-models.html"><a href="tree-models.html#random-forest-for-regression"><i class="fa fa-check"></i><b>5.3.4</b> Random forest for regression</a></li>
+<li class="chapter" data-level="5.3.5" data-path="tree-models.html"><a href="tree-models.html#random-forest-for-classification"><i class="fa fa-check"></i><b>5.3.5</b> Random forest for classification</a></li>
+<li class="chapter" data-level="5.3.6" data-path="tree-models.html"><a href="tree-models.html#皮玛印第安人糖尿病数据集"><i class="fa fa-check"></i><b>5.3.6</b> 皮玛印第安人糖尿病数据集</a></li>
+<li class="chapter" data-level="5.3.7" data-path="tree-models.html"><a href="tree-models.html#使用随机森林进行特征选择"><i class="fa fa-check"></i><b>5.3.7</b> 使用随机森林进行特征选择</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="tree-models.html"><a href="tree-models.html#gradient-boosting"><i class="fa fa-check"></i><b>5.4</b> Gradient Boosting</a></li>
+<li class="chapter" data-level="5.5" data-path="tree-models.html"><a href="tree-models.html#gradient-descent"><i class="fa fa-check"></i><b>5.5</b> Gradient Descent</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="tree-models.html"><a href="tree-models.html#gradient"><i class="fa fa-check"></i><b>5.5.1</b> Gradient</a></li>
+<li class="chapter" data-level="5.5.2" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-1"><i class="fa fa-check"></i><b>5.5.2</b> Gradient Descent</a></li>
+<li class="chapter" data-level="5.5.3" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-algorithm"><i class="fa fa-check"></i><b>5.5.3</b> Gradient Descent Algorithm</a></li>
+<li class="chapter" data-level="5.5.4" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-familiy"><i class="fa fa-check"></i><b>5.5.4</b> Gradient Descent Familiy</a></li>
+<li class="chapter" data-level="5.5.5" data-path="tree-models.html"><a href="tree-models.html#gbdt分类算法"><i class="fa fa-check"></i><b>5.5.5</b> GBDT分类算法</a></li>
+<li class="chapter" data-level="5.5.6" data-path="tree-models.html"><a href="tree-models.html#package-gbm"><i class="fa fa-check"></i><b>5.5.6</b> Package ‘gbm’</a></li>
+<li class="chapter" data-level="5.5.7" data-path="tree-models.html"><a href="tree-models.html#极限梯度提升分类"><i class="fa fa-check"></i><b>5.5.7</b> 极限梯度提升——分类</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="tree-models.html"><a href="tree-models.html#cubist-model"><i class="fa fa-check"></i><b>5.6</b> Cubist Model</a>
+<ul>
+<li class="chapter" data-level="5.6.1" data-path="tree-models.html"><a href="tree-models.html#introduction-3"><i class="fa fa-check"></i><b>5.6.1</b> Introduction</a></li>
+<li class="chapter" data-level="5.6.2" data-path="tree-models.html"><a href="tree-models.html#application-data-preparation"><i class="fa fa-check"></i><b>5.6.2</b> Application Data Preparation</a></li>
+<li class="chapter" data-level="5.6.3" data-path="tree-models.html"><a href="tree-models.html#fit-continious-outcome"><i class="fa fa-check"></i><b>5.6.3</b> Fit Continious Outcome</a></li>
+<li class="chapter" data-level="5.6.4" data-path="tree-models.html"><a href="tree-models.html#variable-importance"><i class="fa fa-check"></i><b>5.6.4</b> Variable Importance</a></li>
+<li class="chapter" data-level="5.6.5" data-path="tree-models.html"><a href="tree-models.html#summary-display"><i class="fa fa-check"></i><b>5.6.5</b> Summary display</a></li>
+<li class="chapter" data-level="5.6.6" data-path="tree-models.html"><a href="tree-models.html#specific-parts"><i class="fa fa-check"></i><b>5.6.6</b> specific parts</a></li>
+<li class="chapter" data-level="5.6.7" data-path="tree-models.html"><a href="tree-models.html#ensembles-by-committees"><i class="fa fa-check"></i><b>5.6.7</b> Ensembles By Committees</a></li>
+<li class="chapter" data-level="5.6.8" data-path="tree-models.html"><a href="tree-models.html#nearestneighbors-adjustmemt"><i class="fa fa-check"></i><b>5.6.8</b> Nearest–neighbors Adjustmemt</a></li>
+<li class="chapter" data-level="5.6.9" data-path="tree-models.html"><a href="tree-models.html#optimize-parameters"><i class="fa fa-check"></i><b>5.6.9</b> Optimize parameters</a></li>
+<li class="chapter" data-level="5.6.10" data-path="tree-models.html"><a href="tree-models.html#logistic-cv"><i class="fa fa-check"></i><b>5.6.10</b> Logistic CV</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="pca.html"><a href="pca.html"><i class="fa fa-check"></i><b>6</b> PCA</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="pca.html"><a href="pca.html#introduction-4"><i class="fa fa-check"></i><b>6.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="pca.html"><a href="pca.html#component"><i class="fa fa-check"></i><b>6.1.1</b> Component</a></li>
+<li class="chapter" data-level="6.1.2" data-path="pca.html"><a href="pca.html#pca算法"><i class="fa fa-check"></i><b>6.1.2</b> PCA算法</a></li>
+<li class="chapter" data-level="6.1.3" data-path="pca.html"><a href="pca.html#主成分旋转"><i class="fa fa-check"></i><b>6.1.3</b> 主成分旋转</a></li>
+<li class="chapter" data-level="6.1.4" data-path="pca.html"><a href="pca.html#kernelized-pca"><i class="fa fa-check"></i><b>6.1.4</b> Kernelized PCA</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="pca.html"><a href="pca.html#application-2"><i class="fa fa-check"></i><b>6.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="pca.html"><a href="pca.html#data-preparation-4"><i class="fa fa-check"></i><b>6.2.1</b> Data preparation</a></li>
+<li class="chapter" data-level="6.2.2" data-path="pca.html"><a href="pca.html#modeling-1"><i class="fa fa-check"></i><b>6.2.2</b> Modeling</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="cluster-analysis.html"><a href="cluster-analysis.html"><i class="fa fa-check"></i><b>7</b> Cluster Analysis</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering"><i class="fa fa-check"></i><b>7.1</b> Hierarchical Clustering</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#introduction-5"><i class="fa fa-check"></i><b>7.1.1</b> Introduction</a></li>
+<li class="chapter" data-level="7.1.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering-algorithms"><i class="fa fa-check"></i><b>7.1.2</b> Hierarchical clustering algorithms</a></li>
+<li class="chapter" data-level="7.1.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#measure-the-dissimilarity-between-two-clusters-of-observations"><i class="fa fa-check"></i><b>7.1.3</b> Measure the dissimilarity between two clusters of observations</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering"><i class="fa fa-check"></i><b>7.2</b> K-means Clustering</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#algorithm"><i class="fa fa-check"></i><b>7.2.1</b> Algorithm</a></li>
+<li class="chapter" data-level="7.2.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means"><i class="fa fa-check"></i><b>7.2.2</b> K-Means++</a></li>
+<li class="chapter" data-level="7.2.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#elkan-k-means"><i class="fa fa-check"></i><b>7.2.3</b> elkan K-Means</a></li>
+<li class="chapter" data-level="7.2.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#mini-batch-k-means"><i class="fa fa-check"></i><b>7.2.4</b> Mini Batch K-Means</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient-and-pam"><i class="fa fa-check"></i><b>7.3</b> Gower’s coefficient and PAM</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient"><i class="fa fa-check"></i><b>7.3.1</b> Gower’s coefficient</a></li>
+<li class="chapter" data-level="7.3.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#不同数据类型的相异度计算-距离法"><i class="fa fa-check"></i><b>7.3.2</b> 不同数据类型的相异度计算 (距离法)</a></li>
+<li class="chapter" data-level="7.3.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#pam"><i class="fa fa-check"></i><b>7.3.3</b> PAM</a></li>
+</ul></li>
+<li class="chapter" data-level="7.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch-clustering"><i class="fa fa-check"></i><b>7.4</b> BIRCH Clustering</a>
+<ul>
+<li class="chapter" data-level="7.4.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch-introduction"><i class="fa fa-check"></i><b>7.4.1</b> BIRCH Introduction</a></li>
+<li class="chapter" data-level="7.4.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#聚类特征cf与聚类特征树cf-tree"><i class="fa fa-check"></i><b>7.4.2</b> 聚类特征CF与聚类特征树CF Tree</a></li>
+<li class="chapter" data-level="7.4.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#cf-tree的生成"><i class="fa fa-check"></i><b>7.4.3</b> CF Tree的生成</a></li>
+<li class="chapter" data-level="7.4.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch算法"><i class="fa fa-check"></i><b>7.4.4</b> BIRCH算法</a></li>
+</ul></li>
+<li class="chapter" data-level="7.5" data-path="cluster-analysis.html"><a href="cluster-analysis.html#application-3"><i class="fa fa-check"></i><b>7.5</b> Application</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#data-preparation-5"><i class="fa fa-check"></i><b>7.5.1</b> Data preparation</a></li>
+<li class="chapter" data-level="7.5.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering-1"><i class="fa fa-check"></i><b>7.5.2</b> Hierarchical Clustering</a></li>
+<li class="chapter" data-level="7.5.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering-1"><i class="fa fa-check"></i><b>7.5.3</b> K-means Clustering</a></li>
+<li class="chapter" data-level="7.5.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient-and-pam-1"><i class="fa fa-check"></i><b>7.5.4</b> Gower’s coefficient and PAM</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html"><i class="fa fa-check"></i><b>8</b> linear discriminant analysis (LDA)</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#introduction-6"><i class="fa fa-check"></i><b>8.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#naive-bayes"><i class="fa fa-check"></i><b>8.1.1</b> Naive Bayes</a></li>
+<li class="chapter" data-level="8.1.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#controlling-prevalence"><i class="fa fa-check"></i><b>8.1.2</b> Controlling prevalence</a></li>
+<li class="chapter" data-level="8.1.3" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#qda"><i class="fa fa-check"></i><b>8.1.3</b> QDA</a></li>
+<li class="chapter" data-level="8.1.4" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda"><i class="fa fa-check"></i><b>8.1.4</b> LDA</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#discriminant-analysis-algorithm"><i class="fa fa-check"></i><b>8.2</b> Discriminant analysis algorithm</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#idee-1"><i class="fa fa-check"></i><b>8.2.1</b> Idee</a></li>
+<li class="chapter" data-level="8.2.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#瑞利商rayleigh-quotient"><i class="fa fa-check"></i><b>8.2.2</b> 瑞利商（Rayleigh quotient）</a></li>
+<li class="chapter" data-level="8.2.3" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#广义瑞利商-genralized-rayleigh-quotient"><i class="fa fa-check"></i><b>8.2.3</b> 广义瑞利商 genralized Rayleigh quotient</a></li>
+<li class="chapter" data-level="8.2.4" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda算法流程"><i class="fa fa-check"></i><b>8.2.4</b> LDA算法流程</a></li>
+<li class="chapter" data-level="8.2.5" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda-application"><i class="fa fa-check"></i><b>8.2.5</b> LDA Application</a></li>
+<li class="chapter" data-level="8.2.6" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#qda-1"><i class="fa fa-check"></i><b>8.2.6</b> QDA</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="neural-network.html"><a href="neural-network.html"><i class="fa fa-check"></i><b>9</b> Neural Network</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="neural-network.html"><a href="neural-network.html#introduction-7"><i class="fa fa-check"></i><b>9.1</b> Introduction</a></li>
+<li class="chapter" data-level="9.2" data-path="neural-network.html"><a href="neural-network.html#反向传播方法进行训练的前馈神经网络"><i class="fa fa-check"></i><b>9.2</b> 反向传播方法进行训练的前馈神经网络</a></li>
+<li class="chapter" data-level="9.3" data-path="neural-network.html"><a href="neural-network.html#application-4"><i class="fa fa-check"></i><b>9.3</b> Application</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="neural-network.html"><a href="neural-network.html#数据准备"><i class="fa fa-check"></i><b>9.3.1</b> 数据准备</a></li>
+<li class="chapter" data-level="9.3.2" data-path="neural-network.html"><a href="neural-network.html#模型构建"><i class="fa fa-check"></i><b>9.3.2</b> 模型构建</a></li>
+</ul></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="more-to-say.html"><a href="more-to-say.html"><i class="fa fa-check"></i><b>A</b> More to Say</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://bookdown.org" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">ML Project Using bookdown</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="pca" class="section level1 hasAnchor" number="6">
+<h1><span class="header-section-number">Chapter 6</span> PCA<a href="pca.html#pca" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div class="markmap html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-6ffbc14e88e18136b316" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-6ffbc14e88e18136b316">{"x":{"data":"# \n##  PCA\n### Introduction\n#### Component\n#### PCA算法\n#### 主成分旋转\n#### Kernelized PCA\n### Application\n#### Data preparation\n#### Modeling","options":{"preset":"colorful","autoFit":true}},"evals":[],"jsHooks":[]}</script>
+<div id="introduction-4" class="section level2 hasAnchor" number="6.1">
+<h2><span class="header-section-number">6.1</span> Introduction<a href="pca.html#introduction-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ul>
+<li>聚类分析，它可以将相似的观测 归成一类</li>
+<li>主成分分析(PCA)，它可以对相关变量进行归类，从而降低数据维度，提高对数据的理解</li>
+</ul>
+<div id="component" class="section level3 hasAnchor" number="6.1.1">
+<h3><span class="header-section-number">6.1.1</span> Component<a href="pca.html#component" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>成分就是特征的规范化线性组合(James，2012)。在一个数据集中，<strong>第一主成分就 是能够最大程度解释数据中的方差的特征线性组合</strong>。<strong>第二主成分是另一种特征线性组合，它在方 向与第一主成分垂直这个限制条件下，最大程度解释数据中的方差</strong>。其后的每一个主成分(可以 构造与变量数相等数目的主成分)都遵循同样的规则。</p>
+<ul>
+<li>线性组合：如果你试图在一个变量之间基本不相关的数据集上使用PCA，很可能会得到一个毫无意义的分析结果</li>
+<li>变量的均值和方差是充分统计量。也就是说，数据应该服从正态分布，这样协方差矩阵即可充分 描述数据集。换言之，数据要满足多元正态分布。PCA对于非正态分布的数据具有相当强的鲁棒 性，甚至可以和二值变量一起使用，所以结果具有很好的解释性。</li>
+</ul>
+</div>
+<div id="pca算法" class="section level3 hasAnchor" number="6.1.2">
+<h3><span class="header-section-number">6.1.2</span> PCA算法<a href="pca.html#pca算法" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>PCA顾名思义，就是找出数据里最主要的方面，用数据里最主要的方面来代替原始数据。具体的，假如我们的数据集是n维的，共有m个数据 <span class="math inline">\((x^{(1)},x^{(2)},...,x^{(m)})\)</span> 。我们希望将这m个数据的维度从n维降到n’维，希望这m个n’维的数据集尽可能的代表原始数据集。我们知道数据从n维降到n’维肯定会有损失，但是我们希望损失尽可能的小。如何让这n’维的数据尽可能表示原来的数据</p>
+<p>求样本 <span class="math inline">\(x^{(i)}\)</span> 的n’维的主成分其实就是求样本集的协方差矩阵 <span class="math inline">\(X X^{T}\)</span> 的前n’个特征值对应特征向量矩阵W，然后对于每个样本 <span class="math inline">\(x^{(i)}\)</span>,做如下变换 <span class="math inline">\(z^{(i)}=W^{T} x^{(i)},\)</span> 即达到降维的PCA目的。</p>
+<p>具体的算法流程。</p>
+<ul>
+<li>输入：n维样本集 <span class="math inline">\(D=\left(x^{(1)}, x^{(2)}, \ldots, x^{(m)}\right),\)</span> 要降维到的维数n’.</li>
+<li>输出：降维后的样本集 <span class="math inline">\(D^{\prime}\)</span></li>
+</ul>
+<ol style="list-style-type: decimal">
+<li>对所有的样本进行中心化: <span class="math inline">\(x^{(i)}=x^{(i)}-\frac{1}{m} \sum_{j=1}^{m} x^{(j)}\)</span></li>
+<li>计算样本的协方差矩阵 <span class="math inline">\(X X^{T}\)</span></li>
+<li>对矩阵 <span class="math inline">\(X X^{T}\)</span> 进行特征值分解</li>
+<li>取出最大的n’个特征值对应的特征向量 <span class="math inline">\(\left(w_{1}, w_{2}, \ldots, w_{n^{\prime}}\right),\)</span> 将所有的特征向量标准化后, 组成特征向量矩阵W。。</li>
+<li>对样本集中的每一个样本 <span class="math inline">\(x^{(i)}\)</span>,转化为新的样本 <span class="math inline">\(z^{(i)}=W^{T} x^{(i)}\)</span></li>
+<li>得到输出样本集 <span class="math inline">\(D^{\prime}=\left(z^{(1)}, z^{(2)}, \ldots, z^{(m)}\right)\)</span></li>
+</ol>
+</div>
+<div id="主成分旋转" class="section level3 hasAnchor" number="6.1.3">
+<h3><span class="header-section-number">6.1.3</span> 主成分旋转<a href="pca.html#主成分旋转" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><strong>旋转方法有两种</strong></p>
+<ul>
+<li><strong>正交旋转</strong>(rotate=“varimax”)<br />
+使得成分保持不相关（正交旋转）</li>
+<li><strong>斜交旋转</strong>(rotate=“promax”)<br />
+使得成分相关<br />
+<br />
+最流行的正交旋转是 方差极大旋转，它试图对载荷的列进行去噪， 使得每个成分只由一组有限的变量来解释（即载荷阵每列只有少数几个很大的载荷，其他的都是很小的载荷）</li>
+</ul>
+</div>
+<div id="kernelized-pca" class="section level3 hasAnchor" number="6.1.4">
+<h3><span class="header-section-number">6.1.4</span> Kernelized PCA<a href="pca.html#kernelized-pca" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>PCA算法中，假设存在一个线性的超平面，可以让我们对数据进行投影。但是有些时候，数据不是线性的，不能直接进行PCA降维。</p>
+<p>这里就需要用到和支持向量机一样的核函数的思想，先把数据集从n维映射到线性可分的高维N&gt;n,然后再从N维降维到一个低维度n’, 这里的维度之间满足<span class="math inline">\(n&#39;\lt n \lt N\)</span>。</p>
+<p>使用了核函数的主成分分析一般称之为核主成分分析(Kernelized PCA, 以下简称KPCA。假设高维空间的数据是由n维空间的数据通过映射<span class="math inline">\(\phi\)</span>产生。则对于n维空间的特征分解：</p>
+<p><span class="math display">\[
+\sum\limits_{i=1}^{m}x^{(i)}x^{(i)T}W=\lambda W
+\]</span></p>
+<p>映射为：</p>
+<p><span class="math display">\[
+\sum\limits_{i=1}^{m}\phi(x^{(i)})\phi(x^{(i)})^TW=\lambda W
+\]</span></p>
+<p>通过在高维空间进行协方差矩阵的特征值分解，然后用和PCA一样的方法进行降维。</p>
+</div>
+</div>
+<div id="application-2" class="section level2 hasAnchor" number="6.2">
+<h2><span class="header-section-number">6.2</span> Application<a href="pca.html#application-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="data-preparation-4" class="section level3 hasAnchor" number="6.2.1">
+<h3><span class="header-section-number">6.2.1</span> Data preparation<a href="pca.html#data-preparation-4" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>## tidyverse     knitr 
+##      TRUE      TRUE</code></pre>
+</div>
+<div id="modeling-1" class="section level3 hasAnchor" number="6.2.2">
+<h3><span class="header-section-number">6.2.2</span> Modeling<a href="pca.html#modeling-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>对于模型构建过程，我们按照以下几个步骤进行:</p>
+<ul>
+<li><p>抽取主成分并决定保留的数量;</p>
+<ul>
+<li>通过psych包抽取主成分要使用principal()函数，语法中要包括数据和是否要进行主成分旋转</li>
+<li>pca &lt;- principal(train.scale, rotate=“none”)</li>
+<li>碎石图可以帮助你评估能解释大部分数据方差的主成分, 需要在碎石图中找出使变化率降低的那个点， 也就是我们常说的统计图中的“肘点”或弯曲点。</li>
+<li>肘点表示在这个点上新增加一个主成分时，对方差的解释增加得并不太多。换句话说，这个点就是曲线由陡变平的转折点</li>
+</ul></li>
+<li><p>对留下的主成分进行旋转;</p>
+<ul>
+<li>旋转背后的意义是使变量在某个主成分上的载荷最大化</li>
+<li>可以减少(或消灭)主成分之间的相关性，有助于对主成分的解释。</li>
+<li>进行正交旋转的方法称为“方差最大法”。还有其他非正交旋转方法，这种方法允许主成分(因子)之间存在相关性</li>
+</ul></li>
+<li><p>对旋转后的解决方案进行解释; 生成各个因子的得分; 使用得分作为输入变量进行回归分析</p></li>
+<li><p>使用测试数据评价模型效果。</p></li>
+</ul>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre><code>## Principal Components Analysis
+## Call: principal(r = train.scale, nfactors = 5, rotate = &quot;varimax&quot;)
+## Standardized loadings (pattern matrix) based upon correlation matrix
+##                 RC1   RC2   RC5   RC3   RC4   h2   u2 com
+## Goals_For     -0.21  0.82  0.21  0.05 -0.11 0.78 0.22 1.3
+## Goals_Against  0.88 -0.02 -0.05  0.21  0.00 0.82 0.18 1.1
+## Shots_For     -0.22  0.43  0.76 -0.02 -0.10 0.81 0.19 1.8
+## Shots_Against  0.73 -0.02 -0.20 -0.29  0.20 0.70 0.30 1.7
+## PP_perc       -0.73  0.46 -0.04 -0.15  0.04 0.77 0.23 1.8
+## PK_perc       -0.73 -0.21  0.22 -0.03  0.10 0.64 0.36 1.4
+## CF60_pp       -0.20  0.12  0.71  0.24  0.29 0.69 0.31 1.9
+## CA60_sh        0.35  0.66 -0.25 -0.48 -0.03 0.85 0.15 2.8
+## OZFOperc_pp   -0.02 -0.18  0.70 -0.01  0.11 0.53 0.47 1.2
+## Give          -0.02  0.58  0.17  0.52  0.10 0.65 0.35 2.2
+## Take           0.16  0.02  0.01  0.90 -0.05 0.83 0.17 1.1
+## hits          -0.02 -0.01  0.27 -0.06  0.87 0.83 0.17 1.2
+## blks           0.19  0.63 -0.18  0.14  0.47 0.70 0.30 2.4
+## 
+##                        RC1  RC2  RC5  RC3  RC4
+## SS loadings           2.69 2.33 1.89 1.55 1.16
+## Proportion Var        0.21 0.18 0.15 0.12 0.09
+## Cumulative Var        0.21 0.39 0.53 0.65 0.74
+## Proportion Explained  0.28 0.24 0.20 0.16 0.12
+## Cumulative Proportion 0.28 0.52 0.72 0.88 1.00
+## 
+## Mean item complexity =  1.7
+## Test of the hypothesis that 5 components are sufficient.
+## 
+## The root mean square of the residuals (RMSR) is  0.08 
+##  with the empirical chi square  28.59  with prob &lt;  0.19 
+## 
+## Fit based upon off diagonal values = 0.91</code></pre>
+<pre><code>##           RC1          RC2        RC5        RC3        RC4
+## 1 -2.21526408  0.002821488  0.3161588 -0.1572320  1.5278033
+## 2  0.88147630 -0.569239044 -1.2361419 -0.2703150 -0.0113224
+## 3  0.10321189  0.481754024  1.8135052 -0.1606672  0.7346531
+## 4 -0.06630166 -0.630676083 -0.2121434 -1.3086231  0.1541255
+## 5  1.49662977  1.156905747 -0.3222194  0.9647145 -0.6564827
+## 6 -0.48902169 -2.119952370  1.0456190  2.7375097 -1.3735777</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = ppg ~ ., data = pca.scores)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.163274 -0.048189  0.003718  0.038723  0.165905 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.111333   0.015752  70.551  &lt; 2e-16 ***
+## RC1         -0.112201   0.016022  -7.003 3.06e-07 ***
+## RC2          0.070991   0.016022   4.431 0.000177 ***
+## RC5          0.022945   0.016022   1.432 0.164996    
+## RC3         -0.017782   0.016022  -1.110 0.278044    
+## RC4         -0.005314   0.016022  -0.332 0.743003    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.08628 on 24 degrees of freedom
+## Multiple R-squared:  0.7502, Adjusted R-squared:  0.6981 
+## F-statistic: 14.41 on 5 and 24 DF,  p-value: 1.446e-06</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = ppg ~ RC1 + RC2, data = pca.scores)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.18914 -0.04430  0.01438  0.05645  0.16469 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.11133    0.01587  70.043  &lt; 2e-16 ***
+## RC1         -0.11220    0.01614  -6.953  1.8e-07 ***
+## RC2          0.07099    0.01614   4.399 0.000153 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.0869 on 27 degrees of freedom
+## Multiple R-squared:  0.7149, Adjusted R-squared:  0.6937 
+## F-statistic: 33.85 on 2 and 27 DF,  p-value: 4.397e-08</code></pre>
+<pre><code>## [1] 0.08244449</code></pre>
+<pre><code>## [1] 0.08244449</code></pre>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<pre><code>## [1] 0.1011561</code></pre>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="tree-models.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="cluster-analysis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/yihui/bookdown-crc/edit/master/08-PCA.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["bookdown.pdf", "bookdown.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "none"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

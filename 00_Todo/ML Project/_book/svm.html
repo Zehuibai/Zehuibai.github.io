@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 4 SVM | ML Project Using bookdown</title>
+  <meta name="description" content="A book example for a Chapman &amp; Hall book." />
+  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 4 SVM | ML Project Using bookdown" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="A book example for a Chapman &amp; Hall book." />
+  <meta name="github-repo" content="yihui/bookdown-crc" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 4 SVM | ML Project Using bookdown" />
+  
+  <meta name="twitter:description" content="A book example for a Chapman &amp; Hall book." />
+  
+
+<meta name="author" content="Zehui Bai" />
+
+
+<meta name="date" content="2023-12-06" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="knn.html"/>
+<link rel="next" href="tree-models.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="libs/d3-3.5.17/d3.min.js"></script>
+<link href="libs/markmap-0.3.3/view.mindmap.css" rel="stylesheet" />
+<script src="libs/markmap-0.3.3/view.mindmap.js"></script>
+<script src="libs/markmap-0.3.3/plugins/parsemd.min.js"></script>
+<script src="libs/markmap-binding-1.3.2/markmap.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">ML Project</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#why-read-this-book"><i class="fa fa-check"></i>Why read this book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#structure-of-the-book"><i class="fa fa-check"></i>Structure of the book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information-and-conventions"><i class="fa fa-check"></i>Software information and conventions</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html"><i class="fa fa-check"></i><b>1</b> Regularization Penalized Regression</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#motivation"><i class="fa fa-check"></i><b>1.1.1</b> Motivation</a></li>
+<li class="chapter" data-level="1.1.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#data-preparation"><i class="fa fa-check"></i><b>1.1.2</b> Data preparation</a></li>
+<li class="chapter" data-level="1.1.3" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#best-subset-regression"><i class="fa fa-check"></i><b>1.1.3</b> Best subset regression</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#ridge-regression"><i class="fa fa-check"></i><b>1.2</b> Ridge Regression</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modeling"><i class="fa fa-check"></i><b>1.2.1</b> Modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#lasso-regression"><i class="fa fa-check"></i><b>1.3</b> Lasso Regression</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modelling"><i class="fa fa-check"></i><b>1.3.1</b> Modelling</a></li>
+<li class="chapter" data-level="1.3.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#glmnet-cross-validation"><i class="fa fa-check"></i><b>1.3.2</b> glmnet cross validation</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#elasticnet"><i class="fa fa-check"></i><b>1.4</b> ElasticNet</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modelling-1"><i class="fa fa-check"></i><b>1.4.1</b> Modelling</a></li>
+<li class="chapter" data-level="1.4.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#classification"><i class="fa fa-check"></i><b>1.4.2</b> Classification</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="smoothing.html"><a href="smoothing.html"><i class="fa fa-check"></i><b>2</b> Smoothing</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="smoothing.html"><a href="smoothing.html#smoothing-1"><i class="fa fa-check"></i><b>2.1</b> Smoothing</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="smoothing.html"><a href="smoothing.html#bin-smoothing"><i class="fa fa-check"></i><b>2.1.1</b> Bin smoothing</a></li>
+<li class="chapter" data-level="2.1.2" data-path="smoothing.html"><a href="smoothing.html#kernels"><i class="fa fa-check"></i><b>2.1.2</b> Kernels</a></li>
+<li class="chapter" data-level="2.1.3" data-path="smoothing.html"><a href="smoothing.html#local-weighted-regression-loess"><i class="fa fa-check"></i><b>2.1.3</b> Local weighted regression (loess)</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="smoothing.html"><a href="smoothing.html#loess-regression"><i class="fa fa-check"></i><b>2.2</b> Loess Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="knn.html"><a href="knn.html"><i class="fa fa-check"></i><b>3</b> KNN</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="knn.html"><a href="knn.html#introduction-1"><i class="fa fa-check"></i><b>3.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="knn.html"><a href="knn.html#idee"><i class="fa fa-check"></i><b>3.1.1</b> Idee</a></li>
+<li class="chapter" data-level="3.1.2" data-path="knn.html"><a href="knn.html#加权最近邻法"><i class="fa fa-check"></i><b>3.1.2</b> 加权最近邻法</a></li>
+<li class="chapter" data-level="3.1.3" data-path="knn.html"><a href="knn.html#knn算法三要素"><i class="fa fa-check"></i><b>3.1.3</b> KNN算法三要素</a></li>
+<li class="chapter" data-level="3.1.4" data-path="knn.html"><a href="knn.html#优缺点"><i class="fa fa-check"></i><b>3.1.4</b> 优缺点</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="knn.html"><a href="knn.html#knn算法的实现方式"><i class="fa fa-check"></i><b>3.2</b> KNN算法的实现方式</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="knn.html"><a href="knn.html#brute-force"><i class="fa fa-check"></i><b>3.2.1</b> Brute-force</a></li>
+<li class="chapter" data-level="3.2.2" data-path="knn.html"><a href="knn.html#kd树实现"><i class="fa fa-check"></i><b>3.2.2</b> KD树实现</a></li>
+<li class="chapter" data-level="3.2.3" data-path="knn.html"><a href="knn.html#球树实现"><i class="fa fa-check"></i><b>3.2.3</b> 球树实现</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="knn.html"><a href="knn.html#application"><i class="fa fa-check"></i><b>3.3</b> Application</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="knn.html"><a href="knn.html#data-preparation-1"><i class="fa fa-check"></i><b>3.3.1</b> Data Preparation</a></li>
+<li class="chapter" data-level="3.3.2" data-path="knn.html"><a href="knn.html#knn-modelling"><i class="fa fa-check"></i><b>3.3.2</b> KNN Modelling</a></li>
+<li class="chapter" data-level="3.3.3" data-path="knn.html"><a href="knn.html#加权最近邻法-1"><i class="fa fa-check"></i><b>3.3.3</b> 加权最近邻法</a></li>
+<li class="chapter" data-level="3.3.4" data-path="knn.html"><a href="knn.html#over-training"><i class="fa fa-check"></i><b>3.3.4</b> Over-training</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="svm.html"><a href="svm.html"><i class="fa fa-check"></i><b>4</b> SVM</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="svm.html"><a href="svm.html#introduction-2"><i class="fa fa-check"></i><b>4.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="svm.html"><a href="svm.html#perceptron"><i class="fa fa-check"></i><b>4.1.1</b> Perceptron</a></li>
+<li class="chapter" data-level="4.1.2" data-path="svm.html"><a href="svm.html#函数间隔与几何间隔"><i class="fa fa-check"></i><b>4.1.2</b> 函数间隔与几何间隔</a></li>
+<li class="chapter" data-level="4.1.3" data-path="svm.html"><a href="svm.html#svm支持向量"><i class="fa fa-check"></i><b>4.1.3</b> SVM支持向量</a></li>
+<li class="chapter" data-level="4.1.4" data-path="svm.html"><a href="svm.html#svm模型目标函数与优化"><i class="fa fa-check"></i><b>4.1.4</b> SVM模型目标函数与优化</a></li>
+<li class="chapter" data-level="4.1.5" data-path="svm.html"><a href="svm.html#线性可分svm的算法过程"><i class="fa fa-check"></i><b>4.1.5</b> 线性可分SVM的算法过程</a></li>
+<li class="chapter" data-level="4.1.6" data-path="svm.html"><a href="svm.html#线性svm的软间隔最大化"><i class="fa fa-check"></i><b>4.1.6</b> 线性SVM的软间隔最大化</a></li>
+<li class="chapter" data-level="4.1.7" data-path="svm.html"><a href="svm.html#线性不可分支持向量机与核函数"><i class="fa fa-check"></i><b>4.1.7</b> 线性不可分支持向量机与核函数</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="svm.html"><a href="svm.html#application-1"><i class="fa fa-check"></i><b>4.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="svm.html"><a href="svm.html#data-preparation-2"><i class="fa fa-check"></i><b>4.2.1</b> Data Preparation</a></li>
+<li class="chapter" data-level="4.2.2" data-path="svm.html"><a href="svm.html#svm-modelling"><i class="fa fa-check"></i><b>4.2.2</b> SVM Modelling</a></li>
+<li class="chapter" data-level="4.2.3" data-path="svm.html"><a href="svm.html#model-selection"><i class="fa fa-check"></i><b>4.2.3</b> Model Selection</a></li>
+<li class="chapter" data-level="4.2.4" data-path="svm.html"><a href="svm.html#character-selection"><i class="fa fa-check"></i><b>4.2.4</b> Character selection</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="tree-models.html"><a href="tree-models.html"><i class="fa fa-check"></i><b>5</b> Tree models</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="tree-models.html"><a href="tree-models.html#decision-tree-model"><i class="fa fa-check"></i><b>5.1</b> Decision Tree Model</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="tree-models.html"><a href="tree-models.html#decision-tree-algorithm"><i class="fa fa-check"></i><b>5.1.1</b> Decision tree algorithm</a></li>
+<li class="chapter" data-level="5.1.2" data-path="tree-models.html"><a href="tree-models.html#id3-algorithm"><i class="fa fa-check"></i><b>5.1.2</b> ID3 Algorithm</a></li>
+<li class="chapter" data-level="5.1.3" data-path="tree-models.html"><a href="tree-models.html#c4.5-algorithm"><i class="fa fa-check"></i><b>5.1.3</b> C4.5 Algorithm</a></li>
+<li class="chapter" data-level="5.1.4" data-path="tree-models.html"><a href="tree-models.html#cart-algorithm"><i class="fa fa-check"></i><b>5.1.4</b> CART Algorithm</a></li>
+<li class="chapter" data-level="5.1.5" data-path="tree-models.html"><a href="tree-models.html#pruning"><i class="fa fa-check"></i><b>5.1.5</b> Pruning</a></li>
+<li class="chapter" data-level="5.1.6" data-path="tree-models.html"><a href="tree-models.html#package-rpart"><i class="fa fa-check"></i><b>5.1.6</b> Package ‘rpart’</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="tree-models.html"><a href="tree-models.html#random-forest"><i class="fa fa-check"></i><b>5.2</b> Random Forest</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="tree-models.html"><a href="tree-models.html#bootstrap-bagging"><i class="fa fa-check"></i><b>5.2.1</b> Bootstrap (Bagging)</a></li>
+<li class="chapter" data-level="5.2.2" data-path="tree-models.html"><a href="tree-models.html#bagging算法流程"><i class="fa fa-check"></i><b>5.2.2</b> bagging算法流程</a></li>
+<li class="chapter" data-level="5.2.3" data-path="tree-models.html"><a href="tree-models.html#random-forest-algorithm"><i class="fa fa-check"></i><b>5.2.3</b> Random Forest Algorithm</a></li>
+<li class="chapter" data-level="5.2.4" data-path="tree-models.html"><a href="tree-models.html#random-forest-promotion"><i class="fa fa-check"></i><b>5.2.4</b> Random forest promotion</a></li>
+<li class="chapter" data-level="5.2.5" data-path="tree-models.html"><a href="tree-models.html#package-randomforest"><i class="fa fa-check"></i><b>5.2.5</b> Package ‘randomForest’</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="tree-models.html"><a href="tree-models.html#modelling-2"><i class="fa fa-check"></i><b>5.3</b> Modelling</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="tree-models.html"><a href="tree-models.html#data-preparation-3"><i class="fa fa-check"></i><b>5.3.1</b> Data preparation</a></li>
+<li class="chapter" data-level="5.3.2" data-path="tree-models.html"><a href="tree-models.html#regression-tree-1"><i class="fa fa-check"></i><b>5.3.2</b> Regression tree</a></li>
+<li class="chapter" data-level="5.3.3" data-path="tree-models.html"><a href="tree-models.html#classification-tree-1"><i class="fa fa-check"></i><b>5.3.3</b> Classification tree</a></li>
+<li class="chapter" data-level="5.3.4" data-path="tree-models.html"><a href="tree-models.html#random-forest-for-regression"><i class="fa fa-check"></i><b>5.3.4</b> Random forest for regression</a></li>
+<li class="chapter" data-level="5.3.5" data-path="tree-models.html"><a href="tree-models.html#random-forest-for-classification"><i class="fa fa-check"></i><b>5.3.5</b> Random forest for classification</a></li>
+<li class="chapter" data-level="5.3.6" data-path="tree-models.html"><a href="tree-models.html#皮玛印第安人糖尿病数据集"><i class="fa fa-check"></i><b>5.3.6</b> 皮玛印第安人糖尿病数据集</a></li>
+<li class="chapter" data-level="5.3.7" data-path="tree-models.html"><a href="tree-models.html#使用随机森林进行特征选择"><i class="fa fa-check"></i><b>5.3.7</b> 使用随机森林进行特征选择</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="tree-models.html"><a href="tree-models.html#gradient-boosting"><i class="fa fa-check"></i><b>5.4</b> Gradient Boosting</a></li>
+<li class="chapter" data-level="5.5" data-path="tree-models.html"><a href="tree-models.html#gradient-descent"><i class="fa fa-check"></i><b>5.5</b> Gradient Descent</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="tree-models.html"><a href="tree-models.html#gradient"><i class="fa fa-check"></i><b>5.5.1</b> Gradient</a></li>
+<li class="chapter" data-level="5.5.2" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-1"><i class="fa fa-check"></i><b>5.5.2</b> Gradient Descent</a></li>
+<li class="chapter" data-level="5.5.3" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-algorithm"><i class="fa fa-check"></i><b>5.5.3</b> Gradient Descent Algorithm</a></li>
+<li class="chapter" data-level="5.5.4" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-familiy"><i class="fa fa-check"></i><b>5.5.4</b> Gradient Descent Familiy</a></li>
+<li class="chapter" data-level="5.5.5" data-path="tree-models.html"><a href="tree-models.html#gbdt分类算法"><i class="fa fa-check"></i><b>5.5.5</b> GBDT分类算法</a></li>
+<li class="chapter" data-level="5.5.6" data-path="tree-models.html"><a href="tree-models.html#package-gbm"><i class="fa fa-check"></i><b>5.5.6</b> Package ‘gbm’</a></li>
+<li class="chapter" data-level="5.5.7" data-path="tree-models.html"><a href="tree-models.html#极限梯度提升分类"><i class="fa fa-check"></i><b>5.5.7</b> 极限梯度提升——分类</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="tree-models.html"><a href="tree-models.html#cubist-model"><i class="fa fa-check"></i><b>5.6</b> Cubist Model</a>
+<ul>
+<li class="chapter" data-level="5.6.1" data-path="tree-models.html"><a href="tree-models.html#introduction-3"><i class="fa fa-check"></i><b>5.6.1</b> Introduction</a></li>
+<li class="chapter" data-level="5.6.2" data-path="tree-models.html"><a href="tree-models.html#application-data-preparation"><i class="fa fa-check"></i><b>5.6.2</b> Application Data Preparation</a></li>
+<li class="chapter" data-level="5.6.3" data-path="tree-models.html"><a href="tree-models.html#fit-continious-outcome"><i class="fa fa-check"></i><b>5.6.3</b> Fit Continious Outcome</a></li>
+<li class="chapter" data-level="5.6.4" data-path="tree-models.html"><a href="tree-models.html#variable-importance"><i class="fa fa-check"></i><b>5.6.4</b> Variable Importance</a></li>
+<li class="chapter" data-level="5.6.5" data-path="tree-models.html"><a href="tree-models.html#summary-display"><i class="fa fa-check"></i><b>5.6.5</b> Summary display</a></li>
+<li class="chapter" data-level="5.6.6" data-path="tree-models.html"><a href="tree-models.html#specific-parts"><i class="fa fa-check"></i><b>5.6.6</b> specific parts</a></li>
+<li class="chapter" data-level="5.6.7" data-path="tree-models.html"><a href="tree-models.html#ensembles-by-committees"><i class="fa fa-check"></i><b>5.6.7</b> Ensembles By Committees</a></li>
+<li class="chapter" data-level="5.6.8" data-path="tree-models.html"><a href="tree-models.html#nearestneighbors-adjustmemt"><i class="fa fa-check"></i><b>5.6.8</b> Nearest–neighbors Adjustmemt</a></li>
+<li class="chapter" data-level="5.6.9" data-path="tree-models.html"><a href="tree-models.html#optimize-parameters"><i class="fa fa-check"></i><b>5.6.9</b> Optimize parameters</a></li>
+<li class="chapter" data-level="5.6.10" data-path="tree-models.html"><a href="tree-models.html#logistic-cv"><i class="fa fa-check"></i><b>5.6.10</b> Logistic CV</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="pca.html"><a href="pca.html"><i class="fa fa-check"></i><b>6</b> PCA</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="pca.html"><a href="pca.html#introduction-4"><i class="fa fa-check"></i><b>6.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="pca.html"><a href="pca.html#component"><i class="fa fa-check"></i><b>6.1.1</b> Component</a></li>
+<li class="chapter" data-level="6.1.2" data-path="pca.html"><a href="pca.html#pca算法"><i class="fa fa-check"></i><b>6.1.2</b> PCA算法</a></li>
+<li class="chapter" data-level="6.1.3" data-path="pca.html"><a href="pca.html#主成分旋转"><i class="fa fa-check"></i><b>6.1.3</b> 主成分旋转</a></li>
+<li class="chapter" data-level="6.1.4" data-path="pca.html"><a href="pca.html#kernelized-pca"><i class="fa fa-check"></i><b>6.1.4</b> Kernelized PCA</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="pca.html"><a href="pca.html#application-2"><i class="fa fa-check"></i><b>6.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="pca.html"><a href="pca.html#data-preparation-4"><i class="fa fa-check"></i><b>6.2.1</b> Data preparation</a></li>
+<li class="chapter" data-level="6.2.2" data-path="pca.html"><a href="pca.html#modeling-1"><i class="fa fa-check"></i><b>6.2.2</b> Modeling</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="cluster-analysis.html"><a href="cluster-analysis.html"><i class="fa fa-check"></i><b>7</b> Cluster Analysis</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering"><i class="fa fa-check"></i><b>7.1</b> Hierarchical Clustering</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#introduction-5"><i class="fa fa-check"></i><b>7.1.1</b> Introduction</a></li>
+<li class="chapter" data-level="7.1.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering-algorithms"><i class="fa fa-check"></i><b>7.1.2</b> Hierarchical clustering algorithms</a></li>
+<li class="chapter" data-level="7.1.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#measure-the-dissimilarity-between-two-clusters-of-observations"><i class="fa fa-check"></i><b>7.1.3</b> Measure the dissimilarity between two clusters of observations</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering"><i class="fa fa-check"></i><b>7.2</b> K-means Clustering</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#algorithm"><i class="fa fa-check"></i><b>7.2.1</b> Algorithm</a></li>
+<li class="chapter" data-level="7.2.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means"><i class="fa fa-check"></i><b>7.2.2</b> K-Means++</a></li>
+<li class="chapter" data-level="7.2.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#elkan-k-means"><i class="fa fa-check"></i><b>7.2.3</b> elkan K-Means</a></li>
+<li class="chapter" data-level="7.2.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#mini-batch-k-means"><i class="fa fa-check"></i><b>7.2.4</b> Mini Batch K-Means</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient-and-pam"><i class="fa fa-check"></i><b>7.3</b> Gower’s coefficient and PAM</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient"><i class="fa fa-check"></i><b>7.3.1</b> Gower’s coefficient</a></li>
+<li class="chapter" data-level="7.3.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#不同数据类型的相异度计算-距离法"><i class="fa fa-check"></i><b>7.3.2</b> 不同数据类型的相异度计算 (距离法)</a></li>
+<li class="chapter" data-level="7.3.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#pam"><i class="fa fa-check"></i><b>7.3.3</b> PAM</a></li>
+</ul></li>
+<li class="chapter" data-level="7.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch-clustering"><i class="fa fa-check"></i><b>7.4</b> BIRCH Clustering</a>
+<ul>
+<li class="chapter" data-level="7.4.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch-introduction"><i class="fa fa-check"></i><b>7.4.1</b> BIRCH Introduction</a></li>
+<li class="chapter" data-level="7.4.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#聚类特征cf与聚类特征树cf-tree"><i class="fa fa-check"></i><b>7.4.2</b> 聚类特征CF与聚类特征树CF Tree</a></li>
+<li class="chapter" data-level="7.4.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#cf-tree的生成"><i class="fa fa-check"></i><b>7.4.3</b> CF Tree的生成</a></li>
+<li class="chapter" data-level="7.4.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch算法"><i class="fa fa-check"></i><b>7.4.4</b> BIRCH算法</a></li>
+</ul></li>
+<li class="chapter" data-level="7.5" data-path="cluster-analysis.html"><a href="cluster-analysis.html#application-3"><i class="fa fa-check"></i><b>7.5</b> Application</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#data-preparation-5"><i class="fa fa-check"></i><b>7.5.1</b> Data preparation</a></li>
+<li class="chapter" data-level="7.5.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering-1"><i class="fa fa-check"></i><b>7.5.2</b> Hierarchical Clustering</a></li>
+<li class="chapter" data-level="7.5.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering-1"><i class="fa fa-check"></i><b>7.5.3</b> K-means Clustering</a></li>
+<li class="chapter" data-level="7.5.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient-and-pam-1"><i class="fa fa-check"></i><b>7.5.4</b> Gower’s coefficient and PAM</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html"><i class="fa fa-check"></i><b>8</b> linear discriminant analysis (LDA)</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#introduction-6"><i class="fa fa-check"></i><b>8.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#naive-bayes"><i class="fa fa-check"></i><b>8.1.1</b> Naive Bayes</a></li>
+<li class="chapter" data-level="8.1.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#controlling-prevalence"><i class="fa fa-check"></i><b>8.1.2</b> Controlling prevalence</a></li>
+<li class="chapter" data-level="8.1.3" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#qda"><i class="fa fa-check"></i><b>8.1.3</b> QDA</a></li>
+<li class="chapter" data-level="8.1.4" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda"><i class="fa fa-check"></i><b>8.1.4</b> LDA</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#discriminant-analysis-algorithm"><i class="fa fa-check"></i><b>8.2</b> Discriminant analysis algorithm</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#idee-1"><i class="fa fa-check"></i><b>8.2.1</b> Idee</a></li>
+<li class="chapter" data-level="8.2.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#瑞利商rayleigh-quotient"><i class="fa fa-check"></i><b>8.2.2</b> 瑞利商（Rayleigh quotient）</a></li>
+<li class="chapter" data-level="8.2.3" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#广义瑞利商-genralized-rayleigh-quotient"><i class="fa fa-check"></i><b>8.2.3</b> 广义瑞利商 genralized Rayleigh quotient</a></li>
+<li class="chapter" data-level="8.2.4" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda算法流程"><i class="fa fa-check"></i><b>8.2.4</b> LDA算法流程</a></li>
+<li class="chapter" data-level="8.2.5" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda-application"><i class="fa fa-check"></i><b>8.2.5</b> LDA Application</a></li>
+<li class="chapter" data-level="8.2.6" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#qda-1"><i class="fa fa-check"></i><b>8.2.6</b> QDA</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="neural-network.html"><a href="neural-network.html"><i class="fa fa-check"></i><b>9</b> Neural Network</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="neural-network.html"><a href="neural-network.html#introduction-7"><i class="fa fa-check"></i><b>9.1</b> Introduction</a></li>
+<li class="chapter" data-level="9.2" data-path="neural-network.html"><a href="neural-network.html#反向传播方法进行训练的前馈神经网络"><i class="fa fa-check"></i><b>9.2</b> 反向传播方法进行训练的前馈神经网络</a></li>
+<li class="chapter" data-level="9.3" data-path="neural-network.html"><a href="neural-network.html#application-4"><i class="fa fa-check"></i><b>9.3</b> Application</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="neural-network.html"><a href="neural-network.html#数据准备"><i class="fa fa-check"></i><b>9.3.1</b> 数据准备</a></li>
+<li class="chapter" data-level="9.3.2" data-path="neural-network.html"><a href="neural-network.html#模型构建"><i class="fa fa-check"></i><b>9.3.2</b> 模型构建</a></li>
+</ul></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="more-to-say.html"><a href="more-to-say.html"><i class="fa fa-check"></i><b>A</b> More to Say</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://bookdown.org" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">ML Project Using bookdown</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="svm" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">Chapter 4</span> SVM<a href="svm.html#svm" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div class="markmap html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-e03e3c07cd423f2c3e54" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-e03e3c07cd423f2c3e54">{"x":{"data":"# \n## SVM\n### Introduction\n#### Perceptron \n#### 函数间隔与几何间隔\n#### SVM支持向量\n#### SVM模型目标函数与优化\n#### 线性可分SVM的算法过程\n#### 线性SVM的软间隔最大化\n##### 软间隔最大化时的支持向量\n#### 线性不可分支持向量机与核函数\n##### 核函数的引入\n### Application\n#### Data Preparation\n#### SVM Modelling\n#### Model Selection\n#### Character selection","options":{"preset":"colorful","autoFit":true}},"evals":[],"jsHooks":[]}</script>
+<div id="introduction-2" class="section level2 hasAnchor" number="4.1">
+<h2><span class="header-section-number">4.1</span> Introduction<a href="svm.html#introduction-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>支持向量机（Support Vector Machine, SVM）是一类按监督学习（supervised learning）方式对数据进行二元分类的广义线性分类器（generalized linear classifier），其决策边界是对学习样本求解的最大边距超平面（maximum-margin hyperplane）</p>
+<div id="perceptron" class="section level3 hasAnchor" number="4.1.1">
+<h3><span class="header-section-number">4.1.1</span> Perceptron<a href="svm.html#perceptron" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>感知器模型</p>
+<p>我们在一个平台上有很多的男孩女孩，感知机的模型就是尝试找到一条直线，能够把所有的男孩和女孩隔离开。放到三维空间或者更高维的空间，感知机的模型就是尝试找到一个超平面，能够把所有的二元类别隔离开。使用感知机一个最大的前提，就是数据是线性可分的。这严重限制了感知机的使用场景。它的分类竞争对手在面对不可分的情况时，比如支持向量机可以通过核技巧来让数据在高维可分，神经网络可以通过激活函数和增加隐藏层来让数据可分。</p>
+<p>用数学的语言来说，如果我们有m个样本，每个样本对应于n维特征和一个二元类别输出，如下：</p>
+<p><span class="math display">\[
+(x_1^{(0)}, x_2^{(0)}, ...x_n^{(0)}, y_0), (x_1^{(1)}, x_2^{(1)}, ...x_n^{(1)},y_1), ... (x_1^{(m)}, x_2^{(m)}, ...x_n^{(m)}, y_m)
+\]</span></p>
+<p>我们的目标是找到这样一个超平面，即：</p>
+<p><span class="math display">\[
+\theta_0 + \theta_{1}x_1 + ... + \theta_{n}x_{n} = 0
+\]</span></p>
+<p>让其中一种类别的样本都满足 <span class="math display">\[\theta_0 + \theta_{1}x_1 + ... + \theta_{n}x_{n} &gt; 0\]</span> ，让另一种类别的样本都满足<span class="math display">\[\theta_0 + \theta_{1}x_1 + ... + \theta_{n}x_{n} &lt; 0\]</span>，从而得到线性可分。如果数据线性可分，这样的超平面一般都不是唯一的，也就是说感知机模型可以有多个解。</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-1"></span>
+<img src="02_Plots/ML_SVM_Perceptronmodel.png" alt="Perceptronmodel" width="100%" />
+<p class="caption">
+FIGURE 4.1: Perceptronmodel
+</p>
+</div>
+<p>即对于这个分离的超平面，我们定义为<span class="math inline">\(w^Tx + b = 0\)</span>。在超平面<span class="math inline">\(w^Tx + b = 0\)</span>上方的我们定义为𝑦=1 y = 1 ,在超平面<span class="math inline">\(w^Tx + b = 0\)</span>下方的我们定义为𝑦=−1 y = − 1 。可以看出满足这个条件的超平面并不止一个。那么我们可能会尝试思考，这么多的可以分类的超平面，哪个是最好的呢？或者说哪个是泛化能力最强的呢?</p>
+<p>感知机模型的损失函数优化，它的思想是让所有误分类的点(定义为M)到超平面的距离和最小，即最小化下式：</p>
+<p><span class="math display">\[
+\sum\limits_{x_i \in M}- y^{(i)}(w^Tx^{(i)} +b)\big / ||w||_2
+\]</span></p>
+<p>当𝑤和𝑏 成比例的增加，比如,当分子的𝑤和𝑏扩大N倍时，分母的L2范数也会扩大N倍。也就是说，分子和分母有固定的倍数关系。那么我们可以固定分子或者分母为1，然后求另一个即分子自己或者分母的倒数的最小化作为损失函数，这样可以简化我们的损失函数。在感知机模型中，我们采用的是保留分子，固定分母||𝑤||2=1,即最终感知机模型的损失函数为</p>
+<p><span class="math display">\[
+\sum\limits_{x_i \in M}- y^{(i)}(w^Tx^{(i)} +b)
+\]</span></p>
+</div>
+<div id="函数间隔与几何间隔" class="section level3 hasAnchor" number="4.1.2">
+<h3><span class="header-section-number">4.1.2</span> 函数间隔与几何间隔<a href="svm.html#函数间隔与几何间隔" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>在分离超平面固定为<span class="math display">\[w^Tx + b = 0\]</span>的时候，<span class="math inline">\(|w^Tx + b|\)</span>表示点x到超平面的相对距离。通过观察<span class="math inline">\(w^Tx + b\)</span>和y是否同号，我们判断分类是否正确，这里我们引入函数间隔的概念，定义函数间隔𝛾′ 为：</p>
+<p><span class="math display">\[
+\gamma^{&#39;} = y(w^Tx + b)
+\]</span></p>
+<p>它就是感知机模型里面的误分类点到超平面距离的分子。对于训练集中m个样本点对应的m个函数间隔的最小值，就是整个训练集的函数间隔。</p>
+<p>函数间隔并不能正常反应点到超平面的距离，在感知机模型里我们也提到，当分子成比例的增长时，分母也是成倍增长。为了统一度量，我们需要对法向量𝑤加上约束条件，这样我们就得到了几何间隔𝛾,定义为</p>
+<p><span class="math display">\[
+\gamma = \frac{y(w^Tx + b)}{||w||_2} =  \frac{\gamma^{&#39;}}{||w||_2}
+\]</span></p>
+</div>
+<div id="svm支持向量" class="section level3 hasAnchor" number="4.1.3">
+<h3><span class="header-section-number">4.1.3</span> SVM支持向量<a href="svm.html#svm支持向量" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>在感知机模型中，我们可以找到多个可以分类的超平面将数据分开，并且优化时希望所有的点都被准确分类。但是<strong>实际上离超平面很远的点已经被正确分类，它对超平面的位置没有影响</strong>。我们最关心是那些离超平面很<strong>近的点，这些点很容易被误分类</strong>。如果我们可以让离超平面比较近的点尽可能的远离超平面，最大化几何间隔，那么我们的分类效果会更好一些。SVM的思想起源正起于此。</p>
+<p>如下图所示，分离超平面为<span class="math display">\[w^Tx + b = 0\]</span>，如果所有的样本不光可以被超平面分开，还和超平面保持一定的函数距离（下图函数距离为1），那么这样的分类超平面是比感知机的分类超平面优的。可以证明，这样的超平面只有一个。和超平面平行的保持一定的函数距离的这两个超平面对应的向量，我们定义为支持向量。</p>
+<p>细实线就是最优线性分类器，它建立了上面提到的最大可能边际， 提高了一个新观测落入分类器正确一侧的概率。两条虚线对应着安全边际。如果支持向量发生移动，就会导致边际和决策范围发生改变。支持向量到超平面的距离为<span class="math display">\[1/||w||_2\]</span>,两个支持向量之间的距离为<span class="math display">\[2/||w||_2\]</span>。</p>
+</div>
+<div id="svm模型目标函数与优化" class="section level3 hasAnchor" number="4.1.4">
+<h3><span class="header-section-number">4.1.4</span> SVM模型目标函数与优化<a href="svm.html#svm模型目标函数与优化" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>SVM的模型是让所有点到超平面的距离大于一定的距离，也就是所有的分类点要在各自类别的支持向量两边。用数学式子表示为：</p>
+<p><span class="math display">\[
+max \;\; \gamma = \frac{y(w^Tx + b)}{||w||_2}  \;\; s.t \;\; y_i(w^Tx_i + b) = \gamma^{&#39;(i)} \geq \gamma^{&#39;} (i =1,2,...m)
+\]</span></p>
+<p>一般我们都取函数间隔γ′为1，这样我们的优化函数定义为：</p>
+<p><span class="math display">\[
+max \;\; \frac{1}{||w||_2}  \;\; s.t \;\; y_i(w^Tx_i + b)  \geq 1 (i =1,2,...m)
+\]</span></p>
+<p>也就是说，我们要在约束条件 <span class="math display">\[y_i(w^Tx_i + b)  \geq 1 (i =1,2,...m)\]</span> 下，最大化 <span class="math display">\[\frac{1)}{||w||_2}\]</span> 。可以看出，感知机是固定分母优化分子，而<strong>SVM是固定分子优化分母，同时加上了支持向量的限制</strong>。</p>
+<p>由于<span class="math display">\[\frac{1)}{||w||_2}\]</span>的最大化等同于 <span class="math display">\[\frac{1}{2}||w||_2^2\]</span> (凸函数) 的最小化。这样SVM的优化函数等价于：</p>
+<p><span class="math display">\[
+min \;\; \frac{1}{2}||w||_2^2  \;\; s.t \;\; y_i(w^Tx_i + b)  \geq 1 (i =1,2,...m)
+\]</span></p>
+<p>根据凸优化理论，我们可以通过拉格朗日函数将我们的优化目标转化为无约束的优化函数，</p>
+<p><span class="math display">\[
+L(w,b,\alpha) = \frac{1}{2}||w||_2^2 - \sum\limits_{i=1}^{m}\alpha_i[y_i(w^Tx_i + b) - 1] \; 满足\alpha_i \geq 0
+\]</span></p>
+<p>最后一顿神仙操作后，对于任意支持向量 <span class="math display">\[(x_x, y_s)\]</span>，都有</p>
+<p><span class="math display">\[
+y_s(w^Tx_s+b) = y_s(\sum\limits_{i=1}^{m}\alpha_iy_ix_i^Tx_s+b) = 1
+\]</span></p>
+<p>假设我们有S个支持向量，则对应我们求出S个<span class="math display">\[b^{*}\]</span>,理论上这些<span class="math display">\[b^{*}\]</span>都可以作为最终的结果， 但是我们一般采用一种更健壮的办法，即<strong>求出所有支持向量所对应的 </strong><span class="math display">\[b_s^{*}\]</span>** ，然后将其平均值作为最后的结果**。(注意到对于严格线性可分的SVM，b的值是有唯一解的，也就是这里求出的所有$$b^{*}都是一样的)</p>
+</div>
+<div id="线性可分svm的算法过程" class="section level3 hasAnchor" number="4.1.5">
+<h3><span class="header-section-number">4.1.5</span> 线性可分SVM的算法过程<a href="svm.html#线性可分svm的算法过程" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>算法过程如下：</p>
+<ul>
+<li>1) 构造约束优化问题</li>
+</ul>
+<p><span class="math display">\[
+\begin{array}{c}
+\underbrace{\min }_{\alpha} \frac{1}{2} \sum_{i=1}^{m} \sum_{j=1}^{m} \alpha_{i} \alpha_{j} y_{i} y_{j}\left(x_{i} \bullet x_{j}\right)-\sum_{i=1}^{m} \alpha_{i} \\
+\text { s.t. } \sum_{i=1}^{m} \alpha_{i} y_{i}=0 \\
+\alpha_{i} \geq 0 i=1,2, \ldots m
+\end{array}
+\]</span></p>
+<ul>
+<li>2) 用SMO算法求出上式最小时对应的 <span class="math display">\[\alpha\]</span> 向量的值 <span class="math display">\[\alpha^{*}\]</span> 向量.</li>
+<li>3) 计算 <span class="math display">\[w^{*}=\sum_{i=1}^{m} \alpha_{i}^{*} y_{i} x_{i}\]</span></li>
+<li>4) 找出所有的S个支持向量,即满足 <span class="math display">\[\alpha_{s}&gt;0\]</span> 对应的样本 <span class="math display">\[\left(x_{s}, y_{s}\right),\]</span> 通过 <span class="math display">\[y_{s}\left(\sum_{i=1}^{m} \alpha_{i} y_{i} x_{i}^{T} x_{s}+b\right)=1,\]</span> 计算出每个支持向量 <span class="math display">\[\left(x_{x}, y_{s}\right)\]</span> 对应的 <span class="math display">\[b_{s}^{*}\]</span>,计算出 这些 <span class="math display">\[b_{s}^{*}=y_{s}-\sum_{i=1}^{m} \alpha_{i} y_{i} x_{i}^{T} x_{s} .\]</span> 所有的 <span class="math display">\[b_{s}^{*}\]</span> 对应的平均值即为最终的 <span class="math display">\[b^{*}=\frac{1}{S} \sum_{i=1}^{S} b_{s}^{*}\]</span></li>
+</ul>
+<p>这样最终的分类超平面为: <span class="math display">\[w^{*} \bullet x+b^{*}=0,\]</span> 最终的分类决策函数为: <span class="math display">\[f(x)=\operatorname{sign}\left(w^{*} \bullet x+b^{*}\right)\]</span></p>
+<p>线性可分SVM的学习方法对于非线性的数据集是没有办法使用的， 有时候不能线性可分的原因是线性数据集里面多了少量的异常点，由于这些异常点导致了数据集不能线性可分， 那么怎么可以处理这些异常点使数据集依然可以用线性可分的思想 —- 线性SVM的软间隔最大化</p>
+</div>
+<div id="线性svm的软间隔最大化" class="section level3 hasAnchor" number="4.1.6">
+<h3><span class="header-section-number">4.1.6</span> 线性SVM的软间隔最大化<a href="svm.html#线性svm的软间隔最大化" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>所谓的软间隔，是相对于硬间隔说的，线性分类SVM的学习方法属于硬间隔最大化。硬间隔最大化的条件：</p>
+<p><span class="math display">\[
+min\;\; \frac{1}{2}||w||_2^2  \;\; s.t \;\; y_i(w^Tx_i + b)  \geq 1 (i =1,2,...m)
+\]</span></p>
+<p>如何可以软间隔最大化: 对训练集里面的每个样本(xi,yi)引入了一个松弛变量 <span class="math display">\[\xi_i \geq 0\]</span> ,使函数间隔加上松弛变量大于等于1，也就是说 <span class="math display">\[y_i(w\bullet x_i +b) \geq 1- \xi_i\]</span> 软间隔最大化的SVM学习条件如下：</p>
+<p><span class="math display">\[
+min\;\; \frac{1}{2}||w||_2^2 +C\sum\limits_{i=1}^{m}\xi_i \ \ \ s.t.  \;\; y_i(w^Tx_i + b)  \geq 1 - \xi_i \;\;(i =1,2,...m)
+\]</span></p>
+<p><span class="math display">\[
+\xi_i \geq 0 \;\;(i =1,2,...m)
+\]</span></p>
+<p>Here <span class="math display">\[C&gt;0\]</span> 为惩罚参数，可以理解为我们一般回归和分类问题正则化时候的参数。C越大，对误分类的惩罚越大，C越小，对误分类的惩罚越小。也就是说，我们希望<span class="math display">\[\frac{1}{2}||w||_2^2\]</span>尽量小，误分类的点尽可能的少。C是协调两者关系的正则化惩罚系数。在实际应用中，需要调参来选择。</p>
+<div id="软间隔最大化时的支持向量" class="section level4 hasAnchor" number="4.1.6.1">
+<h4><span class="header-section-number">4.1.6.1</span> 软间隔最大化时的支持向量<a href="svm.html#软间隔最大化时的支持向量" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>在硬间隔最大化时, 支持向量比较简单, 就是满足 <span class="math display">\[y_{i}\left(w^{T} x_{i}+b\right)-1=0\]</span> 就可以了。根据KKT条件中的对偶互补条件 <span class="math display">\[\alpha_{i}^{*}\left(y_{i}\left(w^{T} x_{i}+b\right)-1\right)=0,\]</span></p>
+<ul>
+<li>如果 <span class="math display">\[\alpha_{i}^{*}&gt;0\]</span> 则有 <span class="math display">\[y_{i}\left(w^{T} x_{i}+b\right)=1\]</span> 即点在支持向量上,</li>
+<li>否则如果 <span class="math display">\[\alpha_{i}^{*}=0\]</span> 则有 <span class="math display">\[y_{i}\left(w^{T} x_{i}+b\right) \geq 1,\]</span> 即样本在支持向量上或者已经被正确分类。</li>
+</ul>
+<p>在软间隔最大化时, 则稍微复杂一些, 因为我们对每个样本 <span class="math display">\[\left(x_{i}, y_{i}\right)\]</span> 引入了松他变量 <span class="math display">\[\xi_{i 。}\]</span> 我们从下图来研究软间隔最大化时支持向量的情况, 第i个点到 对应类别支持向量的距离为 <span class="math display">\[\frac{\xi_{i}}{\|w\|_{2}}\]</span> 。根据软间隔最大化时KKT条件中的对偶互补条件 <span class="math display">\[\alpha_{i}^{*}\left(y_{i}\left(w^{T} x_{i}+b\right)-1+\xi_{i}^{*}\right)=0\]</span> 我们有:</p>
+<ul>
+<li><ol style="list-style-type: lower-alpha">
+<li>如果 <span class="math display">\[\alpha=0\]</span>,那么 <span class="math display">\[y_{i}\left(w^{T} x_{i}+b\right)-1 \geq 0\]</span>,即样本在间隔边界上或者已经被正确分类。如图中所有远离间隔边界的点。</li>
+</ol></li>
+<li><ol start="2" style="list-style-type: lower-alpha">
+<li>如果 <span class="math display">\[0&lt;\alpha&lt;C\]</span>,那么 <span class="math display">\[\xi_{i}=0, \quad y_{i}\left(w^{T} x_{i}+b\right)-1=0\]</span>,即点在间隔边界上。</li>
+</ol></li>
+<li><ol start="3" style="list-style-type: lower-alpha">
+<li>如果 <span class="math display">\[\alpha=C,\]</span> 说明这是一个可能比较异常的点, 需要检查此时 <span class="math display">\[\xi_{i}\]</span></li>
+</ol>
+<ul>
+<li>i)如果 <span class="math display">\[0 \leq \xi_{i} \leq 1\]</span>,那么点被正确分类, 但是却在超平面和自己类别的间隔边界之间。如图中的样本2和4.</li>
+<li>ii)如果 <span class="math display">\[\xi_{i}=1\]</span>,那么点在分离超平面上, 无法被正确分类。</li>
+<li>iii)如果 <span class="math display">\[\xi_{i}&gt;1\]</span>,那么点在超平面的另一侧, 也就是说, 这个点不能被正常分类。如图中的样本1和3.</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="线性不可分支持向量机与核函数" class="section level3 hasAnchor" number="4.1.7">
+<h3><span class="header-section-number">4.1.7</span> 线性不可分支持向量机与核函数<a href="svm.html#线性不可分支持向量机与核函数" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>如果数据不是线性可分的，很多观测值就会落到分类边际错误的一侧（所谓松弛变量），这就是误分类。建立SVM算法的关键是，通过交叉验证找出最优数量的 支持向量。任何一个正好位于最大分类边际上的观测都可以被认为是支持向量。</p>
+<ul>
+<li>如果误差值的调优参数过大，你就会找到很多支持向量，受到高偏差低方差的困扰。</li>
+<li>如果调优参数过小，就会出现相反的情况。</li>
+</ul>
+<p>SVM中的另一个重要问题是处理非线性模型的能力，非线性模型的输入特征带有二次项或更 高阶的多项式。在SVM中，这种处理被称为<strong>核技巧。对于任何模型，你都可以通过不同阶数的多项式、交互项或其他衍生项来扩展特征的数量。</strong> 在大规模数据集中，这样做可能失控。SVM中的核技巧可以使我们有效扩展特征空间，目的是使 特征空间近似于线性可分.</p>
+<p>核函数的巧妙之处在于，它将特征到高维空间的转换进行了数学上的简化，不需要在高维空 间中显式地创建特征。这样做的好处是，在建立高维非线性空间和决策边界的同时，还能保持最 优问题的计算有效性。核函数不用将特征转换到高维空间即可计算特征在高维空间中的内积。一般用特征的内积（点积）表示核函数，用xi和xj代表向量，γ和c为参数，常用的核函数:</p>
+<ul>
+<li>线性核函数</li>
+<li>多项式核函数</li>
+<li>径向基核函数</li>
+<li>sigmod核函数</li>
+</ul>
+<div id="核函数的引入" class="section level4 hasAnchor" number="4.1.7.1">
+<h4><span class="header-section-number">4.1.7.1</span> 核函数的引入<a href="svm.html#核函数的引入" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>线性不可分的低维特征数据，我们可以将其映射到高维，就能线性可分。我们定义一个低维特征空间到高维特征空间的映射ϕ，将所有特征映射到一个更高的维度，让数据线性可分，优化目标函数，求出分离超平面和分类决策函数</p>
+<p><span class="math display">\[
+\underbrace{ min }_{\alpha}  \frac{1}{2}\sum\limits_{i=1,j=1}^{m}\alpha_i\alpha_jy_iy_j\phi(x_i) \bullet \phi(x_j) - \sum\limits_{i=1}^{m}\alpha_i \ \ \ s.t. \; \sum\limits_{i=1}^{m}\alpha_iy_i = 0
+\]</span></p>
+<p><span class="math display">\[
+0 \leq \alpha_i \leq C
+\]</span></p>
+<p>和线性可分SVM的优化目标函数的区别仅仅是将内积xi∙xj替换为ϕ(xi)∙ϕ(xj)。假如是一个2维特征的数据，我们可以将其映射到5维来做特征的内积，如果原始空间是三维，可以映射到到19维空间，似乎还可以处理。但是如果我们的低维特征是100个维度，1000个维度呢？那么我们要将其映射到超级高的维度来计算特征的内积。这时候映射成的高维维度是爆炸性增长的，这个计算量实在是太大了，而且如果遇到无穷维的情况，就根本无从计算了。核函数该隆重出场了</p>
+<p>假设ϕ是一个从低维的输入空间 <span class="math inline">\(\chi\)</span> （欧式空间的子集或者离散集合）到高维的希尔伯特空间的 <span class="math inline">\(\mathcal{H}\)</span> 映射。那么如果存在函数 <span class="math inline">\(K(x,z)\)</span> ，对于任意x,z∈χ，都有： <span class="math inline">\(K(x, z) = \phi(x) \bullet \phi(z)\)</span> 那么我们就称<span class="math display">\[K(x,z)\]</span>为核函数。</p>
+<p>核函数计算是在低维特征空间来计算的，它避免了在刚才我们提到了在高维维度空间计算内积的恐怖计算量。也就是说，我们可以好好享受在高维特征空间线性可分的红利，却避免了高维特征空间恐怖的内积计算量。</p>
+<ul>
+<li>线性核函数（Linear Kernel）其实就是线性可分SVM，表达式为： <span class="math inline">\(K(x, z) = x \bullet z\)</span></li>
+<li>多项式核函数（Polynomial Kernel）是线性不可分SVM常用的核函数之一，表达式为： <span class="math inline">\(K(x, z) = （\gamma x \bullet z + r)^d\)</span> 其中，γ,r,d都需要自己调参定义。</li>
+<li>高斯核函数（Gaussian Kernel），在SVM中也称为径向基核函数（Radial Basis Function,RBF），它是非线性分类SVM最主流的核函数。表达式为： <span class="math inline">\(K(x, z) = exp(-\gamma||x-z||^2)\)</span> 其中，γ大于0，需要自己调参定义。</li>
+<li>Sigmoid核函数（Sigmoid Kernel）也是线性不可分SVM常用的核函数之一，表达式为： <span class="math inline">\(K(x, z) = tanh（\gamma x \bullet z + r)\)</span></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="application-1" class="section level2 hasAnchor" number="4.2">
+<h2><span class="header-section-number">4.2</span> Application<a href="svm.html#application-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="data-preparation-2" class="section level3 hasAnchor" number="4.2.1">
+<h3><span class="header-section-number">4.2.1</span> Data Preparation<a href="svm.html#data-preparation-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>要研究的数据来自美国国家糖尿病消化病肾病研究所，这个数据集包括532个观测，8 个输入特征以及1个二值结果变量（Yes/No）。这项研究中的患者来自美国亚利桑那州中南部，是 皮玛族印第安人的后裔。数据显示，在过去的30年中，科学家已经通过研究证明肥胖是引发糖尿 病的重要因素。选择皮玛印第安人进行这项研究是因为，半数成年皮玛印第安人患有糖尿病。而这些患有糖尿病的人中，有95%超重。研究仅限于成年女性，病情则按照世界卫生组织的标准进 行诊断，为Ⅱ型糖尿病。这种糖尿病的患者胰腺功能并未完全丧失，还可以产生胰岛素，因此又 称“非胰岛素依赖型”糖尿病。</p>
+<p>是研究那些糖尿病患者，并对这个人群中可能导致糖尿病的风险因素进行预测。 久坐不动的生活方式和高热量的饮食习惯使得糖尿病已经成为美国的流行病。根据美国糖尿病协 会的数据，2010年，糖尿病成为美国排名第七的致死疾病，这个结果还不包括那些未被诊断出来 的病例。糖尿病还会大大增加其他疾病的发病概率，比如高血压、血脂异常、中风、眼疾和肾脏 疾病。糖尿病及其并发症的医疗成本非常巨大，据估计，美国2012年糖尿病治疗总成本大约为4900 亿美元。</p>
+<p>数据集包含了532位女性患者的信息，存储在两个数据框中。数据集包含在MASS这个R包中，一个数据框是Pima.tr，另一个数据框的是Pima.te。我们不 将它们分别作为训练集和测试集，而是将其合在一起，然后建立自己的训练集和测试集</p>
+<p>数据集变量如下:</p>
+<pre><code>npreg：怀孕次数  
+glu：血糖浓度，由口服葡萄糖耐量测试给出  
+bp：舒张压（单位为mm Hg）  
+skin：三头肌皮褶厚度（单位为mm）  
+bmi：身体质量指数  
+ped：糖尿病家族影响因素  
+age：年龄  
+type：是否患有糖尿病（是/否）</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="svm.html#cb2-1" tabindex="-1"></a><span class="fu">data</span>(Pima.tr)</span>
+<span id="cb2-2"><a href="svm.html#cb2-2" tabindex="-1"></a><span class="fu">str</span>(Pima.tr)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    200 obs. of  8 variables:
+##  $ npreg: int  5 7 5 0 0 5 3 1 3 2 ...
+##  $ glu  : int  86 195 77 165 107 97 83 193 142 128 ...
+##  $ bp   : int  68 70 82 76 60 76 58 50 80 78 ...
+##  $ skin : int  28 33 41 43 25 27 31 16 15 37 ...
+##  $ bmi  : num  30.2 25.1 35.8 47.9 26.4 35.6 34.3 25.9 32.4 43.3 ...
+##  $ ped  : num  0.364 0.163 0.156 0.259 0.133 ...
+##  $ age  : int  24 55 35 26 23 52 25 24 63 31 ...
+##  $ type : Factor w/ 2 levels &quot;No&quot;,&quot;Yes&quot;: 1 2 1 1 1 2 1 1 1 2 ...</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="svm.html#cb4-1" tabindex="-1"></a><span class="fu">data</span>(Pima.te)</span>
+<span id="cb4-2"><a href="svm.html#cb4-2" tabindex="-1"></a><span class="fu">str</span>(Pima.te)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    332 obs. of  8 variables:
+##  $ npreg: int  6 1 1 3 2 5 0 1 3 9 ...
+##  $ glu  : int  148 85 89 78 197 166 118 103 126 119 ...
+##  $ bp   : int  72 66 66 50 70 72 84 30 88 80 ...
+##  $ skin : int  35 29 23 32 45 19 47 38 41 35 ...
+##  $ bmi  : num  33.6 26.6 28.1 31 30.5 25.8 45.8 43.3 39.3 29 ...
+##  $ ped  : num  0.627 0.351 0.167 0.248 0.158 0.587 0.551 0.183 0.704 0.263 ...
+##  $ age  : int  50 31 21 26 53 51 31 33 27 29 ...
+##  $ type : Factor w/ 2 levels &quot;No&quot;,&quot;Yes&quot;: 2 1 1 2 2 2 2 1 1 2 ...</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="svm.html#cb6-1" tabindex="-1"></a>pima <span class="ot">&lt;-</span> <span class="fu">rbind</span>(Pima.tr, Pima.te)</span>
+<span id="cb6-2"><a href="svm.html#cb6-2" tabindex="-1"></a><span class="fu">str</span>(pima)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    532 obs. of  8 variables:
+##  $ npreg: int  5 7 5 0 0 5 3 1 3 2 ...
+##  $ glu  : int  86 195 77 165 107 97 83 193 142 128 ...
+##  $ bp   : int  68 70 82 76 60 76 58 50 80 78 ...
+##  $ skin : int  28 33 41 43 25 27 31 16 15 37 ...
+##  $ bmi  : num  30.2 25.1 35.8 47.9 26.4 35.6 34.3 25.9 32.4 43.3 ...
+##  $ ped  : num  0.364 0.163 0.156 0.259 0.133 ...
+##  $ age  : int  24 55 35 26 23 52 25 24 63 31 ...
+##  $ type : Factor w/ 2 levels &quot;No&quot;,&quot;Yes&quot;: 1 2 1 1 1 2 1 1 1 2 ...</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="svm.html#cb8-1" tabindex="-1"></a><span class="do">## 通过箱线图进行探索性分析。为此，要使用结果变量&quot;type&quot;作为ID变量的值。和逻辑斯蒂 回归一样，melt()函数会融合数据并准备好用于生成箱线图的数据框</span></span>
+<span id="cb8-2"><a href="svm.html#cb8-2" tabindex="-1"></a><span class="do">## 用facet_wrap()函数将统计图分两列显示</span></span>
+<span id="cb8-3"><a href="svm.html#cb8-3" tabindex="-1"></a>pima.melt <span class="ot">&lt;-</span> <span class="fu">melt</span>(pima, <span class="at">id.var =</span> <span class="st">&quot;type&quot;</span>)</span>
+<span id="cb8-4"><a href="svm.html#cb8-4" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> pima.melt, <span class="fu">aes</span>(<span class="at">x =</span> type, <span class="at">y =</span> value)) <span class="sc">+</span></span>
+<span id="cb8-5"><a href="svm.html#cb8-5" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span> variable, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="svm.html#cb9-1" tabindex="-1"></a><span class="do">## 为很难从中发现任何明显区别, 里最大的问题是，不同统计图的 单位不同，但却共用一个Y轴。对数据进行标准化处理并重新做图，可以解决这个问题，并生成 更有意义的统计图。</span></span>
+<span id="cb9-2"><a href="svm.html#cb9-2" tabindex="-1"></a><span class="do">## R内建函数scale()，可以将数据转换为均值为0、标准差为1的标准 形式, 你对一个数据框应用了scale()函数，它 就自动变成一个矩阵。使用as.data.frame()函数，将其重新变回数据框</span></span>
+<span id="cb9-3"><a href="svm.html#cb9-3" tabindex="-1"></a><span class="do">## 要对所有特征进行转换，只留 下响应变量type</span></span>
+<span id="cb9-4"><a href="svm.html#cb9-4" tabindex="-1"></a>pima.scale <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">scale</span>(pima[, <span class="sc">-</span><span class="dv">8</span>]))</span>
+<span id="cb9-5"><a href="svm.html#cb9-5" tabindex="-1"></a><span class="co">#scale.pima = as.data.frame(scale(pima[,1:7], byrow=FALSE)) #do not create own function</span></span>
+<span id="cb9-6"><a href="svm.html#cb9-6" tabindex="-1"></a><span class="fu">str</span>(pima.scale)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    532 obs. of  7 variables:
+##  $ npreg: num  0.448 1.052 0.448 -1.062 -1.062 ...
+##  $ glu  : num  -1.13 2.386 -1.42 1.418 -0.453 ...
+##  $ bp   : num  -0.285 -0.122 0.852 0.365 -0.935 ...
+##  $ skin : num  -0.112 0.363 1.123 1.313 -0.397 ...
+##  $ bmi  : num  -0.391 -1.132 0.423 2.181 -0.943 ...
+##  $ ped  : num  -0.403 -0.987 -1.007 -0.708 -1.074 ...
+##  $ age  : num  -0.708 2.173 0.315 -0.522 -0.801 ...</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="svm.html#cb11-1" tabindex="-1"></a>pima.scale<span class="sc">$</span>type <span class="ot">&lt;-</span> pima<span class="sc">$</span>type</span>
+<span id="cb11-2"><a href="svm.html#cb11-2" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="svm.html#cb11-3" tabindex="-1"></a>pima.scale.melt <span class="ot">&lt;-</span> <span class="fu">melt</span>(pima.scale, <span class="at">id.var =</span> <span class="st">&quot;type&quot;</span>)</span>
+<span id="cb11-4"><a href="svm.html#cb11-4" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>pima.scale.melt, <span class="fu">aes</span>(<span class="at">x =</span> type, <span class="at">y =</span> value)) <span class="sc">+</span> </span>
+<span id="cb11-5"><a href="svm.html#cb11-5" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span> variable, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="svm.html#cb12-1" tabindex="-1"></a><span class="do">## Interpretation: 出其他特征也随着 type发生变化，特别是age</span></span>
+<span id="cb12-2"><a href="svm.html#cb12-2" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="svm.html#cb12-3" tabindex="-1"></a><span class="do">## 有两对变量之间具有相关性：npreg/age和skin/bmi。如果能够正确训练模型，并能调整好 超参数，那么多重共线性对于这些方法通常都不是问题</span></span>
+<span id="cb12-4"><a href="svm.html#cb12-4" tabindex="-1"></a><span class="fu">cor</span>(pima.scale[<span class="sc">-</span><span class="dv">8</span>])</span></code></pre></div>
+<pre><code>##             npreg       glu          bp       skin         bmi         ped
+## npreg 1.000000000 0.1253296 0.204663421 0.09508511 0.008576282 0.007435104
+## glu   0.125329647 1.0000000 0.219177950 0.22659042 0.247079294 0.165817411
+## bp    0.204663421 0.2191779 1.000000000 0.22607244 0.307356904 0.008047249
+## skin  0.095085114 0.2265904 0.226072440 1.00000000 0.647422386 0.118635569
+## bmi   0.008576282 0.2470793 0.307356904 0.64742239 1.000000000 0.151107136
+## ped   0.007435104 0.1658174 0.008047249 0.11863557 0.151107136 1.000000000
+## age   0.640746866 0.2789071 0.346938723 0.16133614 0.073438257 0.071654133
+##              age
+## npreg 0.64074687
+## glu   0.27890711
+## bp    0.34693872
+## skin  0.16133614
+## bmi   0.07343826
+## ped   0.07165413
+## age   1.00000000</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="svm.html#cb14-1" tabindex="-1"></a><span class="do">## 先检查响应变量中 Yes和No的比例。确保数据划分平衡是非常重要的，如果某个结果过于稀疏，就会导致问题，可 能引起分类器在优势类和劣势类之间发生偏离。对于不平衡的判定没有一个固定的规则。一个比 较好的经验法则是，结果中的比例至少应该达到2∶1</span></span>
+<span id="cb14-2"><a href="svm.html#cb14-2" tabindex="-1"></a><span class="fu">table</span>(pima.scale<span class="sc">$</span>type)</span></code></pre></div>
+<pre><code>## 
+##  No Yes 
+## 355 177</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="svm.html#cb16-1" tabindex="-1"></a><span class="do">## 比例为2∶1，现在可以建立训练集和测试集了。使用我们常用的语法，划分比例为70/30</span></span>
+<span id="cb16-2"><a href="svm.html#cb16-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">502</span>)</span>
+<span id="cb16-3"><a href="svm.html#cb16-3" tabindex="-1"></a>ind <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">2</span>, <span class="fu">nrow</span>(pima.scale), <span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="fl">0.3</span>))</span>
+<span id="cb16-4"><a href="svm.html#cb16-4" tabindex="-1"></a>train <span class="ot">&lt;-</span> pima.scale[ind <span class="sc">==</span> <span class="dv">1</span>, ]</span>
+<span id="cb16-5"><a href="svm.html#cb16-5" tabindex="-1"></a>test <span class="ot">&lt;-</span> pima.scale[ind <span class="sc">==</span> <span class="dv">2</span>, ]</span>
+<span id="cb16-6"><a href="svm.html#cb16-6" tabindex="-1"></a><span class="fu">str</span>(train)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    385 obs. of  8 variables:
+##  $ npreg: num  0.448 0.448 -0.156 -0.76 -0.156 ...
+##  $ glu  : num  -1.42 -0.775 -1.227 2.322 0.676 ...
+##  $ bp   : num  0.852 0.365 -1.097 -1.747 0.69 ...
+##  $ skin : num  1.123 -0.207 0.173 -1.253 -1.348 ...
+##  $ bmi  : num  0.4229 0.3938 0.2049 -1.0159 -0.0712 ...
+##  $ ped  : num  -1.007 -0.363 -0.485 0.441 -0.879 ...
+##  $ age  : num  0.315 1.894 -0.615 -0.708 2.916 ...
+##  $ type : Factor w/ 2 levels &quot;No&quot;,&quot;Yes&quot;: 1 2 1 1 1 2 2 1 1 1 ...</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="svm.html#cb18-1" tabindex="-1"></a><span class="fu">str</span>(test)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    147 obs. of  8 variables:
+##  $ npreg: num  0.448 1.052 -1.062 -1.062 -0.458 ...
+##  $ glu  : num  -1.13 2.386 1.418 -0.453 0.225 ...
+##  $ bp   : num  -0.285 -0.122 0.365 -0.935 0.528 ...
+##  $ skin : num  -0.112 0.363 1.313 -0.397 0.743 ...
+##  $ bmi  : num  -0.391 -1.132 2.181 -0.943 1.513 ...
+##  $ ped  : num  -0.403 -0.987 -0.708 -1.074 2.093 ...
+##  $ age  : num  -0.7076 2.173 -0.5217 -0.8005 -0.0571 ...
+##  $ type : Factor w/ 2 levels &quot;No&quot;,&quot;Yes&quot;: 1 2 1 1 2 1 2 1 1 1 ...</code></pre>
+</div>
+<div id="svm-modelling" class="section level3 hasAnchor" number="4.2.2">
+<h3><span class="header-section-number">4.2.2</span> SVM Modelling<a href="svm.html#svm-modelling" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>使用e1071包构建SVM模型，先从线性支持向量分类器开始，然后转入非线性模型</p>
+<p>e1071 包中有一个非常好的用于SVM的函数——tune.svm()，它可以帮助我们选择调优参数及核函 数。tune.svm()使用交叉验证使调优参数达到最优。我们先建立一个名为linear.tune的对象， 然后使用summary()函数看看其中的内容</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="svm.html#cb20-1" tabindex="-1"></a><span class="do">## linear tune</span></span>
+<span id="cb20-2"><a href="svm.html#cb20-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb20-3"><a href="svm.html#cb20-3" tabindex="-1"></a>linear.tune <span class="ot">&lt;-</span> <span class="fu">tune.svm</span>(type <span class="sc">~</span> ., <span class="at">data =</span> train, </span>
+<span id="cb20-4"><a href="svm.html#cb20-4" tabindex="-1"></a>                        <span class="at">kernel =</span> <span class="st">&quot;linear&quot;</span>, </span>
+<span id="cb20-5"><a href="svm.html#cb20-5" tabindex="-1"></a>                        <span class="at">cost =</span> <span class="fu">c</span>(<span class="fl">0.001</span>, <span class="fl">0.01</span>, <span class="fl">0.1</span>, <span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>))</span>
+<span id="cb20-6"><a href="svm.html#cb20-6" tabindex="-1"></a><span class="fu">summary</span>(linear.tune)</span></code></pre></div>
+<pre><code>## 
+## Parameter tuning of &#39;svm&#39;:
+## 
+## - sampling method: 10-fold cross validation 
+## 
+## - best parameters:
+##  cost
+##  0.01
+## 
+## - best performance: 0.2 
+## 
+## - Detailed performance results:
+##    cost     error dispersion
+## 1 1e-03 0.3192308 0.04698696
+## 2 1e-02 0.2000000 0.04579145
+## 3 1e-01 0.2102564 0.05714612
+## 4 1e+00 0.2076248 0.06252977
+## 5 5e+00 0.2102564 0.06321544
+## 6 1e+01 0.2102564 0.06321544</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="svm.html#cb22-1" tabindex="-1"></a><span class="do">## 最优成本函数cost是1，这时的误分类误差率差不多为21%。我们在测试集 上进行预测和检验</span></span>
+<span id="cb22-2"><a href="svm.html#cb22-2" tabindex="-1"></a>best.linear <span class="ot">&lt;-</span> linear.tune<span class="sc">$</span>best.model</span>
+<span id="cb22-3"><a href="svm.html#cb22-3" tabindex="-1"></a>tune.test <span class="ot">&lt;-</span> <span class="fu">predict</span>(best.linear, <span class="at">newdata =</span> test)</span>
+<span id="cb22-4"><a href="svm.html#cb22-4" tabindex="-1"></a><span class="fu">table</span>(tune.test, test<span class="sc">$</span>type)</span></code></pre></div>
+<pre><code>##          
+## tune.test No Yes
+##       No  82  24
+##       Yes 11  30</code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="svm.html#cb24-1" tabindex="-1"></a>(<span class="dv">82</span><span class="sc">+</span><span class="dv">30</span>)<span class="sc">/</span><span class="dv">147</span></span></code></pre></div>
+<pre><code>## [1] 0.7619048</code></pre>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="svm.html#cb26-1" tabindex="-1"></a><span class="do">## 试验的第一个核函数是多项式核函数，需要调整优化两个参数：多项式的阶（degree） 与核系数（coef0）。设定多项式的阶是3、4和5，核系数从0.1逐渐增加到4</span></span>
+<span id="cb26-2"><a href="svm.html#cb26-2" tabindex="-1"></a><span class="do">## SVM with e1071; tune the poly only</span></span>
+<span id="cb26-3"><a href="svm.html#cb26-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb26-4"><a href="svm.html#cb26-4" tabindex="-1"></a>poly.tune <span class="ot">&lt;-</span> <span class="fu">tune.svm</span>(type <span class="sc">~</span> ., <span class="at">data =</span> train, </span>
+<span id="cb26-5"><a href="svm.html#cb26-5" tabindex="-1"></a>                      <span class="at">kernel =</span> <span class="st">&quot;polynomial&quot;</span>, </span>
+<span id="cb26-6"><a href="svm.html#cb26-6" tabindex="-1"></a>                      <span class="at">degree =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>), </span>
+<span id="cb26-7"><a href="svm.html#cb26-7" tabindex="-1"></a>                      <span class="at">coef0 =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>))</span>
+<span id="cb26-8"><a href="svm.html#cb26-8" tabindex="-1"></a><span class="fu">summary</span>(poly.tune)</span></code></pre></div>
+<pre><code>## 
+## Parameter tuning of &#39;svm&#39;:
+## 
+## - sampling method: 10-fold cross validation 
+## 
+## - best parameters:
+##  degree coef0
+##       3     3
+## 
+## - best performance: 0.2209177 
+## 
+## - Detailed performance results:
+##    degree coef0     error dispersion
+## 1       3   0.1 0.2339406 0.05673284
+## 2       4   0.1 0.2416329 0.05898725
+## 3       5   0.1 0.2441970 0.06195056
+## 4       3   0.5 0.2418354 0.06226721
+## 5       4   0.5 0.2468961 0.07055752
+## 6       5   0.5 0.2414980 0.05339164
+## 7       3   1.0 0.2339406 0.05280244
+## 8       4   1.0 0.2649123 0.05419548
+## 9       5   1.0 0.2625506 0.07622638
+## 10      3   2.0 0.2235493 0.05464342
+## 11      4   2.0 0.2493927 0.05941857
+## 12      5   2.0 0.2755061 0.06597294
+## 13      3   3.0 0.2209177 0.05595814
+## 14      4   3.0 0.2520243 0.05094380
+## 15      5   3.0 0.2701754 0.04813547
+## 16      3   4.0 0.2261134 0.05428339
+## 17      4   4.0 0.2493927 0.06747803
+## 18      5   4.0 0.2857625 0.05870079</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="svm.html#cb28-1" tabindex="-1"></a>best.poly <span class="ot">&lt;-</span> poly.tune<span class="sc">$</span>best.model</span>
+<span id="cb28-2"><a href="svm.html#cb28-2" tabindex="-1"></a>poly.test <span class="ot">&lt;-</span> <span class="fu">predict</span>(best.poly, <span class="at">newdata =</span> test)</span>
+<span id="cb28-3"><a href="svm.html#cb28-3" tabindex="-1"></a><span class="fu">table</span>(poly.test, test<span class="sc">$</span>type)</span></code></pre></div>
+<pre><code>##          
+## poly.test No Yes
+##       No  75  25
+##       Yes 18  29</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="svm.html#cb30-1" tabindex="-1"></a>(<span class="dv">81</span> <span class="sc">+</span> <span class="dv">26</span>) <span class="sc">/</span> <span class="dv">147</span></span></code></pre></div>
+<pre><code>## [1] 0.7278912</code></pre>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="svm.html#cb32-1" tabindex="-1"></a><span class="do">## 测试径向基核函数，此处只需找出一个参数gamma， 在0.1 ~ 4中依次检验。如果gamma过小，模型就不能解释决策边界的复杂性；如果gamma过大， 模型就会严重过拟合。</span></span>
+<span id="cb32-2"><a href="svm.html#cb32-2" tabindex="-1"></a><span class="do">## tune the rbf</span></span>
+<span id="cb32-3"><a href="svm.html#cb32-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb32-4"><a href="svm.html#cb32-4" tabindex="-1"></a>rbf.tune <span class="ot">&lt;-</span> <span class="fu">tune.svm</span>(type <span class="sc">~</span> ., <span class="at">data =</span> train, </span>
+<span id="cb32-5"><a href="svm.html#cb32-5" tabindex="-1"></a>                     <span class="at">kernel =</span> <span class="st">&quot;radial&quot;</span>, </span>
+<span id="cb32-6"><a href="svm.html#cb32-6" tabindex="-1"></a>                     <span class="at">gamma =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>))</span>
+<span id="cb32-7"><a href="svm.html#cb32-7" tabindex="-1"></a><span class="fu">summary</span>(rbf.tune)</span></code></pre></div>
+<pre><code>## 
+## Parameter tuning of &#39;svm&#39;:
+## 
+## - sampling method: 10-fold cross validation 
+## 
+## - best parameters:
+##  gamma
+##    0.1
+## 
+## - best performance: 0.2184885 
+## 
+## - Detailed performance results:
+##   gamma     error dispersion
+## 1   0.1 0.2184885 0.05636224
+## 2   0.5 0.2236842 0.06496235
+## 3   1.0 0.2752362 0.06431054
+## 4   2.0 0.3244939 0.04452924
+## 5   3.0 0.3218623 0.04750687
+## 6   4.0 0.3192308 0.04698696</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="svm.html#cb34-1" tabindex="-1"></a>best.rbf <span class="ot">&lt;-</span> rbf.tune<span class="sc">$</span>best.model</span>
+<span id="cb34-2"><a href="svm.html#cb34-2" tabindex="-1"></a>rbf.test <span class="ot">&lt;-</span> <span class="fu">predict</span>(best.rbf, <span class="at">newdata =</span> test)</span>
+<span id="cb34-3"><a href="svm.html#cb34-3" tabindex="-1"></a><span class="fu">table</span>(rbf.test, test<span class="sc">$</span>type)</span></code></pre></div>
+<pre><code>##         
+## rbf.test No Yes
+##      No  76  26
+##      Yes 17  28</code></pre>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="svm.html#cb36-1" tabindex="-1"></a>(<span class="dv">73</span><span class="sc">+</span><span class="dv">21</span>)<span class="sc">/</span><span class="dv">147</span></span></code></pre></div>
+<pre><code>## [1] 0.6394558</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="svm.html#cb38-1" tabindex="-1"></a><span class="do">## 找出两个参 数——gamma和核系数（coef0）</span></span>
+<span id="cb38-2"><a href="svm.html#cb38-2" tabindex="-1"></a><span class="do">## tune the sigmoid</span></span>
+<span id="cb38-3"><a href="svm.html#cb38-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb38-4"><a href="svm.html#cb38-4" tabindex="-1"></a>sigmoid.tune <span class="ot">&lt;-</span> <span class="fu">tune.svm</span>(type <span class="sc">~</span> ., <span class="at">data =</span> train, </span>
+<span id="cb38-5"><a href="svm.html#cb38-5" tabindex="-1"></a>                         <span class="at">kernel =</span> <span class="st">&quot;sigmoid&quot;</span>, </span>
+<span id="cb38-6"><a href="svm.html#cb38-6" tabindex="-1"></a>                         <span class="at">gamma =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>),</span>
+<span id="cb38-7"><a href="svm.html#cb38-7" tabindex="-1"></a>                         <span class="at">coef0 =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>))</span>
+<span id="cb38-8"><a href="svm.html#cb38-8" tabindex="-1"></a><span class="fu">summary</span>(sigmoid.tune)</span></code></pre></div>
+<pre><code>## 
+## Parameter tuning of &#39;svm&#39;:
+## 
+## - sampling method: 10-fold cross validation 
+## 
+## - best parameters:
+##  gamma coef0
+##    0.1   0.1
+## 
+## - best performance: 0.2101889 
+## 
+## - Detailed performance results:
+##    gamma coef0     error dispersion
+## 1    0.1   0.1 0.2101889 0.06844133
+## 2    0.5   0.1 0.2881242 0.07399055
+## 3    1.0   0.1 0.2985830 0.07442363
+## 4    2.0   0.1 0.2856275 0.03959643
+## 5    3.0   0.1 0.2827935 0.06092125
+## 6    4.0   0.1 0.2935223 0.08685399
+## 7    0.1   0.5 0.2334683 0.08787718
+## 8    0.5   0.5 0.2933198 0.08615339
+## 9    1.0   0.5 0.2987179 0.05894058
+## 10   2.0   0.5 0.3009447 0.06724507
+## 11   3.0   0.5 0.3037112 0.07594313
+## 12   4.0   0.5 0.2962213 0.08011745
+## 13   0.1   1.0 0.2728745 0.08381160
+## 14   0.5   1.0 0.3066127 0.06722716
+## 15   1.0   1.0 0.2775304 0.05618176
+## 16   2.0   1.0 0.3060054 0.07541155
+## 17   3.0   1.0 0.2933198 0.06786442
+## 18   4.0   1.0 0.2985830 0.08166238
+## 19   0.1   2.0 0.2155196 0.07736128
+## 20   0.5   2.0 0.3692308 0.08603337
+## 21   1.0   2.0 0.3481781 0.06052096
+## 22   2.0   2.0 0.2570175 0.04241475
+## 23   3.0   2.0 0.2905533 0.05586494
+## 24   4.0   2.0 0.3141026 0.06505962
+## 25   0.1   3.0 0.3192308 0.04698696
+## 26   0.5   3.0 0.3508097 0.05834655
+## 27   1.0   3.0 0.3717949 0.08106407
+## 28   2.0   3.0 0.3351552 0.04363826
+## 29   3.0   3.0 0.3064777 0.05576306
+## 30   4.0   3.0 0.2959514 0.05254327
+## 31   0.1   4.0 0.3192308 0.04698696
+## 32   0.5   4.0 0.3533063 0.06060383
+## 33   1.0   4.0 0.3848178 0.08806008
+## 34   2.0   4.0 0.3506748 0.06107104
+## 35   3.0   4.0 0.3010121 0.06866140
+## 36   4.0   4.0 0.2957490 0.06078291</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="svm.html#cb40-1" tabindex="-1"></a>best.sigmoid <span class="ot">&lt;-</span> sigmoid.tune<span class="sc">$</span>best.model</span>
+<span id="cb40-2"><a href="svm.html#cb40-2" tabindex="-1"></a>sigmoid.test <span class="ot">&lt;-</span> <span class="fu">predict</span>(best.sigmoid, <span class="at">newdata =</span> test)</span>
+<span id="cb40-3"><a href="svm.html#cb40-3" tabindex="-1"></a><span class="fu">table</span>(sigmoid.test, test<span class="sc">$</span>type)</span></code></pre></div>
+<pre><code>##             
+## sigmoid.test No Yes
+##          No  74  23
+##          Yes 19  31</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="svm.html#cb42-1" tabindex="-1"></a>(<span class="dv">82</span><span class="sc">+</span><span class="dv">35</span>)<span class="sc">/</span><span class="dv">147</span></span></code></pre></div>
+<pre><code>## [1] 0.7959184</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="svm.html#cb44-1" tabindex="-1"></a><span class="do">## 在测试集上表现得更好, 可以选 择sigmoid核函数作为最优预测。</span></span>
+<span id="cb44-2"><a href="svm.html#cb44-2" tabindex="-1"></a><span class="do">## 研究了两种不同类型的建模技术，从各方面来看，KNN都处于下风。KNN在测试 集上最好的正确率只有71%左右，相反，通过SVM可以获得接近80%的正确率(使用sigmoid核函数的SVM模型)。</span></span></code></pre></div>
+</div>
+<div id="model-selection" class="section level3 hasAnchor" number="4.2.3">
+<h3><span class="header-section-number">4.2.3</span> Model Selection<a href="svm.html#model-selection" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>通过混淆矩阵来比较各种模型, 友caret包的confusionMatrix() 函数, 使用过InformationValue包中的同名函数。但caret包中的这 个函数会生成我们评价和选择最优模型所需的所有统计量。先从建立的最后一个模型开始，使用 的语法和基础的table()函数一样，不同之处是要指定positive类</p>
+<p>其他统计量介绍:</p>
+<pre><code>No Information Rate：最大分类所占的比例——63%的人没有糖尿病
+Mcnemar&#39;s Test：我们现在不关心这个统计量，它用于配对分析，主要用于流行病学 的研究
+Sensitivity：敏感度，真阳性率；在本案例中，表示没有糖尿病并且被正确识别的 比例。
+Specificity：特异度，真阴性率；在本案例中，表示有糖尿病并且被正确识别的比例
+Pos Pred Value：阳性预测率，被认为有糖尿病的人中真的有糖尿病的概率。
+  PPV =敏感度 *患病率/((敏感度 *患病率) + (1-敏感度) * (1-患病率))
+Neg Pred Value：阴性预测率，被认为没有糖尿病的人中真的没有糖尿病的概率
+  NPV=敏感度 * (1-患病率)/(((1-敏感度) * (患病率)) + (敏感度) * (1-患病率) )
+Prevalence：患病率，某种疾病在人群中流行度的估计值: 第二列   （Yes列）中的数之和除以总观测数（矩阵中所有数之和）。 
+Detection Rate：真阳性预测中被正确识别的比例
+Detection Prevalence：预测的患病率，在本案例中，底行中的数的和除以总观测数。
+Balanced Accuracy：所有类别正确率的平均数。用来表示由于分类器算法中潜在的偏     差造成的对最频繁类的过度预测。可以简单地用(敏感度 + 特异度)/2来计算</code></pre>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="svm.html#cb46-1" tabindex="-1"></a><span class="fu">confusionMatrix</span>(sigmoid.test, test<span class="sc">$</span>type, <span class="at">positive =</span> <span class="st">&quot;Yes&quot;</span>)</span></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction No Yes
+##        No  74  23
+##        Yes 19  31
+##                                          
+##                Accuracy : 0.7143         
+##                  95% CI : (0.634, 0.7857)
+##     No Information Rate : 0.6327         
+##     P-Value [Acc &gt; NIR] : 0.02308        
+##                                          
+##                   Kappa : 0.3756         
+##                                          
+##  Mcnemar&#39;s Test P-Value : 0.64343        
+##                                          
+##             Sensitivity : 0.5741         
+##             Specificity : 0.7957         
+##          Pos Pred Value : 0.6200         
+##          Neg Pred Value : 0.7629         
+##              Prevalence : 0.3673         
+##          Detection Rate : 0.2109         
+##    Detection Prevalence : 0.3401         
+##       Balanced Accuracy : 0.6849         
+##                                          
+##        &#39;Positive&#39; Class : Yes            
+## </code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="svm.html#cb48-1" tabindex="-1"></a><span class="do">## 结果和线性SVM进行对比</span></span>
+<span id="cb48-2"><a href="svm.html#cb48-2" tabindex="-1"></a><span class="fu">confusionMatrix</span>(tune.test, test<span class="sc">$</span>type, <span class="at">positive =</span> <span class="st">&quot;Yes&quot;</span>)</span></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction No Yes
+##        No  82  24
+##        Yes 11  30
+##                                           
+##                Accuracy : 0.7619          
+##                  95% CI : (0.6847, 0.8282)
+##     No Information Rate : 0.6327          
+##     P-Value [Acc &gt; NIR] : 0.0005615       
+##                                           
+##                   Kappa : 0.4605          
+##                                           
+##  Mcnemar&#39;s Test P-Value : 0.0425225       
+##                                           
+##             Sensitivity : 0.5556          
+##             Specificity : 0.8817          
+##          Pos Pred Value : 0.7317          
+##          Neg Pred Value : 0.7736          
+##              Prevalence : 0.3673          
+##          Detection Rate : 0.2041          
+##    Detection Prevalence : 0.2789          
+##       Balanced Accuracy : 0.7186          
+##                                           
+##        &#39;Positive&#39; Class : Yes             
+## </code></pre>
+</div>
+<div id="character-selection" class="section level3 hasAnchor" number="4.2.4">
+<h3><span class="header-section-number">4.2.4</span> Character selection<a href="svm.html#character-selection" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>此处忽略了一件事，即没有进行任何特征选择。我们做的工作就是把特征堆在一起， 作为所谓的输入空间，然后让SVM这个黑盒去计算，最后给出一个预测分类。使用SVM的一个 主要问题就是，它给出的结果非常难以解释. 使用caret包进行粗略的特征选择。因为对于那些像SVM一样使用 黑盒技术的方法来说，特征选择确实是个艰巨的挑战。这也是使用这些技术时可能遇到的主要困 难</p>
+<p>还有一些其他办法可以进行特征选择, 需要做的就是反复实验。再次用到caret包，因为它可以基于kernlab包在线性SVM中 进行交叉验证.</p>
+<p>设定随机数种子，在caret包中的rfeControl()函数中指定交叉验 证方法，使用rfe()函数执行一个递归的特征选择过程，最后检验模型在测试集上的运行情况。 在rfeControl()中，你需要根据使用的模型指定functions参数。可以使用几种不同的functions 参数，此处使用lrFuncs</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="svm.html#cb50-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb50-2"><a href="svm.html#cb50-2" tabindex="-1"></a>rfeCNTL <span class="ot">&lt;-</span> <span class="fu">rfeControl</span>(<span class="at">functions =</span> lrFuncs, <span class="at">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="at">number =</span> <span class="dv">10</span>)</span>
+<span id="cb50-3"><a href="svm.html#cb50-3" tabindex="-1"></a><span class="do">## 要指定输入数据和响应因子、通过参数sizes指定输入 特征的数量以及kernlab包中的线性方法（此处是svmLinear）。method还有其他一些选项</span></span>
+<span id="cb50-4"><a href="svm.html#cb50-4" tabindex="-1"></a>svm.features <span class="ot">&lt;-</span> <span class="fu">rfe</span>(train[, <span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>], train[, <span class="dv">8</span>],</span>
+<span id="cb50-5"><a href="svm.html#cb50-5" tabindex="-1"></a>                   <span class="at">sizes =</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">6</span>, <span class="dv">5</span>, <span class="dv">4</span>), </span>
+<span id="cb50-6"><a href="svm.html#cb50-6" tabindex="-1"></a>                   <span class="at">rfeControl =</span> rfeCNTL, </span>
+<span id="cb50-7"><a href="svm.html#cb50-7" tabindex="-1"></a>                   <span class="at">method =</span> <span class="st">&quot;svmLinear&quot;</span>)</span>
+<span id="cb50-8"><a href="svm.html#cb50-8" tabindex="-1"></a>svm.features</span></code></pre></div>
+<pre><code>## 
+## Recursive feature selection
+## 
+## Outer resampling method: Cross-Validated (10 fold) 
+## 
+## Resampling performance over subset size:
+## 
+##  Variables Accuracy  Kappa AccuracySD KappaSD Selected
+##          4   0.7845 0.4774    0.06121  0.1619         
+##          5   0.7898 0.4855    0.05589  0.1551        *
+##          6   0.7870 0.4774    0.05563  0.1561         
+##          7   0.7897 0.4826    0.05499  0.1545         
+## 
+## The top 5 variables (out of 5):
+##    glu, ped, npreg, bmi, age</code></pre>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="svm.html#cb52-1" tabindex="-1"></a>svm<span class="fl">.5</span> <span class="ot">&lt;-</span> <span class="fu">svm</span>(type <span class="sc">~</span> glu <span class="sc">+</span> ped <span class="sc">+</span> npreg <span class="sc">+</span> bmi <span class="sc">+</span> age, </span>
+<span id="cb52-2"><a href="svm.html#cb52-2" tabindex="-1"></a>             <span class="at">data =</span> train, </span>
+<span id="cb52-3"><a href="svm.html#cb52-3" tabindex="-1"></a>             <span class="at">kernel =</span> <span class="st">&quot;linear&quot;</span>)</span>
+<span id="cb52-4"><a href="svm.html#cb52-4" tabindex="-1"></a>svm.<span class="fl">5.</span>predict <span class="ot">=</span> <span class="fu">predict</span>(svm<span class="fl">.5</span>, <span class="at">newdata=</span>test[<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>)])</span>
+<span id="cb52-5"><a href="svm.html#cb52-5" tabindex="-1"></a><span class="fu">table</span>(svm.<span class="fl">5.</span>predict, test<span class="sc">$</span>type)</span></code></pre></div>
+<pre><code>##              
+## svm.5.predict No Yes
+##           No  79  21
+##           Yes 14  33</code></pre>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="svm.html#cb54-1" tabindex="-1"></a><span class="do">## 全特征模型的正确率是76.2%, 表现不怎么样, 要回到全特征模型。</span></span></code></pre></div>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="knn.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="tree-models.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/yihui/bookdown-crc/edit/master/06-SVM.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["bookdown.pdf", "bookdown.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "none"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 9 Neural Network | ML Project Using bookdown</title>
+  <meta name="description" content="A book example for a Chapman &amp; Hall book." />
+  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 9 Neural Network | ML Project Using bookdown" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="A book example for a Chapman &amp; Hall book." />
+  <meta name="github-repo" content="yihui/bookdown-crc" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 9 Neural Network | ML Project Using bookdown" />
+  
+  <meta name="twitter:description" content="A book example for a Chapman &amp; Hall book." />
+  
+
+<meta name="author" content="Zehui Bai" />
+
+
+<meta name="date" content="2023-12-06" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="linear-discriminant-analysis-lda.html"/>
+<link rel="next" href="more-to-say.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="libs/d3-3.5.17/d3.min.js"></script>
+<link href="libs/markmap-0.3.3/view.mindmap.css" rel="stylesheet" />
+<script src="libs/markmap-0.3.3/view.mindmap.js"></script>
+<script src="libs/markmap-0.3.3/plugins/parsemd.min.js"></script>
+<script src="libs/markmap-binding-1.3.2/markmap.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">ML Project</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#why-read-this-book"><i class="fa fa-check"></i>Why read this book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#structure-of-the-book"><i class="fa fa-check"></i>Structure of the book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information-and-conventions"><i class="fa fa-check"></i>Software information and conventions</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html"><i class="fa fa-check"></i><b>1</b> Regularization Penalized Regression</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#motivation"><i class="fa fa-check"></i><b>1.1.1</b> Motivation</a></li>
+<li class="chapter" data-level="1.1.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#data-preparation"><i class="fa fa-check"></i><b>1.1.2</b> Data preparation</a></li>
+<li class="chapter" data-level="1.1.3" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#best-subset-regression"><i class="fa fa-check"></i><b>1.1.3</b> Best subset regression</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#ridge-regression"><i class="fa fa-check"></i><b>1.2</b> Ridge Regression</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modeling"><i class="fa fa-check"></i><b>1.2.1</b> Modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#lasso-regression"><i class="fa fa-check"></i><b>1.3</b> Lasso Regression</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modelling"><i class="fa fa-check"></i><b>1.3.1</b> Modelling</a></li>
+<li class="chapter" data-level="1.3.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#glmnet-cross-validation"><i class="fa fa-check"></i><b>1.3.2</b> glmnet cross validation</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#elasticnet"><i class="fa fa-check"></i><b>1.4</b> ElasticNet</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#modelling-1"><i class="fa fa-check"></i><b>1.4.1</b> Modelling</a></li>
+<li class="chapter" data-level="1.4.2" data-path="regularization-penalized-regression.html"><a href="regularization-penalized-regression.html#classification"><i class="fa fa-check"></i><b>1.4.2</b> Classification</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="smoothing.html"><a href="smoothing.html"><i class="fa fa-check"></i><b>2</b> Smoothing</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="smoothing.html"><a href="smoothing.html#smoothing-1"><i class="fa fa-check"></i><b>2.1</b> Smoothing</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="smoothing.html"><a href="smoothing.html#bin-smoothing"><i class="fa fa-check"></i><b>2.1.1</b> Bin smoothing</a></li>
+<li class="chapter" data-level="2.1.2" data-path="smoothing.html"><a href="smoothing.html#kernels"><i class="fa fa-check"></i><b>2.1.2</b> Kernels</a></li>
+<li class="chapter" data-level="2.1.3" data-path="smoothing.html"><a href="smoothing.html#local-weighted-regression-loess"><i class="fa fa-check"></i><b>2.1.3</b> Local weighted regression (loess)</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="smoothing.html"><a href="smoothing.html#loess-regression"><i class="fa fa-check"></i><b>2.2</b> Loess Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="knn.html"><a href="knn.html"><i class="fa fa-check"></i><b>3</b> KNN</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="knn.html"><a href="knn.html#introduction-1"><i class="fa fa-check"></i><b>3.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="knn.html"><a href="knn.html#idee"><i class="fa fa-check"></i><b>3.1.1</b> Idee</a></li>
+<li class="chapter" data-level="3.1.2" data-path="knn.html"><a href="knn.html#加权最近邻法"><i class="fa fa-check"></i><b>3.1.2</b> 加权最近邻法</a></li>
+<li class="chapter" data-level="3.1.3" data-path="knn.html"><a href="knn.html#knn算法三要素"><i class="fa fa-check"></i><b>3.1.3</b> KNN算法三要素</a></li>
+<li class="chapter" data-level="3.1.4" data-path="knn.html"><a href="knn.html#优缺点"><i class="fa fa-check"></i><b>3.1.4</b> 优缺点</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="knn.html"><a href="knn.html#knn算法的实现方式"><i class="fa fa-check"></i><b>3.2</b> KNN算法的实现方式</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="knn.html"><a href="knn.html#brute-force"><i class="fa fa-check"></i><b>3.2.1</b> Brute-force</a></li>
+<li class="chapter" data-level="3.2.2" data-path="knn.html"><a href="knn.html#kd树实现"><i class="fa fa-check"></i><b>3.2.2</b> KD树实现</a></li>
+<li class="chapter" data-level="3.2.3" data-path="knn.html"><a href="knn.html#球树实现"><i class="fa fa-check"></i><b>3.2.3</b> 球树实现</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="knn.html"><a href="knn.html#application"><i class="fa fa-check"></i><b>3.3</b> Application</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="knn.html"><a href="knn.html#data-preparation-1"><i class="fa fa-check"></i><b>3.3.1</b> Data Preparation</a></li>
+<li class="chapter" data-level="3.3.2" data-path="knn.html"><a href="knn.html#knn-modelling"><i class="fa fa-check"></i><b>3.3.2</b> KNN Modelling</a></li>
+<li class="chapter" data-level="3.3.3" data-path="knn.html"><a href="knn.html#加权最近邻法-1"><i class="fa fa-check"></i><b>3.3.3</b> 加权最近邻法</a></li>
+<li class="chapter" data-level="3.3.4" data-path="knn.html"><a href="knn.html#over-training"><i class="fa fa-check"></i><b>3.3.4</b> Over-training</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="svm.html"><a href="svm.html"><i class="fa fa-check"></i><b>4</b> SVM</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="svm.html"><a href="svm.html#introduction-2"><i class="fa fa-check"></i><b>4.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="svm.html"><a href="svm.html#perceptron"><i class="fa fa-check"></i><b>4.1.1</b> Perceptron</a></li>
+<li class="chapter" data-level="4.1.2" data-path="svm.html"><a href="svm.html#函数间隔与几何间隔"><i class="fa fa-check"></i><b>4.1.2</b> 函数间隔与几何间隔</a></li>
+<li class="chapter" data-level="4.1.3" data-path="svm.html"><a href="svm.html#svm支持向量"><i class="fa fa-check"></i><b>4.1.3</b> SVM支持向量</a></li>
+<li class="chapter" data-level="4.1.4" data-path="svm.html"><a href="svm.html#svm模型目标函数与优化"><i class="fa fa-check"></i><b>4.1.4</b> SVM模型目标函数与优化</a></li>
+<li class="chapter" data-level="4.1.5" data-path="svm.html"><a href="svm.html#线性可分svm的算法过程"><i class="fa fa-check"></i><b>4.1.5</b> 线性可分SVM的算法过程</a></li>
+<li class="chapter" data-level="4.1.6" data-path="svm.html"><a href="svm.html#线性svm的软间隔最大化"><i class="fa fa-check"></i><b>4.1.6</b> 线性SVM的软间隔最大化</a></li>
+<li class="chapter" data-level="4.1.7" data-path="svm.html"><a href="svm.html#线性不可分支持向量机与核函数"><i class="fa fa-check"></i><b>4.1.7</b> 线性不可分支持向量机与核函数</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="svm.html"><a href="svm.html#application-1"><i class="fa fa-check"></i><b>4.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="svm.html"><a href="svm.html#data-preparation-2"><i class="fa fa-check"></i><b>4.2.1</b> Data Preparation</a></li>
+<li class="chapter" data-level="4.2.2" data-path="svm.html"><a href="svm.html#svm-modelling"><i class="fa fa-check"></i><b>4.2.2</b> SVM Modelling</a></li>
+<li class="chapter" data-level="4.2.3" data-path="svm.html"><a href="svm.html#model-selection"><i class="fa fa-check"></i><b>4.2.3</b> Model Selection</a></li>
+<li class="chapter" data-level="4.2.4" data-path="svm.html"><a href="svm.html#character-selection"><i class="fa fa-check"></i><b>4.2.4</b> Character selection</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="tree-models.html"><a href="tree-models.html"><i class="fa fa-check"></i><b>5</b> Tree models</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="tree-models.html"><a href="tree-models.html#decision-tree-model"><i class="fa fa-check"></i><b>5.1</b> Decision Tree Model</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="tree-models.html"><a href="tree-models.html#decision-tree-algorithm"><i class="fa fa-check"></i><b>5.1.1</b> Decision tree algorithm</a></li>
+<li class="chapter" data-level="5.1.2" data-path="tree-models.html"><a href="tree-models.html#id3-algorithm"><i class="fa fa-check"></i><b>5.1.2</b> ID3 Algorithm</a></li>
+<li class="chapter" data-level="5.1.3" data-path="tree-models.html"><a href="tree-models.html#c4.5-algorithm"><i class="fa fa-check"></i><b>5.1.3</b> C4.5 Algorithm</a></li>
+<li class="chapter" data-level="5.1.4" data-path="tree-models.html"><a href="tree-models.html#cart-algorithm"><i class="fa fa-check"></i><b>5.1.4</b> CART Algorithm</a></li>
+<li class="chapter" data-level="5.1.5" data-path="tree-models.html"><a href="tree-models.html#pruning"><i class="fa fa-check"></i><b>5.1.5</b> Pruning</a></li>
+<li class="chapter" data-level="5.1.6" data-path="tree-models.html"><a href="tree-models.html#package-rpart"><i class="fa fa-check"></i><b>5.1.6</b> Package ‘rpart’</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="tree-models.html"><a href="tree-models.html#random-forest"><i class="fa fa-check"></i><b>5.2</b> Random Forest</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="tree-models.html"><a href="tree-models.html#bootstrap-bagging"><i class="fa fa-check"></i><b>5.2.1</b> Bootstrap (Bagging)</a></li>
+<li class="chapter" data-level="5.2.2" data-path="tree-models.html"><a href="tree-models.html#bagging算法流程"><i class="fa fa-check"></i><b>5.2.2</b> bagging算法流程</a></li>
+<li class="chapter" data-level="5.2.3" data-path="tree-models.html"><a href="tree-models.html#random-forest-algorithm"><i class="fa fa-check"></i><b>5.2.3</b> Random Forest Algorithm</a></li>
+<li class="chapter" data-level="5.2.4" data-path="tree-models.html"><a href="tree-models.html#random-forest-promotion"><i class="fa fa-check"></i><b>5.2.4</b> Random forest promotion</a></li>
+<li class="chapter" data-level="5.2.5" data-path="tree-models.html"><a href="tree-models.html#package-randomforest"><i class="fa fa-check"></i><b>5.2.5</b> Package ‘randomForest’</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="tree-models.html"><a href="tree-models.html#modelling-2"><i class="fa fa-check"></i><b>5.3</b> Modelling</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="tree-models.html"><a href="tree-models.html#data-preparation-3"><i class="fa fa-check"></i><b>5.3.1</b> Data preparation</a></li>
+<li class="chapter" data-level="5.3.2" data-path="tree-models.html"><a href="tree-models.html#regression-tree-1"><i class="fa fa-check"></i><b>5.3.2</b> Regression tree</a></li>
+<li class="chapter" data-level="5.3.3" data-path="tree-models.html"><a href="tree-models.html#classification-tree-1"><i class="fa fa-check"></i><b>5.3.3</b> Classification tree</a></li>
+<li class="chapter" data-level="5.3.4" data-path="tree-models.html"><a href="tree-models.html#random-forest-for-regression"><i class="fa fa-check"></i><b>5.3.4</b> Random forest for regression</a></li>
+<li class="chapter" data-level="5.3.5" data-path="tree-models.html"><a href="tree-models.html#random-forest-for-classification"><i class="fa fa-check"></i><b>5.3.5</b> Random forest for classification</a></li>
+<li class="chapter" data-level="5.3.6" data-path="tree-models.html"><a href="tree-models.html#皮玛印第安人糖尿病数据集"><i class="fa fa-check"></i><b>5.3.6</b> 皮玛印第安人糖尿病数据集</a></li>
+<li class="chapter" data-level="5.3.7" data-path="tree-models.html"><a href="tree-models.html#使用随机森林进行特征选择"><i class="fa fa-check"></i><b>5.3.7</b> 使用随机森林进行特征选择</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="tree-models.html"><a href="tree-models.html#gradient-boosting"><i class="fa fa-check"></i><b>5.4</b> Gradient Boosting</a></li>
+<li class="chapter" data-level="5.5" data-path="tree-models.html"><a href="tree-models.html#gradient-descent"><i class="fa fa-check"></i><b>5.5</b> Gradient Descent</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="tree-models.html"><a href="tree-models.html#gradient"><i class="fa fa-check"></i><b>5.5.1</b> Gradient</a></li>
+<li class="chapter" data-level="5.5.2" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-1"><i class="fa fa-check"></i><b>5.5.2</b> Gradient Descent</a></li>
+<li class="chapter" data-level="5.5.3" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-algorithm"><i class="fa fa-check"></i><b>5.5.3</b> Gradient Descent Algorithm</a></li>
+<li class="chapter" data-level="5.5.4" data-path="tree-models.html"><a href="tree-models.html#gradient-descent-familiy"><i class="fa fa-check"></i><b>5.5.4</b> Gradient Descent Familiy</a></li>
+<li class="chapter" data-level="5.5.5" data-path="tree-models.html"><a href="tree-models.html#gbdt分类算法"><i class="fa fa-check"></i><b>5.5.5</b> GBDT分类算法</a></li>
+<li class="chapter" data-level="5.5.6" data-path="tree-models.html"><a href="tree-models.html#package-gbm"><i class="fa fa-check"></i><b>5.5.6</b> Package ‘gbm’</a></li>
+<li class="chapter" data-level="5.5.7" data-path="tree-models.html"><a href="tree-models.html#极限梯度提升分类"><i class="fa fa-check"></i><b>5.5.7</b> 极限梯度提升——分类</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="tree-models.html"><a href="tree-models.html#cubist-model"><i class="fa fa-check"></i><b>5.6</b> Cubist Model</a>
+<ul>
+<li class="chapter" data-level="5.6.1" data-path="tree-models.html"><a href="tree-models.html#introduction-3"><i class="fa fa-check"></i><b>5.6.1</b> Introduction</a></li>
+<li class="chapter" data-level="5.6.2" data-path="tree-models.html"><a href="tree-models.html#application-data-preparation"><i class="fa fa-check"></i><b>5.6.2</b> Application Data Preparation</a></li>
+<li class="chapter" data-level="5.6.3" data-path="tree-models.html"><a href="tree-models.html#fit-continious-outcome"><i class="fa fa-check"></i><b>5.6.3</b> Fit Continious Outcome</a></li>
+<li class="chapter" data-level="5.6.4" data-path="tree-models.html"><a href="tree-models.html#variable-importance"><i class="fa fa-check"></i><b>5.6.4</b> Variable Importance</a></li>
+<li class="chapter" data-level="5.6.5" data-path="tree-models.html"><a href="tree-models.html#summary-display"><i class="fa fa-check"></i><b>5.6.5</b> Summary display</a></li>
+<li class="chapter" data-level="5.6.6" data-path="tree-models.html"><a href="tree-models.html#specific-parts"><i class="fa fa-check"></i><b>5.6.6</b> specific parts</a></li>
+<li class="chapter" data-level="5.6.7" data-path="tree-models.html"><a href="tree-models.html#ensembles-by-committees"><i class="fa fa-check"></i><b>5.6.7</b> Ensembles By Committees</a></li>
+<li class="chapter" data-level="5.6.8" data-path="tree-models.html"><a href="tree-models.html#nearestneighbors-adjustmemt"><i class="fa fa-check"></i><b>5.6.8</b> Nearest–neighbors Adjustmemt</a></li>
+<li class="chapter" data-level="5.6.9" data-path="tree-models.html"><a href="tree-models.html#optimize-parameters"><i class="fa fa-check"></i><b>5.6.9</b> Optimize parameters</a></li>
+<li class="chapter" data-level="5.6.10" data-path="tree-models.html"><a href="tree-models.html#logistic-cv"><i class="fa fa-check"></i><b>5.6.10</b> Logistic CV</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="pca.html"><a href="pca.html"><i class="fa fa-check"></i><b>6</b> PCA</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="pca.html"><a href="pca.html#introduction-4"><i class="fa fa-check"></i><b>6.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="pca.html"><a href="pca.html#component"><i class="fa fa-check"></i><b>6.1.1</b> Component</a></li>
+<li class="chapter" data-level="6.1.2" data-path="pca.html"><a href="pca.html#pca算法"><i class="fa fa-check"></i><b>6.1.2</b> PCA算法</a></li>
+<li class="chapter" data-level="6.1.3" data-path="pca.html"><a href="pca.html#主成分旋转"><i class="fa fa-check"></i><b>6.1.3</b> 主成分旋转</a></li>
+<li class="chapter" data-level="6.1.4" data-path="pca.html"><a href="pca.html#kernelized-pca"><i class="fa fa-check"></i><b>6.1.4</b> Kernelized PCA</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="pca.html"><a href="pca.html#application-2"><i class="fa fa-check"></i><b>6.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="pca.html"><a href="pca.html#data-preparation-4"><i class="fa fa-check"></i><b>6.2.1</b> Data preparation</a></li>
+<li class="chapter" data-level="6.2.2" data-path="pca.html"><a href="pca.html#modeling-1"><i class="fa fa-check"></i><b>6.2.2</b> Modeling</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="cluster-analysis.html"><a href="cluster-analysis.html"><i class="fa fa-check"></i><b>7</b> Cluster Analysis</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering"><i class="fa fa-check"></i><b>7.1</b> Hierarchical Clustering</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#introduction-5"><i class="fa fa-check"></i><b>7.1.1</b> Introduction</a></li>
+<li class="chapter" data-level="7.1.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering-algorithms"><i class="fa fa-check"></i><b>7.1.2</b> Hierarchical clustering algorithms</a></li>
+<li class="chapter" data-level="7.1.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#measure-the-dissimilarity-between-two-clusters-of-observations"><i class="fa fa-check"></i><b>7.1.3</b> Measure the dissimilarity between two clusters of observations</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering"><i class="fa fa-check"></i><b>7.2</b> K-means Clustering</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#algorithm"><i class="fa fa-check"></i><b>7.2.1</b> Algorithm</a></li>
+<li class="chapter" data-level="7.2.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means"><i class="fa fa-check"></i><b>7.2.2</b> K-Means++</a></li>
+<li class="chapter" data-level="7.2.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#elkan-k-means"><i class="fa fa-check"></i><b>7.2.3</b> elkan K-Means</a></li>
+<li class="chapter" data-level="7.2.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#mini-batch-k-means"><i class="fa fa-check"></i><b>7.2.4</b> Mini Batch K-Means</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient-and-pam"><i class="fa fa-check"></i><b>7.3</b> Gower’s coefficient and PAM</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient"><i class="fa fa-check"></i><b>7.3.1</b> Gower’s coefficient</a></li>
+<li class="chapter" data-level="7.3.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#不同数据类型的相异度计算-距离法"><i class="fa fa-check"></i><b>7.3.2</b> 不同数据类型的相异度计算 (距离法)</a></li>
+<li class="chapter" data-level="7.3.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#pam"><i class="fa fa-check"></i><b>7.3.3</b> PAM</a></li>
+</ul></li>
+<li class="chapter" data-level="7.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch-clustering"><i class="fa fa-check"></i><b>7.4</b> BIRCH Clustering</a>
+<ul>
+<li class="chapter" data-level="7.4.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch-introduction"><i class="fa fa-check"></i><b>7.4.1</b> BIRCH Introduction</a></li>
+<li class="chapter" data-level="7.4.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#聚类特征cf与聚类特征树cf-tree"><i class="fa fa-check"></i><b>7.4.2</b> 聚类特征CF与聚类特征树CF Tree</a></li>
+<li class="chapter" data-level="7.4.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#cf-tree的生成"><i class="fa fa-check"></i><b>7.4.3</b> CF Tree的生成</a></li>
+<li class="chapter" data-level="7.4.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#birch算法"><i class="fa fa-check"></i><b>7.4.4</b> BIRCH算法</a></li>
+</ul></li>
+<li class="chapter" data-level="7.5" data-path="cluster-analysis.html"><a href="cluster-analysis.html#application-3"><i class="fa fa-check"></i><b>7.5</b> Application</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#data-preparation-5"><i class="fa fa-check"></i><b>7.5.1</b> Data preparation</a></li>
+<li class="chapter" data-level="7.5.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering-1"><i class="fa fa-check"></i><b>7.5.2</b> Hierarchical Clustering</a></li>
+<li class="chapter" data-level="7.5.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering-1"><i class="fa fa-check"></i><b>7.5.3</b> K-means Clustering</a></li>
+<li class="chapter" data-level="7.5.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#gowers-coefficient-and-pam-1"><i class="fa fa-check"></i><b>7.5.4</b> Gower’s coefficient and PAM</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html"><i class="fa fa-check"></i><b>8</b> linear discriminant analysis (LDA)</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#introduction-6"><i class="fa fa-check"></i><b>8.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#naive-bayes"><i class="fa fa-check"></i><b>8.1.1</b> Naive Bayes</a></li>
+<li class="chapter" data-level="8.1.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#controlling-prevalence"><i class="fa fa-check"></i><b>8.1.2</b> Controlling prevalence</a></li>
+<li class="chapter" data-level="8.1.3" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#qda"><i class="fa fa-check"></i><b>8.1.3</b> QDA</a></li>
+<li class="chapter" data-level="8.1.4" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda"><i class="fa fa-check"></i><b>8.1.4</b> LDA</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#discriminant-analysis-algorithm"><i class="fa fa-check"></i><b>8.2</b> Discriminant analysis algorithm</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#idee-1"><i class="fa fa-check"></i><b>8.2.1</b> Idee</a></li>
+<li class="chapter" data-level="8.2.2" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#瑞利商rayleigh-quotient"><i class="fa fa-check"></i><b>8.2.2</b> 瑞利商（Rayleigh quotient）</a></li>
+<li class="chapter" data-level="8.2.3" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#广义瑞利商-genralized-rayleigh-quotient"><i class="fa fa-check"></i><b>8.2.3</b> 广义瑞利商 genralized Rayleigh quotient</a></li>
+<li class="chapter" data-level="8.2.4" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda算法流程"><i class="fa fa-check"></i><b>8.2.4</b> LDA算法流程</a></li>
+<li class="chapter" data-level="8.2.5" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#lda-application"><i class="fa fa-check"></i><b>8.2.5</b> LDA Application</a></li>
+<li class="chapter" data-level="8.2.6" data-path="linear-discriminant-analysis-lda.html"><a href="linear-discriminant-analysis-lda.html#qda-1"><i class="fa fa-check"></i><b>8.2.6</b> QDA</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="neural-network.html"><a href="neural-network.html"><i class="fa fa-check"></i><b>9</b> Neural Network</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="neural-network.html"><a href="neural-network.html#introduction-7"><i class="fa fa-check"></i><b>9.1</b> Introduction</a></li>
+<li class="chapter" data-level="9.2" data-path="neural-network.html"><a href="neural-network.html#反向传播方法进行训练的前馈神经网络"><i class="fa fa-check"></i><b>9.2</b> 反向传播方法进行训练的前馈神经网络</a></li>
+<li class="chapter" data-level="9.3" data-path="neural-network.html"><a href="neural-network.html#application-4"><i class="fa fa-check"></i><b>9.3</b> Application</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="neural-network.html"><a href="neural-network.html#数据准备"><i class="fa fa-check"></i><b>9.3.1</b> 数据准备</a></li>
+<li class="chapter" data-level="9.3.2" data-path="neural-network.html"><a href="neural-network.html#模型构建"><i class="fa fa-check"></i><b>9.3.2</b> 模型构建</a></li>
+</ul></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="more-to-say.html"><a href="more-to-say.html"><i class="fa fa-check"></i><b>A</b> More to Say</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://bookdown.org" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">ML Project Using bookdown</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="neural-network" class="section level1 hasAnchor" number="9">
+<h1><span class="header-section-number">Chapter 9</span> Neural Network<a href="neural-network.html#neural-network" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div class="markmap html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-9dc0cbb9a25285cce9dc" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-9dc0cbb9a25285cce9dc">{"x":{"data":"# \n##  Neural Network\n### Introduction \n### 反向传播方法进行训练的前馈神经网络\n### Application\n#### 数据准备\n#### 模型构建","options":{"preset":"colorful","autoFit":true}},"evals":[],"jsHooks":[]}</script>
+<div id="introduction-7" class="section level2 hasAnchor" number="9.1">
+<h2><span class="header-section-number">9.1</span> Introduction<a href="neural-network.html#introduction-7" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>人工神经网络（Artificial Neural Network，即ANN ），是20世纪80 年代以来人工智能领域兴起的研究热点。它从信息处理角度对人脑神经元网络进行抽象， 建立某种简单模型，按不同的连接方式组成不同的网络。神经网络是一种运算模型，由大量的节点（或称神经元）之间相互联接构成。每个节点代表一种特定的输出函数，称为激励函数（activation function）。每两个节点间的连接都代表一个对于通过该连接信号的加权值，称之为权重，这相当于人工神经网络的记忆。网络的输出则依网络的连接方式，权重值和激励函数的不同而不同。而网络自身通常都是对自然界某种算法或者函数的逼近，也可能是对一种逻辑策略的表达。</p>
+<p>开发神经网络模型的动机（或者说神经网络模型的优点）在于，可以对输入变量（特征）和 响应变量之间的高度复杂关系进行建模，特别是关系呈现高度非线性时。神经网络模型的构建和 评价不需要基本假设，对于定量和定性响应变量都适用。</p>
+<p>对神经网络的一种常见的批评就是，它的结果是一个黑盒。换言之，没有一个 带有系数的等式可供检验并分享给业务伙伴。实际上，结果几乎是无法解释的。另外一种批评意 见的主要内容是，当初始的随机输入发生变化时，我们不清楚结果会发生什么变化。还有，神经网络的训练过程需要昂贵的时间和计算成本。</p>
+<p>“神经网络”的概念相当宽泛，它包括了很多相关的方法。</p>
+</div>
+<div id="反向传播方法进行训练的前馈神经网络" class="section level2 hasAnchor" number="9.2">
+<h2><span class="header-section-number">9.2</span> 反向传播方法进行训练的前馈神经网络<a href="neural-network.html#反向传播方法进行训练的前馈神经网络" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>在这个简单的网络中，输入（又称协变量）由两个节点（又称神经元）组成。标有1的神经 元代表一个常数，更确切地说，是截距。X1代表一个定量变量，W代表权重，会和输入节点的值 相乘。输入节点的值在与W相乘后传递到隐藏节点。你可以有多个隐藏节点，但是工作原理和一 个隐藏节点没有什么不同。在隐藏节点H1中，所有加权后的输入值被加总。因为截距为1，所以 这个输入节点的值就是权重W1。然后就是见证奇迹的时刻：加总后的值通过激活函数进行转换， 将输入信号转换为输出信号。在这个简单例子中，H1是唯一的隐藏节点，它的值被乘以W3，成 为响应变量Y的估计值。这就是算法的前馈部分</p>
+<p>完成一次完整的“训练”，还 要进行反向传播过程，基于学习到的知识来训练模型。为了初始化反向传播过程，需要基于损失 函数确定误差，损失函数可以是误差平方总和，也可以是交叉熵，或者其他形式。因为权重W1 和W2最初被设定为[1, 1]之间的随机数，所以初始的误差可能会很大。反向传播时，要改变权重 值以使损失函数中的误差最小。这样就完成了一次完整的训练。这个过程不断继续，使用梯度下降方法减小误差， 直到算法收敛于误差最小值或者达到预先设定的训练次数。如果假设本例中的激活函数是简单线 性的，那么结果为Y = W3(W1(1) + W2(X1))。</p>
+<p>有很多种激活函数可供使用，其中包括一个简单线性函数，还有用于分类问题的sigmoid函 数，它是逻辑斯蒂函数的一种特殊形式（第3章）。当输出变量是基于某种阈值的二值变量（0或1） 时，可以使用阈值函数。其他常用的激活函数还有Rectifier、Maxout以及双曲正切函数（tanh）。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="neural-network.html#cb1-1" tabindex="-1"></a><span class="do">## 画出sigmoid函数</span></span>
+<span id="cb1-2"><a href="neural-network.html#cb1-2" tabindex="-1"></a>sigmoid <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb1-3"><a href="neural-network.html#cb1-3" tabindex="-1"></a>   <span class="dv">1</span> <span class="sc">/</span> ( <span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span>x) )</span>
+<span id="cb1-4"><a href="neural-network.html#cb1-4" tabindex="-1"></a>   }</span>
+<span id="cb1-5"><a href="neural-network.html#cb1-5" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>, .<span class="dv">1</span>)</span>
+<span id="cb1-6"><a href="neural-network.html#cb1-6" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">sigmoid</span>(x))</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="neural-network.html#cb2-1" tabindex="-1"></a><span class="do">## 画出tanh函数 tanh(x) = 2 * sigmoid(2x) - 1， 绘制并比较tanh函数和sigmoid函数</span></span>
+<span id="cb2-2"><a href="neural-network.html#cb2-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb2-3"><a href="neural-network.html#cb2-3" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">sigmoid</span>(x)</span>
+<span id="cb2-4"><a href="neural-network.html#cb2-4" tabindex="-1"></a>t <span class="ot">&lt;-</span> <span class="fu">tanh</span>(x)</span>
+<span id="cb2-5"><a href="neural-network.html#cb2-5" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">cbind</span>(x, s, t))</span>
+<span id="cb2-6"><a href="neural-network.html#cb2-6" tabindex="-1"></a><span class="fu">ggplot</span>(z, <span class="fu">aes</span>(x)) <span class="sc">+</span> </span>
+<span id="cb2-7"><a href="neural-network.html#cb2-7" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> s, <span class="at">color =</span> <span class="st">&quot;sigmoid&quot;</span>)) <span class="sc">+</span> </span>
+<span id="cb2-8"><a href="neural-network.html#cb2-8" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> t, <span class="at">color =</span> <span class="st">&quot;tanh&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb2-9"><a href="neural-network.html#cb2-9" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Input&quot;</span>,<span class="at">y =</span> <span class="st">&quot;Output&quot;</span>) </span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
+<p>tanh函数：</p>
+<pre><code>假设对数据做了缩放处理，使数据的均值为0、方差为1，那么tanh函数就可以提供一组均值接近于0(以0为中心)的权重。这样的权重有助于避免偏差， 并可以提高收敛速度。
+
+如果使用sigmoid函数作为激活函数，那么就意味着从输出神经元到输入神经元都是正的权重。在后向传播过程中，这样就会导致各层之间的权重或者都是正的，或者都是负的，从而引发性能方面的问题。还有，因为sigmoid函数在两个尾部(0和1)的 梯度接近于0，所以在后向传播过程中，几乎没有信号在不同层次的神经元之间流动。</code></pre>
+<p><a href="https://www.zhihu.com/question/22553761" class="uri">https://www.zhihu.com/question/22553761</a></p>
+</div>
+<div id="application-4" class="section level2 hasAnchor" number="9.3">
+<h2><span class="header-section-number">9.3</span> Application<a href="neural-network.html#application-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="数据准备" class="section level3 hasAnchor" number="9.3.1">
+<h3><span class="header-section-number">9.3.1</span> 数据准备<a href="neural-network.html#数据准备" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="neural-network.html#cb4-1" tabindex="-1"></a><span class="do">## 数据保存在MASS包, Neuralnet包用于构建模型，caret包用于数据准备，vcd包会帮助进行数据可视化</span></span>
+<span id="cb4-2"><a href="neural-network.html#cb4-2" tabindex="-1"></a><span class="do">## 数据集包括256个观测和7个变量。所有变量都是分类变量，响应变量use有两个水平，auto和noauto</span></span>
+<span id="cb4-3"><a href="neural-network.html#cb4-3" tabindex="-1"></a><span class="do">## 表格来探索数据</span></span>
+<span id="cb4-4"><a href="neural-network.html#cb4-4" tabindex="-1"></a><span class="fu">data</span>(shuttle)</span>
+<span id="cb4-5"><a href="neural-network.html#cb4-5" tabindex="-1"></a><span class="fu">str</span>(shuttle)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    256 obs. of  7 variables:
+##  $ stability: Factor w/ 2 levels &quot;stab&quot;,&quot;xstab&quot;: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ error    : Factor w/ 4 levels &quot;LX&quot;,&quot;MM&quot;,&quot;SS&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ sign     : Factor w/ 2 levels &quot;nn&quot;,&quot;pp&quot;: 2 2 2 2 2 2 1 1 1 1 ...
+##  $ wind     : Factor w/ 2 levels &quot;head&quot;,&quot;tail&quot;: 1 1 1 2 2 2 1 1 1 2 ...
+##  $ magn     : Factor w/ 4 levels &quot;Light&quot;,&quot;Medium&quot;,..: 1 2 4 1 2 4 1 2 4 1 ...
+##  $ vis      : Factor w/ 2 levels &quot;no&quot;,&quot;yes&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ use      : Factor w/ 2 levels &quot;auto&quot;,&quot;noauto&quot;: 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="neural-network.html#cb6-1" tabindex="-1"></a><span class="fu">table</span>(shuttle<span class="sc">$</span>use)</span></code></pre></div>
+<pre><code>## 
+##   auto noauto 
+##    145    111</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="neural-network.html#cb8-1" tabindex="-1"></a><span class="do">## vcd包提供了很多 制表和制图函数</span></span>
+<span id="cb8-2"><a href="neural-network.html#cb8-2" tabindex="-1"></a>table1 <span class="ot">&lt;-</span> <span class="fu">structable</span>(wind <span class="sc">+</span> magn <span class="sc">~</span> use, shuttle)</span>
+<span id="cb8-3"><a href="neural-network.html#cb8-3" tabindex="-1"></a>table1</span></code></pre></div>
+<pre><code>##        wind  head                    tail                  
+##        magn Light Medium Out Strong Light Medium Out Strong
+## use                                                        
+## auto           19     19  16     18    19     19  16     19
+## noauto         13     13  16     14    13     13  16     13</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="neural-network.html#cb10-1" tabindex="-1"></a><span class="do">## vcd包提供了mosaic()函数，将structable() 函数生成的表格绘制成统计图，同时提供了卡方检验的p值</span></span>
+<span id="cb10-2"><a href="neural-network.html#cb10-2" tabindex="-1"></a><span class="fu">mosaic</span>(table1, <span class="at">shade =</span> T)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="neural-network.html#cb11-1" tabindex="-1"></a><span class="do">## 要生成统计图，也可以不使用structable()建立的对象，因为mosaic()函数也 可以接受公式</span></span>
+<span id="cb11-2"><a href="neural-network.html#cb11-2" tabindex="-1"></a><span class="do">## 图中阴影发生了变化，反映出原假设被拒绝，变量之间具有相关性</span></span>
+<span id="cb11-3"><a href="neural-network.html#cb11-3" tabindex="-1"></a><span class="fu">mosaic</span>(use <span class="sc">~</span> error <span class="sc">+</span> vis, shuttle)</span></code></pre></div>
+<p><img src="bookdown_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="neural-network.html#cb12-1" tabindex="-1"></a><span class="do">## 用prop.table()函数查看比例表，将它作为table()函数的包装器即可</span></span>
+<span id="cb12-2"><a href="neural-network.html#cb12-2" tabindex="-1"></a><span class="fu">table</span>(shuttle<span class="sc">$</span>use, shuttle<span class="sc">$</span>stability)</span></code></pre></div>
+<pre><code>##         
+##          stab xstab
+##   auto     81    64
+##   noauto   47    64</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="neural-network.html#cb14-1" tabindex="-1"></a><span class="fu">prop.table</span>(<span class="fu">table</span>(shuttle<span class="sc">$</span>use, shuttle<span class="sc">$</span>stability))</span></code></pre></div>
+<pre><code>##         
+##               stab     xstab
+##   auto   0.3164062 0.2500000
+##   noauto 0.1835938 0.2500000</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="neural-network.html#cb16-1" tabindex="-1"></a><span class="do">## 卡方检验p值</span></span>
+<span id="cb16-2"><a href="neural-network.html#cb16-2" tabindex="-1"></a><span class="fu">chisq.test</span>(shuttle<span class="sc">$</span>use, shuttle<span class="sc">$</span>stability)</span></code></pre></div>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  shuttle$use and shuttle$stability
+## X-squared = 4.0718, df = 1, p-value = 0.0436</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="neural-network.html#cb18-1" tabindex="-1"></a><span class="do">## 神经网络的数据准备是非常重要的，因为所有协变量和响应变量都必须是数值型。在这个案 例中，虽然所有变量都是分类变量，但caret包可以帮助我们快速建立虚拟变量作为输入特征：</span></span>
+<span id="cb18-2"><a href="neural-network.html#cb18-2" tabindex="-1"></a>dummies <span class="ot">&lt;-</span> <span class="fu">dummyVars</span>(use <span class="sc">~</span>. ,shuttle, <span class="at">fullRank =</span> T)</span>
+<span id="cb18-3"><a href="neural-network.html#cb18-3" tabindex="-1"></a>dummies</span></code></pre></div>
+<pre><code>## Dummy Variable Object
+## 
+## Formula: use ~ .
+## 7 variables, 7 factors
+## Variables and levels will be separated by &#39;.&#39;
+## A full rank encoding is used</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="neural-network.html#cb20-1" tabindex="-1"></a>shuttle<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">predict</span>(dummies, <span class="at">newdata =</span> shuttle))</span>
+<span id="cb20-2"><a href="neural-network.html#cb20-2" tabindex="-1"></a><span class="fu">names</span>(shuttle<span class="fl">.2</span>)</span></code></pre></div>
+<pre><code>##  [1] &quot;stability.xstab&quot; &quot;error.MM&quot;        &quot;error.SS&quot;        &quot;error.XL&quot;       
+##  [5] &quot;sign.pp&quot;         &quot;wind.tail&quot;       &quot;magn.Medium&quot;     &quot;magn.Out&quot;       
+##  [9] &quot;magn.Strong&quot;     &quot;vis.yes&quot;</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="neural-network.html#cb22-1" tabindex="-1"></a><span class="fu">head</span>(shuttle<span class="fl">.2</span>)</span></code></pre></div>
+<pre><code>##   stability.xstab error.MM error.SS error.XL sign.pp wind.tail magn.Medium
+## 1               1        0        0        0       1         0           0
+## 2               1        0        0        0       1         0           1
+## 3               1        0        0        0       1         0           0
+## 4               1        0        0        0       1         1           0
+## 5               1        0        0        0       1         1           1
+## 6               1        0        0        0       1         1           0
+##   magn.Out magn.Strong vis.yes
+## 1        0           0       0
+## 2        0           0       0
+## 3        0           1       0
+## 4        0           0       0
+## 5        0           0       0
+## 6        0           1       0</code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="neural-network.html#cb24-1" tabindex="-1"></a><span class="do">## ifelse()函数建立响应变量</span></span>
+<span id="cb24-2"><a href="neural-network.html#cb24-2" tabindex="-1"></a>shuttle<span class="fl">.2</span><span class="sc">$</span>use <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(shuttle<span class="sc">$</span>use <span class="sc">==</span> <span class="st">&quot;auto&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb24-3"><a href="neural-network.html#cb24-3" tabindex="-1"></a><span class="fu">table</span>(shuttle<span class="fl">.2</span><span class="sc">$</span>use)</span></code></pre></div>
+<pre><code>## 
+##   0   1 
+## 111 145</code></pre>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="neural-network.html#cb26-1" tabindex="-1"></a><span class="do">## caret包还可以生成训练数据集和测试数据集，做法是对每个观测赋一个索引标记，或者标记 为训练数据，或者标记为测试数据，然后依照索引进行分类。我们按70/30的比例划分训练数据 和测试数据</span></span>
+<span id="cb26-2"><a href="neural-network.html#cb26-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb26-3"><a href="neural-network.html#cb26-3" tabindex="-1"></a>trainIndex <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(shuttle<span class="fl">.2</span><span class="sc">$</span>use, <span class="at">p =</span> .<span class="dv">7</span>,</span>
+<span id="cb26-4"><a href="neural-network.html#cb26-4" tabindex="-1"></a>                                  <span class="at">list =</span> F)</span>
+<span id="cb26-5"><a href="neural-network.html#cb26-5" tabindex="-1"></a><span class="co"># head(trainIndex)</span></span>
+<span id="cb26-6"><a href="neural-network.html#cb26-6" tabindex="-1"></a>shuttleTrain <span class="ot">&lt;-</span> shuttle<span class="fl">.2</span>[ trainIndex, ]</span>
+<span id="cb26-7"><a href="neural-network.html#cb26-7" tabindex="-1"></a>shuttleTest  <span class="ot">&lt;-</span> shuttle<span class="fl">.2</span>[<span class="sc">-</span>trainIndex, ]</span></code></pre></div>
+</div>
+<div id="模型构建" class="section level3 hasAnchor" number="9.3.2">
+<h3><span class="header-section-number">9.3.2</span> 模型构建<a href="neural-network.html#模型构建" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>在nerualnet包中，我们要使用 的函数的名字就叫作nerualnet()。除了模型公式，还有4个关键参数需要说明。</p>
+<p><em>hidden：每层中隐藏神经元的数量，最多可以设置3个隐藏层，默认值为1。<br />
+</em>act.fct：激活函数，默认为逻辑斯蒂函数，也可以设置为tanh函数。<br />
+<em>err.fct：计算误差，默认为sse；因为我们处理的是二值结果变量，所以要设置成ce， 使用交叉熵。<br />
+</em>linear.output：逻辑参数，控制是否忽略act.fct，默认值为TRUE；对于我们的数据来 说，需要设置为FALSE。
+*还可以指定算法，默认算法是弹性反向传播</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="neural-network.html#cb27-1" tabindex="-1"></a><span class="do">## neuralnet中不允许用y ~指定数据集中除响应变量之外的所有变量, 绕过这种限制的方式是，使用as.formula()函数。先 建立一个保存变量名的对象，然后用这个对象作为输入，从而将变量名粘贴到公式右侧</span></span>
+<span id="cb27-2"><a href="neural-network.html#cb27-2" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">names</span>(shuttleTrain)</span>
+<span id="cb27-3"><a href="neural-network.html#cb27-3" tabindex="-1"></a>form <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;use ~&quot;</span>, <span class="fu">paste</span>(n[<span class="sc">!</span>n <span class="sc">%in%</span> <span class="st">&quot;use&quot;</span>], <span class="at">collapse =</span> <span class="st">&quot; + &quot;</span>)))</span>
+<span id="cb27-4"><a href="neural-network.html#cb27-4" tabindex="-1"></a>form</span></code></pre></div>
+<pre><code>## use ~ stability.xstab + error.MM + error.SS + error.XL + sign.pp + 
+##     wind.tail + magn.Medium + magn.Out + magn.Strong + vis.yes</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="neural-network.html#cb29-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb29-2"><a href="neural-network.html#cb29-2" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">neuralnet</span>(form, <span class="at">data =</span> shuttleTrain, <span class="at">hidden =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>), <span class="at">err.fct =</span> <span class="st">&quot;ce&quot;</span>, </span>
+<span id="cb29-3"><a href="neural-network.html#cb29-3" tabindex="-1"></a>                 <span class="at">linear.output =</span> F)</span>
+<span id="cb29-4"><a href="neural-network.html#cb29-4" tabindex="-1"></a>fit<span class="sc">$</span>result.matrix</span></code></pre></div>
+<pre><code>##                                      [,1]
+## error                         0.006745424
+## reached.threshold             0.008028217
+## steps                       251.000000000
+## Intercept.to.1layhid1        -2.913396291
+## stability.xstab.to.1layhid1   1.061971240
+## error.MM.to.1layhid1         -1.507105083
+## error.SS.to.1layhid1         -1.960491707
+## error.XL.to.1layhid1         -0.557518418
+## sign.pp.to.1layhid1          -0.362270154
+## wind.tail.to.1layhid1        -0.093003853
+## magn.Medium.to.1layhid1       0.012907060
+## magn.Out.to.1layhid1          1.118360425
+## magn.Strong.to.1layhid1       0.257518170
+## vis.yes.to.1layhid1           4.650735293
+## Intercept.to.1layhid2         1.560214842
+## stability.xstab.to.1layhid2  -1.204509288
+## error.MM.to.1layhid2         -0.000887696
+## error.SS.to.1layhid2          0.904825578
+## error.XL.to.1layhid2         -0.231255788
+## sign.pp.to.1layhid2           0.382575500
+## wind.tail.to.1layhid2         0.592086158
+## magn.Medium.to.1layhid2       0.058625357
+## magn.Out.to.1layhid2         -1.051535539
+## magn.Strong.to.1layhid2       0.179652043
+## vis.yes.to.1layhid2          -2.693403633
+## Intercept.to.2layhid1         1.615079923
+## 1layhid1.to.2layhid1        -15.554046037
+## 1layhid2.to.2layhid1         14.713278061
+## Intercept.to.use            -12.182285372
+## 2layhid1.to.use              24.844204493</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="neural-network.html#cb31-1" tabindex="-1"></a><span class="do">## Interpretation: 误差非常低，仅为0.0099。steps的值是算法达到阈值所需的训练次数，也就是误 差函数的偏导数的绝对值小于阈值（默认为0.1）时的训练次数。权重最高的神经元是 vis.yes.to.1layhid1，权重值为6.21</span></span>
+<span id="cb31-2"><a href="neural-network.html#cb31-2" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="neural-network.html#cb31-3" tabindex="-1"></a><span class="do">## 广义权重: 被定义为第i个协变量 对对数发生比的贡献： 广义权重表示每个协变量xi的影响，可以类比为回归模型中的第i个回归系数。但是，广义权 重依赖于所有其他协变量。</span></span>
+<span id="cb31-4"><a href="neural-network.html#cb31-4" tabindex="-1"></a><span class="fu">head</span>(fit<span class="sc">$</span>generalized.weights[[<span class="dv">1</span>]])</span></code></pre></div>
+<pre><code>##            [,1]         [,2]         [,3]         [,4]         [,5]
+## 1 -0.0058040120 0.0022578370 0.0061042939 2.793278e-05 0.0018809227
+## 4 -0.0007663366 0.0003444101 0.0008416829 2.706483e-05 0.0002491154
+## 5 -0.0006637593 0.0003076139 0.0007361950 2.814040e-05 0.0002159244
+## 6 -0.0007314225 0.0004031544 0.0008607337 6.341801e-05 0.0002389983
+## 7 -0.0444148565 0.0195765927 0.0484852322 1.374447e-03 0.0144317093
+## 8 -0.0367735469 0.0164391436 0.0403214453 1.254416e-03 0.0119526383
+##           [,6]         [,7]          [,8]          [,9]        [,10]
+## 1 0.0022094031 1.855860e-04 -0.0053538239  2.417218e-04 -0.016392872
+## 4 0.0002785484 2.252078e-05 -0.0007127678  1.914664e-05 -0.002234323
+## 5 0.0002386163 1.910769e-05 -0.0006185411  1.401738e-05 -0.001949295
+## 6 0.0002446797 1.830607e-05 -0.0006897356 -2.256756e-06 -0.002244884
+## 7 0.0162533313 1.321717e-03 -0.0412613771  1.215746e-03 -0.128915111
+## 8 0.0133914379 1.084446e-03 -0.0341918523  9.429830e-04 -0.107084095</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="neural-network.html#cb33-1" tabindex="-1"></a><span class="do">## 实现神经网络的可视化</span></span>
+<span id="cb33-2"><a href="neural-network.html#cb33-2" tabindex="-1"></a><span class="fu">plot</span>(fit)</span>
+<span id="cb33-3"><a href="neural-network.html#cb33-3" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="neural-network.html#cb33-4" tabindex="-1"></a><span class="do">## 看vis.yes和wind.tail的广义权重图</span></span>
+<span id="cb33-5"><a href="neural-network.html#cb33-5" tabindex="-1"></a><span class="do">## vis.yes的广义权重非常不对称，而wind.tail的权重则分布得非常均匀，说明这个变量基本不具备预测能力</span></span>
+<span id="cb33-6"><a href="neural-network.html#cb33-6" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb33-7"><a href="neural-network.html#cb33-7" tabindex="-1"></a><span class="fu">gwplot</span>(fit, <span class="at">selected.covariate =</span> <span class="st">&quot;vis.yes&quot;</span>)</span>
+<span id="cb33-8"><a href="neural-network.html#cb33-8" tabindex="-1"></a><span class="fu">gwplot</span>(fit, <span class="at">selected.covariate =</span> <span class="st">&quot;wind.tail&quot;</span>)</span>
+<span id="cb33-9"><a href="neural-network.html#cb33-9" tabindex="-1"></a></span>
+<span id="cb33-10"><a href="neural-network.html#cb33-10" tabindex="-1"></a><span class="do">## 看模型的表现如何，可以通过在compute()函数中指定fit模型和协变量来实现</span></span>
+<span id="cb33-11"><a href="neural-network.html#cb33-11" tabindex="-1"></a>resultsTrain <span class="ot">&lt;-</span> <span class="fu">compute</span>(fit, shuttleTrain[, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>])</span>
+<span id="cb33-12"><a href="neural-network.html#cb33-12" tabindex="-1"></a><span class="do">## 得到的结果是概率的形式，所以要将结果转换成0或1，然后生成混淆矩阵</span></span>
+<span id="cb33-13"><a href="neural-network.html#cb33-13" tabindex="-1"></a>predTrain <span class="ot">&lt;-</span> resultsTrain<span class="sc">$</span>net.result</span>
+<span id="cb33-14"><a href="neural-network.html#cb33-14" tabindex="-1"></a>predTrain <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(predTrain <span class="sc">&gt;=</span> <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb33-15"><a href="neural-network.html#cb33-15" tabindex="-1"></a><span class="fu">table</span>(predTrain, shuttleTrain<span class="sc">$</span>use)</span></code></pre></div>
+<pre><code>##          
+## predTrain   0   1
+##         0  73   0
+##         1   0 107</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="neural-network.html#cb35-1" tabindex="-1"></a><span class="do">## Interpretation: 天哪, 正确率达到了100%！</span></span>
+<span id="cb35-2"><a href="neural-network.html#cb35-2" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="neural-network.html#cb35-3" tabindex="-1"></a><span class="do">## 在测试集上的表现</span></span>
+<span id="cb35-4"><a href="neural-network.html#cb35-4" tabindex="-1"></a>resultsTest <span class="ot">&lt;-</span> <span class="fu">compute</span>(fit, shuttleTest[,<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>])</span>
+<span id="cb35-5"><a href="neural-network.html#cb35-5" tabindex="-1"></a>predTest <span class="ot">&lt;-</span> resultsTest<span class="sc">$</span>net.result</span>
+<span id="cb35-6"><a href="neural-network.html#cb35-6" tabindex="-1"></a>predTest <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(predTest <span class="sc">&gt;=</span> <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb35-7"><a href="neural-network.html#cb35-7" tabindex="-1"></a><span class="fu">table</span>(predTest, shuttleTest<span class="sc">$</span>use)</span></code></pre></div>
+<pre><code>##         
+## predTest  0  1
+##        0 38  2
+##        1  0 36</code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="neural-network.html#cb37-1" tabindex="-1"></a><span class="do">## 测试集中只有一个假阳性的误预测。如果你想找出这是哪个观测，可以使用which()函数</span></span>
+<span id="cb37-2"><a href="neural-network.html#cb37-2" tabindex="-1"></a><span class="fu">which</span>(predTest <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> shuttleTest<span class="sc">$</span>use <span class="sc">==</span> <span class="dv">0</span>)</span></code></pre></div>
+<pre><code>## integer(0)</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="neural-network.html#cb39-1" tabindex="-1"></a>shuttleTest[<span class="dv">62</span>,]</span></code></pre></div>
+<pre><code>##     stability.xstab error.MM error.SS error.XL sign.pp wind.tail magn.Medium
+## 215               0        0        1        0       1         1           0
+##     magn.Out magn.Strong vis.yes use
+## 215        0           1       1   1</code></pre>
+
+</div>
+</div>
+</div>
+
+
+
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="linear-discriminant-analysis-lda.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="more-to-say.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/yihui/bookdown-crc/edit/master/11-Neural-Networks.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["bookdown.pdf", "bookdown.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "none"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
