@@ -25,7 +25,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## if(!require(psych)){install.packages("psych")}
 packages<-c("tidyverse", "kableExtra", "gtsummary","inTextSummaryTable",
-            "Hmisc","htmltools","clinUtils")
+            "Hmisc","htmltools","clinUtils","gridExtra",
+            ## Data
+            "mlbench",
+            ## Bayes Packages
+            "broom","rstanarm","bayesplot","bayestestR","insight","brms")
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(new.pkg)) 
@@ -200,18 +204,25 @@ BayesReg(faithful[,1],faithful[,2])
 
  
 
-# Bayesian Linear Regression
+# Bayesian Linear Regression using rstanarm
 
-```{r Bayesian linear regression, echo = T,message = FALSE, error = FALSE, warning = FALSE}
- 
+## Classical Linear Regression Model
+
+Classical linear regression, often referred to as ordinary least squares (OLS) regression, estimates the parameters of the model by minimizing the sum of the squared differences between observed values and those predicted by the linear model.  
+
+- **Parameter Estimation:** It provides point estimates for the parameters (intercepts and slopes) that define a line of best fit through the data.
+- **Assumptions:** Assumes residuals are normally distributed, independent, and have constant variance.
+- **Inference:** Statistical inference, such as hypothesis testing and confidence intervals, relies on frequency-based methods. These methods often involve assumptions about the distributions of parameters or error terms (e.g., normally distributed errors).
+- **Uncertainty:** Uncertainty in parameter estimates is typically represented through confidence intervals and p-values, which depend on assumptions of normality and sample size.
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # suppressPackageStartupMessages(library(rstanarm))
 # suppressPackageStartupMessages(library(bayestestR))
 # suppressPackageStartupMessages(library(bayesplot))
 # suppressPackageStartupMessages(library(insight))
  
-
 # use the BostonHousing data from mlbench package
-library(mlbench)
+# library(mlbench)
 data("BostonHousing")
 str(BostonHousing)
 bost <- BostonHousing[,c("medv","age","dis","chas")]
@@ -219,8 +230,10 @@ summary(bost)
 
 # Classical linear regression model
 model_freq<-lm(medv~., data=bost)
-library(broom)
-tidy(model_freq)
+# library("broom")
+tidy(model_freq) %>%
+  kable("html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
 
 # # Bayesian regression
 # library(rstanarm)
@@ -228,6 +241,193 @@ tidy(model_freq)
 ```
 
 
+
+
+## Examining and visualizing data
+ 
+
+```{r, echo = F,message = FALSE, error = FALSE, warning = FALSE}
+grid.arrange( 
+  ggplot()+
+    geom_point(data = bost, aes(y = medv, x = age))+
+    geom_smooth(), 
+
+  ggplot()+
+    geom_point(data = bost, aes(y = medv, x = dis))+
+    geom_smooth(), 
+  
+  ncol = 2
+  )
+```
+ 
+
+## Bayesian Linear Regression
+
+Bayesian linear regression, on the other hand, incorporates prior beliefs about parameters and updates these beliefs after observing the data. This approach is fundamentally probabilistic:
+
+- **Parameter Estimation:** Instead of offering single point estimates, Bayesian regression produces a probability distribution (posterior distribution) for each parameter. This reflects all possible values of the parameters weighted by their likelihood given the prior belief and the observed data.
+- **Prior Knowledge:** It starts with a prior distribution on the parameters, which can encode existing knowledge or assumptions about the values they might take.
+- **Inference:** Bayesian inference doesn’t depend on large-sample theory. Instead, it calculates the probability of a parameter value given the data. This is often done via Markov Chain Monte Carlo (MCMC) methods or other numerical techniques for more complex models.
+- **Uncertainty and Prediction:** Provides a richer understanding of uncertainty by using the full posterior distribution of the parameters. Predictive distributions for new data can be directly derived from the posterior.
+
+**Practical Differences:**
+
+- **Flexibility:** Bayesian methods are typically more flexible in incorporating prior information and dealing with complex models where traditional methods may not provide feasible solutions or require cumbersome calculations.
+- **Computation:** Classical methods are generally less computationally intensive compared to Bayesian methods, which may require complex computational techniques (like MCMC) to approximate the posterior distributions, especially in models with a large number of parameters or complex prior distributions.
+- **Interpretation:** Bayesian inference provides a more intuitive probabilistic interpretation of model results, which can be particularly useful in decision-making contexts where probabilities of different outcomes need to be evaluated.
+
+
+### rstanarm::stan_glm - fit the model {-}
+
+To fit a Bayesian regression, we use the function stan_glm from the rstanarm package. This function as the above lm function requires providing the formula and the data that will be used, and leave all the following arguments with their default values:
+
+* family : by default this function uses the gaussian distribution as we do with the classical glm function to perform lm model.
+* prior : The prior distribution for the regression coefficients, By default the normal prior is used. There are subset of functions used for the prior provided by rstanarm like , student t family, laplace family…ect. To get the full list with all the details run this command ?priors. If we want a flat uniform prior we set this to NULL.
+* prior_intercept: prior for the intercept, can be normal, student_t , or cauchy. If we want a flat uniform prior we set this to NULL.
+* prior_aux: prior fo auxiliary parameters such as the error standard deviation for the gaussion family.
+* algorithm: The estimating approach to use. The default is “sampling MCMC1.
+* QR: FALSE by default, if true QR decomposition applied on the design matrix if we have large number of predictors.
+* iter : is the number of iterations if the MCMC method is used, the default is 2000.
+* chains : the number of Markov chains, the default is 4.
+* warmup : also known as burnin, the number of iterations used for adaptation, and should not be used for inference. By default it is half of the iterations.
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# library("rstanarm")
+model_bayes <- stan_glm(medv~., data=bost, seed=111)
+
+print(model_bayes, digits = 3)
+```
+
+
+### bayesplot::mcmc_dens - plot the MCMC simulation {-}
+
+The Median estimate is the median computed from the MCMC simulation, and MAD_SD is the median absolute deviation computed from the same simulation. To well understand how getting these outputs, we plot the MCMC simulation of each predictor using bayesplot
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# library("bayesplot")
+# Generate the first plot for the 'age' parameter
+plot1 <- mcmc_dens(model_bayes, pars = "age") +
+  vline_at(-0.143, color = "red") +
+  ggtitle("Density of Age") +
+  theme_minimal()
+
+# Generate the second plot for the 'dis' parameter
+plot2 <- mcmc_dens(model_bayes, pars = "dis") +
+  vline_at(-0.244, color = "red") +
+  ggtitle("Density of Dis") +
+  theme_minimal()
+
+# Arrange both plots side by side
+grid.arrange(plot1, plot2, ncol = 2)
+```
+
+### bayestestR::describe_posterior - model parameters {-}
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# library("bayestestR")
+describe_posterior(model_bayes)
+```
+
+- **CI** : Credible Interval, it is used to quantify the uncertainty about the regression coefficients. There are two methods to compute CI, the highest density interval HDI which is the default, and the Equal-tailed Interval ETI. with 89% probability (given the data) that a coefficient lies above the CI_low value and under CI_high value. This strightforward probabilistic interpretation is completely diffrent from the confidence interval used in classical linear regression where the coefficient fall inside this confidence interval (if we choose 95% of confidence) 95 times if we repeat the study 100 times.
+
+- **pd (Probability of Direction):** Measures the probability that a parameter has a consistent positive or negative effect. It's akin to checking whether the parameter's effect is consistently in one direction or another, not merely the magnitude. And it is considered as the best equivalent for the p-value.
+
+- **ROPE_CI**: Region of Practical Equivalence, since bayes method deals with true probabilities, it does not make sense to compute the probability of getting the effect equals zero (the null hypothesis) as a point (probability of a point in continuous intervals equal zero ). Thus, we define instead a small range around zero which can be considered practically the same as no effect (zero), this range therefore is called ROPE. By default (according to Cohen, 1988) The Rope is [-0.1,0.1] from the standardized coefficients.
+- **% in ROPE:** Shows the percentage of the posterior distribution that falls within the ROPE, helping to evaluate the practical significance of the effect.
+
+- **Rhat:** The potential scale reduction factor on split chains (Gelman-Rubin statistic). it is computed for each scalar quantity of interest, as the standard deviation of that quantity from all the chains included together, divided by the root mean square of the separate within-chain standard deviations. When this value is close to 1 we do not have any convergence problem with MCMC.
+
+- **ESS (Effective Sample Size):** it captures how many independent draws contain the same amount of information as the dependent sample obtained by the MCMC algorithm, the higher the ESS the better. The threshold used in practice is 400.
+
+Aternatively, we can get the coefficeient estimates (which are the medians by default) separatly by using the package insight.
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# library("insight")
+post <- get_parameters(model_bayes)
+print(purrr::map_dbl(post,median),digits = 3)
+```
+
+ 
+
+The mean of the posterior distribution is the expected value of the parameter over its entire plausible range as informed by the data and the prior. It provides a balance point of the distribution. as follows:
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+print(purrr::map_dbl(post, mean),digits = 3)
+```
+
+The values are closer to each other due to the like normality of the distribution of the posteriors where all the central statistics (mean, median, mode) are closer to each other. Using the following plot to visualize the age coefficient using different statistics as follows:
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+mcmc_dens(model_bayes, pars=c("age"))+
+  vline_at(median(post$age), col="red")+
+  vline_at(mean(post$age), col="yellow")+
+  vline_at(map_estimate(post$age)[1,2], col="green")
+```
+
+
+## Inferences - Interval 
+
+In Bayesian statistics, credible intervals (CIs) are used to represent the probability of a parameter lying within a certain range, given the observed data and prior beliefs. These intervals are critical in understanding the distribution of parameters estimated by Bayesian models. Two common types of credible intervals are the Highest Density Interval (HDI) and the Equal-Tailed Interval (ETI).
+
+As we do with classical regression (frequentist), we can test the significance of the bayesian regression coefficients by checking whether the corresponding credible interval contains zero or not
+
+  - If the credible interval (be it HDI or ETI) for a regression coefficient does not include zero, we can say there is substantial evidence that the effect (or association) of that predictor on the response variable is non-zero, and thus "significant" in a practical sense.
+  - Conversely, if the interval includes zero, the data do not provide strong evidence against the null hypothesis of no association.
+
+### 1. Highest Density Interval (HDI) {-}
+
+The Highest Density Interval, or HDI, is a range within which a specified proportion of the distribution's probability mass lies, and where all points within the interval have higher probability density than points outside the interval. For instance, a 95% HDI contains the most credible values of the parameter that account for 95% of the probability mass, and every point inside the interval has a higher probability density than any point outside the interval.
+
+- **Key Feature:** The HDI is the shortest possible interval for a given coverage probability. This makes it particularly useful for skewed distributions, as it naturally adapts to the shape of the distribution and focuses on the most probable values.
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+hdi(model_bayes)
+```
+
+
+### 2. Equal-Tailed Interval (ETI)
+
+The Equal-Tailed Interval is another type of credible interval where each tail of the distribution contains an equal amount of probability mass outside the interval. For a 95% ETI, 2.5% of the distribution's probability mass lies below the lower bound and 2.5% lies above the upper bound.
+
+- **Key Feature:** The ETI is straightforward and intuitive, mirroring the concept of frequentist confidence intervals. It does not necessarily contain the most probable values (like the HDI does) but is easier to compute and interpret for symmetric distributions.
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+eti(model_bayes)
+```
+
+*Note: this similar result between frequentist and bayesian regression may due to the normality assumption for the former that is well satisfied which gives satisfied results and due to the normal prior used in the latter. However, in real world it is less often to be sure about the normality assumption which may give contradict conclusions between the two approaches.*
+
+
+## Inferences - Check part of the credible interval that falls inside the ROPE 
+
+Indeed, the Region of Practical Equivalence (ROPE) offers another way to assess the significance of regression coefficients in a Bayesian framework. This method is complementary to examining whether the credible intervals contain zero. The ROPE technique allows for a more nuanced interpretation of results, particularly when you need to decide if an effect is not only different from zero but also small enough to be considered practically insignificant.
+ 
+The ROPE is a predefined range around zero (e.g., \([-0.1, 0.1]\)) within which effects are considered negligible or practically equivalent to zero. This concept is based on the idea that not all statistically significant findings are practically significant. By defining a small interval around zero, researchers can identify parameters whose effects, while possibly statistically distinct from zero, are so small that they do not matter in practical terms.
+
+- **High Percentage in ROPE:** If a large portion of the posterior distribution of a parameter is within the ROPE, this suggests that the parameter's effect is practically negligible.
+- **Low Percentage in ROPE:** Conversely, if only a small portion of the posterior distribution falls within the ROPE, this suggests that the parameter's effect is practically significant.
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+rope(post$age)
+rope(post$chas1)
+rope(post$`(Intercept)`)
+rope(post$dis)
+```
+
+
+## Inferences - PD and P-value
+
+The concept of **Probability of Direction (pd)** in Bayesian analysis is critical for understanding the directionality of effects in a model. It provides a straightforward interpretation of how likely it is that a parameter has a consistent positive or negative effect, based on the posterior distribution. This is particularly useful when the primary interest is in the direction rather than the magnitude or statistical significance of an effect.
+ 
+- **Probability of Direction (pd):** This metric measures the proportion of the posterior distribution that is either above or below zero (depending on the sign of the median). A pd close to 1 indicates that nearly all of the posterior distribution is on one side of zero, suggesting a consistent effect direction. Conversely, a pd close to 0.5 suggests that the posterior is spread around zero, indicating less certainty about the direction of the effect.
+
+- **Connection to P-values:** In frequentist statistics, the p-value measures the probability of observing data at least as extreme as the data actually observed, under the assumption that the null hypothesis (typically, that there is no effect) is true. In a Bayesian context, while p-values are not directly used, there is an analogous concept where the p-value can be approximated from the pd as \( p\text{-value} = 1 - pd \) for one-sided tests. This approximation gives a sense of how often the observed effect would occur by chance if the null hypothesis were true.
+
+
+ 
+
+
+ 
 
 # Item Response Theory
 
@@ -518,3 +718,10 @@ Bayesian GLMs are powerful because they provide a probabilistic framework for mo
 
 6. **Computational Methods**:
    The analysis often involves using Markov Chain Monte Carlo (MCMC) methods to sample from the posterior distributions. This is particularly necessary in complex models where analytical solutions are infeasible.
+
+
+
+# Reference
+
+* [R Bloggers - Bayesian linear regression](https://www.r-bloggers.com/2020/04/bayesian-linear-regression/)
+* [Bayesian Regression Analysis in R using brms](https://tem11010.github.io/regression_brms/)

@@ -37,6 +37,8 @@
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
 
@@ -893,17 +895,39 @@ BayesReg(faithful[,1],faithful[,2])</code></pre>
 ## [1] 0.1268176</code></pre>
 </div>
 </div>
-<div id="bayesian-linear-regression" class="section level1" number="2">
+<div id="bayesian-linear-regression-using-rstanarm"
+class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Bayesian Linear
-Regression</h1>
+Regression using rstanarm</h1>
+<div id="classical-linear-regression-model" class="section level2"
+number="2.1">
+<h2><span class="header-section-number">2.1</span> Classical Linear
+Regression Model</h2>
+<p>Classical linear regression, often referred to as ordinary least
+squares (OLS) regression, estimates the parameters of the model by
+minimizing the sum of the squared differences between observed values
+and those predicted by the linear model.</p>
+<ul>
+<li><strong>Parameter Estimation:</strong> It provides point estimates
+for the parameters (intercepts and slopes) that define a line of best
+fit through the data.</li>
+<li><strong>Assumptions:</strong> Assumes residuals are normally
+distributed, independent, and have constant variance.</li>
+<li><strong>Inference:</strong> Statistical inference, such as
+hypothesis testing and confidence intervals, relies on frequency-based
+methods. These methods often involve assumptions about the distributions
+of parameters or error terms (e.g., normally distributed errors).</li>
+<li><strong>Uncertainty:</strong> Uncertainty in parameter estimates is
+typically represented through confidence intervals and p-values, which
+depend on assumptions of normality and sample size.</li>
+</ul>
 <pre class="r"><code># suppressPackageStartupMessages(library(rstanarm))
 # suppressPackageStartupMessages(library(bayestestR))
 # suppressPackageStartupMessages(library(bayesplot))
 # suppressPackageStartupMessages(library(insight))
  
-
 # use the BostonHousing data from mlbench package
-library(mlbench)
+# library(mlbench)
 data(&quot;BostonHousing&quot;)
 str(BostonHousing)</code></pre>
 <pre><code>## &#39;data.frame&#39;:    506 obs. of  14 variables:
@@ -932,16 +956,562 @@ summary(bost)</code></pre>
 ##  Max.   :50.00   Max.   :100.00   Max.   :12.127</code></pre>
 <pre class="r"><code># Classical linear regression model
 model_freq&lt;-lm(medv~., data=bost)
-library(broom)
-tidy(model_freq)</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["term"],"name":[1],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"(Intercept)","2":"32.7397914","3":"2.24704611","4":"14.5701467","5":"2.328480e-40"},{"1":"age","2":"-0.1427996","3":"0.01981039","4":"-7.2083181","5":"2.093624e-12"},{"1":"dis","2":"-0.2461603","3":"0.26513688","4":"-0.9284273","5":"3.536322e-01"},{"1":"chas1","2":"7.5129712","3":"1.46465652","4":"5.1295106","5":"4.156897e-07"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+# library(&quot;broom&quot;)
+tidy(model_freq) %&gt;%
+  kable(&quot;html&quot;) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;))</code></pre>
+<table class="table table-striped table-hover" style="color: black; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p.value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+32.7397914
+</td>
+<td style="text-align:right;">
+2.2470461
+</td>
+<td style="text-align:right;">
+14.5701467
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+age
+</td>
+<td style="text-align:right;">
+-0.1427996
+</td>
+<td style="text-align:right;">
+0.0198104
+</td>
+<td style="text-align:right;">
+-7.2083181
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dis
+</td>
+<td style="text-align:right;">
+-0.2461603
+</td>
+<td style="text-align:right;">
+0.2651369
+</td>
+<td style="text-align:right;">
+-0.9284273
+</td>
+<td style="text-align:right;">
+0.3536322
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chas1
+</td>
+<td style="text-align:right;">
+7.5129712
+</td>
+<td style="text-align:right;">
+1.4646565
+</td>
+<td style="text-align:right;">
+5.1295106
+</td>
+<td style="text-align:right;">
+0.0000004
+</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code># # Bayesian regression
 # library(rstanarm)
 # https://www.r-bloggers.com/2020/04/bayesian-linear-regression/</code></pre>
+</div>
+<div id="examining-and-visualizing-data" class="section level2"
+number="2.2">
+<h2><span class="header-section-number">2.2</span> Examining and
+visualizing data</h2>
+<p><img src="07-ML-Bayesian-Analysis_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+<div id="bayesian-linear-regression" class="section level2"
+number="2.3">
+<h2><span class="header-section-number">2.3</span> Bayesian Linear
+Regression</h2>
+<p>Bayesian linear regression, on the other hand, incorporates prior
+beliefs about parameters and updates these beliefs after observing the
+data. This approach is fundamentally probabilistic:</p>
+<ul>
+<li><strong>Parameter Estimation:</strong> Instead of offering single
+point estimates, Bayesian regression produces a probability distribution
+(posterior distribution) for each parameter. This reflects all possible
+values of the parameters weighted by their likelihood given the prior
+belief and the observed data.</li>
+<li><strong>Prior Knowledge:</strong> It starts with a prior
+distribution on the parameters, which can encode existing knowledge or
+assumptions about the values they might take.</li>
+<li><strong>Inference:</strong> Bayesian inference doesn’t depend on
+large-sample theory. Instead, it calculates the probability of a
+parameter value given the data. This is often done via Markov Chain
+Monte Carlo (MCMC) methods or other numerical techniques for more
+complex models.</li>
+<li><strong>Uncertainty and Prediction:</strong> Provides a richer
+understanding of uncertainty by using the full posterior distribution of
+the parameters. Predictive distributions for new data can be directly
+derived from the posterior.</li>
+</ul>
+<p><strong>Practical Differences:</strong></p>
+<ul>
+<li><strong>Flexibility:</strong> Bayesian methods are typically more
+flexible in incorporating prior information and dealing with complex
+models where traditional methods may not provide feasible solutions or
+require cumbersome calculations.</li>
+<li><strong>Computation:</strong> Classical methods are generally less
+computationally intensive compared to Bayesian methods, which may
+require complex computational techniques (like MCMC) to approximate the
+posterior distributions, especially in models with a large number of
+parameters or complex prior distributions.</li>
+<li><strong>Interpretation:</strong> Bayesian inference provides a more
+intuitive probabilistic interpretation of model results, which can be
+particularly useful in decision-making contexts where probabilities of
+different outcomes need to be evaluated.</li>
+</ul>
+<div id="rstanarmstan_glm---fit-the-model"
+class="section level3 unnumbered">
+<h3 class="unnumbered">rstanarm::stan_glm - fit the model</h3>
+<p>To fit a Bayesian regression, we use the function stan_glm from the
+rstanarm package. This function as the above lm function requires
+providing the formula and the data that will be used, and leave all the
+following arguments with their default values:</p>
+<ul>
+<li>family : by default this function uses the gaussian distribution as
+we do with the classical glm function to perform lm model.</li>
+<li>prior : The prior distribution for the regression coefficients, By
+default the normal prior is used. There are subset of functions used for
+the prior provided by rstanarm like , student t family, laplace
+family…ect. To get the full list with all the details run this command
+?priors. If we want a flat uniform prior we set this to NULL.</li>
+<li>prior_intercept: prior for the intercept, can be normal, student_t ,
+or cauchy. If we want a flat uniform prior we set this to NULL.</li>
+<li>prior_aux: prior fo auxiliary parameters such as the error standard
+deviation for the gaussion family.</li>
+<li>algorithm: The estimating approach to use. The default is “sampling
+MCMC1.</li>
+<li>QR: FALSE by default, if true QR decomposition applied on the design
+matrix if we have large number of predictors.</li>
+<li>iter : is the number of iterations if the MCMC method is used, the
+default is 2000.</li>
+<li>chains : the number of Markov chains, the default is 4.</li>
+<li>warmup : also known as burnin, the number of iterations used for
+adaptation, and should not be used for inference. By default it is half
+of the iterations.</li>
+</ul>
+<pre class="r"><code># library(&quot;rstanarm&quot;)
+model_bayes &lt;- stan_glm(medv~., data=bost, seed=111)</code></pre>
+<pre><code>## 
+## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 1).
+## Chain 1: 
+## Chain 1: Gradient evaluation took 6.7e-05 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.67 seconds.
+## Chain 1: Adjust your expectations accordingly!
+## Chain 1: 
+## Chain 1: 
+## Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 1: 
+## Chain 1:  Elapsed Time: 0.088 seconds (Warm-up)
+## Chain 1:                0.121 seconds (Sampling)
+## Chain 1:                0.209 seconds (Total)
+## Chain 1: 
+## 
+## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 2).
+## Chain 2: 
+## Chain 2: Gradient evaluation took 1.4e-05 seconds
+## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.14 seconds.
+## Chain 2: Adjust your expectations accordingly!
+## Chain 2: 
+## Chain 2: 
+## Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 2: 
+## Chain 2:  Elapsed Time: 0.077 seconds (Warm-up)
+## Chain 2:                0.105 seconds (Sampling)
+## Chain 2:                0.182 seconds (Total)
+## Chain 2: 
+## 
+## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 3).
+## Chain 3: 
+## Chain 3: Gradient evaluation took 1.5e-05 seconds
+## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.15 seconds.
+## Chain 3: Adjust your expectations accordingly!
+## Chain 3: 
+## Chain 3: 
+## Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 3: 
+## Chain 3:  Elapsed Time: 0.084 seconds (Warm-up)
+## Chain 3:                0.111 seconds (Sampling)
+## Chain 3:                0.195 seconds (Total)
+## Chain 3: 
+## 
+## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 4).
+## Chain 4: 
+## Chain 4: Gradient evaluation took 1.4e-05 seconds
+## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.14 seconds.
+## Chain 4: Adjust your expectations accordingly!
+## Chain 4: 
+## Chain 4: 
+## Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 4: 
+## Chain 4:  Elapsed Time: 0.084 seconds (Warm-up)
+## Chain 4:                0.108 seconds (Sampling)
+## Chain 4:                0.192 seconds (Total)
+## Chain 4:</code></pre>
+<pre class="r"><code>print(model_bayes, digits = 3)</code></pre>
+<pre><code>## stan_glm
+##  family:       gaussian [identity]
+##  formula:      medv ~ .
+##  observations: 506
+##  predictors:   4
+## ------
+##             Median MAD_SD
+## (Intercept) 32.834  2.285
+## age         -0.143  0.020
+## dis         -0.258  0.257
+## chas1        7.543  1.432
+## 
+## Auxiliary parameter(s):
+##       Median MAD_SD
+## sigma 8.324  0.260 
+## 
+## ------
+## * For help interpreting the printed output see ?print.stanreg
+## * For info on the priors used see ?prior_summary.stanreg</code></pre>
+</div>
+<div id="bayesplotmcmc_dens---plot-the-mcmc-simulation"
+class="section level3 unnumbered">
+<h3 class="unnumbered">bayesplot::mcmc_dens - plot the MCMC
+simulation</h3>
+<p>The Median estimate is the median computed from the MCMC simulation,
+and MAD_SD is the median absolute deviation computed from the same
+simulation. To well understand how getting these outputs, we plot the
+MCMC simulation of each predictor using bayesplot</p>
+<pre class="r"><code># library(&quot;bayesplot&quot;)
+# Generate the first plot for the &#39;age&#39; parameter
+plot1 &lt;- mcmc_dens(model_bayes, pars = &quot;age&quot;) +
+  vline_at(-0.143, color = &quot;red&quot;) +
+  ggtitle(&quot;Density of Age&quot;) +
+  theme_minimal()
+
+# Generate the second plot for the &#39;dis&#39; parameter
+plot2 &lt;- mcmc_dens(model_bayes, pars = &quot;dis&quot;) +
+  vline_at(-0.244, color = &quot;red&quot;) +
+  ggtitle(&quot;Density of Dis&quot;) +
+  theme_minimal()
+
+# Arrange both plots side by side
+grid.arrange(plot1, plot2, ncol = 2)</code></pre>
+<p><img src="07-ML-Bayesian-Analysis_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="bayestestrdescribe_posterior---model-parameters"
+class="section level3 unnumbered">
+<h3 class="unnumbered">bayestestR::describe_posterior - model
+parameters</h3>
+<pre class="r"><code># library(&quot;bayestestR&quot;)
+describe_posterior(model_bayes)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Parameter"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Median"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["CI"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["CI_low"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["CI_high"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["pd"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["ROPE_CI"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["ROPE_low"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["ROPE_high"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["ROPE_Percentage"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["Rhat"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["ESS"],"name":[12],"type":["dbl"],"align":["right"]}],"data":[{"1":"(Intercept)","2":"32.8341912","3":"0.95","4":"28.2854215","5":"37.1297419","6":"1.00000","7":"0.95","8":"-0.9197104","9":"0.9197104","10":"0","11":"1.001522","12":"2029.279","_rn_":"1"},{"1":"age","2":"-0.1433484","3":"0.95","4":"-0.1812149","5":"-0.1038925","6":"1.00000","7":"0.95","8":"-0.9197104","9":"0.9197104","10":"1","11":"1.001331","12":"2052.155","_rn_":"2"},{"1":"dis","2":"-0.2581988","3":"0.95","4":"-0.7644922","5":"0.2574534","6":"0.81925","7":"0.95","8":"-0.9197104","9":"0.9197104","10":"1","11":"1.001581","12":"2115.192","_rn_":"4"},{"1":"chas1","2":"7.5425493","3":"0.95","4":"4.6695071","5":"10.3937077","6":"1.00000","7":"0.95","8":"-0.9197104","9":"0.9197104","10":"0","11":"1.000453","12":"3744.403","_rn_":"3"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<ul>
+<li><p><strong>CI</strong> : Credible Interval, it is used to quantify
+the uncertainty about the regression coefficients. There are two methods
+to compute CI, the highest density interval HDI which is the default,
+and the Equal-tailed Interval ETI. with 89% probability (given the data)
+that a coefficient lies above the CI_low value and under CI_high value.
+This strightforward probabilistic interpretation is completely diffrent
+from the confidence interval used in classical linear regression where
+the coefficient fall inside this confidence interval (if we choose 95%
+of confidence) 95 times if we repeat the study 100 times.</p></li>
+<li><p><strong>pd (Probability of Direction):</strong> Measures the
+probability that a parameter has a consistent positive or negative
+effect. It’s akin to checking whether the parameter’s effect is
+consistently in one direction or another, not merely the magnitude. And
+it is considered as the best equivalent for the p-value.</p></li>
+<li><p><strong>ROPE_CI</strong>: Region of Practical Equivalence, since
+bayes method deals with true probabilities, it does not make sense to
+compute the probability of getting the effect equals zero (the null
+hypothesis) as a point (probability of a point in continuous intervals
+equal zero ). Thus, we define instead a small range around zero which
+can be considered practically the same as no effect (zero), this range
+therefore is called ROPE. By default (according to Cohen, 1988) The Rope
+is [-0.1,0.1] from the standardized coefficients.</p></li>
+<li><p><strong>% in ROPE:</strong> Shows the percentage of the posterior
+distribution that falls within the ROPE, helping to evaluate the
+practical significance of the effect.</p></li>
+<li><p><strong>Rhat:</strong> The potential scale reduction factor on
+split chains (Gelman-Rubin statistic). it is computed for each scalar
+quantity of interest, as the standard deviation of that quantity from
+all the chains included together, divided by the root mean square of the
+separate within-chain standard deviations. When this value is close to 1
+we do not have any convergence problem with MCMC.</p></li>
+<li><p><strong>ESS (Effective Sample Size):</strong> it captures how
+many independent draws contain the same amount of information as the
+dependent sample obtained by the MCMC algorithm, the higher the ESS the
+better. The threshold used in practice is 400.</p></li>
+</ul>
+<p>Aternatively, we can get the coefficeient estimates (which are the
+medians by default) separatly by using the package insight.</p>
+<pre class="r"><code># library(&quot;insight&quot;)
+post &lt;- get_parameters(model_bayes)
+print(purrr::map_dbl(post,median),digits = 3)</code></pre>
+<pre><code>## (Intercept)         age         dis       chas1 
+##      32.834      -0.143      -0.258       7.543</code></pre>
+<p>The mean of the posterior distribution is the expected value of the
+parameter over its entire plausible range as informed by the data and
+the prior. It provides a balance point of the distribution. as
+follows:</p>
+<pre class="r"><code>print(purrr::map_dbl(post, mean),digits = 3)</code></pre>
+<pre><code>## (Intercept)         age         dis       chas1 
+##      32.761      -0.143      -0.248       7.523</code></pre>
+<p>The values are closer to each other due to the like normality of the
+distribution of the posteriors where all the central statistics (mean,
+median, mode) are closer to each other. Using the following plot to
+visualize the age coefficient using different statistics as follows:</p>
+<pre class="r"><code>mcmc_dens(model_bayes, pars=c(&quot;age&quot;))+
+  vline_at(median(post$age), col=&quot;red&quot;)+
+  vline_at(mean(post$age), col=&quot;yellow&quot;)+
+  vline_at(map_estimate(post$age)[1,2], col=&quot;green&quot;)</code></pre>
+<p><img src="07-ML-Bayesian-Analysis_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+</div>
+<div id="inferences---interval" class="section level2" number="2.4">
+<h2><span class="header-section-number">2.4</span> Inferences -
+Interval</h2>
+<p>In Bayesian statistics, credible intervals (CIs) are used to
+represent the probability of a parameter lying within a certain range,
+given the observed data and prior beliefs. These intervals are critical
+in understanding the distribution of parameters estimated by Bayesian
+models. Two common types of credible intervals are the Highest Density
+Interval (HDI) and the Equal-Tailed Interval (ETI).</p>
+<p>As we do with classical regression (frequentist), we can test the
+significance of the bayesian regression coefficients by checking whether
+the corresponding credible interval contains zero or not</p>
+<ul>
+<li>If the credible interval (be it HDI or ETI) for a regression
+coefficient does not include zero, we can say there is substantial
+evidence that the effect (or association) of that predictor on the
+response variable is non-zero, and thus “significant” in a practical
+sense.</li>
+<li>Conversely, if the interval includes zero, the data do not provide
+strong evidence against the null hypothesis of no association.</li>
+</ul>
+<div id="highest-density-interval-hdi"
+class="section level3 unnumbered">
+<h3 class="unnumbered">1. Highest Density Interval (HDI)</h3>
+<p>The Highest Density Interval, or HDI, is a range within which a
+specified proportion of the distribution’s probability mass lies, and
+where all points within the interval have higher probability density
+than points outside the interval. For instance, a 95% HDI contains the
+most credible values of the parameter that account for 95% of the
+probability mass, and every point inside the interval has a higher
+probability density than any point outside the interval.</p>
+<ul>
+<li><strong>Key Feature:</strong> The HDI is the shortest possible
+interval for a given coverage probability. This makes it particularly
+useful for skewed distributions, as it naturally adapts to the shape of
+the distribution and focuses on the most probable values.</li>
+</ul>
+<pre class="r"><code>hdi(model_bayes)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Parameter"],"name":[1],"type":["chr"],"align":["left"]},{"label":["CI"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["CI_low"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["CI_high"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Effects"],"name":[5],"type":["chr"],"align":["left"]},{"label":["Component"],"name":[6],"type":["chr"],"align":["left"]}],"data":[{"1":"(Intercept)","2":"0.95","3":"28.4343424","4":"37.2354889","5":"fixed","6":"conditional","_rn_":"1"},{"1":"age","2":"0.95","3":"-0.1813622","4":"-0.1040772","5":"fixed","6":"conditional","_rn_":"2"},{"1":"dis","2":"0.95","3":"-0.7644668","4":"0.2574968","5":"fixed","6":"conditional","_rn_":"4"},{"1":"chas1","2":"0.95","3":"4.7407028","4":"10.4381668","5":"fixed","6":"conditional","_rn_":"3"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="equal-tailed-interval-eti" class="section level3"
+number="2.4.1">
+<h3><span class="header-section-number">2.4.1</span> 2. Equal-Tailed
+Interval (ETI)</h3>
+<p>The Equal-Tailed Interval is another type of credible interval where
+each tail of the distribution contains an equal amount of probability
+mass outside the interval. For a 95% ETI, 2.5% of the distribution’s
+probability mass lies below the lower bound and 2.5% lies above the
+upper bound.</p>
+<ul>
+<li><strong>Key Feature:</strong> The ETI is straightforward and
+intuitive, mirroring the concept of frequentist confidence intervals. It
+does not necessarily contain the most probable values (like the HDI
+does) but is easier to compute and interpret for symmetric
+distributions.</li>
+</ul>
+<pre class="r"><code>eti(model_bayes)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Parameter"],"name":[1],"type":["chr"],"align":["left"]},{"label":["CI"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["CI_low"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["CI_high"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Effects"],"name":[5],"type":["chr"],"align":["left"]},{"label":["Component"],"name":[6],"type":["chr"],"align":["left"]}],"data":[{"1":"(Intercept)","2":"0.95","3":"28.2854215","4":"37.1297419","5":"fixed","6":"conditional","_rn_":"1"},{"1":"age","2":"0.95","3":"-0.1812149","4":"-0.1038925","5":"fixed","6":"conditional","_rn_":"2"},{"1":"dis","2":"0.95","3":"-0.7644922","4":"0.2574534","5":"fixed","6":"conditional","_rn_":"4"},{"1":"chas1","2":"0.95","3":"4.6695071","4":"10.3937077","5":"fixed","6":"conditional","_rn_":"3"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p><em>Note: this similar result between frequentist and bayesian
+regression may due to the normality assumption for the former that is
+well satisfied which gives satisfied results and due to the normal prior
+used in the latter. However, in real world it is less often to be sure
+about the normality assumption which may give contradict conclusions
+between the two approaches.</em></p>
+</div>
+</div>
+<div
+id="inferences---check-part-of-the-credible-interval-that-falls-inside-the-rope"
+class="section level2" number="2.5">
+<h2><span class="header-section-number">2.5</span> Inferences - Check
+part of the credible interval that falls inside the ROPE</h2>
+<p>Indeed, the Region of Practical Equivalence (ROPE) offers another way
+to assess the significance of regression coefficients in a Bayesian
+framework. This method is complementary to examining whether the
+credible intervals contain zero. The ROPE technique allows for a more
+nuanced interpretation of results, particularly when you need to decide
+if an effect is not only different from zero but also small enough to be
+considered practically insignificant.</p>
+<p>The ROPE is a predefined range around zero (e.g., <span
+class="math inline">\([-0.1, 0.1]\)</span>) within which effects are
+considered negligible or practically equivalent to zero. This concept is
+based on the idea that not all statistically significant findings are
+practically significant. By defining a small interval around zero,
+researchers can identify parameters whose effects, while possibly
+statistically distinct from zero, are so small that they do not matter
+in practical terms.</p>
+<ul>
+<li><strong>High Percentage in ROPE:</strong> If a large portion of the
+posterior distribution of a parameter is within the ROPE, this suggests
+that the parameter’s effect is practically negligible.</li>
+<li><strong>Low Percentage in ROPE:</strong> Conversely, if only a small
+portion of the posterior distribution falls within the ROPE, this
+suggests that the parameter’s effect is practically significant.</li>
+</ul>
+<pre class="r"><code>rope(post$age)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["CI"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["ROPE_low"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["ROPE_high"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["ROPE_Percentage"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.95","2":"-0.1","3":"0.1","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>rope(post$chas1)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["CI"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["ROPE_low"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["ROPE_high"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["ROPE_Percentage"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.95","2":"-0.1","3":"0.1","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>rope(post$`(Intercept)`)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["CI"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["ROPE_low"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["ROPE_high"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["ROPE_Percentage"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.95","2":"-0.1","3":"0.1","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>rope(post$dis)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["CI"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["ROPE_low"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["ROPE_high"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["ROPE_Percentage"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.95","2":"-0.1","3":"0.1","4":"0.1876316"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="inferences---pd-and-p-value" class="section level2"
+number="2.6">
+<h2><span class="header-section-number">2.6</span> Inferences - PD and
+P-value</h2>
+<p>The concept of <strong>Probability of Direction (pd)</strong> in
+Bayesian analysis is critical for understanding the directionality of
+effects in a model. It provides a straightforward interpretation of how
+likely it is that a parameter has a consistent positive or negative
+effect, based on the posterior distribution. This is particularly useful
+when the primary interest is in the direction rather than the magnitude
+or statistical significance of an effect.</p>
+<ul>
+<li><p><strong>Probability of Direction (pd):</strong> This metric
+measures the proportion of the posterior distribution that is either
+above or below zero (depending on the sign of the median). A pd close to
+1 indicates that nearly all of the posterior distribution is on one side
+of zero, suggesting a consistent effect direction. Conversely, a pd
+close to 0.5 suggests that the posterior is spread around zero,
+indicating less certainty about the direction of the effect.</p></li>
+<li><p><strong>Connection to P-values:</strong> In frequentist
+statistics, the p-value measures the probability of observing data at
+least as extreme as the data actually observed, under the assumption
+that the null hypothesis (typically, that there is no effect) is true.
+In a Bayesian context, while p-values are not directly used, there is an
+analogous concept where the p-value can be approximated from the pd as
+<span class="math inline">\(p\text{-value} = 1 - pd\)</span> for
+one-sided tests. This approximation gives a sense of how often the
+observed effect would occur by chance if the null hypothesis were
+true.</p></li>
+</ul>
+</div>
 </div>
 <div id="item-response-theory" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Item Response
@@ -1501,6 +2071,16 @@ the posterior distributions. This is particularly necessary in complex
 models where analytical solutions are infeasible.</p></li>
 </ol>
 </div>
+</div>
+<div id="reference" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Reference</h1>
+<ul>
+<li><a
+href="https://www.r-bloggers.com/2020/04/bayesian-linear-regression/">R
+Bloggers - Bayesian linear regression</a></li>
+<li><a href="https://tem11010.github.io/regression_brms/">Bayesian
+Regression Analysis in R using brms</a></li>
+</ul>
 </div>
 
 
