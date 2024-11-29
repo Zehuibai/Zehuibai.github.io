@@ -297,6 +297,92 @@ In Bayesian hypothesis testing, the likelihood of two competing hypotheses \(H_0
    - A Bayes factor \(B_1\) greater than 1 indicates stronger support for \(H_1\) relative to \(H_0\), while a \(B_1\) less than 1 supports \(H_0\) more.
    - \(B_0\) is the reciprocal of \(B_1\) and interprets support in the opposite direction.
    
+  
+## P-values and Bayes factors 
+
+P-values and Bayes factors  are two approaches for hypothesis testing and assessing evidence, but they represent fundamentally different statistical paradigms. Here's a comparison and detailed explanation:
+
+
+**P-Values (Frequentist Paradigm)**
+
+A **P-value** is a frequentist measure used to test a null hypothesis (\(H_0\)):
+
+1. **Definition:**
+   - The probability of observing data as extreme as, or more extreme than, the observed data, assuming \(H_0\) is true.
+   - It does not give the probability that \(H_0\) is true.
+
+2. **Purpose:**
+   - To assess whether the evidence is inconsistent with \(H_0\).
+
+3. **Interpretation:**
+   - A small \(P\)-value (e.g., \(P < 0.05\)) suggests evidence against \(H_0\), but it does not confirm \(H_1\) (the alternative hypothesis).
+   - A large \(P\)-value suggests insufficient evidence to reject \(H_0\), not that \(H_0\) is true.
+
+4. **Limitations:**
+   - Dependence on sample size: Large datasets may produce small \(P\)-values even for trivial effects.
+   - Misinterpretation: Often misunderstood as the probability of \(H_0\) being true or false.
+
+5. **P-Value Example**
+- \(H_0\): A new drug has no effect (\(\mu = 0\)).
+- A test yields \(P = 0.03\).
+  - Interpretation: There is a 3% probability of observing data as extreme as the observed, assuming \(H_0\) is true.
+  - Action: Reject \(H_0\) at the 5% significance level.
+  
+
+**Bayes Factors (Bayesian Paradigm)**
+
+A **Bayes factor (BF)** is a Bayesian measure of evidence that compares two hypotheses, \(H_0\) (null) and \(H_1\) (alternative):
+
+1. **Definition:**
+   - The ratio of the likelihood of the observed data under two competing hypotheses:
+     \[
+     BF = \frac{P(\text{Data} | H_1)}{P(\text{Data} | H_0)}
+     \]
+
+2. **Purpose:**
+   - To quantify how much more (or less) the data supports \(H_1\) compared to \(H_0\).
+
+3. **Interpretation:**
+   - \(BF > 1\): Evidence in favor of \(H_1\).
+   - \(BF < 1\): Evidence in favor of \(H_0\).
+   - \(BF = 1\): Data equally supports both hypotheses.
+
+4. **Bayes Factor Scale (Jeffreys’ interpretation):**
+
+   | **Bayes Factor (BF)** | **Evidence Strength**         |
+   |------------------------|-------------------------------|
+   | \(1\)                 | No evidence                  |
+   | \(1 - 3\)             | Weak evidence for \(H_1\)    |
+   | \(3 - 10\)            | Moderate evidence for \(H_1\)|
+   | \(> 10\)              | Strong evidence for \(H_1\)  |
+
+5. **Advantages:**
+   - Accounts for prior beliefs (\(P(H_0)\), \(P(H_1)\)).
+   - Allows direct comparison of evidence for both hypotheses.
+   - Works well with small sample sizes or complex models.
+
+
+6. **Bayes Factor Example**
+- Same \(H_0\): New drug has no effect.
+- Bayes Factor \(BF = 5\):
+  - Interpretation: The data are 5 times more likely under \(H_1\) (the drug has an effect) than \(H_0\).
+  - Action: Strong evidence in favor of \(H_1\).
+
+
+**Comparison: P-Values vs. Bayes Factors**
+
+| **Aspect**                | **P-Values**                                   | **Bayes Factors**                                |
+|---------------------------|-----------------------------------------------|------------------------------------------------|
+| **Paradigm**              | Frequentist                                   | Bayesian                                       |
+| **Key Concept**           | Probability of data given \(H_0\).            | Likelihood ratio of data under \(H_1\) and \(H_0\). |
+| **Prior Knowledge**       | Not considered.                               | Incorporates prior beliefs.                   |
+| **Output**                | Single probability value.                     | A ratio quantifying evidence.                 |
+| **Hypotheses Comparison** | Only tests against \(H_0\).                   | Direct comparison of \(H_0\) and \(H_1\).     |
+| **Effect of Sample Size** | Large sample size can lead to small \(P\)-values even for trivial effects. | Directly incorporates data strength.          |
+| **Interpretation**        | Often misinterpreted as evidence for \(H_1\). | Provides explicit evidence for one hypothesis over another. |
+
+ 
+  
    
 ## Parameter Estimates
 
@@ -621,6 +707,71 @@ Expert elicitation involves systematically gathering opinions from one or more e
 
 - **Facilitates Complex Decision Making**: Expert elicitation is particularly beneficial in complex decision-making scenarios, such as policy formulation or risk assessment, where the stakes are high and the problems are too intricate to be captured fully by available data.
 
+
+## Sensitivity Analysis and ‘Robust’ Priors
+
+Sensitivity analysis in Bayesian statistics is a crucial step to evaluate how the conclusions of a model are affected by the assumptions made, particularly about the **prior distributions**. Unlike frequentist methods, Bayesian approaches inherently depend on prior assumptions, which makes it vital to test how robust the results are to variations in those priors. 
+
+- **Definition:** Robust priors refer to a class of priors that lead to consistent and stable conclusions, even when varied within a reasonable range.
+- **Key Idea:** Instead of committing to a single prior, the robust Bayesian approach explores a **community of priors** to determine how conclusions depend on prior assumptions.
+- Sensitivity analysis is particularly useful in clinical trials, where stakeholders may have varying prior beliefs about the efficacy of an intervention.
+  - Assessing how trial results support the superiority of a treatment under skeptical vs. optimistic prior assumptions.
+  - Examining how conclusions change with different prior beliefs about the null hypothesis.
+- **Complexity:** Conducting sensitivity analysis across a wide range of priors can be computationally intensive. A narrow or overly restricted sensitivity analysis may miss critical variations in prior assumptions.
+
+
+**1. Purpose of Sensitivity Analysis in Bayesian Approaches**
+
+- **Assess Dependence on Priors:** Bayesian results are influenced by prior distributions. Sensitivity analysis examines whether the conclusions would change significantly under different reasonable priors.
+- **Address Subjectivity:** Priors are subjective by nature, reflecting beliefs or knowledge before observing data. Sensitivity analysis helps ensure that conclusions are not unduly dependent on a single prior choice.
+- **Transparency:** Allows readers or stakeholders to judge how their own prior beliefs might influence the conclusions.
+
+**2. Steps in a Robust Bayesian Sensitivity Analysis**
+
+1. **Select a Flexible Class of Priors:**
+   - Choose a broad range of plausible priors, including skeptical, optimistic, and neutral priors.
+   - Ensure the priors reflect diverse perspectives (e.g., clinical expert opinions, data-driven priors, or "ignorance" priors).
+
+2. **Examine Dependence on Prior Choices:**
+   - Analyze how posterior conclusions (e.g., posterior probabilities, credible intervals) change as priors vary.
+   - Identify regions where prior assumptions significantly alter conclusions.
+
+3. **Identify Critical Priors:**
+   - Determine which subsets of priors lead to specific posterior outcomes of interest, such as the superiority of a treatment.
+   - Highlight priors that would be pivotal for decision-making.
+
+4. **Report Results Transparently:**
+   - Present findings clearly, allowing the audience to see how different priors affect conclusions.
+   - Provide tools or visualizations (e.g., graphs of posterior probabilities vs. prior parameters) to facilitate interpretation.
+   
+   
+**3. Types of Communities of Priors**
+
+There are three main approaches to defining a community of priors:
+
+**(a) Discrete Set of Priors:**
+
+- Analyze sensitivity to a limited, predefined list of priors, such as:
+  - **Skeptical prior:** Reflecting doubt about a treatment’s efficacy.
+  - **Optimistic prior:** Assuming strong efficacy.
+  - **Neutral prior:** Representing "ignorance" or minimal assumptions.
+- Examples:
+  - Sensitivity to the opinions of multiple experts.
+  - Extreme prior scenarios that reflect opposing views.
+
+**(b) Parametric Family of Priors:**
+
+- Define a family of priors characterized by one or more parameters (e.g., a beta distribution with varying shape parameters).
+- Plot posterior results as a function of these parameters to visualize sensitivity.
+- Example:
+  - Varying the weight of prior information (e.g., increasing skepticism or optimism) and observing the effect on posterior probabilities.
+
+**(c) Non-Parametric Family of Priors:**
+
+- Use flexible priors that are not constrained by a specific parametric form.
+- Example:
+  - Gustafson (1989): Introduced a "neighborhood" of priors around a non-informative prior, with some contamination from alternative priors.
+- Tools like maximum and minimum posterior probabilities within the class can highlight the range of plausible conclusions.
 
 # Distribution 
 
