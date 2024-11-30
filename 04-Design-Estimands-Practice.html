@@ -1,0 +1,2586 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Zehui Bai" />
+
+
+<title> Estimands and Sensitivity Analyses</title>
+
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/table1-1.0/table1_defaults.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Biosimilar-Trials.html">Statistical Considerations for the Design and Analysis of Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Alternatives-to-Power.html">Bayesian methods - Alternatives to Power</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Continuous-Endpoint.html">Sample Size Determination for Continuous Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Categorical-Endpoint.html">Sample Size Determination for Categorical Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Survival-Endpoint.html">Sample Size Determination for Survival Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Repeated-Measures.html">Sample Size Determination for Repeated Measures</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Sequential-Design.html">Statistical Considerations for Group Sequential Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Adaptive-Design.html">Statistical Considerations for Adaptive Design</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-Estimands-Framework.html">Estimands Framework</a>
+    </li>
+    <li>
+      <a href="04-Design-Estimands-Practice.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Single-Arm-Clinical-Trials.html">Single Arm Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+    <li>
+      <a href="04-Design-Regulatory-Submission.html">Regulatory Submission from Stats Perspective</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot-Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Time-To-Event.html">Time to Event Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-PRO-Data.html">Patient Reported Outcome Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-SSC-and-Power-Calculation.html">Sample Size and Power Calculations Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Correlation.html">Correlation Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Model-Table.html">Clinical Data and Model visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-ScatterPlot.html">Scatter and Line Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-BarPlot.html">Bar Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-PieChart.html">Pie Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-BoxPlot.html">Box Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Histogram.html">Histogram</a>
+    </li>
+    <li>
+      <a href="05-Plot-Forest-Plot.html">Forest Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Flow-Chart.html">Flow Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-calculator"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Linear-Regression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Meta-Analysis.html">Meta Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Time-Series-Analysis.html">Time Series Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-SEM.html">Structural Equation Modeling</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Factor-Analysis.html">Factor Analysis</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-bar-chart"></span>
+     
+    Machine Learning
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="07-ML-Bayesian-Theory.html">Bayesian Theory</a>
+    </li>
+    <li>
+      <a href="07-ML-Bayesian-Analysis.html">Bayesian Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Regularization-Penalized-Regression.html">Regularization Penalized Regression</a>
+    </li>
+    <li>
+      <a href="07-ML-Loss-Regression.html">Loss Functions in Machine Learning</a>
+    </li>
+    <li>
+      <a href="07-ML-PCA.html">Principal Component Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-KNN.html">K-Nearest Neighbors</a>
+    </li>
+    <li>
+      <a href="07-ML-SVM.html">Support Vector Machine</a>
+    </li>
+    <li>
+      <a href="07-ML-Tree-Models.html">Tree Models</a>
+    </li>
+    <li>
+      <a href="07-ML-LDA.html">Linear Discriminant Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Cluster-Analysis.html">Cluster Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Neural-Networks.html">Neural Network</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="08-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+<li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Estimands and Sensitivity Analyses</p></h1>
+<h4 class="author">Zehui Bai</h4>
+<h4 class="date">2024-11-30 20:35:41</h4>
+
+</div>
+
+
+<div id="introduction" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<div id="estimands-and-missing-data" class="section level2"
+number="1.1">
+<h2><span class="header-section-number">1.1</span> Estimands and Missing
+Data</h2>
+<p>Missing data in clinical studies is a major concern because it can
+compromise the validity, reliability, and generalizability of the
+study’s findings. In clinical trials, data is collected at various
+points to monitor the effects of interventions, track patient progress,
+and assess outcomes. However, missing data can occur due to various
+reasons, and if not handled properly, it can lead to biased results and
+flawed conclusions.</p>
+<p>Missing data may result from an intercurrent event (ICE) or simply
+due to a missed assessment. An <strong>intercurrent event</strong>
+refers to an event that happens after the treatment has started and
+affects either the collection of data or the interpretation of the
+treatment’s effect. For example, a patient might stop participating in
+the study due to adverse effects or an unrelated medical condition that
+prevents further follow-up. These events can complicate the
+interpretation of the data because they reflect disruptions that were
+not anticipated at the start of the trial. In contrast, a <strong>missed
+assessment</strong> refers to situations where data collection fails at
+a particular visit or time point. This could be due to logistical
+issues, scheduling conflicts, or patient non-compliance, and while it
+may not directly affect how the treatment’s effect is interpreted, it
+still results in incomplete data.</p>
+<p>Baseline data in clinical trials is usually complete. This is the
+data collected at the start of the study before any intervention begins.
+Baseline measurements are critical because they provide the reference
+point for understanding how patients change over time. Since baseline
+data is essential for trial validity, efforts are made to ensure that
+this data is thoroughly collected from all participants. However, as the
+study progresses, subsequent visits may have various missed assessments.
+These missing data points are more likely to occur during follow-up
+visits or data collection stages later in the study, particularly in
+long-term trials or studies involving frequent visits or tests.</p>
+<p>The potential impact of missing data on the interpretation of study
+findings is significant and needs to be carefully considered when
+designing the study protocol. If not managed properly, missing data can
+introduce <strong>bias</strong> into the study. This occurs when the
+missing data is not random but instead is related to specific factors
+that could affect the outcome. For example, if participants who drop out
+of the study tend to have worse health outcomes, then the study results
+may overestimate the treatment’s effectiveness. Another issue caused by
+missing data is the <strong>loss of statistical power</strong>, which
+happens when fewer data points are available for analysis. This makes it
+more difficult to detect real differences between treatment groups,
+increasing the likelihood of false conclusions.</p>
+<p>At the time of protocol development, researchers need to plan how to
+handle missing data and potential missing outcomes. Several strategies
+can be applied, including efforts to <strong>prevent missing
+data</strong> by ensuring robust follow-up processes or implementing
+strategies like reminder systems for patients. Additionally, statistical
+techniques such as <strong>imputation</strong> can be used to estimate
+missing values, or more advanced models that account for missing data
+can be employed. Sensitivity analysis, which tests how different
+assumptions about the missing data might affect the study’s results, is
+another important consideration. This ensures that the final conclusions
+are robust to various scenarios of missing data.</p>
+<p>One of the first steps in managing missing data is to identify the
+cause of the missing data. This can involve understanding whether the
+missing data is <strong>Missing Completely at Random (MCAR)</strong>,
+<strong>Missing at Random (MAR)</strong>, or <strong>Missing Not at
+Random (MNAR)</strong>. If data is MCAR, it means that the missing data
+is unrelated to any of the variables in the study, making the issue less
+concerning because it doesn’t introduce bias. MAR means that the missing
+data is related to observed variables, such as younger patients being
+more likely to miss follow-up visits. MNAR means that the missing data
+is related to unobserved data, such as patients with worse outcomes
+dropping out of the trial.</p>
+<p>When designing a study, it is important to clearly define the
+<strong>research questions of interest</strong> and how missing data may
+affect these questions. In clinical studies, <strong>estimands</strong>
+are used to define the quantity being estimated and answer the research
+questions. Estimands provide a framework that helps define the effect of
+the treatment or intervention under study. Handling missing data will
+depend on how the estimands are defined. For example, if the goal is to
+estimate the effect of the treatment assuming full adherence, missing
+data from participants who discontinue treatment could pose a problem
+and would need to be appropriately accounted for. Alternatively, if the
+estimand reflects real-world use of the treatment, data from
+participants who drop out might be considered part of the natural course
+of the study and handled differently.</p>
+<p>In conclusion, missing data is a complex issue that requires careful
+planning and consideration in clinical studies. The source of missing
+data, whether due to intercurrent events or missed assessments, needs to
+be clearly understood, and strategies for handling missing data should
+be built into the study design from the beginning. Identifying the
+causes of missing data, understanding the impact on study results, and
+aligning with the research objectives and estimands are essential for
+ensuring valid and interpretable findings in clinical research.</p>
+</div>
+<div id="estimand-estimators-and-estimation" class="section level2"
+number="1.2">
+<h2><span class="header-section-number">1.2</span> Estimand, Estimators
+and Estimation</h2>
+<p><strong>1. Trial Objective to Estimand Flow</strong> - <strong>Trial
+Objective</strong>: This is the primary goal or question that the trial
+seeks to answer. It’s the starting point for defining what the trial
+will focus on. - <strong>Estimand</strong>: A precise definition of what
+is to be estimated in the trial. It translates the trial objective into
+a statistically quantifiable entity. It is essentially what the trial
+aims to measure or the specific effect that the trial intends to
+estimate. - <strong>Main Estimator</strong>: The statistical methodology
+or approach used to estimate the estimand. This could be a specific
+statistical model or analysis technique. - <strong>Main
+Estimate</strong>: The actual numerical estimate obtained from applying
+the main estimator to the trial data. This is the result that addresses
+the trial objective. - <strong>Sensitivity Estimators and
+Estimates</strong>: Additional analyses conducted to assess the
+robustness of the main estimate against different assumptions or
+conditions. These help validate the reliability of the findings under
+various scenarios.</p>
+<p><img src="02_Plots/Estimand/Estimand_Estimator.png" width="75%" style="display: block; margin: auto;" /></p>
+<p><strong>2. Description of an Estimand: Attributes</strong> -
+<strong>Treatment</strong>: Identification of both the treatment of
+interest and the comparator (control treatment). It specifies what is
+being tested and against what it is being compared. -
+<strong>Variable</strong>: The primary measure or outcome variable that
+the study aims to evaluate. This could be a clinical metric,
+patient-reported outcome, or a biomarker. - <strong>Population</strong>:
+The specific group of patients targeted by the scientific question. This
+defines who the trial results will apply to. - <strong>Population-Level
+Summary</strong>: How the results are summarized across the entire study
+population, such as differences between means, ratios of proportions, or
+hazard ratios. This summarizes the treatment effect at the group
+level.</p>
+<p><img src="02_Plots/Estimand/Estimand_4Att.png" width="75%" style="display: block; margin: auto;" /></p>
+<p><strong>3. Intercurrent Events and Strategies to Address
+Them</strong> - Intercurrent events are occurrences during the trial
+that could affect the interpretation of the treatment effect, such as
+participants taking additional medication. - <strong>Treatment
+Policy</strong>: Considers the effect of the treatment as it is used in
+practice, including any additional medications taken. -
+<strong>Composite</strong>: Defines the endpoint to include whether or
+not intercurrent events occur, considering events like additional
+medication intake as part of the treatment assessment. -
+<strong>Hypothetical</strong>: Estimates what the treatment effect would
+have been if the intercurrent event had not occurred. -
+<strong>Principal Stratum</strong>: Focuses on a subset of participants
+who would not experience the intercurrent event, assessing the effect in
+this more controlled scenario. - <strong>While on Treatment</strong>:
+Looks at the treatment effect only before any intercurrent event occurs,
+isolating the effect of the treatment itself.</p>
+</div>
+<div id="causal" class="section level2" number="1.3">
+<h2><span class="header-section-number">1.3</span> Causal</h2>
+<p>Causal estimands are a critical concept in the field of statistics,
+particularly when it comes to understanding the effect of interventions
+in clinical trials and observational studies. They are designed to
+estimate the impact of a treatment by considering what the outcome would
+have been under different treatment conditions.</p>
+<ol style="list-style-type: decimal">
+<li><strong>Concept of Causal Estimands</strong></li>
+</ol>
+<p>Causal estimands are aimed at answering “what if” questions in a
+formal, quantitative way. They focus on understanding the effect of a
+specific treatment by asking how the outcomes would differ if the
+treatment were applied versus not applied, or if an alternative
+treatment were used. This approach aligns with causal inference, which
+seeks to infer the cause-and-effect relationship from data.</p>
+<ol start="2" style="list-style-type: decimal">
+<li><strong>Framework of Potential Outcomes</strong></li>
+</ol>
+<p>The potential outcomes framework is fundamental to causal inference
+and was originally formalized by Donald Rubin. It considers every
+subject in a study to have potential outcomes under each treatment
+condition. For example: - <span class="math inline">\(Y(1)\)</span>:
+Outcome if the subject receives the treatment. - <span
+class="math inline">\(Y(0)\)</span>: Outcome if the subject does not
+receive the treatment.</p>
+<p>These potential outcomes help to define the causal effect of the
+treatment, which cannot be observed directly since we can only observe
+one of these outcomes for each individual — the one corresponding to the
+treatment they actually received.</p>
+<ol start="3" style="list-style-type: decimal">
+<li><strong>Causal Estimand Formula</strong></li>
+</ol>
+<p>The basic causal estimand in a randomized controlled trial (RCT) can
+be expressed as: - <span class="math inline">\(E(Y(1)) -
+E(Y(0))\)</span> This represents the expected difference in outcomes
+between subjects assigned to the treatment versus those assigned to the
+control. This difference is what statisticians aim to estimate through
+the trial.</p>
+<ol start="4" style="list-style-type: decimal">
+<li><strong>Challenges in Observational Studies</strong></li>
+</ol>
+<p>In observational studies, where treatments are not randomly assigned,
+estimating causal effects becomes more complex due to potential
+confounding factors. Here, additional models and assumptions about how
+treatments are assigned to patients (assignment models) and how outcomes
+are generated (outcome models) are necessary. These models help to
+adjust for factors that may influence both the treatment assignment and
+the outcomes.</p>
+<ol start="5" style="list-style-type: decimal">
+<li><strong>International Council for Harmonization (ICH) and Causal
+Estimands</strong></li>
+</ol>
+<p>The ICH guidelines emphasize the importance of causal estimands in
+clinical trials, suggesting that the trials should be designed to answer
+specific causal questions. Even though the term “causal” is not
+explicitly used, the guidelines align with causal reasoning principles
+to ensure that the results of clinical trials are robust and
+interpretable in terms of causal effects.</p>
+<ol start="6" style="list-style-type: decimal">
+<li><strong>Statistical Inference for Causal Estimands</strong></li>
+</ol>
+<p>Statistical methods are employed to estimate causal estimands from
+the observed data. In RCTs, this often involves comparing the observed
+outcomes between the treatment and control groups, leveraging the
+randomization to argue that these groups are comparable. In
+non-randomized studies, more sophisticated statistical techniques, such
+as instrumental variable analysis, propensity score matching, or
+structural models, are required.</p>
+<ol start="7" style="list-style-type: decimal">
+<li><strong>Importance for Regulatory Authorities</strong></li>
+</ol>
+<p>Regulatory authorities, such as the FDA or EMA, are particularly
+interested in causal estimands because they provide a clear basis for
+regulatory decisions regarding drug approvals. By focusing on causal
+estimands, regulators can better understand the true effect of a drug,
+independent of other confounding treatment or patient
+characteristics</p>
+</div>
+<div id="missing-data-vs-intercurrent-event" class="section level2"
+number="1.4">
+<h2><span class="header-section-number">1.4</span> Missing data vs
+intercurrent event</h2>
+<p>Intercurrent events are incidents that occur after the initiation of
+treatment and may impact the interpretation of the trial outcomes or
+affect the continuity of the measurements related to the clinical
+question of interest. These can include events such as patients starting
+additional therapies, experiencing side effects leading to treatment
+discontinuation, or any other circumstances that alter the course of
+standard treatment administration.</p>
+<p>Missing data refers to information that was intended to be collected
+but was not, due to various reasons such as patients dropping out of the
+study, missing visits, or failure to record certain outcomes. It’s
+important to distinguish between data that is missing because it was not
+collected (but could have been under different circumstances) and data
+that is considered not meaningful due to an intercurrent event.</p>
+<p><img src="02_Plots/Estimand/Missing_QA.png" width="75%" style="display: block; margin: auto;" /></p>
+<p><strong>Handling Strategies for Intercurrent Events and Missing
+Data</strong></p>
+<p><strong>1. Treatment Policy Strategy:</strong> -
+<strong>Approach:</strong> Includes all data up to and possibly
+including the intercurrent event, considering the measurements of
+interest regardless of subsequent therapies or changes. -
+<strong>Missing Data Issue:</strong> Here, the missing data problem may
+arise when assuming values for unobserved outcomes based on the observed
+data. For example, if patients are lost to follow-up but are assumed to
+continue on their projected path without treatment changes.</p>
+<p><strong>2. Hypothetical Strategy:</strong> -
+<strong>Approach:</strong> Assumes a scenario where the intercurrent
+event, such as treatment discontinuation, does not occur. -
+<strong>Missing Data Issue:</strong> Focuses on hypothetical data. For
+instance, it would not consider data from follow-up visits if a patient
+had not been lost to follow-up, imagining the patient remained in the
+trial under the initial treatment conditions.</p>
+<p><strong>3. Composite Strategy:</strong> - <strong>Approach:</strong>
+Combines multiple elements or outcomes into a single variable that
+incorporates the intercurrent event as part of the variable of interest.
+- <strong>Missing Data Issue:</strong> Typically, there is no missing
+data concern under this strategy as the intercurrent events are
+accounted for within the composite outcome measure.</p>
+<p><strong>4. While-on-Treatment Strategy:</strong> -
+<strong>Approach:</strong> Analyzes the response to treatment only up to
+the point of an intercurrent event. - <strong>Missing Data
+Issue:</strong> There is generally no missing data because the analysis
+only includes data collected while the patients were on treatment and
+before any intercurrent event.</p>
+<p><strong>5. Principal Stratum Strategy:</strong> -
+<strong>Approach:</strong> Focuses on specific subgroups (strata) that
+are not affected by the intercurrent events, based on their potential
+outcomes under different treatment scenarios. - <strong>Missing Data
+Issue:</strong> This strategy avoids missing data issues by defining the
+population such that the intercurrent event is not considered relevant
+for the stratum of interest. It inherently excludes patients from the
+analysis if they are outside the target strata.</p>
+</div>
+<div id="sensitivity-versus-supplementary-analysis"
+class="section level2" number="1.5">
+<h2><span class="header-section-number">1.5</span> Sensitivity versus
+Supplementary Analysis</h2>
+<p><strong>Sensitivity Analysis</strong></p>
+<ul>
+<li><strong>Purpose</strong>: Sensitivity analysis is performed to
+assess the robustness of the conclusions derived from the main analysis
+of a clinical trial. It involves testing how the main findings hold up
+under various assumptions or variations in the analysis model.</li>
+<li><strong>Process</strong>: This type of analysis typically involves
+using multiple sensitivity estimators that deviate in specific ways from
+the main estimator’s assumptions. For instance, sensitivity analyses may
+involve changing assumptions about the distribution of the data, the
+model used, or handling of missing data.</li>
+<li><strong>Objective</strong>: The goal is to explore the extent to
+which the main findings are dependent on the assumptions made in the
+statistical modeling. This is crucial for verifying that the conclusions
+are not unduly influenced by these assumptions and therefore can be
+considered reliable under a variety of scenarios.</li>
+</ul>
+<p><strong>Supplementary Analysis</strong></p>
+<ul>
+<li><strong>Purpose</strong>: Supplementary analysis goes beyond
+sensitivity analysis to further explore and understand the treatment
+effects. These analyses are usually more exploratory in nature and are
+often conducted to address additional research questions or hypotheses
+that were not the primary focus of the main analysis.</li>
+<li><strong>Process</strong>: This could include additional analyses as
+requested by regulatory authorities, or analyses planned after reviewing
+initial findings to probe deeper into specific areas of interest.
+Supplementary analyses may investigate different subgroups of patients,
+additional endpoints, or longer-term outcomes that were not part of the
+original estimand.</li>
+<li><strong>Objective</strong>: The main aim is to provide a broader
+understanding of the data and treatment effects. This might involve
+confirming the findings from the main analysis, exploring areas where
+the main analysis was inconclusive, or generating new insights that
+could lead to further research questions.</li>
+</ul>
+<p><img src="02_Plots/Estimand/Estimand_Sen_Supp.png" width="75%" style="display: block; margin: auto;" /></p>
+<p><strong>Key Differences and Interplay</strong></p>
+<ul>
+<li><strong>Scope</strong>: Sensitivity analysis is more focused on
+testing the stability and reliability of the results under different
+assumptions directly linked to the main outcome of interest defined by
+the estimand. In contrast, supplementary analysis often has a broader
+scope, potentially addressing new or secondary questions that extend
+beyond the original estimand.</li>
+<li><strong>Outcome Dependency</strong>: Sensitivity analyses are
+inherently tied to the outcomes of the main estimator and focus on the
+dependencies and variabilities around these outcomes. Supplementary
+analyses, however, might explore entirely new outcomes or expand on the
+findings of the main analysis in ways that provide additional context or
+insights.</li>
+<li><strong>Regulatory Impact</strong>: Sensitivity analyses are
+critical for regulatory review, providing evidence that the study
+findings are robust and not unduly influenced by specific assumptions.
+Supplementary analyses, while informative, may not always be crucial for
+regulatory approval but can be important for labeling, post-marketing
+commitments, or future clinical development strategies.</li>
+</ul>
+</div>
+<div id="disease-specific-guideline" class="section level2"
+number="1.6">
+<h2><span class="header-section-number">1.6</span> Disease Specific
+Guideline</h2>
+<p>European Medicines Agency (EMA) and the U.S. Food and Drug
+Administration (FDA) include estimands in their specific disease
+guidance documents</p>
+<ol style="list-style-type: decimal">
+<li><strong>EMA Guidance:</strong>
+<ul>
+<li><strong>Diseases Covered</strong>: The EMA has incorporated the use
+of estimands in the guidelines for several conditions and areas,
+including:
+<ul>
+<li>Diabetes</li>
+<li>Alzheimer’s disease</li>
+<li>Acute kidney injury</li>
+<li>Chronic non-infectious liver diseases</li>
+<li>Epileptic disorders</li>
+<li>Medicinal products with genetically modified cells</li>
+<li>Registry-based studies</li>
+</ul></li>
+</ul></li>
+<li><strong>FDA Guidance:</strong>
+<ul>
+<li><strong>Diseases Covered</strong>: The FDA also specifies the use of
+estimands in their guidance for diseases such as:
+<ul>
+<li>Eosinophilic esophagitis</li>
+<li>Acute myeloid leukemia</li>
+<li>Chronic rhinosinusitis with nasal polyps</li>
+</ul></li>
+</ul></li>
+</ol>
+</div>
+</div>
+<div id="analysis-of-treatment-policy-estimands" class="section level1"
+number="2">
+<h1><span class="header-section-number">2</span> Analysis of Treatment
+Policy Estimands</h1>
+<div id="case-study-type-2-diabetes" class="section level2"
+number="2.1">
+<h2><span class="header-section-number">2.1</span> Case Study: type 2
+diabetes</h2>
+<p><img src="02_Plots/Estimand/Estimand_S2_Case.png" width="75%" style="display: block; margin: auto;" /></p>
+<p><strong>Study Design</strong></p>
+<ul>
+<li>Type: Parallel, randomized, placebo-controlled, blinded trial</li>
+<li>Size: 400 patients, randomized in a 1:1 ratio between the test
+treatment and placebo</li>
+</ul>
+<p><strong>Population</strong></p>
+<ul>
+<li>Participants: Patients with type 2 diabetes managed solely by diet
+and exercise</li>
+</ul>
+<p><strong>Treatments</strong></p>
+<ul>
+<li>Comparison: Test treatment versus placebo</li>
+</ul>
+<p><strong>Key Variable</strong></p>
+<ul>
+<li>Primary Endpoint: Change in Hemoglobin A1c (HbA1c) levels from
+baseline to week 26. HbA1c is a marker of average blood glucose levels
+over the previous two to three months, with a decrease indicating
+improvement in diabetes management.</li>
+</ul>
+<p><strong>Summary Measure</strong></p>
+<ul>
+<li>Assessment: Expected change from baseline to week 26 in HbA1c, with
+a between-group comparison focusing on the difference in changes between
+the test treatment and placebo groups.</li>
+</ul>
+<p><strong>Intercurrent Event</strong></p>
+<ul>
+<li>Event Description: Discontinuation of the randomized treatment and
+switch to unblinded use of the test treatment. This event is considered
+under a single category termed ‘treatment non-adherence,’ which
+includes:
+<ul>
+<li>For patients initially receiving the test treatment, this would
+involve continuing the test treatment but in an unblinded manner.</li>
+<li>For patients initially receiving placebo, this would involve
+switching to the test treatment, also unblinded.</li>
+</ul></li>
+</ul>
+<p><strong>Visit Schedule</strong></p>
+<ul>
+<li>Visits: One baseline visit (V0) and five post-baseline visits
+(V1-V5), with V5 at week 26 marking the end of the study period.</li>
+</ul>
+<p><strong>Implications of the Design and Intercurrent
+Event</strong></p>
+<ol style="list-style-type: decimal">
+<li><p>Unblinding Risks: The possibility of patients switching from
+placebo to the test treatment and from blinded to unblinded test
+treatment use could potentially introduce biases or affect the trial’s
+integrity by revealing treatment assignments. This needs careful
+handling to maintain the validity of the study outcomes.</p></li>
+<li><p>Handling of Non-adherence: The study’s approach to treatment
+discontinuation (categorized as non-adherence) could impact the
+interpretation of the efficacy data. It’s crucial how this data will be
+analyzed, as non-adherence might affect the comparability between groups
+if not properly accounted for in the analysis.</p></li>
+<li><p>Efficacy Measurement: The primary focus on the change in HbA1c
+allows for a direct assessment of the treatment’s impact on glucose
+regulation over a substantial period, aligning well with clinical
+objectives in diabetes care. The measure is objective and quantifiable,
+providing a clear metric for evaluating the effectiveness of the
+treatment.</p></li>
+<li><p>Ethical Considerations: Allowing patients on placebo to switch to
+the test treatment (unblinded) after discontinuation could be seen as
+enhancing the ethical conduct of the trial by potentially providing a
+beneficial treatment to those not initially receiving it. However, this
+must be balanced against the risk of bias introduced by such
+switches.</p></li>
+</ol>
+</div>
+<div id="treatment-policy-estimand-of-interest" class="section level2"
+number="2.2">
+<h2><span class="header-section-number">2.2</span> Treatment Policy
+Estimand of Interest</h2>
+<p>Here’s a breakdown of the key components:</p>
+<p><strong>Population:</strong></p>
+<ul>
+<li>Patients with type 2 diabetes who are managing their condition
+solely through diet and exercise.</li>
+</ul>
+<p><strong>Treatments:</strong></p>
+<ul>
+<li>The trial compares a test treatment with a placebo. The crucial
+aspect of this estimand is that it considers the effect of the
+treatments regardless of the patients’ adherence to the assigned
+treatment regimen.</li>
+</ul>
+<p><strong>Variable:</strong></p>
+<ul>
+<li>The primary endpoint is the change in Hemoglobin A1c (HbA1c) from
+baseline to week 26. HbA1c is a key indicator that reflects the average
+blood glucose concentration over the previous three months.</li>
+</ul>
+<p><strong>Summary Measure:</strong></p>
+<ul>
+<li>The expected change from baseline in HbA1c at week 26, with the
+analysis focusing on the difference between the two groups. This measure
+will help determine if the test treatment is more effective than the
+placebo in lowering blood glucose levels over the trial period.</li>
+</ul>
+<p><img src="02_Plots/Estimand/Estimand_S2_TPShema.png" width="75%" style="display: block; margin: auto;" /></p>
+<p><strong>Data Collection Approach:</strong></p>
+<ul>
+<li>Data will continue to be collected until the primary endpoint for
+all patients, including those who do not adhere to the treatment to
+which they were initially randomized. This approach supports the
+treatment policy estimand by capturing the full scope of treatment
+effects, inclusive of all deviations from the protocol that might occur
+during the trial.</li>
+</ul>
+<p><strong>Significance of This Estimand:</strong></p>
+<ul>
+<li>This estimand is significant because it aims to capture the
+‘real-world’ effectiveness of the test treatment. By evaluating the
+impact of the treatment irrespective of adherence, the estimand provides
+a more comprehensive understanding of how effective the treatment could
+be in typical clinical practice, where patients may not always follow
+prescribed treatments strictly.</li>
+</ul>
+<p>The treatment policy estimand approach allows the study results to be
+more generalizable and reflective of practical clinical outcomes,
+acknowledging that non-adherence is a common occurrence in real-world
+settings. This makes the findings relevant for healthcare providers and
+policymakers when considering the potential benefits and limitations of
+new treatments for type 2 diabetes.</p>
+</div>
+<div id="missing-data-under-treatment-policy-strategy"
+class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> Missing data under
+treatment policy strategy</h2>
+<p>Missing data imputation is a critical process in clinical trials,
+particularly when ensuring the integrity and robustness of the study’s
+results in the face of missing data due to non-adherence, dropouts, or
+other reasons. Aligning missing data imputation strategies with the
+targeted estimand and considering clinically and statistically sound
+assumptions are essential for maintaining the validity of the trial’s
+conclusions.</p>
+<p><img src="02_Plots/Estimand/Estimand_S2_TPMissing.png" width="75%" style="display: block; margin: auto;" /></p>
+<p><strong>Principles for Missing Data Imputation:</strong></p>
+<ul>
+<li><strong>Alignment with Estimand:</strong> The method of imputation
+should reflect the nature of the estimand. For a treatment policy
+estimand, the imputation method should accommodate data in a way that
+reflects the intention-to-treat principle, considering all assigned
+treatments as if they were followed as per protocol.</li>
+<li><strong>Clinically Plausible Assumptions:</strong> These depend on
+the therapeutic context, disease characteristics, and the treatment
+mechanism. Assumptions must consider factors like whether the drug is
+disease-modifying or merely symptomatic and its pharmacokinetics such as
+half-life.</li>
+<li><strong>Adequate Modelling Assumptions:</strong> The statistical
+model used for imputation should be robust, minimizing bias and
+providing a reliable approximation of missing values based on available
+data.</li>
+</ul>
+<p><strong>Common Imputation Methods:</strong></p>
+<p>These methods are often used in scenarios where treatment
+discontinuation leads to missing data, and the aim is to estimate the
+trajectory of patients’ outcomes as if they had continued on the
+assigned treatment or shifted to a control or placebo condition.</p>
+<p>When choosing an imputation method, it is critical to consider the
+nature of the disease and treatment. For instance, in chronic conditions
+where effects are prolonged and discontinuations common, more nuanced
+approaches like CIR might be more appropriate than J2R, which could be
+more suitable for acute settings or where the drug effect is expected to
+cease immediately upon discontinuation.</p>
+<p><strong>Comparison of Methods</strong></p>
+<ul>
+<li><strong>Reference-Based Methods (J2R, CIR, CR)</strong>:
+<ul>
+<li><strong>Jump to Reference (J2R / JR)</strong>: Assumes all drug
+effects cease immediately upon discontinuation, with future outcomes
+following the placebo trajectory.</li>
+<li><strong>Copy Increment in Reference (CIR)</strong>: Assumes the rate
+of change (increment) in the patient’s outcomes will start to mimic
+those observed in the placebo group post-discontinuation.</li>
+<li><strong>Copy Reference (CR)</strong>: Patients are assumed to follow
+the entire trajectory of the placebo group from the point of their
+discontinuation.</li>
+</ul></li>
+<li><strong>Missing at Random (MAR)</strong>:
+<ul>
+<li>Suitable when the reasons for missing data are related to observed
+factors rather than the missing data itself, assuming a similarity in
+behavior between those with complete and incomplete data.</li>
+</ul></li>
+<li><strong>Retrieved Dropout (RDO) Imputation</strong>:
+<ul>
+<li>Useful in scenarios where it’s possible to track outcomes of
+patients post-discontinuation, providing a more direct observation of
+potential outcomes for dropouts. This method is particularly valuable
+when analyzing long-term effects and adherence issues in clinical
+trials.</li>
+</ul></li>
+</ul>
+<div id="jump-to-reference-j2r-jr-imputation"
+class="section level3 unnumbered">
+<h3 class="unnumbered">1. Jump to Reference (J2R / JR) Imputation</h3>
+<ul>
+<li><strong>Overview</strong>: This method assumes that any drug effect
+disappears immediately upon discontinuation, and the patient’s condition
+reverts to what it would have been under the placebo.
+<ul>
+<li><strong>Description:</strong> This method assumes that any effect
+from the active drug ceases immediately upon discontinuation. Patients
+are then assumed to “jump” to the trajectory typical of the reference
+group, usually the placebo arm.</li>
+<li><strong>Use Case:</strong> Appropriate when the drug effect
+dissipates quickly after discontinuation.</li>
+</ul></li>
+<li><strong>Visualization Details</strong>:
+<ul>
+<li>Similar to CR, the blue line represents the drug arm and the black
+line represents the control (placebo) arm.</li>
+<li>Patients who discontinue the drug are assumed to revert to a
+condition similar to the placebo group immediately.</li>
+<li>Future values are worse than if they had continued on the drug but
+are aligned with the mean of the placebo group for simplicity in
+analysis.</li>
+</ul></li>
+</ul>
+<p><img src="02_Plots/Estimand/Estimand_S2_MI_JR.png" width="75%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="copy-reference-cr-imputation"
+class="section level3 unnumbered">
+<h3 class="unnumbered">2. Copy Reference (CR) Imputation</h3>
+<ul>
+<li><strong>Overview</strong>: In the CR method, it is assumed that once
+a patient discontinues the drug, their future values will mimic the
+trajectory of the placebo arm, regardless of any benefit they might have
+initially experienced from the drug.
+<ul>
+<li><strong>Description:</strong> Here, the assumption is that after
+discontinuation, the changes (increments) in the patient’s measurements
+mimic those observed in the reference group from that point
+forward.</li>
+<li><strong>Use Case:</strong> Useful when the drug’s effect diminishes
+gradually rather than instantly, allowing for a more gradual transition
+in the effect observed in patients.</li>
+</ul></li>
+<li><strong>Visualization Details</strong>:
+<ul>
+<li>The blue line represents the drug arm, and the black line represents
+the placebo arm.</li>
+<li>Patients who drop out are assumed to follow the trajectory of the
+placebo arm exactly from the point of dropout.</li>
+<li>The imputed values for future observations are aligned with the mean
+trajectory of the placebo group.</li>
+</ul></li>
+</ul>
+<p><img src="02_Plots/Estimand/Estimand_S2_MI_CIR.png" width="75%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="copy-increments-in-reference-cir-imputation"
+class="section level3 unnumbered">
+<h3 class="unnumbered">3. Copy Increments in Reference (CIR)
+Imputation</h3>
+<ul>
+<li><strong>Overview</strong>: This method assumes that patients who
+drop out from the drug arm do not revert entirely to the placebo
+condition but instead begin to follow the incremental changes observed
+in the placebo arm. This acknowledges some residual effect of the drug
+that was taken before dropout.
+<ul>
+<li><strong>Description:</strong> Patients are assumed to follow the
+distribution pattern of the reference group from the point of
+randomization. This method effectively resets the patient’s expected
+outcome to mirror the reference group entirely from the start of the
+study.</li>
+<li><strong>Use Case:</strong> Best suited for scenarios where treatment
+effects are unclear or highly variable, or when the treatment is
+suspected to have no lasting independent effects beyond
+discontinuation.</li>
+</ul></li>
+<li><strong>Visualization Details</strong>:
+<ul>
+<li>The drug’s impact is considered to taper off, not abruptly stop, as
+patients begin to mimic the incremental progress (or lack thereof) of
+the placebo arm from their last observed value.</li>
+<li>This creates a more gradual transition in the dataset, potentially
+reflecting a more realistic scenario of drug discontinuation
+effects.</li>
+</ul></li>
+</ul>
+<p><img src="02_Plots/Estimand/Estimand_S2_MI_CR.png" width="75%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="missing-at-random-mar" class="section level3 unnumbered">
+<h3 class="unnumbered">4. Missing at Random (MAR)</h3>
+<ul>
+<li><strong>Implementation</strong>: This approach assumes that missing
+data can be modeled based on similar subjects within the same treatment
+arm, considering that missingness is not related to unobserved
+variables.</li>
+<li><strong>Visualization and Usage</strong>: The graph illustrates how
+variability in outcomes increases over time, which is a typical scenario
+in long-term studies. The imputed values (squares) are based on the
+conditional mean given the observed values, which helps maintain the
+internal consistency of the dataset.</li>
+</ul>
+<p><img src="02_Plots/Estimand/Estimand_S2_MI_MAR.png" width="75%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="retrieved-dropout-rdo" class="section level3 unnumbered">
+<h3 class="unnumbered">5. Retrieved Dropout (RDO)</h3>
+<ul>
+<li><strong>Concept</strong>: The RDO method focuses on utilizing data
+from patients who discontinued treatment but whose outcomes continue to
+be tracked. This approach helps model what could happen to patients who
+drop out, by using data from those who have similar profiles but remain
+under observation.</li>
+<li><strong>Implementation and Challenges</strong>: For patients with
+missing data at a specific visit, information is borrowed from similar
+patients in the same treatment arm who have available dropout data. This
+method requires a sufficient amount of RDO data for reliable imputation
+and can lead to variance inflation if the data is not sufficient,
+impacting the bias-variance trade-off.</li>
+<li><strong>Visualization</strong>: The diagram shows various points
+where patients either continue, drop out, or are followed after
+discontinuation, with imputed values being informed by the retrieved
+dropout data.</li>
+</ul>
+<p><img src="02_Plots/Estimand/Estimand_S2_MI_RDO.png" width="75%" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="multiple-imputation" class="section level2" number="2.4">
+<h2><span class="header-section-number">2.4</span> Multiple
+Imputation</h2>
+<p><img src="02_Plots/Estimand/Estimand_S2_MIScheme.png" width="75%" style="display: block; margin: auto;" /></p>
+<div id="step-1-parameter-estimation-imputation-model"
+class="section level3 unnumbered">
+<h3 class="unnumbered">Step 1: Parameter Estimation (Imputation
+Model)</h3>
+<ul>
+<li><strong>Objective</strong>: Fit a multivariate normal distribution
+for each treatment arm using data observed prior to any intercurrent
+event (ICE), such as dropout or switching treatments.</li>
+<li><strong>Components</strong>:
+<ul>
+<li><span class="math inline">\(\mu_a, \Sigma_a\)</span>: Mean and
+covariance matrix for the active treatment arm.</li>
+<li><span class="math inline">\(\mu_r, \Sigma_r\)</span>: Mean and
+covariance matrix for the reference (placebo) arm.</li>
+<li>Uninformative priors are used for both the mean and the covariance
+matrices, with the covariance matrix typically employing an Inverse
+Wishart distribution. This choice helps in avoiding bias from overly
+prescriptive assumptions about the data structure.</li>
+</ul></li>
+</ul>
+</div>
+<div id="step-2-imputation" class="section level3 unnumbered">
+<h3 class="unnumbered">Step 2: Imputation</h3>
+<ul>
+<li><strong>Objective</strong>: Generate multiple complete datasets by
+imputing missing values based on the distributions estimated in Step
+1.</li>
+<li><strong>Process</strong>:
+<ul>
+<li><p>Draw from the posterior distribution of parameters <span
+class="math inline">\(\mu_r, \Sigma_r, \mu_a, \Sigma_a\)</span>
+established in Step 1.</p></li>
+<li><p>Construct a joint distribution of observed and missing data to
+facilitate imputation.</p></li>
+<li><p>Impute missing data from the conditional distribution of <span
+class="math inline">\(Y_{miss} | Y_{obs}\)</span>, where <span
+class="math inline">\(Y_{miss}\)</span> is the missing data and <span
+class="math inline">\(Y_{obs}\)</span> is the observed data, based on
+the relationships established in the model.</p></li>
+<li><p>The imputation is repeated multiple times (commonly denoted as
+<span class="math inline">\(M\)</span> times), creating multiple
+complete datasets.</p></li>
+<li><p>Different imputation means are calculated depending on the
+method: J2R, CIR, CR. Each method adjusts the imputation based on the
+reference trajectory, whether it’s a direct copy, an increment
+adjustment, or a complete jump to the reference values at the time of
+dropout.</p>
+<ul>
+<li><strong>J2R Mean (<span
+class="math inline">\(\tilde{\mu}\)</span>)</strong>:
+<ul>
+<li>For Jump to Reference, the imputed values for post-ICE data are a
+direct continuation of the reference group mean from the latest observed
+time point (<span class="math inline">\(t_i\)</span>), effectively
+assuming that the treatment effect disappears and the patient follows
+the placebo trajectory.</li>
+</ul></li>
+<li><strong>CIR Mean (<span
+class="math inline">\(\tilde{\mu}\)</span>)</strong>:
+<ul>
+<li>For Copy Increment in Reference, the imputed values are calculated
+as a blend of the active arm’s trajectory up to the last observed time
+point and then shifting towards the change observed in the reference
+group. This reflects a gradual decline or alteration in the treatment
+effect rather than an abrupt stop.</li>
+</ul></li>
+<li><strong>CR Mean (<span
+class="math inline">\(\tilde{\mu}\)</span>)</strong>:
+<ul>
+<li>For Copy Reference, the imputed values are straightforwardly set to
+follow the reference arm’s mean (<span
+class="math inline">\(\mu_r\)</span>), assuming that post-dropout, the
+patient’s outcomes align exactly with those typically seen in the
+placebo group.</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div id="step-3-analysis" class="section level3 unnumbered">
+<h3 class="unnumbered">Step 3: Analysis</h3>
+<ul>
+<li><strong>Objective</strong>: Analyze each dataset independently to
+compute the summary measures of interest, which might include means,
+variances, or other statistical tests.</li>
+<li><strong>Importance</strong>: This step allows for the assessment of
+variability and the robustness of the study results across different
+imputed datasets.</li>
+</ul>
+</div>
+<div id="step-4-pooling" class="section level3 unnumbered">
+<h3 class="unnumbered">Step 4: Pooling</h3>
+<ul>
+<li><strong>Objective</strong>: Combine results from multiple imputed
+datasets.</li>
+<li><strong>Methodology</strong>: Use Rubin’s rules to pool the results.
+Rubin’s rules provide a way to combine estimates from multiple imputed
+datasets to obtain overall estimates and their variances, accounting for
+both within-imputation and between-imputation variability. This approach
+helps in deriving more accurate confidence intervals and p-values.</li>
+</ul>
+</div>
+</div>
+<div id="analysis-of-treatment-policy-estimands-1"
+class="section level2" number="2.5">
+<h2><span class="header-section-number">2.5</span> Analysis of Treatment
+Policy Estimands</h2>
+<p>An analysis of the example randomized controlled trial in patients
+with type 2 diabetes. The analyses in this worksheet target a treatment
+policy estimand, i.e., we are interested in the comparison between
+treatment versus placebo group irrespective of whether or not patients
+experienced the intercurrent event of treatment discontinuation.</p>
+<p><img src="02_Plots/Estimand/Estimand_S2_Results.png" width="75%" style="display: block; margin: auto;" /></p>
+<div id="review-data" class="section level3" number="2.5.1">
+<h3><span class="header-section-number">2.5.1</span> Review Data</h3>
+<p>Although we are interested in the treatment effect irrespective of
+whether or not a patient discontinued randomized treatment, it is still
+generally of interest to understand the proportion of patients who
+adhered or discontinued treatment.</p>
+<p>Let us create a table to summarize the number and proportion of
+patients who discontinued treatment by group and visit.</p>
+<pre><code>## $ctl
+##  ontrt            1            2            3            4            5
+##      0   8   (4.0%)  18   (9.0%)  31  (15.5%)  43  (21.5%)  50  (25.0%)
+##      1 192  (96.0%) 182  (91.0%) 169  (84.5%) 157  (78.5%) 150  (75.0%)
+##  Total 200 (100.0%) 200 (100.0%) 200 (100.0%) 200 (100.0%) 200 (100.0%)
+## 
+## $trt
+##  ontrt            1            2            3            4            5
+##      0   5   (2.5%)  12   (6.0%)  20  (10.0%)  27  (13.5%)  29  (14.5%)
+##      1 195  (97.5%) 188  (94.0%) 180  (90.0%) 173  (86.5%) 171  (85.5%)
+##  Total 200 (100.0%) 200 (100.0%) 200 (100.0%) 200 (100.0%) 200 (100.0%)</code></pre>
+<p>Now let us create a figure to show the mean change in HbA1c from
+baseline by visit, treatment group and whether they have experienced the
+intercurrent event of treatment discontinuation</p>
+<p><img src="04-Design-Estimands-Practice_files/figure-html/unnamed-chunk-17-1.png" width="960" /></p>
+</div>
+<div id="analysis-of-data-ancova" class="section level3" number="2.5.2">
+<h3><span class="header-section-number">2.5.2</span> Analysis of Data
+(ANCOVA)</h3>
+<p>As we have no missing data, we can perform our analysis just using
+ANCOVA. Our primary estimand is interested in the change in HbA1c from
+baseline to week 26 (visit 5), so we can restrict our analysis to
+visitn==5.</p>
+<pre><code>## 
+## Call:
+## lm(formula = hba1cChg ~ group + hba1cBl, data = .)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.1306 -0.7002 -0.0591  0.7915  3.2440 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  5.94031    0.63404   9.369  &lt; 2e-16 ***
+## grouptrt    -0.68208    0.10915  -6.249 1.07e-09 ***
+## hba1cBl     -0.76454    0.07976  -9.585  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.092 on 397 degrees of freedom
+## Multiple R-squared:  0.2482, Adjusted R-squared:  0.2444 
+## F-statistic: 65.52 on 2 and 397 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="trial-with-missing-data" class="section level3" number="2.5.3">
+<h3><span class="header-section-number">2.5.3</span> Trial with Missing
+Data</h3>
+<pre><code>## $ctl
+##                    dispo            1            2            3            4
+##                Off-study   2   (1.0%)   7   (3.5%)  14   (7.0%)  24  (12.0%)
+##  Off-treatment, on-study   6   (3.0%)  11   (5.5%)  17   (8.5%)  19   (9.5%)
+##             On-treatment 192  (96.0%) 182  (91.0%) 169  (84.5%) 157  (78.5%)
+##                    Total 200 (100.0%) 200 (100.0%) 200 (100.0%) 200 (100.0%)
+##             5
+##   32  (16.0%)
+##   18   (9.0%)
+##  150  (75.0%)
+##  200 (100.0%)
+## 
+## $trt
+##                    dispo            1            2            3            4
+##                Off-study   1   (0.5%)   4   (2.0%)   9   (4.5%)  14   (7.0%)
+##  Off-treatment, on-study   4   (2.0%)   8   (4.0%)  11   (5.5%)  13   (6.5%)
+##             On-treatment 195  (97.5%) 188  (94.0%) 180  (90.0%) 173  (86.5%)
+##                    Total 200 (100.0%) 200 (100.0%) 200 (100.0%) 200 (100.0%)
+##             5
+##   16   (8.0%)
+##   13   (6.5%)
+##  171  (85.5%)
+##  200 (100.0%)</code></pre>
+</div>
+<div id="complete-case-analysis" class="section level3" number="2.5.4">
+<h3><span class="header-section-number">2.5.4</span> Complete-Case
+Analysis</h3>
+<pre><code>## 
+## Call:
+## lm(formula = hba1cChg ~ group + hba1cBl, data = .)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.1634 -0.6974 -0.0336  0.7934  3.1896 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  5.86939    0.67544   8.690  &lt; 2e-16 ***
+## grouptrt    -0.74453    0.11422  -6.518 2.49e-10 ***
+## hba1cBl     -0.74898    0.08605  -8.704  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.07 on 349 degrees of freedom
+##   (48 observations deleted due to missingness)
+## Multiple R-squared:  0.2602, Adjusted R-squared:  0.256 
+## F-statistic: 61.38 on 2 and 349 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="multiple-imputation-analysis-jr---jump-to-reference"
+class="section level3" number="2.5.5">
+<h3><span class="header-section-number">2.5.5</span> Multiple imputation
+analysis (JR - Jump to Reference)</h3>
+<p>However, first we need to create:</p>
+<ul>
+<li>A dataset showing the visit when the intercurrent event occurred for
+each patient.</li>
+<li>A list of the key variables to be used in the imputation step.</li>
+</ul>
+<p><em>Note that in reality we never observe the missing data.
+Therefore, we would not be able to decide on the imputation strategy
+based on the data. Instead this should be based on clinically plausible
+assumptions depending on the therapeutic setting, disease
+characteristics and treatment mechanism.</em></p>
+<p>ry running some different analyses on data_missing using different
+assumptions for the missing data. Strategies available in rbmi are:</p>
+<ul>
+<li>MAR - Missing At Random</li>
+<li>JR - Jump to Reference</li>
+<li>CR - Copy Reference</li>
+<li>CIR - Copy Increments in Reference</li>
+<li>LMCF - Last Mean Carried Forward</li>
+</ul>
+<p>Step 1: Fit the imputation model to the observed data</p>
+<pre><code>{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+# Define which imputation method 
+# Here we use Bayesian multiple imputation with 250 imputed datasets 
+set.seed(123456)
+method &lt;- rbmi::method_bayes(burn_in = 200,
+                             burn_between = 6,
+                             n_samples = 250)
+
+# Create samples for the imputation parameters by running the draws() function
+
+drawObj &lt;- draws(data = data_missing,
+                 data_ice = dat_ice,
+                 vars = vars,
+                 method = method)</code></pre>
+<p>Step 2: Impute the missing data using the imputation model multiple
+times</p>
+<pre><code>{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+# Impute the data using the imputation model above
+# In the dataset `dat_ice` we specified a jump-to-reference strategy
+# Now we need to specify for each group what this &#39;reference&#39; is
+# Set reference arm in control group to itself to the control group
+# Set reference arm in treatment group to control group
+imputeObj &lt;- rbmi::impute(draws = drawObj,
+                    references = c(&quot;trt&quot;=&quot;ctl&quot;, 
+                                   &quot;ctl&quot;=&quot;ctl&quot;))</code></pre>
+<p>Step 3: Analyse each complete dataset</p>
+<pre><code>{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+# Fit the analysis model (ANCOVA) on each imputed dataset
+# Analysis model includes group and baseline HbA1c as covariates
+anaObj &lt;- analyse(imputations = imputeObj, 
+                  fun = ancova,
+                  vars = set_vars(outcome = &quot;hba1cChg&quot;,
+                                  visit = &quot;visitn&quot;,
+                                  subjid = &quot;subjid&quot;,
+                                  group = &quot;group&quot;,
+                                  covariates = &quot;hba1cBl&quot;))</code></pre>
+<p>Step 4: Combine the results to obtain point estimate and variance
+estimation</p>
+<pre><code>{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+# Pool the results to get treatment effects
+# In the output:
+# trt_x refers to the difference between control and treatment group at visit x
+# lsm_ref_x is the change from baseline in the reference group (control) at visit x
+# lsm_alt_x is the change from baseline in the alternative group (treatment) at visit x
+poolObj &lt;- pool(results = anaObj, conf.level = 0.95, alternative = &quot;two.sided&quot;)
+poolObj</code></pre>
+</div>
+<div id="retrieved-dropout-models" class="section level3"
+number="2.5.6">
+<h3><span class="header-section-number">2.5.6</span> Retrieved-dropout
+models</h3>
+<p>This practical above has only covered reference-based imputation
+methods. An alternative approach is to use retrieved-dropout models. The
+link below contains a vignette showing how the rmbi package can also be
+used to implement this approach.</p>
+<p><a
+href="https://insightsengineering.github.io/rbmi/main/articles/retrieved_dropout.html"
+class="uri">https://insightsengineering.github.io/rbmi/main/articles/retrieved_dropout.html</a></p>
+</div>
+</div>
+</div>
+<div id="analysis-of-hypothetical-estimands" class="section level1"
+number="3">
+<h1><span class="header-section-number">3</span> Analysis of
+Hypothetical Estimands</h1>
+<div id="estimation-for-hypothetical-estimands" class="section level2"
+number="3.1">
+<h2><span class="header-section-number">3.1</span> Estimation for
+hypothetical estimands</h2>
+<p><img src="02_Plots/Estimand/Estimand_S2_Case.png" width="75%" style="display: block; margin: auto;" /><img src="02_Plots/Estimand/Estimand_S3_HYSheme.png" width="75%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="prediction-of-hypothetical-trajectories" class="section level2"
+number="3.2">
+<h2><span class="header-section-number">3.2</span> Prediction of
+Hypothetical Trajectories</h2>
+<ul>
+<li><strong>Explicit or implicit predictions of hypothetical
+trajectories</strong>: This refers to making predictions about what
+might happen under various hypothetical scenarios, using either
+explicitly stated models or assumptions.</li>
+<li><strong>Assumptions for the predictions</strong>: Assumptions must
+align with the hypothetical scenarios, influencing the model’s design
+and expected outcomes.</li>
+</ul>
+<p><strong>Notation and Study Design</strong></p>
+<ul>
+<li><strong>Randomized Treatment (Z)</strong>: Indicates whether a
+participant received the treatment (1) or was in the control group
+(0).</li>
+<li><strong>Intercurrent Event Indicator (Eᵢ)</strong>: Shows whether an
+intercurrent event (ICE) occurred at each visit (1 if occurred, 0 if
+not). Assumes once an intercurrent event occurs, it continues to
+exist.</li>
+<li><strong>Outcome Variable (Y)</strong>: The observed change in HbA1c
+from baseline at week 26.</li>
+<li><strong>Potential Outcome (Yᵢ)</strong>: Hypothetical outcome
+without any intercurrent event or under different treatment
+conditions.</li>
+<li><strong>Estimand of interest</strong>: The difference in the outcome
+between treatment and control groups, assuming no intercurrent
+events.</li>
+<li><strong>Covariates (X₀, Xᵢ)</strong>: Baseline and subsequent
+covariates that might affect the outcome, measured throughout the
+study.</li>
+</ul>
+<p><img src="02_Plots/Estimand/Estimand_S3_Causal.png" width="75%" style="display: block; margin: auto;" /></p>
+<ul>
+<li><strong>Z influences E₁</strong>: Treatment can affect the
+likelihood of an intercurrent event.</li>
+<li><strong>Eᵢ influences Eᵢ₊₁</strong>: Indicates a cascade effect
+where an intercurrent event at one point increases the likelihood of
+another in the future.</li>
+<li><strong>X₀ → X₁ → X₂ → … → X₄</strong>: Represents changes or
+measurements of covariates (like HbA1c) over time.</li>
+<li><strong>Arrows into Y</strong>: Shows that all these factors,
+including treatment, intercurrent events, and covariates, influence the
+final outcome of HbA1c levels.</li>
+</ul>
+<p><img src="02_Plots/Estimand/Estimand_S3_Causal2.png" width="75%" style="display: block; margin: auto;" /></p>
+<p><strong>Treatment Policy</strong></p>
+<ul>
+<li><strong>Green Pathways (Estimated Treatment Effect)</strong>: These
+represent the direct and indirect effects of the treatment (Z) on the
+outcome (Y). The treatment affects each point in time where HbA1c is
+measured (X1 through X4) and can influence intercurrent events (E1
+through E5), which in turn can affect subsequent measurements and the
+final outcome.</li>
+<li>This diagram shows all possible impacts of the treatment throughout
+the course of the study, including its potential to affect the
+occurrence of intercurrent events, which are particularly critical in
+clinical trials.</li>
+</ul>
+<p><strong>Hypothetical Estimand</strong></p>
+<ul>
+<li><strong>Green Pathways (Estimated Treatment Effect)</strong>: These
+lines show the direct influence of treatment on the outcome (Y) and
+intermediate HbA1c measurements (X1 to X4), assuming no intercurrent
+events (E1 to E5) affected the outcomes. This hypothetical estimand aims
+to estimate what the treatment effect would be in an ideal scenario
+where no intercurrent events alter the course of treatment.</li>
+<li><strong>Red Pathways (Biasing path)</strong>: These paths highlight
+potential sources of bias if the intercurrent events were ignored in the
+analysis. They show how each intercurrent event (E1 to E5) could
+influence the HbA1c measurements (X2 to X4), potentially confounding the
+true treatment effect.</li>
+</ul>
+<p><strong>Key Points</strong></p>
+<ul>
+<li><strong>Treatment Policy Estimand</strong>: This considers all
+real-world effects, including intercurrent events, providing a
+comprehensive view of treatment effectiveness.</li>
+<li><strong>Hypothetical Estimand</strong>: By ignoring intercurrent
+events, this focuses on the direct effect of the treatment under
+idealized conditions, useful for understanding the intrinsic efficacy of
+the treatment.</li>
+</ul>
+<p><strong>Concept of Time-dependent Confounding:</strong></p>
+<ul>
+<li><strong>Time-dependent Confounders (X₁-X₄)</strong>: These are
+variables that:
+<ol style="list-style-type: decimal">
+<li>Are affected by previous treatment.</li>
+<li>Influence the probability of future treatment.</li>
+<li>Impact the outcome of interest (Y).</li>
+</ol></li>
+</ul>
+<p>In this study, the levels of HbA1c measured at different times (X₁
+through X₄) are time-dependent confounders because each measurement can
+influence and be influenced by treatment decisions and outcomes.</p>
+<p>The challenge lies in adjusting for these confounders without
+inadvertently blocking the pathway through which the treatment effect is
+transmitted. This is a key concern in causal inference: -
+<strong>Blocking the Effect Pathway</strong>: Adjusting for X₁-X₄
+directly could block some of the treatment effects since these
+confounders are also intermediaries of treatment effects.</p>
+<p><img src="02_Plots/Estimand/Estimand_S3_Causal3.png" width="75%" style="display: block; margin: auto;" /></p>
+<p><strong>Directed Acyclic Graphs (DAGs) Analysis - DAG
+(a):</strong></p>
+<ul>
+<li><strong>Green Paths</strong>: Show the estimated treatment effect
+paths which demonstrate how treatment (Z) potentially affects the final
+HbA1c measurement (Y) through intermediate measurements (X₁-X₄) and
+intercurrent events (E₁-E₅).</li>
+<li><strong>Red Paths</strong>: Illustrate the biasing paths where
+confounders (X₁-X₄) and intercurrent events (E₁-E₅) may misrepresent the
+true treatment effect if not properly accounted for.</li>
+</ul>
+<p><strong>Directed Acyclic Graphs (DAGs) Analysis - DAG
+(b):</strong></p>
+<ul>
+<li><strong>Simplified Representation</strong>: Focuses on paths that
+are purely related to treatment effects, ignoring paths through
+time-dependent confounders to avoid the bias introduced by adjusting for
+these confounders.</li>
+</ul>
+<p><strong>Desired Comparison:</strong></p>
+<ul>
+<li><strong>Y(Z = 1, E₁-₄ = 0) vs Y(Z = 0, E₁-₄ = 0)</strong>: This
+comparison aims to measure the treatment effect assuming no intercurrent
+events have occurred to purely see the effect of the treatment.</li>
+</ul>
+</div>
+<div id="methods-for-estimating-hypothetical-estimands"
+class="section level2" number="3.3">
+<h2><span class="header-section-number">3.3</span> Methods for
+Estimating Hypothetical Estimands</h2>
+<div id="multiple-imputation-mi" class="section level3" number="3.3.1">
+<h3><span class="header-section-number">3.3.1</span> Multiple Imputation
+(MI)</h3>
+<p><strong>Multiple Imputation for Hypothetical Estimands</strong>:</p>
+<ul>
+<li><strong>Purpose</strong>: In clinical trials, especially those with
+longitudinal measurements, data after an ICE are often not considered
+relevant for the hypothetical estimand (the outcome that would have been
+observed had the ICE not occurred). This can be thought of as a missing
+data problem.</li>
+<li><strong>Method</strong>: MI treats all post-ICE data as missing. For
+example, if an intercurrent event <span
+class="math inline">\(E1\)</span> occurs, then subsequent measurements
+<span class="math inline">\(X1, X2, X3, X4\)</span>, and the final
+outcome <span class="math inline">\(Y\)</span> are treated as missing.
+The imputation model is used to estimate these missing values based on
+other available data, under the assumption that the missingness is
+related to observed data but not to the missing data itself.</li>
+<li><strong>Assumptions</strong>: A key assumption in this context might
+be Missing At Random (MAR), where the likelihood of missing data depends
+only on observed data.</li>
+</ul>
+<p><strong>Use of MAR in Predicting Hypothetical
+Trajectories</strong>:</p>
+<ul>
+<li><strong>Definition</strong>: Under MAR, the missingness of data is
+related only to the observed data, not to any unobserved data.</li>
+<li><strong>Application</strong>: In hypothetical estimands, assuming
+MAR suggests that the data missing due to ICEs can be imputed based on
+the observed characteristics and responses of similar patients who did
+not experience the ICEs.</li>
+<li><strong>Feasibility</strong>: Whether MAR is a sensible assumption
+depends on the specific characteristics of the intercurrent event and
+the study design. If the ICEs are believed to be random with respect to
+future outcomes after controlling for observed data, MAR can be a
+reasonable assumption. However, if ICEs are related to unobserved future
+outcomes or unmeasured confounders, then MAR would not be appropriate,
+and a more sophisticated method like MNAR (Missing Not At Random) might
+be needed.</li>
+</ul>
+</div>
+<div id="inverse-probability-weighting-ipw" class="section level3"
+number="3.3.2">
+<h3><span class="header-section-number">3.3.2</span> Inverse Probability
+Weighting (IPW)</h3>
+<p><strong>Inverse Probability Weighting for Hypothetical
+Estimands</strong>: - <strong>Purpose</strong>: IPW is used to adjust
+for the non-random occurrence of intercurrent events by modeling the
+process leading to these events. - <strong>Method</strong>: Each
+participant’s data is weighted by the inverse of the probability of
+their observed treatment path, given their covariates and previous
+treatment history. This approach aims to create a pseudo-population
+where the occurrence of intercurrent events is independent of treatment,
+mimicking the condition of no ICEs.</p>
+<p><strong>Problem Setup:</strong></p>
+<ul>
+<li><strong>Confounder (<span
+class="math inline">\(X_i\)</span>)</strong>: This is a variable that
+influences both the outcome (<span class="math inline">\(Y\)</span>) and
+the likelihood of an intercurrent event (<span
+class="math inline">\(E_{i+1}\)</span>).</li>
+<li><strong>Intercurrent Event (<span
+class="math inline">\(E_i\)</span>)</strong>: Events that can affect the
+continuation or outcome of the treatment.</li>
+</ul>
+<p><strong>IPW Idea:</strong></p>
+<ul>
+<li><strong>Upweighting</strong>: In the presence of intercurrent events
+that might skew the observed outcome, IPW adjusts the influence of each
+individual’s data based on their probability of not experiencing the
+intercurrent event, given their confounders. This adjustment helps in
+maintaining a balanced representation of all groups within the
+study.</li>
+<li><strong>Creating a Pseudo-Population</strong>: IPW adjusts the
+dataset to create a “pseudo-population” in which the distribution of
+individuals who did and did not experience intercurrent events is
+balanced as if these events were independent of the measured
+confounders. This adjustment helps to mitigate the effect of confounders
+that are linked to the likelihood of experiencing an intercurrent
+event.</li>
+</ul>
+<p>Imagine a study with two baseline groups differentiated by color
+(blue/green), which represent different levels or types of a confounder
+<span class="math inline">\(X\)</span>. Suppose that the probability of
+not having an intercurrent event <span
+class="math inline">\(E=0\)</span> given the confounder blue is <span
+class="math inline">\(P(E=0|blue) = 0.5\)</span> (i.e., 50%). If in the
+actual study, fewer blue individuals did not experience the event
+compared to green, then each blue individual who did not experience the
+event might be weighted more heavily (e.g., a weight of 2) to represent
+not only themselves but also those blue individuals who did have the
+event, thus simulating a scenario where the intercurrent event is
+independent of being blue or green.</p>
+<p><img src="02_Plots/Estimand/Estimand_S3_IPW.png" width="75%" style="display: block; margin: auto;" /></p>
+<ul>
+<li><strong>Weights (<span class="math inline">\(w_k\)</span>)</strong>:
+Each subject <span class="math inline">\(k\)</span> receives a weight
+calculated as the inverse of the probability of being free from the
+intercurrent event, conditioned on their treatment status <span
+class="math inline">\(Z\)</span> and confounders <span
+class="math inline">\(X\)</span>. Mathematically, this is expressed as:
+<span class="math display">\[
+w_k = \frac{1}{P(E_k = 0|Z_k, X_k)}
+\]</span> This weight is used to adjust their contribution to the
+analysis, effectively increasing the influence of underrepresented
+scenarios within the observed data.</li>
+</ul>
+<p><strong>IPW for Hypothetical Estimand:</strong></p>
+<p>In estimating a hypothetical estimand (where we hypothesize the
+outcome had the ICEs not occurred), IPW helps to simulate a dataset
+where: - <strong>ICEs are absent</strong>: It weights the data so that
+the analysis can proceed as if the ICEs did not occur. -
+<strong>Independent of Confounders <span
+class="math inline">\(X\)</span></strong>: It also ensures that this
+simulated dataset is independent of the distribution of the confounder,
+<span class="math inline">\(X\)</span>, making the analysis robust
+against confounding bias due to <span
+class="math inline">\(X\)</span>.</p>
+<p>This method is crucial for ensuring that estimates of treatment
+effects or exposures are unbiased by confounders or selection mechanisms
+related to intercurrent events, providing a clearer picture of the
+causal effects of interest.</p>
+</div>
+<div id="g-computation" class="section level3" number="3.3.3">
+<h3><span class="header-section-number">3.3.3</span> G-Computation</h3>
+<ul>
+<li><strong>Purpose</strong>: G-computation is a statistical technique
+used to estimate the effect of a treatment or exposure in the presence
+of confounders.</li>
+<li><strong>Method</strong>: It involves modeling the outcome as a
+function of treatment and confounders. In the context of hypothetical
+estimands, it can sometimes be equivalent to multiple imputation,
+depending on how the outcome model is specified and used.</li>
+</ul>
+</div>
+<div id="advanced-methods" class="section level3" number="3.3.4">
+<h3><span class="header-section-number">3.3.4</span> Advanced
+Methods</h3>
+<ul>
+<li><strong>Augmented IPW and Targeted Maximum Likelihood Estimation
+(TMLE)</strong>: These methods combine the strengths of IPW and outcome
+modeling to produce more efficient and less biased estimates.</li>
+<li><strong>G-Estimation</strong>: This method is specifically designed
+for estimating the effects of time-varying treatments in the presence of
+time-varying confounders that are also affected by past treatment.</li>
+</ul>
+</div>
+</div>
+<div id="time-dependent-intercurrent-event-occurrence"
+class="section level2" number="3.4">
+<h2><span class="header-section-number">3.4</span> Time-dependent
+Intercurrent Event Occurrence</h2>
+<p><strong>Objective</strong>: - We aim to estimate the probability that
+a patient does not experience the intercurrent event at any time during
+the study. This is crucial for properly weighing each subject in the
+analysis to account for these events.</p>
+<p>Calculation of Probabilities</p>
+<p><strong>Formula for Probability</strong>: - The probability
+calculation involves taking the product of the conditional probabilities
+of not experiencing the intercurrent event across all time points up to
+the current visit <span class="math inline">\(i\)</span>: <span
+class="math display">\[
+  \prod_{i=1}^5 P(E_{i,k} = 0 | Z = z_k, E_{1,i-1,k} = 0, X_{i-1,k} =
+x_{i-1,k})
+  \]</span> Here: - <span class="math inline">\(E_{i,k}\)</span> =
+Intercurrent event indicator at visit <span
+class="math inline">\(i\)</span> for individual <span
+class="math inline">\(k\)</span>. - <span class="math inline">\(Z =
+z_k\)</span> = Treatment assignment for individual <span
+class="math inline">\(k\)</span>. - <span
+class="math inline">\(E_{1,i-1,k} = 0\)</span> = Condition where no
+intercurrent events have occurred up to the previous visit. - <span
+class="math inline">\(X_{i-1,k} = x_{i-1,k}\)</span> = Covariates
+observed up to the previous visit for individual <span
+class="math inline">\(k\)</span>.</p>
+<p><strong>Intuition</strong>: - Each factor in the product adjusts for
+the history of treatment and intercurrent events, along with the
+observed covariates, making the probability specific to the pathway that
+individual <span class="math inline">\(k\)</span> has actually
+followed.</p>
+<p>Subject Weights Calculation</p>
+<p><strong>Weight Formula</strong>: - Each subject <span
+class="math inline">\(k\)</span> receives a weight calculated as: <span
+class="math display">\[
+  w_k = \frac{1}{\prod_{i=1}^5 P(E_{i,k} = 0 | Z = z_k, E_{1,i-1,k} = 0,
+X_{i-1,k} = x_{i-1,k})}
+  \]</span> - <strong>Purpose of Weights</strong>: These weights are
+used to create a weighted sample (pseudo-population) in which the
+occurrence of intercurrent events is statistically independent of the
+observed covariates and treatment assignment. This adjustment is
+necessary to estimate the effect of the treatment under the hypothetical
+scenario where no intercurrent events occur.</p>
+<p>This approach is particularly important in longitudinal studies where
+events occurring after baseline can affect the treatment and subsequent
+outcomes. By adjusting the contribution of each participant’s data based
+on the likelihood of remaining event-free, IPW helps to reduce bias in
+estimating treatment effects, providing a clearer picture of the
+treatment’s potential impact under ideal conditions.</p>
+</div>
+<div id="estimation-of-weight-and-treatment-effect"
+class="section level2" number="3.5">
+<h2><span class="header-section-number">3.5</span> Estimation of weight
+and treatment effect</h2>
+<div id="estimation-of-weight" class="section level3" number="3.5.1">
+<h3><span class="header-section-number">3.5.1</span> Estimation of
+Weight</h3>
+<p><strong>Methods</strong>:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Nonparametric Methods</strong>:
+<ul>
+<li>Example: Calculate the sample proportion within each stratum of
+<span class="math inline">\(X\)</span>. This approach does not assume
+any specific form of the relationship between the covariates and the
+probability of the intercurrent event <span
+class="math inline">\(E\)</span>. It’s straightforward but may not be
+practical with continuous or high-dimensional covariates due to the
+“curse of dimensionality.”</li>
+</ul></li>
+<li><strong>Parametric Methods</strong>:
+<ul>
+<li>Example: Use logistic regression to model the probability of <span
+class="math inline">\(E\)</span> given covariates <span
+class="math inline">\(X\)</span> and treatment <span
+class="math inline">\(Z\)</span>. This approach allows for more
+efficient estimation in the presence of multiple or continuous
+covariates and can provide better insights into how specific variables
+influence the probability of experiencing an intercurrent event.</li>
+</ul></li>
+</ol>
+</div>
+<div id="estimation-of-treatment-effect" class="section level3"
+number="3.5.2">
+<h3><span class="header-section-number">3.5.2</span> Estimation of
+Treatment Effect</h3>
+<p><strong>Weighted Sample Mean</strong>: - Uses the weights derived
+(potentially from one of the above methods) to calculate a mean that
+reflects a population where the treatment assignment <span
+class="math inline">\(Z\)</span> is independent of the potential
+outcomes under no intercurrent events.</p>
+<p><strong>Hájek Estimator</strong>: - A specific type of estimator for
+the mean that adjusts the weighted sample mean by the sum of the
+weights, helping to stabilize estimates especially in smaller samples or
+in unbalanced designs: <span class="math display">\[
+  \text{Hájek Estimator: } \frac{\sum_{i=1}^n
+(1-E_i)Z_iY_iw_i}{\sum_{i=1}^n (1-E_i)Z_iw_i} - \frac{\sum_{i=1}^n
+(1-E_i)(1-Z_i)Y_iw_i}{\sum_{i=1}^n (1-E_i)(1-Z_i)w_i}
+  \]</span> This formula calculates the weighted averages of the outcome
+<span class="math inline">\(Y\)</span> separately for the treated and
+control groups, adjusting for the distribution of the weights.</p>
+<p><strong>Weighted Least Squares Regression</strong>: - Uses the
+weights in a regression model of <span class="math inline">\(Y\)</span>
+on <span class="math inline">\(Z\)</span> for those cases where <span
+class="math inline">\(E = 0\)</span>, treating it as a Marginal
+Structural Model. This model provides a way to estimate causal effects
+by appropriately accounting for time-dependent confounders adjusted by
+weights.</p>
+<p><strong>Inference and Confidence Intervals (CIs)</strong>: -
+<strong>Robust Sandwich Variance Estimator</strong>: This method is used
+to calculate confidence intervals that are robust to misspecification of
+the model. While valid, these CIs might be conservative (i.e., wider
+than necessary), potentially overestimating the uncertainty. -
+<strong>Non-parametric Bootstrap</strong>: Often used to validate CIs by
+resampling the data with replacement and recalculating the estimator
+multiple times. This method can provide a more accurate representation
+of the uncertainty if the original CI assumptions are violated or if the
+sample size is small.</p>
+</div>
+</div>
+<div id="issue-of-large-weights-in-ipw" class="section level2"
+number="3.6">
+<h2><span class="header-section-number">3.6</span> Issue of Large
+Weights in IPW</h2>
+<ol style="list-style-type: decimal">
+<li><strong>Positivity Assumption</strong>: This is crucial for IPW. If
+the propensity score (probability of receiving treatment given
+covariates) for any individual is exactly 0 or 1, it leads to infinite
+weights, which are problematic.</li>
+<li><strong>Consequence of Extreme Propensity Scores</strong>:
+Propensity scores close to 0 or 1 result in very large weights for those
+individuals, making the estimates less precise and potentially unstable.
+This usually occurs when an individual’s characteristics (covariates)
+make them highly unlikely or likely to receive treatment compared to the
+rest of the sample.</li>
+</ol>
+<p><strong>How to Handle Large Weights</strong></p>
+<ol style="list-style-type: decimal">
+<li><strong>Investigate the Cause</strong>:
+<ul>
+<li><strong>Identify Outliers</strong>: Determine who these individuals
+with large weights are and investigate whether they represent a
+combination of covariate values that are rare within the dataset.</li>
+<li><strong>Understand Their Impact</strong>: Analyze whether these
+individuals have extreme values for some confounders which might be
+influencing the propensity score significantly.</li>
+</ul></li>
+<li><strong>Use Stabilized Weights</strong>:
+<ul>
+<li><strong>Method</strong>: Adjust the original weights by the ratio of
+the marginal probability of receiving treatment to the conditional
+probability given the covariates. This often reduces the variance of the
+weights without introducing bias.</li>
+<li><strong>Reference</strong>: Cole &amp; Hernan (2008) provide a
+detailed discussion on this technique.</li>
+</ul></li>
+<li><strong>Trim Weights</strong>:
+<ul>
+<li><strong>Approach</strong>: Remove or cap individuals with weights
+beyond a certain threshold (e.g., greater than <span
+class="math inline">\(w_0\)</span>).</li>
+<li><strong>Effect</strong>: This method changes the target population
+of the inference because it effectively excludes or down-weights the
+most extreme cases.</li>
+</ul></li>
+<li><strong>Truncate Weights</strong>:
+<ul>
+<li><strong>Method</strong>: Set weights that are smaller than the <span
+class="math inline">\(p\%\)</span> quantile to the <span
+class="math inline">\(p\%\)</span> quantile and similarly for weights
+larger than the <span class="math inline">\((1-p)\%\)</span>
+quantile.</li>
+<li><strong>Trade-off</strong>: Truncating weights introduces some bias
+(because it alters the actual contribution of each observation based on
+its probability of treatment) but reduces variance, which can lead to
+more stable estimates. This is a classic bias-variance trade-off
+scenario.</li>
+</ul></li>
+</ol>
+</div>
+<div id="analysis-of-hypothetical-estimands-1" class="section level2"
+number="3.7">
+<h2><span class="header-section-number">3.7</span> Analysis of
+Hypothetical Estimands</h2>
+<p>In the below scenario, using complete-case analysis results in a
+smaller treatment effect estimate, highlighting that biases due to
+confounding can vary in direction. Although Multiple Imputation (MI) and
+Inverse Probability Weighting (IPW) show similar standard errors (SE) in
+this specific instance with only one post-baseline covariate, typically,
+MI produces smaller SE compared to IPW. However, the reduced SE with MI
+comes at the expense of more extensive parametric assumptions,
+indicating a trade-off between statistical precision and reliance on
+model-based assumptions.</p>
+<p><img src="02_Plots/Estimand/Estimand_S3_Results.png" width="75%" style="display: block; margin: auto;" /></p>
+<div id="review-data-1" class="section level3" number="3.7.1">
+<h3><span class="header-section-number">3.7.1</span> Review Data</h3>
+<p>Load the dataset DiabetesExampleData_wide_noICE.rds, which contains
+the ideal trial in which no intercurrent events were observed. The
+dataset is contextually the same as those used previously in the
+Treatment Policy Estimands Practical, except that for the analyses in
+this worksheet we will primarily work with data in wide, rather than
+long, format.</p>
+<p><img src="04-Design-Estimands-Practice_files/figure-html/unnamed-chunk-28-1.png" width="960" /></p>
+</div>
+<div id="analysis-of-data-ancova-1" class="section level3"
+number="3.7.2">
+<h3><span class="header-section-number">3.7.2</span> Analysis of Data
+(ANCOVA)</h3>
+<pre><code>## 
+## Call:
+## lm(formula = hba1cChg_5 ~ group + hba1cBl, data = .)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.2518 -0.6455 -0.0299  0.7744  3.1562 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  5.28553    0.63645   8.305 1.59e-15 ***
+## grouptrt    -0.80323    0.10957  -7.331 1.29e-12 ***
+## hba1cBl     -0.66254    0.08007  -8.275 1.97e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.096 on 397 degrees of freedom
+## Multiple R-squared:  0.2356, Adjusted R-squared:  0.2317 
+## F-statistic: 61.17 on 2 and 397 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div
+id="trial-where-some-participants-did-not-adhere-to-randomized-treatment"
+class="section level3" number="3.7.3">
+<h3><span class="header-section-number">3.7.3</span> Trial where some
+participants did not adhere to randomized treatment</h3>
+<p>Now we will move onto the more realistic example, where some patients
+did not adhere to their randomized treatment. We are interested in the
+hypothetical estimand as if all patients adhered to their randomized
+treatment.</p>
+<div class="Rtable1"><table class="Rtable1">
+<thead>
+<tr>
+<th class='rowlabel firstrow lastrow'></th>
+<th class='firstrow lastrow'><span class='stratlabel'>ctl<br><span class='stratn'>(N=200)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>trt<br><span class='stratn'>(N=200)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Overall<br><span class='stratn'>(N=400)</span></span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class='rowlabel firstrow'>ontrt_1</td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>0</td>
+<td>8 (4.0%)</td>
+<td>5 (2.5%)</td>
+<td>13 (3.3%)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>1</td>
+<td class='lastrow'>192 (96.0%)</td>
+<td class='lastrow'>195 (97.5%)</td>
+<td class='lastrow'>387 (96.8%)</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'>ontrt_2</td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>0</td>
+<td>18 (9.0%)</td>
+<td>12 (6.0%)</td>
+<td>30 (7.5%)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>1</td>
+<td class='lastrow'>182 (91.0%)</td>
+<td class='lastrow'>188 (94.0%)</td>
+<td class='lastrow'>370 (92.5%)</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'>ontrt_3</td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>0</td>
+<td>31 (15.5%)</td>
+<td>20 (10.0%)</td>
+<td>51 (12.8%)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>1</td>
+<td class='lastrow'>169 (84.5%)</td>
+<td class='lastrow'>180 (90.0%)</td>
+<td class='lastrow'>349 (87.3%)</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'>ontrt_4</td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>0</td>
+<td>43 (21.5%)</td>
+<td>27 (13.5%)</td>
+<td>70 (17.5%)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>1</td>
+<td class='lastrow'>157 (78.5%)</td>
+<td class='lastrow'>173 (86.5%)</td>
+<td class='lastrow'>330 (82.5%)</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'>ontrt_5</td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>0</td>
+<td>50 (25.0%)</td>
+<td>29 (14.5%)</td>
+<td>79 (19.8%)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>1</td>
+<td class='lastrow'>150 (75.0%)</td>
+<td class='lastrow'>171 (85.5%)</td>
+<td class='lastrow'>321 (80.3%)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="analysis-of-patients-without-intercurrent-event"
+class="section level3" number="3.7.4">
+<h3><span class="header-section-number">3.7.4</span> Analysis of
+Patients without Intercurrent Event</h3>
+<p>Let us first perform the analysis dropping any patients who did not
+adhere to treatment, i.e., only using the observed outcome data in the
+patients who did adhere to their randomized treatment until the end of
+follow-up. This analysis will only provide an unbiased estimate of the
+treatment effect under the assumption that treatment non-adherence
+occurred completely at random in both treatment arms.</p>
+<pre><code>## 
+## Call:
+## lm(formula = hba1cChg_5 ~ group + hba1cBl, data = .)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.1646 -0.7189 -0.0195  0.8072  3.1928 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  5.99485    0.72999   8.212 5.51e-15 ***
+## grouptrt    -0.73757    0.12147  -6.072 3.60e-09 ***
+## hba1cBl     -0.76496    0.09408  -8.131 9.60e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.081 on 318 degrees of freedom
+##   (79 observations deleted due to missingness)
+## Multiple R-squared:  0.2629, Adjusted R-squared:  0.2582 
+## F-statistic:  56.7 on 2 and 318 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="analysis-using-multiple-imputation" class="section level3"
+number="3.7.5">
+<h3><span class="header-section-number">3.7.5</span> Analysis using
+Multiple imputation</h3>
+<p>Now, let us move onto more principled analyses, starting with a
+multiple imputation approach. Here, for the patients who experience the
+intercurrent event of treatment non-adherence, we aim to impute what
+their values of HbA1c would have been if they had not experienced the
+intercurrent event by modelling the hypothetical future trajectory based
+on their past trajectory and the trajectories of similar patients.</p>
+<p>As soon as a patient experiences the intercurrent event of treatment
+non-adherence, all future values of HbA1c will be missing. Therefore, we
+have a monotone missingness pattern, i.e., if a patient discontinues
+treatment at visit 1, then HbA1c will be missing from visit 1 to visit
+5, whereas if a patient discontinues treatment at visit 4, then HbA1c
+will only be missing for visits 4 and 5.</p>
+<p>The code below will perform a sequential imputation starting by
+imputing HbA1c at visit 1, sequentially through the visits, finally
+imputing HbA1c at visit 5. Each imputation is performed using Bayesian
+linear regression method=“norm” including treatment and all previous
+values of HbA1c.</p>
+<p>We then fit our ANCOVA model to each imputed dataset, and finally
+pool the results of each imputation using Rubin’s rules to obtain a
+point estimate and its standard error.</p>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["term"],"name":[1],"type":["fct"],"align":["left"]},{"label":["estimate"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"(Intercept)","2":"5.2961129","3":"0.73074146","4":"7.247588","5":"261.8575","6":"4.762653e-12"},{"1":"grouptrt","2":"-0.8316542","3":"0.12376240","4":"-6.719765","5":"277.6998","6":"1.029454e-10"},{"1":"hba1cBl","2":"-0.6576815","3":"0.09386676","4":"-7.006543","5":"243.0176","6":"2.388341e-11"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="analysis-using-inverse-probability-weighting-ipw"
+class="section level3" number="3.7.6">
+<h3><span class="header-section-number">3.7.6</span> Analysis using
+Inverse Probability Weighting (IPW)</h3>
+<p>Another way to perform this analysis is to use inverse probability
+weighting. In this approach, we only use the outcome data for the
+patients who did not experience the intercurrent event, but we up-weight
+these patients in such a way that they also represent what we estimate
+would have been observed in similar patients who did experience the
+intercurrent event.</p>
+<p>The weights are given by the inverse of the propensity score, which
+is the propensity for patients to experience the intercurrent event at
+each visit. We start by calculating the weights to account for patients
+who experienced the intercurrent event at visit 1.</p>
+<div class="Rtable1"><table class="Rtable1">
+<thead>
+<tr>
+<th class='rowlabel firstrow lastrow'></th>
+<th class='firstrow lastrow'><span class='stratlabel'>ctl<br><span class='stratn'>(N=192)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>trt<br><span class='stratn'>(N=195)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Overall<br><span class='stratn'>(N=387)</span></span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class='rowlabel firstrow'>weights</td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>1.04 (0.0615)</td>
+<td>1.03 (0.0284)</td>
+<td>1.03 (0.0484)</td>
+</tr>
+<tr>
+<td class='rowlabel'>Median [Min, Max]</td>
+<td>1.02 [1.00, 1.51]</td>
+<td>1.02 [1.00, 1.16]</td>
+<td>1.02 [1.00, 1.51]</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Sum</td>
+<td class='lastrow'>200</td>
+<td class='lastrow'>200</td>
+<td class='lastrow'>400</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Our original sample size was 400 patients (200 in each arm). At visit
+1, 8 patients had experienced the intercurrent event in the control arm,
+and 5 patients in the treatment arm. This reduced our sample size to 192
+and 195 respectively, but through up-weighting patients who were similar
+to those who experienced the intercurrent event, we have maintained an
+effective sample size of 200 per arm.</p>
+<p>Next we continue this process sequentially from visit 2 up to the end
+of follow-up.</p>
+<div class="Rtable1"><table class="Rtable1">
+<thead>
+<tr>
+<th class='rowlabel firstrow lastrow'></th>
+<th class='firstrow lastrow'><span class='stratlabel'>ctl<br><span class='stratn'>(N=150)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>trt<br><span class='stratn'>(N=171)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Overall<br><span class='stratn'>(N=321)</span></span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class='rowlabel firstrow'>weights</td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>1.36 (1.64)</td>
+<td>1.18 (0.243)</td>
+<td>1.26 (1.14)</td>
+</tr>
+<tr>
+<td class='rowlabel'>Median [Min, Max]</td>
+<td>1.11 [1.00, 20.9]</td>
+<td>1.11 [1.01, 3.41]</td>
+<td>1.11 [1.00, 20.9]</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Sum</td>
+<td class='lastrow'>203</td>
+<td class='lastrow'>202</td>
+<td class='lastrow'>405</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>It is always a good idea to check the weights, because extreme
+weights can highlight potential violations of the positivity and/or
+modelling assumptions.</p>
+<p>In the example above, the largest weight is almost 21. This means
+that the data of this one patient is now being used to represent twenty
+other similar patients who did not adhere to the randomized treatment.
+We could consider this as suggesting that patients with these
+characteristics only have a 1/21 = ~5% probability of adhering to their
+randomized treatment. This is perhaps not so extreme, and suggests that
+the positivity assumption holds in this case. However, it is not
+uncommon to see examples with weights &gt;100, meaning this patient had
+less than 1% probability of not experiencing the intercurrent event.
+Although this would still strictly meet the positivity assumption that
+the probability is &gt;0 and &lt;1, the variance estimation will start
+to increase significantly as weights become more extreme.</p>
+<p>The sum of the weights should equal the original sample size in each
+treatment arm. Here we see the sum of the weights in each arm is not
+quite equal to 200, but it is close. There is no strict limit on what
+can be considered ‘close enough’, but if the sum of the weights differs
+significantly from the original sample size it can suggest issues with
+the modelling of the propensity score.</p>
+<p>Finally, we can check the results by fitting a weighted linear
+regression. The variance is estimated using a “robust” (Huber-White)
+sandwich estimator to account for the weighting.</p>
+<pre><code>## 
+## t test of coefficients:
+## 
+##              Estimate Std. Error t value  Pr(&gt;|t|)    
+## (Intercept)  5.201939   0.625226  8.3201 2.619e-15 ***
+## grouptrt    -0.787932   0.126312 -6.2380 1.412e-09 ***
+## hba1cBl     -0.650241   0.078175 -8.3178 2.661e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="ipw-bootstrap-se" class="section level3" number="3.7.7">
+<h3><span class="header-section-number">3.7.7</span> IPW (bootstrap
+SE)</h3>
+<p>Note that the robust variance estimation used above assumes that the
+propensity score is known rather than estimated. This leads to a
+conservative overestimated variance. Unbiased variance estimates can
+instead be obtained via a bootstrap procedure.</p>
+<pre><code>## [1] 0.1227755</code></pre>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

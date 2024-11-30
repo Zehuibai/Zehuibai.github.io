@@ -5,7 +5,7 @@ title: |
 output:
   html_document:
     df_print: paged
-    number_sections: No
+    number_sections: yes
     toc: yes
     toc_float: yes
   word_document:
@@ -23,9 +23,14 @@ knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
 # <!--                    1. load the required packages                       -->
 # <!-- ---------------------------------------------------------------------- --> 
 
-## if(!require(psych)){install.packages("psych")}
+# if(!require(psych)){install.packages("psych")}
 
-packages<-c("tidyverse", "kableExtra")
+# Define the packages
+packages <- c("tidyverse", "kableExtra", "ggtext", "RCurl", "plyr","scales","forcats",
+              "ggplot2", "ggrepel", "cowplot", "lubridate", "readxl", "plotly","shiny",
+              "gridExtra", "patchwork", "reshape2", "grid", "ggthemes", "ggcharts",
+              "ggalluvial","RColorBrewer")
+ 
 
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
@@ -44,27 +49,27 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 getwd()
 Sys.setlocale("LC_ALL","English")
 
-## convert backslash to forward slash in R
+# convert backslash to forward slash in R
 # gsub('"', "", gsub("\\\\", "/", readClipboard()))
 
-### get the path
+## get the path
 # rstudioapi::getSourceEditorContext()$path
 # dirname(rstudioapi::getSourceEditorContext()$path)
 
-### set working directory
+## set working directory
 # getwd()
 # setwd("c:/Users/zbai/Desktop")
 # Sys.setlocale("LC_ALL","English")
 
-### get the R Version
+## get the R Version
 # paste(R.Version()[c("major", "minor")], collapse = ".")
 
-### convert backslash to forward slash 
+## convert backslash to forward slash 
 # scan("clipboard",what="string")
 # gsub('"', "", gsub("\\\\", "/", readClipboard())) 
 
-## Load all r functions
-## The directory where all source code files are saved.
+# Load all r functions
+# The directory where all source code files are saved.
 source_code_dir <- "C:/Users/baiz/Downloads/Data-Analyst-with-R/00 R Function/ZB Function/"  
 file_path_vec <- list.files(source_code_dir, full.names = T)
 for(f_path in file_path_vec){source(f_path)}
@@ -74,7 +79,7 @@ for(f_path in file_path_vec){source(f_path)}
   
   
 
-## Histogram
+# Histogram
 
 In data analysis, especially when dealing with questionnaire data, `geom_histogram()` in `ggplot2` can be an essential tool for visualizing the distribution of responses. Histograms are particularly effective for showing the frequency of score occurrences across a range of values, making them ideal for summarizing the results from questionnaires where responses are often scaled (e.g., Likert scales from 1 to 5).
  
@@ -98,7 +103,7 @@ In data analysis, especially when dealing with questionnaire data, `geom_histogr
    - Histograms allow you to quickly grasp the distribution of responses, identify common and outlier responses, and assess the skewness or symmetry of the data.
    - By comparing histograms from different demographic groups, you can explore how opinions or behaviors differ across these groups, potentially guiding more detailed statistical tests or reporting insights.
 
-### General
+## General
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
 data <- data.frame(
@@ -170,7 +175,7 @@ print(plot3)
 ```
 
 
-### Clean Design 1
+## Clean Design 1
 
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
@@ -181,8 +186,8 @@ attach(dql)
 # summary(dql)
 
 # Load Library 
-library(ggthemes)
-library(ggcharts)
+# library(ggthemes)
+# library(ggcharts)
 
 # Select relevant variables
 dql_renamed <-
@@ -267,7 +272,7 @@ gridExtra::grid.arrange(d, e, nrow = 2)
 ```
 
 
-### Clean Design 2
+## Clean Design 2
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
 dql <- read.csv("./01_Datasets/ww2020_dlqi.csv")
@@ -279,8 +284,8 @@ attach(dql)
 # Load Library
 # library(tidyverse)
 # library(ggplot2)
-library(ggthemes)
-library(ggcharts)
+# library(ggthemes)
+# library(ggcharts)
 
 # Select relevant variables
 dql_renamed <-
@@ -361,15 +366,15 @@ totalA <-
     ))
 
 # Compine plots
-library(gridExtra)
+# library(gridExtra)
 
 gridExtra::grid.arrange(d, e, nrow = 2, heights = c(1.5,1))
 ```
 
 
-##  CGI-S
+#  CGI-S
 
-### Barplot for
+## Barplot for
 
 The clinical global impression – severity scale (CGI-S) is a 7-point scale that requires the clinician to rate the severity of the patient’s illness at the time of assessment, relative to the clinician’s past experience with patients who have the same diagnosis. The challenge was to provide data visualisations to show this data and also to provide comparisons between the different groups (e.g. based on response differences or odds ratios for the different response categories) using Clinical Global Impression Data.
 
@@ -453,14 +458,14 @@ plot.fun(dat, "barplot_1.png", v.just = -0.5, gci.s = "=1", y.max = 50,
 
 
 
-## CGI
+# CGI
 
-### Line graphs
+## Line graphs
 
 ![](./02_Plots/Visualization/PRO/Line.png)
 
 
-### Stacked Bar Chart
+## Stacked Bar Chart
 
 *Annotation (circling Site 4 in red) and sorting (Site 4 in the upper left hand corner) to make clear that Site 4 is a visual outlier. The visual idiom is a stacked bar chart, one color for each questionnaire. Stacked barcharts are limited when comparing any of the components except the one on the bottom. For the purpose of this data viz challenge, it was only necessary to compare the totals, ie the heights of the stacked bars. This is easy to do for the stacked bars from a visual perception point of view. But the colors for the different components (Q1, Q2, Q3 and Q4) can be distracting.*
 
@@ -497,7 +502,7 @@ ggplot(avg_scores, aes(x = TRT, y = Average_Score, fill = Question)) +
 ```
 
 
-### Slope Plots
+## Slope Plots
 
 Leverage visual analytics to identify data issues. Consider 4 questions on a Likert scale. 5 rating levels (Strongly disagree, Disagree, Neutral, Agree, Strongly Agree) coded as 1, 2, 3, 4 and 5, respectively. The higher the number the better. 400 Subjects (200 active, 200 control).
 
@@ -514,9 +519,9 @@ PROdata.slopes <- PROdata.vert %>%
   summarise(total.score = sum(total, na.rm = TRUE)) %>%
   ungroup()
 
-## apply a plot to a data set where this works
+# apply a plot to a data set where this works
 
-library(ggrepel)
+# library(ggrepel)
 
 p <- ggplot(PROdata.slopes, aes(
   x = TRT,
@@ -552,7 +557,7 @@ p <- ggplot(PROdata.slopes, aes(
     direction = "y",
     nudge_x = 0.5,
   ) +
- ## Make Site 04 appear in blue
+ # Make Site 04 appear in blue
   geom_line(
     data=PROdata.slopes |> filter(SITE=="SITE04"),
     size = 0.75,
@@ -572,7 +577,7 @@ p
 
 
 
-### Cumulative distribution plot
+## Cumulative distribution plot
 
 
 ![](./02_Plots/Visualization/PRO/Cumulative1.png)
@@ -582,18 +587,18 @@ p
 
 
 
-## EORTC QLQ-C30
+# EORTC QLQ-C30
 
 The EORTC QLQ-C30 is a 30-item questionnaire that has been designed for use in a wide range of cancer patient populations and is a reliable and valid measure of the quality of life in cancer patients. It includes a number of different scales, but this challenge is focussed on the global health and quality of life scale (QL).
 
-### Line graphs
+## Line graphs
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE} 
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(forcats)
-library(scales)
+# library(dplyr)
+# library(tidyr)
+# library(ggplot2)
+# library(forcats)
+# library(scales)
 
 d0 <- read.csv2("./01_Datasets/ww eortc qlq-c30 missing.csv", sep=",") %>%
   as_tibble() 
@@ -606,7 +611,7 @@ d1 <- d0 %>%
 
 d2 <- d1 %>%
   group_by(ARM, LASTVIS, AVISIT) %>%
-  summarize(AVAL = mean(AVAL, na.rm=TRUE)) %>%
+  dplyr::summarize(AVAL = mean(AVAL, na.rm=TRUE)) %>%
   mutate(LASTVISC=as.factor(paste("Week", sprintf("%02.f", LASTVIS))),
          AVISITN = as.numeric(gsub("WEEK","",AVISIT))) %>%
   mutate(LASTVISC=fct_reorder(LASTVISC, LASTVIS))
@@ -647,19 +652,19 @@ ggplot(data=d2, aes(x=AVISITN, y=AVAL, group=LASTVISC, color=LASTVISC)) +
 ```
 
 
-### Missing Patter
+## Missing Patter
  
 
 ![](./02_Plots/Visualization/PRO/Missing1.png)
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE} 
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(forcats)
-library(scales)
-library(ggalluvial)
-library(RColorBrewer)
+# library(dplyr)
+# library(tidyr)
+# library(ggplot2)
+# library(forcats)
+# library(scales)
+# library(ggalluvial)
+# library(RColorBrewer)
 
 df <- read.csv2("./01_Datasets/ww eortc qlq-c30 missing.csv", sep=",")  %>%
   as_tibble() 
@@ -711,7 +716,7 @@ ggplot(df_1,
 ```
 
 
-### Individual Patient Trajectories
+## Individual Patient Trajectories
 
 EORTC QLQ-C30 is quality of life (QoL) questionnaire designed for use in cancer patients Each item is rated on a 4-point response scale ranging from 1 (“Not at all”) to 4 (“Very much”) or a 7-point scale ranging from 1 (“Very poor”) to 7 (“Excellent”).
 
@@ -722,19 +727,21 @@ This figure of change from baseline in QLQ-C30 over time is showing patient-leve
 The use of faint grey gridlines is quite effective. The possibility of using a greyscale for the patient-level data was discussed, because the colour isn’t coding any information and this would make the line plot of mean over time stand out, but it was agreed this would make the patient-level data difficult to distinguish against the gridlines. Some design improvements were suggested, making some of the labels a little larger, and there is also some scope for decluttering the graph, e.g. removing the Y-axis label from the right panel.
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library(tidyverse)
-library(lubridate)
-library(dplyr)
-library(ggplot2)
-library(readxl)
-library(cowplot)
-library(gridExtra)
-library(patchwork)
-library(reshape2)
-library(grid)
+# library(tidyverse)
+# library(lubridate)
+# library(dplyr)
+# library(ggplot2)
+# library(readxl)
+# library(cowplot)
+# library(gridExtra)
+# library(patchwork)
+# library(reshape2)
+# library(grid)
 
 # ww eortc qlq-c30.csv
-X <- read.csv(url("https://raw.githubusercontent.com/VIS-SIG/Wonderful-Wednesdays/master/data/2022/2022-09-14/ww%20eortc%20qlq-c30.csv"))
+# X <- read.csv(url("https://raw.githubusercontent.com/VIS-SIG/Wonderful-Wednesdays/master/data/2022/2022-09-14/ww%20eortc%20qlq-c30.csv"))
+X <- read.csv("./01_Datasets/ww eortc qlq-c30.csv")
+
 X[X==0] <- NA;
 X1 <- X[1:(nrow(X)/2), ]; # standard
 Xe <- X[(nrow(X)/2+1):nrow(X),]; # experimental
@@ -773,7 +780,7 @@ Be <- Be[, 2:ncol(Be)]/sqrt(100)
 colnames(Be) <- c("QL_se", "PF_se", "RF_se", "EF_se")
 Ae <- data.frame(Ae, Be)
 
-library(plyr) #call this library here, not before.
+# library(plyr) #call this library here, not before.
 
 A = A[c(1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,9),] 
 A[nrow(A)+nrow(X1)-nrow(A),] <- NA;
@@ -831,7 +838,7 @@ plot_grid(title, subtitle, p1, footnote, ncol=1, rel_heights=c(0.1, 0.1, 1, 0.4,
 ```
 
 
-### Top four domains Trajectories Dashboard
+## Top four domains Trajectories Dashboard
 
 [App](https://agstn.github.io/qlq-c30/qlq-c30_flexdashboard.html)
 
@@ -846,18 +853,324 @@ The consistent colour-coding across all panels is helpful, and the colours are s
 
 ![](./02_Plots/Visualization/PRO/Dashboard.png)
 
-## Lollipop/forest plot
+# Responder Rate
+
+In a Phase III study involving patients suffering from hidradenitis suppurativa, an active drug was compared to a placebo. Each group consisted of 200 subjects, and the primary endpoint was the HiSCR, which is a binary endpoint. This endpoint is based on three continuous components:
+
+1. Number of abscesses
+2. Number of draining fistulae
+3. Number of inflammatory nodules
+
+A patient achieves a HiSCR response if all of the following three conditions are met when comparing baseline data to follow-up data (at week 16):
+
+1. At least a 50% decrease in the AN count; AN count is defined as the sum of the number of abscesses and the number of inflammatory nodules.
+2. No increase in the number of abscesses.
+3. No increase in the number of draining fistulae.
+
+The aim of the study was to compare the two treatment arms in regard to the HiSCR response.
+
+The challenge lies in visualizing the impact of changing the definition of the HiSCR response on the results. For example, altering the first condition to assume that a decrease of 25% or 75% is needed to achieve a HiSCR response could be considered. The second and third conditions could be changed separately, or a mix of changes to two or all conditions can be applied. How does this impact the results?
+
+
+## Waffle plot, bar chart, line plot  
+
+Slide can be found [here](https://vis-sig.github.io/blog/posts/2022-06-06-wonderful-wednesdays-may-2022/images/slide_2.pdf)
+
+
+![](./02_Plots/Visualization/PRO/Responder1a.png)
+![](./02_Plots/Visualization/PRO/Responder1b.png)
+![](./02_Plots/Visualization/PRO/Responder1c.png)
+![](./02_Plots/Visualization/PRO/Responder1d.png)
+
+
+## Line plots based on reduction in AN count
+
+This visualization shows nicely that the difference between the groups is rather small, if the percentage change to be reached is large (focusing on the first part of the HiSCR responder definition). This is done by presenting a line plot for both groups using two different colors. There are three graphs. Each one of them keeps the second and/or the third part of the definition of a HiSCR responder fixed. Overall, it is a very clean visualization which very nicely tackles the challenge of showing the impact of chaning the definition of HiSCR response. 
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# library(tidyverse)
+# library(ggtext)
+
+df <- read.csv("./01_Datasets/HiSCR_dat.csv")
+
+# Create required variables for graph
+df_new <- df %>%
+          mutate(
+            
+            # If abscesses increase
+            abscesses.incr = if_else(
+              condition = abscesses.w16 > abscesses.base,
+              true = "Yes",
+              false = "No",
+              missing = NA_character_
+            ),
+            
+            # If draining fistulae increase
+            drain.fist.incr = if_else(
+              condition = drain.fist.w16 > drain.fist.base,
+              true = "Yes",
+              false = "No",
+              missing = NA_character_
+            ),
+            
+            # If abscesses and draining fistulae increase
+            drain.fist.abscesses.incr = if_else(
+              condition = abscesses.incr == "No" & drain.fist.incr == "No",
+              true = "No",
+              false = "Yes",
+              missing = NA_character_
+            ),
+            
+            an.count.base = abscesses.base + infl.nod.base,
+            an.count.w16 = abscesses.w16 + infl.nod.w16,
+            
+            # Percentage change in AN count
+            an.count.change = (an.count.w16 - an.count.base)/an.count.base*100
+          ) %>%
+  
+         select(c(TRT, abscesses.incr, drain.fist.incr,
+                  drain.fist.abscesses.incr, an.count.change))
+
+active.df <- filter(df_new, TRT == "ACT")
+placebo.df <- filter(df_new, TRT == "PBO")
+
+results <- data.frame()
+
+# Find the percentage assigned a positive HiSCR for each value of i
+# where i is the minimum required percentage reduction.
+for (i in 0:100){
+  active.abscesses <- sum(active.df$an.count.change <= -i & active.df$abscesses.incr == "No")/nrow(active.df)*100
+  active.drain.fist <- sum(active.df$an.count.change <= -i & active.df$drain.fist.incr == "No")/nrow(active.df)*100
+  active.both <- sum(active.df$an.count.change <= -i & active.df$drain.fist.abscesses.incr == "No")/nrow(active.df)*100
+  
+  placebo.abscesses <- sum(placebo.df$an.count.change <= -i & placebo.df$abscesses.incr == "No")/nrow(placebo.df)*100
+  placebo.drain.fist <- sum(placebo.df$an.count.change <= -i & placebo.df$drain.fist.incr == "No")/nrow(placebo.df)*100
+  placebo.both <- sum(placebo.df$an.count.change <= -i & placebo.df$drain.fist.abscesses.incr == "No")/nrow(placebo.df)*100
+  
+  # Store results
+  results <- rbind(results,
+                   data.frame(percent = i,
+                               active.abscesses,
+                               active.drain.fist,
+                               active.both,
+                               placebo.abscesses,
+                               placebo.drain.fist,
+                               placebo.both))
+}
+
+# Create a row for each percentage reduction, treatment arm, and condition
+# to get the data into the right form for the graph
+graph_df <- results %>%
+            pivot_longer(cols = -"percent") %>%
+  
+            mutate(
+              # Extract treatment arm
+              TRT = if_else(
+                condition = str_detect(name, pattern = "active"),
+                true = "Active",
+                false = "Placebo",
+                missing = NA_character_),
+              
+              # Extract condition (<br> is used to cause line break in subplot title)
+              condition = case_when(
+                str_detect(name, pattern = "abscesses") ~ "No Increase in Abscesses",
+                str_detect(name, pattern = "fist") ~ "No Increase in Draining Fistulae",
+                TRUE ~ "No Increase in <br>Abscesses & Draining Fistulae"
+              )) %>%
+  
+            select(-name)
+
+# Order conditions for the graph
+graph_df$condition <- factor(graph_df$condition,
+                             levels = c("No Increase in Abscesses",
+                                        "No Increase in Draining Fistulae",
+                                        "No Increase in <br>Abscesses & Draining Fistulae"))
+
+# Annotation dataframe for the Placebo and Active labels
+arm.ann <- data.frame(x = c(5, 3),
+                      y = c(90, 35),
+                      TRT = c("Active", "Placebo"),
+                      condition = rep("No Increase in Abscesses", 2))
+
+# Order condition variable to ensure labels appear in correct subplot.
+arm.ann$condition <- factor(arm.ann$condition,
+                             levels = c("No Increase in Abscesses",
+                                        "No Increase in Draining Fistulae",
+                                        "No Increase in <br>Abscesses & Draining Fistulae"))
+
+axis.color <- "gray40"
+
+# Create graph
+ggplot(data = graph_df,
+       aes(x = percent,
+           y = value,
+           group = TRT)) +
+
+  # Add lines
+  geom_line(aes(color = TRT)) +
+  
+  # Subplot by condition
+  facet_wrap(~condition) +
+  
+  # Restrict plotting area
+  coord_cartesian(expand = F) +
+  
+  # Add % labels to the axes ticks
+  scale_x_continuous(labels = scales::percent_format(scale = 1)) +
+  
+  scale_y_continuous(limits = c(0, 100),
+                     labels = scales::percent_format(scale = 1)) +
+  
+  # Add Active and Placebo labels
+  geom_text(data = arm.ann,
+            aes(x = x,
+                y = y,
+                group = condition,
+                label = TRT,
+                color = TRT),
+            hjust = 0,
+            size = 2.75) +
+
+  # Define theme
+  theme(panel.background    = element_rect(fill = "white"),
+        axis.line           = element_line(color = axis.color),
+        panel.grid.major    = element_line(color = "gray95"),
+        axis.ticks          = element_line(color = axis.color),
+        axis.text           = element_text(color = axis.color),
+        axis.title          = element_text(color = axis.color,
+                                           size = 8),
+        axis.title.x        = element_text(hjust = 0,
+                                           margin = margin(t = 15)),
+        legend.position     = 'none',
+        plot.margin         = margin(20, 20, 20, 20),
+        strip.text          = element_markdown(size = 8),
+        panel.spacing       = unit(0.4, 'in'),
+        plot.title.position = 'plot',
+        plot.subtitle       = element_markdown(color = "gray30",
+                                               size = 9,
+                                               margin = margin(b = 10)),
+        plot.title          = element_markdown(size = 11),
+        plot.caption        = element_markdown(size = 7,
+                                               color = axis.color,
+                                               margin = margin(t = 15))) +
+  
+  # Define plot labels
+  labs(x = "Minimum Required Percentage Reduction in AN Count*",
+       y = NULL,
+       subtitle = " % of Patients assigned a Positive HiSCR Response (N<sub>P</sub> = N<sub>A</sub> = 200)",
+       title = "____ <br> <br> How Changing the HiSCR Definition Changes the Results",
+       caption = "*AN Count = Sum of the Number of Abscesses and Inflammatory Nodes <br> Author: Huw Wilson")
+```
+
+
+## Shiny Apps
+
+The app can be found [here](https://bonorico.shinyapps.io/HiSCR/?_ga=2.91645274.1120831357.1651571388-1024467400.1644592220).
+
+This visualization shows on the y-axis the inverse of the risk ratio and on the x-axis the threshold for the percentage decrease in AN count. It is actually an animation showing the impact of changing the threshold for the change of abscesses from baseline. This is a very useful graph to visualize what happens if you change different aspects of the definition. 
+
+
+![](./02_Plots/Visualization/PRO/Responder_Shiny_a.png)
+
+This is a very simple app which allows you to change the definition of the HiSCR definition (on the left-hand side) to see what happens in the results (on the right-hand side). See [*Shiny\Data Visualization\Responder Bar*]
+
+![](./02_Plots/Visualization/PRO/Responder_Shiny_b.png)
+
+This is a very advanced app which shows a volcano plot in the main panel and it shows what happends in the results when you change the definition on the left-hand side. On the right-hand side, you see a table with additional results based on different HiSCR definitions. The panel thinks that it is a not necessarily straightforward to see what is being shown here. However, it is still a very insightful and useful app to understand the impact of changing the definition of HiSCR.
+
+The app can be found [here](https://vis-sig.github.io/blog/posts/2022-06-06-wonderful-wednesdays-may-2022/images/HiSCR_fig%20-%20Agustin%20Calatroni.html).
+
+![](./02_Plots/Visualization/PRO/HiSCR_fig.png)
+
+
+# Clinical Improvement 
+
+The data reflects a phase III study - active vs placebo and the endpoint was Ordinal Scale for Improvement (OSCI). All patients started at OSCI=4 and daily measures over 35 days were performed. The challenge was to describe the treatment effect specifically taking into account the number and timing of patients who died, left the hospital or fully recovered.
+
+The shiny app can be found [here](https://bonorico.shinyapps.io/oscicovid)
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# packages
+pacman::p_load(rio, tidyverse) 
+pacman::p_load(RColorBrewer, ggtext)
+pacman::p_load(patchwork)
+
+# individual plots
+source('./03_Functions/covid_tile_order.r')
+source('./03_Functions/covid_histogram.r')
+source('./03_Functions/covid_mean.r')
+source('./03_Functions/covid_modal.r')
+
+# layout
+design <- "11114
+           11114
+           11114
+           2222#
+           2222#
+           3333#"
+
+# combine
+(f_t + theme(plot.margin = unit(c(0, 0, 0, 0), "lines") ) ) +
+   
+   (f_h + theme(strip.background = element_blank(), 
+                strip.text = element_blank(),
+                axis.title.x=element_blank(),
+                plot.margin = unit(c(0, 0, 0, 0), "lines") ) ) +
+   
+   # (f_mo + theme(strip.background = element_blank(), 
+   #               strip.text = element_blank(),
+   #               plot.margin = unit(c(0, 0, 0, 0), "lines") ) ) +
+   (f_me) +
+   
+   
+   plot_layout(design = design) +
+   plot_annotation(
+      title    = 'COVID-19 study comparing **Active vs Placebo** on Ordinal Scale for Clinical Improvement (OSCI) daily measures (35 days)',
+      subtitle =
+      '**A. Full Index Plot** representing all individual OSCI sequences sorted accordingly to the finished order. 
+      **B. Frequency Plot** representing OSCI sequences distributions 
+      **C. Sequences of modals** summary derived from the OSCI sequences distributions 
+      **D. Mean time spent in each OSCI** summary of the mean number of times each OSCI is observed in a sequence. 
+      This characterizes the overall OSCI distribution',
+      #caption  = '**Data from Wonderful-Wednesdays** <span style="font-size:8pt">github.com/VIS-SIG[2022â03â09]</span>',
+      theme = theme(plot.title.position = "plot",
+                    plot.title = element_textbox_simple(
+                       size = 16,
+                       lineheight = 1,
+                       r = unit(5, "pt"),
+                       padding = margin(10, 10, 7, 10),
+                       margin = margin(2, 6, 2, 6),
+                       fill = "gray85"
+                    ),
+                    #plot.subtitle.position = "plot",
+                    plot.subtitle = element_textbox_simple(
+                       size = 14,
+                       lineheight = 1,
+                       r = unit(5, "pt"),
+                       padding = margin(5, 5, 5, 5),
+                       margin = margin(2, 6, 2, 6),
+                       fill = "gray95"
+                    ),
+                    plot.caption  = element_markdown()) )
+
+#save
+# ggsave('./covid_combined.pdf', width = 13, height = 10)
+# ggsave('./covid_combined.png', width = 13, height = 10, dpi = 600)
+
+```
+
+# Lollipop/forest plot
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # dat <- read.csv("./01_Datasets/CGI_S_3_groups_csv.csv")
 
-library(RCurl)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(ggrepel)
-library(cowplot)
-library(ggtext)
+# library(RCurl)
+# library(dplyr)
+# library(tidyr)
+# library(ggplot2)
+# library(ggrepel)
+# library(cowplot)
+# library(ggtext)
 
 y <- read.csv("./01_Datasets/CGI_S_3_groups_csv.csv") %>%
    rename(Group = CGI)
@@ -957,7 +1270,7 @@ p <- plot_grid(title,
 p
 ```
 
-## Distribution plot by Category I
+# Distribution plot by Category I
 
 This graph includes stacked density plots, sometimes known as a ridgeline plot. This graph type is useful where there are approximately 4-8 categories with a natural ordering, which is the case in this example. The graph is also showing patient level data as transparent dots on the X axis, and reference lines have been added. There is a lot of overplotting of the dots, so the opacity of dots is representing the data density at each value on the X-axis.
 
@@ -1081,7 +1394,7 @@ rcc
 
 ```
 
-## Dumbbell Plot
+# Dumbbell Plot
 
 
 ![](./02_Plots/Visualization/PRO/Dumbbell1.png)
@@ -1094,7 +1407,7 @@ data <- read.csv("./01_Datasets/MAI.csv")
 ```
 
 
-## Scatter Plot
+# Scatter Plot
 
 
 ![](./02_Plots/Visualization/PRO/Scatter.png)
@@ -1116,190 +1429,8 @@ ggplot(data, aes(x = base.mai, y = mai, color = gr)) +
 ```
 
 
-## eDiary Data
 
-
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-
-pacman::p_load(tidyverse, rio, labelled)
-pacman::p_load(ggfittext)
-pacman::p_load(ggh4x)
-pacman::p_load(ggtext)  
- 
-
-WWWDiary <- import("./01_Datasets/WWWDiary.Rds")
-
-# transform
-diary   <- WWWDiary %>% 
-   relocate(AVALC, .after = AVAL) %>% 
-   mutate(AVAL = as.numeric(AVAL)) %>% 
-   mutate(AVALC = factor(AVALC,
-                         levels = c('None','Minor','Moderate','Extreme')) %>% fct_rev() )
-
-# NEST T-TEST
-diary_nest <- diary %>%
-   nest_by(ADY, PARAM, PARAMN) %>% 
-   mutate(t.test = list( t.test(AVAL ~ TRT, data = data) %>% 
-                            broom::tidy() ) ) %>% 
-   select(-data) %>% 
-   unnest(cols = c(t.test))
-
-# Differences
-diary_d <- diary_nest %>%
-   ungroup() %>% 
-   nest_by(PARAM, PARAMN) %>% 
-   mutate(gg_d = list( 
-      data %>% 
-         ggplot(aes(y = I(-1*ADY), x = estimate) ) +
-         geom_vline(xintercept = 0, color = 'gray50') +
-         geom_pointrange( aes(xmin = conf.low, xmax = conf.high), 
-                          size = 0.1,
-                          alpha = .5) +
-         geom_smooth(orientation = 'y', formula = y ~ x,
-                     se = FALSE,  color = 'black', span = 0.35 ) +
-         scale_y_continuous(name = NULL,
-                            expand = c(0.005, 0.005),
-                            labels = abs,
-                            breaks = -1*c(1, 25, 50, 75, 100),
-                            sec.axis = dup_axis() ) +
-         scale_x_continuous(name = NULL,
-                            limits = c(-2.0, 2.0),
-                            expand = c(0, 0),
-                            breaks = seq(-2, 2, 1) ) +
-         
-         annotate('segment', 
-                  arrow = arrow(angle = 20,
-                                length = unit(0.05,"native"),
-                                type = 'closed'),
-                  x = -1, xend = -1.9,
-                  y = -3, yend = -3) +
-         
-         annotate('segment', 
-                  arrow = arrow(angle = 20,
-                                length = unit(0.05,"native"),
-                                type = 'closed'),
-                  x = 1, xend = 1.9,
-                  y = -3, yend = -3) +
-         
-         annotate('text', 
-                  label = 'Improvement', size = 1.85,
-                  x = -1.5,
-                  y = -6) +
-         
-         annotate('text', 
-                  label = 'Deterioration', size = 1.85,
-                  x = 1.5,
-                  y = -6) +
-         
-         theme_light() +
-         
-         theme( panel.grid.minor = element_blank(),
-                strip.background.y = element_blank(),
-                strip.text.y = element_blank() ) 
-      ) )
-
-# Histogram (day)
-diary_h <- diary %>% 
-   nest_by(PARAM, PARAMN, TRT) %>% 
-   mutate(data = list( data %>% mutate(PARAM = PARAM,
-                                       TRT = TRT) ) ) %>% 
-   mutate(gg_h = list( 
-      ggplot(data = data,
-             aes(y = I(-1*ADY), fill = AVALC)) +
-         geom_histogram(binwidth  = 1, position = 'fill') +
-         
-         facet_wrap(str_glue("{PARAM} {str_to_upper(TRT)}") ~ .,
-                    strip.position = ifelse(TRT == 'Active', "left", "right") ) +
-         
-         scale_x_continuous(name = NULL,
-                            expand = c(0, 0),
-                            labels = scales::percent,
-                            trans = ifelse(TRT=='Active','identity','reverse')) +
-         scale_y_continuous(name = NULL,
-                            expand = c(0, 0),
-                            labels = abs,
-                            breaks = -1*c(1, 25, 50, 75, 100),
-                            position = ifelse(TRT == 'Active', 'right', 'left') ) +
-         scale_color_brewer(name = NULL,
-                            palette = 'Reds',
-                            direction = -1,
-                            aesthetics = c("colour", "fill") ) +
-         theme_light() +
-         theme(panel.grid    = element_blank(),
-               axis.text.y   = element_blank(), 
-               legend.position = "none",
-               strip.text = element_text(color = "black",
-                                         face = 'bold') ) )
-   ) %>% 
-   mutate(gg_h2 = list( 
-      ggplot(data = data,
-             aes(y = 1, fill = AVALC, label = AVALC) ) +
-         
-         geom_histogram(binwidth  = 1, position = 'fill') +
-         
-         geom_fit_text(stat="bin", binwidth  = 1, position="fill", fontface = 'bold', grow = TRUE) +
-         
-         scale_x_continuous(expand = c(0.04, 0.07),
-                            trans = ifelse(TRT=='Active','identity','reverse')) +
-         
-         scale_y_continuous(expand = c(0, 0)) +
-         
-         scale_color_brewer(name = NULL,
-                            palette = 'Reds',
-                            direction = -1,
-                            aesthetics = c("colour", "fill") ) +
-         
-         theme_void() +
-         
-         theme(legend.position = "none") ) )
-
-# COMBINE
-pacman::p_load(patchwork)
-
-f1 <- (diary_h$gg_h[[1]] + diary_d$gg_d[[1]] + diary_h$gg_h[[2]]) / 
-   (diary_h$gg_h2[[1]] + plot_spacer() + diary_h$gg_h2[[2]]) + plot_layout(heights = c(20, 1) ) 
-
-f2 <- (diary_h$gg_h[[3]] + diary_d$gg_d[[2]] + diary_h$gg_h[[4]]) /
-   (diary_h$gg_h2[[3]] + plot_spacer() + diary_h$gg_h2[[4]])  + plot_layout(heights = c(20, 1) )
-
-f3 <- (diary_h$gg_h[[5]] + diary_d$gg_d[[3]] + diary_h$gg_h[[6]]) /
-   (diary_h$gg_h2[[5]] + plot_spacer() + diary_h$gg_h2[[6]])  + plot_layout(heights = c(20, 1) )
-
-f4 <- (diary_h$gg_h[[7]] + diary_d$gg_d[[4]] + diary_h$gg_h[[8]]) /
-   (diary_h$gg_h2[[7]] + plot_spacer() + diary_h$gg_h2[[8]])  + plot_layout(heights = c(20, 1) )
-
-f5 <- (diary_h$gg_h[[9]] + diary_d$gg_d[[5]] + diary_h$gg_h[[10]]) /
-   (diary_h$gg_h2[[9]] + plot_spacer() + diary_h$gg_h2[[10]])  + plot_layout(heights = c(20, 1) )
-
-f6 <- (diary_h$gg_h[[11]] + diary_d$gg_d[[6]] + diary_h$gg_h[[12]]) /
-   (diary_h$gg_h2[[11]] + plot_spacer() + diary_h$gg_h2[[12]])  + plot_layout(heights = c(20, 1) )
-
-# EXPORT
-ggsave(filename = './02_Plots/Visualization/PRO/WWWDiary.pdf',
-       plot = (f1  | f2 | f3 ) / (f4 | f5 | f6) & theme( plot.margin = margin(6, 6, 6, 6, "pt") ),
-       width = 24, height = 10)
-
-# One subscale
-f1 +
-plot_annotation(
-   title = '<span style = "font-size:12pt"> Results for the <b>Aching</b> subscale</span><br>
-               **Top left** Histogram showing the distribution of symptom scores (x-axis) under the ACTIVE arm (n=200) across 100 days (y-axis)
-               <br> **Center panel** Daily difference (w 95% CI) of ACTIVE vs PLACEBO, with Loess line overlayed overtime (negative --> reduction ACTIVE arm) 
-               <br> **Top right** Mirrored histogram of the symptom scores (x-axis) under the PLACEBO Arm (n=100) across 100 days (y-axis). 
-               <br> **Bottom left/right** stacked bar charts for ACTIVE (left) and PLACEBO (right) groups during the 100 days',
-   caption  = 'Symptoms on a 4-point scale (0 = None, 1 = Minor, 2 = Moderate, 3 = Extreme) each day, for 100 days.') & 
-   theme( plot.margin = margin(2, 2, 2, 2, "pt"),
-          plot.title = element_markdown(size = 9,
-                                           fill = 'gray85',
-                                           padding = margin(5, 5, 5, 5),
-                                           r = grid::unit(8, "pt") ) )
-
-ggsave(filename = 'WWWDiary_Aching.pdf',
-       width = 8, height = 5)
-```
-
-
-## Regression model-Prediction of health status (EQ-5D)
+# Regression model-Prediction of health status (EQ-5D)
 
 The data is based on a study to assess the health status in patients with coronary heart diseases (see Ose et al., 2012). The research question was: what factors are associated with health status in usual primary care?
 
@@ -1312,83 +1443,7 @@ The original data included 2,656 patients with 14 (patient and practice) charact
 
 
 
-## Regression model-Prediction of health status (EQ-5D)
-
-
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library(plotly)
-library(shiny)
-options(warn = -1)
- 
-
-  radioButtons("yScale",
-               label = "Scale",
-  #                #HTML('<FONT color="black"><FONT size="5pt">Y-Scale</FONT></FONT><br> #<b>Your favorite color is red ?</b>'),
-               choices = c("Z-score", "Percentile"),
-               selected = "Z-score",
-               inline = T,
-               width = "100%")
-
-# par(mfrow = c(2, 1))
-
-# bp1
-# bp2
-
-PedsGrowth <- read_csv("./01_Datasets/PedsGrowth.csv")
- PedsGrowth$TIME <- as.factor(PedsGrowth$TIME)
- width <- PedsGrowth %>% group_by(MEASURE, TIME) %>% count()
-subset <- reactive({
-  if(input$yScale == "Z-score"){
-  "ZSCORES"
-  }else{
-      "PERCENTILES"
-  }
-})
-
-ylabel <- reactive({
-  if(input$yScale == "Z-score")
-    "Z-score"
-  else
-    "Percentile"
-})
-shading <- reactive({
-  if(input$yScale == "Z-score"){
-    c(-1, 1)
-  }
-  # else if(input$yScale == "Z-score" & input$data == "Change"){
-  #   c(-0.5, 0.5)
-  # }
-  else
-    c(0.25, 0.75)
-    
-})
-output$bp1 <- renderPlot({
-  if(subset() == "ZSCORES"){
-  PedsGrowth %>% filter(complete.cases(.)) %>% group_by(MEASURE, TIME) %>% ggplot(aes(x = TIME, y = ZSCORES)) +          
-  geom_boxplot() + facet_wrap(.~MEASURE, scales="free_y", ncol=1) + theme_minimal() +
-  stat_summary(fun = mean, geom = "point", col = "red") +
-      scale_x_discrete(limits=0:76, breaks = seq(0,76,4), labels = paste(seq(0,76,4), "Weeks")) + scale_y_discrete(limits=-3:3, breaks = seq(-3,3,1)) + 
-      annotate("rect", xmin = -Inf, xmax = Inf, ymin = shading()[1], ymax = shading()[2], 
-           alpha = .2, fill = "grey") + theme(panel.grid.major.x = element_blank())
-  }
-  else
-  {
-    PedsGrowth %>% filter(complete.cases(.)) %>% group_by(MEASURE, TIME) %>% ggplot(aes(x = TIME, y = PERCENTILES)) +          
-  geom_boxplot() + facet_wrap(.~MEASURE, scales="free_y", ncol=1) + theme_minimal() +
-  stat_summary(fun = mean, geom = "point", col = "red") +
-      scale_x_discrete(limits=0:76, breaks = seq(0,76,4), labels = paste(seq(0,76,4), "Weeks")) +
-      annotate("rect", xmin = -Inf, xmax = Inf, ymin = shading()[1], ymax = shading()[2], 
-           alpha = .2, fill = "grey") + theme(panel.grid.major.x = element_blank())
-  }
-  })
-
-plotOutput("bp1")
-```
-
-
-
-
-## Reference
+# Reference
  
 SIG (2023, Sept. 13). VIS-SIG Blog: Wonderful Wednesdays September 2023. Retrieved from https://graphicsprinciples.github.io/posts/2023-12-17-wonderful-wednesdays-september-2023/
 
@@ -1400,3 +1455,6 @@ SIG (2022, Nov. 9). VIS-SIG Blog: Wonderful Wednesdays November 2022. Retrieved 
 
 Mallett (2022, Oct. 12). VIS-SIG Blog: Wonderful Wednesdays October 2022. Retrieved from https://graphicsprinciples.github.io/posts/2023-04-09-wonderful-wednesdays-october-2022/
 
+Uhlmann (2022, May 11). VIS-SIG Blog: Wonderful Wednesdays May 2022. Retrieved from https://graphicsprinciples.github.io/posts/2022-06-06-wonderful-wednesdays-may-2022/
+
+SIG (2022, April 13). VIS-SIG Blog: Wonderful Wednesdays April 2022. Retrieved from https://graphicsprinciples.github.io/posts/2022-04-30-wonderful-wednesdays-april-2022/
