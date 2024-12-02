@@ -24,9 +24,10 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 # getwd()
 # Sys.setlocale("LC_ALL","English")
 
-## devtools::install_github("kupietz/kableExtra")
+# devtools::install_github("kupietz/kableExtra")
 packages<-c("tidyverse", "kableExtra", 
-            "ggpubr","gridExtra","ggtext","ggalt",
+            "ggpubr","grid","gridExtra","ggtext","ggalt",
+            "haven","readxl","cowplot",
             "hrbrthemes","plotly","viridis","patchwork")
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
@@ -36,11 +37,9 @@ ipak <- function(pkg){
 }
 ipak(packages)
 ```
-
- 
  
 
-## Grouping Aesthetic
+# Grouping Aesthetic
 
 * Color Aesthetic
 * Size Aesthetic
@@ -83,9 +82,9 @@ ggplot(data = iris, mapping = aes(x = Petal.Length, y = Petal.Width, shape = Spe
         legend.position = c(0.1, 0.85))
 ```
 
-## Smooth Line 
+# Smooth Line 
 
-### geom_smooth
+## geom_smooth
 
 ```{r Grouping Aesthetic, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # display different aesthetics in different layers
@@ -132,16 +131,16 @@ ggplot(mpg, aes(cty, hwy))+
 ```
 
 
-### Exploratory exposure-response analysis
+## Exploratory exposure-response analysis
  
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-## Read in data
+# Read in data
 my_data <- 
   read_csv("./01_Datasets/401_case1_PKPDdataset_ard.csv") %>%
   filter(CYCLE == 1)
 
-## Plot response vs exposure
+# Plot response vs exposure
 my_data %>%
   ggplot(aes(x = AUC, y = sCHG)) + 
   geom_point() + 
@@ -178,8 +177,8 @@ my_data %>%
 
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-## Cleveland, William S. 1979. “Robust Locally Weighted Regression and Smoothing Scatterplots.” Journal of the American Statistical Association 74 (368): 829–36. https://doi.org/10.1080/01621459.1979.10481038
-## https://graphicsprinciples.github.io/tutorial-case-studies/posts/401-case1-eda/401-case1-eda.html
+# Cleveland, William S. 1979. “Robust Locally Weighted Regression and Smoothing Scatterplots.” Journal of the American Statistical Association 74 (368): 829–36. https://doi.org/10.1080/01621459.1979.10481038
+# https://graphicsprinciples.github.io/tutorial-case-studies/posts/401-case1-eda/401-case1-eda.html
 my_data %>%
   ggplot(aes(x = AUC, y = sCHG, colour = factor(DOSE))) + 
   geom_point(alpha = 0.5) + 
@@ -249,7 +248,7 @@ ggplot(mtcars, aes(disp, mpg)) +
 
 
 
-## Quadrant Counts
+# Quadrant Counts
 
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
@@ -295,7 +294,7 @@ ggplot(my.data, aes(x, y)) +
   geom_point() +
   scale_y_continuous(expand = expansion(mult = 0.15))
 
-### grouped quadrants
+## grouped quadrants
 ggplot(my.data, aes(x, y)) +
   geom_quadrant_lines(colour = "blue",
                       pool.along = "x") +
@@ -307,10 +306,10 @@ ggplot(my.data, aes(x, y)) +
 
 ```
 
-## Grouping
+# Grouping
 
 
-### Facet
+## Facet
 
 facet_wrap(), "winding facet", only one standard can be applied to data classification, and the small shapes obtained from different sets of data are arranged in the order of "winding" from left to right and from top to bottom
 
@@ -364,10 +363,10 @@ ggplot(mpg, aes(cty, hwy)) +
 
 
 
-### XY plots
+## XY plots
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library("lme4") ## data sleepstudy
+library("lme4") # data sleepstudy
 library("lattice")
 
 ##------------------------------------------------------------------------
@@ -381,7 +380,7 @@ xyplot(Reaction ~ Days | Subject, sleepstudy, aspect = "xy",
        as.table = TRUE)
 ```
 
-## Text: ggrepel
+# Text: ggrepel
 
 There are two important functions in ggrepel R packages:
 
@@ -434,7 +433,7 @@ tmp %>%
 ```
 
 
-## Dot Plot
+# Dot Plot
 
 Order `fct_reorder`: Modifying factor order 
 
@@ -454,7 +453,7 @@ ggplot(relig_summary, aes(tvhours, fct_reorder(relig, tvhours))) +
 
 ```
 
-### Diverging Dot Plot
+## Diverging Dot Plot
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # Data Prep
@@ -478,7 +477,7 @@ ggplot(mtcars, aes(x=`car name`, y=mpg_z, label=mpg_z)) +
   coord_flip()
 
  
-## Diverging Lollipop Chart
+# Diverging Lollipop Chart
 ggplot(mtcars, aes(x=`car name`, y=mpg_z, label=mpg_z)) + 
   geom_point(stat='identity', fill="black", size=6)  +
   geom_segment(aes(y = 0, 
@@ -506,7 +505,7 @@ ggplot(mtcars, aes(x=`car name`, y=mpg_z, label=mpg_z)) +
   theme_bw()
 ```
 
-### Alternative using ggbur
+## Alternative using ggbur
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # library(ggpubr)
@@ -577,9 +576,9 @@ ggdotchart(dfm, x = "name", y = "mpg",
 
 
 
-## Residuals Plot
+# Residuals Plot
 
-### Residuals vs. Fitted Plot
+## Residuals vs. Fitted Plot
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 #fit regression model
@@ -614,7 +613,7 @@ ggplot(fit, aes(x = .fitted, y = .stdresid)) +
   theme_bw()
 ```
  
-### Plot actual and predicted values
+## Plot actual and predicted values
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 #fit regression model
@@ -623,7 +622,7 @@ fit <- lm(mpg ~ hp, data = d)
 d$predicted <- predict(fit)   # Save the predicted values
 d$residuals <- residuals(fit) # Save the residual values
 
-## d %>% select(mpg, predicted, residuals) %>% head()
+# d %>% select(mpg, predicted, residuals) %>% head()
 ggplot(d, aes(x = hp, y = mpg)) +
   geom_smooth(method = "lm", se = FALSE,formula = y ~ x, color = "lightgrey") +  # Plot regression slope
   geom_segment(aes(xend = hp, yend = predicted), alpha = .2) +  # alpha to fade lines, connect the actual data points 
@@ -653,7 +652,7 @@ ggplot(d, aes(x = hp, y = mpg)) +
 For more details see (here)[https://drsimonj.svbtle.com/visualising-residuals]
 
 
-### Normal Probability Plot
+## Normal Probability Plot
 
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
@@ -675,7 +674,7 @@ qq_plot
 ```
 
 
-### Histogram of Residuals
+## Histogram of Residuals
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 #fit regression model
@@ -691,18 +690,18 @@ p.hist <- ggplot(fit, aes(x = .resid)) +
 p.hist
 ```
 
-## Bubble Plot
+# Bubble Plot
 
-### Basic 
+## Basic 
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # The dataset is provided in the gapminder library
 library("gapminder")
 data <- gapminder %>% filter(year=="2007") %>% dplyr::select(-year)
 
-## Control circle size with scale_size()
-## Set the size of the smallest and the biggest circles using the range argument.
-## circles often overlap. To avoid having big circles on top of the chart you have to reorder your dataset first, as in the code below.
+# Control circle size with scale_size()
+# Set the size of the smallest and the biggest circles using the range argument.
+# circles often overlap. To avoid having big circles on top of the chart you have to reorder your dataset first, as in the code below.
 data %>%
   arrange(desc(pop)) %>%
   mutate(country = factor(country, country)) %>%
@@ -731,7 +730,7 @@ data %>%
     xlab("Gdp per Capita") 
 ```
 
-### Interactive Version
+## Interactive Version
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # Libraries
@@ -772,7 +771,7 @@ pp
 # saveWidget(pp, file=paste0( getwd(), "/HtmlWidget/ggplotlyBubblechart.html"))
 ```
 
-## Encircling
+# Encircling
 
 In geom_encircle(), set the data to a new data frame containing only points (rows) or points of interest. In addition, you can expand the curve so that it passes outside the point. The color and size (thickness) of the curve can also be modified.
 
@@ -806,7 +805,7 @@ ggplot(midwest, aes(x=area, y=poptotal)) +
        caption="Source: midwest")
 ```
 
-## Dumbbell Plot 
+# Dumbbell Plot 
 
 Dumbbell plot is used to visualize the relative position of two time points (increase or decrease), it could also be used to compare the distance between 2 categories. In order to get right orders of dumbbell, the variable $Y$ should be treated as factor with conresponding orders shown in figure. 
  
@@ -843,16 +842,16 @@ options(warn=0)
 ```
 
 
-## Beeswarm Plot
+# Beeswarm Plot
 
-### General
+## General
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-## Read excel data
+# Read excel data
 library("readxl")
 Cepheid_D01 <- read_excel("./01_Datasets/lab_figure.xlsx")
 
-## Data management
+# Data management
 Cepheid_D01 <-  Cepheid_D01 %>%
   mutate(ER_central = factor(ER_central, levels = c(0,1), labels = c("negative", "positive")),
          PgR_central = factor(PgR_central, levels = c(0,1), labels = c("negative", "positive")),
@@ -903,7 +902,7 @@ dev.off()
 ```
 
 
-### By Subgroup
+## By Subgroup
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # Beeswarm HER2 by ER Status
@@ -929,9 +928,9 @@ HER2_Bin
 ```
 
 
-## Line Plot
+# Line Plot
 
-### Multi groups line chart 
+## Multi groups line chart 
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 library(babynames) # provide the dataset: a dataframe called babynames
@@ -953,10 +952,10 @@ don %>%
     ylab("Number of babies born")
 ```   
 
-### Line chart annotation 
+## Line chart annotation 
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-## Reference: https://r-graph-gallery.com/line_chart_annotation.html
+# Reference: https://r-graph-gallery.com/line_chart_annotation.html
 # library(plotly)
 # library(hrbrthemes)
 
@@ -976,7 +975,7 @@ data %>%
     theme_ipsum()
 ```
 
-### Dual Y axis
+## Dual Y axis
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # library(patchwork) # To display 2 charts together
@@ -1027,11 +1026,11 @@ ggplot(data, aes(x=day)) +
   ggtitle("Temperature down, price up")
 ```
 
-### Advanced Theme Setting
+## Advanced Theme Setting
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-## Reference https://r-graph-gallery.com/web-line-chart-with-labels-at-end-of-line.html
-## Load packages
+# Reference https://r-graph-gallery.com/web-line-chart-with-labels-at-end-of-line.html
+# Load packages
 library(ggrepel)
 # library(ggtext)
 
@@ -1039,7 +1038,7 @@ library(showtext)
 font_add_google("Lato")
 showtext_auto()
 
-## Load and prepare the dataset
+# Load and prepare the dataset
 df_mac_raw <- readr::read_csv('./01_Datasets/big-mac.csv')
 
 df_mac <- df_mac_raw %>% 
@@ -1082,7 +1081,7 @@ df_mac_indexed_2008 <- df_mac %>%
   ) %>% 
   ungroup()
 
-## Theme definition
+# Theme definition
 # This theme extends the 'theme_minimal' that comes with ggplot2.
 # The "Lato" font is used as the base font. This is similar
 # to the original font in Cedric's work, Avenir Next Condensed.
@@ -1137,7 +1136,7 @@ theme_update(
   legend.position = "none"
 )
 
-## Basic chart
+# Basic chart
 plt <- ggplot(
   # The ggplot object has associated the data for the highlighted countries
   df_mac_indexed_2008 %>% filter(group != "other"), 
@@ -1169,14 +1168,14 @@ plt <- ggplot(
     linetype = "dotted",
     size = .8
   ) +
-  ## Lines for the non-highlighted countries
+  # Lines for the non-highlighted countries
   geom_line(
     data = df_mac_indexed_2008 %>% filter(group == "other"),
     color = "grey75",
     size = .6,
     alpha = .5
   ) +
-  ## Lines for the highlighted countries.
+  # Lines for the highlighted countries.
   # It's important to put them after the grey lines
   # so the colored ones are on top
   geom_line(
@@ -1211,7 +1210,7 @@ plt <- plt +
     segment.ncp = 3,
     segment.angle = 20
   ) +
-  ## coordinate system + scales
+  # coordinate system + scales
   coord_cartesian(
     clip = "off",
     ylim = c(-4, 3)
@@ -1227,14 +1226,130 @@ plt <- plt +
     labels = glue::glue("{format(seq(-4, 3, by = 1), nsmall = 2)}$")
   )
 plt 
-
- 
 ```
 
 
-## Pharmacokinetic exposure
+# Scatter Plots and Densities
 
-### Linear Scala
+
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# library(haven)
+# library(dplyr)
+# library(tidyr)
+# library(ggplot2)
+# library(grid)
+# library(gridExtra)
+# library(readxl)
+# library(cowplot)
+
+# Placebo
+
+bl0 <- read_csv("./01_Datasets/adsl.csv") %>%
+  filter(TRT01PN == 0)
+
+base0 <- ggplot(bl0) +
+  geom_jitter(aes(x=AGE, y=as.numeric(BMIBL), color=factor(RACE)),  size=4, width=0.03, height=0, alpha=0.8) +
+  scale_x_continuous(limits=c(50, 90), breaks=c(50, 55, 60, 65, 70, 75, 80, 85, 90)) +
+  scale_y_continuous(limits=c(12, 42), breaks=c(15, 20, 25, 30, 35, 40, 45)) +
+  scale_color_manual("Race", values=c("#d95f02", "#7570b3")) +
+  ylab("BMI at Baseline (kg/m^2)") +
+  xlab("Age (yrs)") +
+  ggtitle("Placebo") +
+  theme_minimal() +
+  theme_linedraw() +
+  theme(text = element_text(size=12)) +
+  theme(legend.position = "none")
+
+xdens0 <- axis_canvas(base0, axis="x") +
+  geom_density(data=bl0, aes(AGE))
+
+ydens0 <- axis_canvas(base0, axis="y", coord_flip = TRUE) +
+  geom_density(data=bl0, aes(as.numeric(BMIBL))) +
+                 coord_flip()
+               
+p10 <- insert_xaxis_grob(base0, xdens0, position="top")
+p20 <- insert_yaxis_grob(p10, ydens0, position="right")
+
+#############################################################################
+# Low Dose
+
+bl_lo <- read_csv("./01_Datasets/adsl.csv") %>%
+  filter(TRT01PN == 54)
+
+base_lo <- ggplot(bl_lo) +
+  geom_jitter(aes(x=AGE, y=as.numeric(BMIBL), color=factor(RACE)),  size=4, width=0.03, height=0, alpha=0.8) +
+  scale_x_continuous(limits=c(50, 90), breaks=c(50, 55, 60, 65, 70, 75, 80, 85, 90)) +
+  scale_y_continuous(limits=c(12, 42), breaks=c(15, 20, 25, 30, 35, 40, 45)) +
+  scale_color_manual("Race", values=c("#d95f02", "#7570b3")) +
+  ylab("BMI at Baseline (kg/m^2)") +
+  xlab("Age (yrs)") +
+  ggtitle("Xanomeline Low Dose") +
+  theme_minimal() +
+  theme_linedraw() +
+  theme(text = element_text(size=12)) +
+  theme(legend.position = "none")
+
+xdens_lo <- axis_canvas(base_lo, axis="x") +
+  geom_density(data=bl_lo, aes(AGE))
+
+ydens_lo <- axis_canvas(base_lo, axis="y", coord_flip = TRUE) +
+  geom_density(data=bl_lo, aes(as.numeric(BMIBL))) +
+  coord_flip()
+
+p1_lo <- insert_xaxis_grob(base_lo, xdens_lo, position="top")
+p2_lo <- insert_yaxis_grob(p1_lo, ydens_lo, position="right")
+#############################################################################
+# High Dose
+
+bl_hi <- read_csv("./01_Datasets/adsl.csv") %>%
+  filter(TRT01PN == 81)
+
+base_hi <- ggplot(bl_hi) +
+  geom_jitter(aes(x=AGE, y=as.numeric(BMIBL), color=factor(RACE)),  size=4, width=0.03, height=0, alpha=0.8) +
+  scale_x_continuous(limits=c(50, 90), breaks=c(50, 55, 60, 65, 70, 75, 80, 85, 90)) +
+  scale_y_continuous(limits=c(12, 42), breaks=c(15, 20, 25, 30, 35, 40, 45)) +
+  scale_color_manual("Race", labels=c("AMERICAN INDIAN", "BLACK OR AFRICAN AMERICAN","WHITE"),values=c("#1b9e77", "#d95f02", "#7570b3")) +
+  ylab("BMI at Baseline (kg/m^2)") +
+  xlab("Age (yrs)") +
+  ggtitle("Xanomeline High Dose") +
+  theme_minimal() +
+  theme_linedraw() +
+  theme(text = element_text(size=12)) +
+  theme(legend.position = "bottom") +
+  theme(legend.title=element_blank())
+
+xdens_hi <- axis_canvas(base_hi, axis="x") +
+  geom_density(data=bl_hi, aes(AGE))
+
+ydens_hi <- axis_canvas(base_hi, axis="y", coord_flip = TRUE) +
+  geom_density(data=bl_hi, aes(as.numeric(BMIBL))) +
+  coord_flip()
+
+p1_hi <- insert_xaxis_grob(base_hi, xdens_hi, position="top")
+p2_hi <- insert_yaxis_grob(p1_hi, ydens_hi, position="right")
+
+
+#############################################################################
+
+p <- grid.arrange(arrangeGrob(p20, ncol=1, nrow=1),
+                  arrangeGrob(p2_lo, ncol=1, nrow=1),
+                  arrangeGrob(p2_hi, ncol=1, nrow=1),
+                  heights = c(1,1.1))
+
+title <- ggdraw() + draw_label("BMI, Age and Race are Well Balanced Between Treatment Groups. \nParticipants Were Predominantly White.\n", size = 18)
+
+p2 <- plot_grid(title, p, ncol=1, rel_heights = c(1, 10)) 
+p2
+
+# ggsave("/shared/175/arenv/arwork/gsk1278863/mid209676/present_2020_01/code/baseline/baseline_SM.png", p2, width=12, height=8, dpi=300)
+```
+
+
+
+# Pharmacokinetic exposure
+
+## Linear Scala
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 my_data <- read_csv("./01_Datasets/402_case2_PKdataset.csv") %>%
@@ -1245,7 +1360,7 @@ my_data <- read_csv("./01_Datasets/402_case2_PKdataset.csv") %>%
     ETHN = factor(ETHN, levels = rev(levels(ETHN)))
   )
 
-## Plot mean and error bars (SD) on a linear scale
+# Plot mean and error bars (SD) on a linear scale
 my_data %>%
   ggplot(aes(
     x = NOMTIME,
@@ -1280,11 +1395,11 @@ my_data %>%
   )
 ```
 
-### Log Scale
+## Log Scale
 
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-## Mean (95% CI) error bars, log scale
+# Mean (95% CI) error bars, log scale
 my_data %>%
   ggplot(aes(
     x = NOMTIME,
@@ -1323,13 +1438,13 @@ my_data %>%
   )
 ```
 
-### Cmax, Ctrough and AUClast
+## Cmax, Ctrough and AUClast
 
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 theme_set(theme_bw(base_size = 10))
 
-## Plot cmax, ctrough, AUClast dots (95% CI) in separate panels
+# Plot cmax, ctrough, AUClast dots (95% CI) in separate panels
 Cmax <- my_data %>%
   filter(!is.na(LIDV))  %>%
   group_by(ID, ETHN) %>%
@@ -1483,7 +1598,7 @@ PKmetrics %>%
   coord_flip(ylim = c(0.15, 5)) 
 ```
 
-### Post-hoc subgroup analyses
+## Post-hoc subgroup analyses
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # Read in data and define order for factors.
@@ -1504,14 +1619,14 @@ my_data <- read.csv("./01_Datasets/PKPDdataset2.csv") %>%
     Biomarker = ifelse(subgroup == 0, "Negative", "Positive")
   )
 
-## Obtain baseline measurement 
+# Obtain baseline measurement 
 base_data <- 
   my_data %>% 
   filter(PROFDAY == 0) %>%
   mutate(BASE = LIDV) %>%
   select(ID, BASE)
 
-## Derive change and percent change from baseline
+# Derive change and percent change from baseline
 data_to_plot <- 
   my_data %>%
   filter(PROFDAY != 0) %>%
@@ -1577,7 +1692,7 @@ data_to_plot %>%
        linetype = "Genetic marker") 
 ```
  
-## Interactive Plot
+# Interactive Plot
 
 ```{r interactive, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # load data
