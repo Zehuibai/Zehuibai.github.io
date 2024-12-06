@@ -5,7 +5,7 @@ title: |
 output:
   html_document:
     df_print: paged
-    number_sections: No
+    number_sections: yes
     toc: yes
     toc_float: yes
   word_document:
@@ -45,8 +45,123 @@ for (file in files_to_source) {
 ```
 
 
+# Introduction
 
-# Considerations
+Survival analysis, also known as time-to-event (TTE) analysis, is a statistical method used to estimate the time it takes for a specific event of interest to occur. This type of analysis is crucial in fields where timing is an essential factor, such as in clinical trials, where understanding the length of time until an event such as death, disease progression, or recurrence can guide treatment decisions and policy-making.
+
+**Events in Survival Analysis**
+
+- **Death (Overall Survival - OS):** Often considered the "gold standard," this measures the time from the start of the study until death from any cause.
+- **Disease Progression (Progression-Free Survival - PFS):** This endpoint measures the time from the start of the study until the disease progresses or the patient dies from any cause, whichever occurs first.
+- **Disease Occurrence/Recurrence:** The time until a disease first appears or reappears after a period of remission.
+- **Symptom Expression:** Time until a particular symptom or set of symptoms appears.
+
+Survival analysis is particularly prevalent in clinical areas such as oncology and cardiology, where understanding the progression of diseases over time is critical. These analyses help quantify the benefits of new treatments or interventions over standard care or placebos.
+
+- **Oncology:** Often focuses on endpoints like OS and PFS to evaluate the effectiveness of cancer therapies.
+- **Cardiology:** Might focus on time to cardiac events or death as a primary endpoint.
+
+**Early vs. Late Stage Trials**
+
+- **Early Stage Trials:** These may not use survival analysis extensively and might rely on response rates such as Objective Response Rate (ORR), which measures the proportion of patients whose tumor size reduces by a predefined amount and for a minimum time period.
+- **Later Stage Trials:** Typically incorporate survival analysis to provide a more comprehensive assessment of a treatment's impact over time, especially for life-threatening diseases.
+
+
+## Design Choices in Survival Analysis
+
+The power of a survival analysis study is influenced by several design choices:
+
+- **Study Design:**
+  - **Parallel:** Compares two or more treatments simultaneously, typically with a control group.
+  - **One-Arm:** Patients receive only one treatment, often used in early-phase trials where the main interest is in gauging a treatment's potential efficacy.
+  - **Complex Designs:** May include crossover, factorial, or adaptive designs depending on the research question and practical considerations.
+
+- **Statistical Methods:**
+  - **Log-Rank Test:** A non-parametric test that compares the survival distributions of two groups. It's used when the hazard ratios are assumed to be constant over time.
+  - **Cox Proportional Hazards Model:** Allows for the estimation of the hazard ratio between two or more groups while controlling for other variables that might affect the outcome.
+
+- **Endpoints:**
+  - **Hazard Ratio (HR):** A measure of how the hazard of the endpoint occurring in one group compares to the hazard in another group over the study period.
+  - **Survival Time:** Often reported as median survival time, which is the time at which 50% of study participants have experienced the event of interest.
+
+- **Survival Distributions:**
+  - **Exponential Distribution:** Assumes a constant hazard over time. Simple to use but often unrealistic in clinical settings.
+  - **Weibull Distribution:** A more flexible model that can accommodate increasing or decreasing hazard rates over time.
+  
+## Step-by-Step Approach
+
+Sample size determination for survival analysis is an important aspect of designing studies that aim to investigate time-to-event outcomes. 
+
+**1. Define Objectives**
+First, clearly define the study objective. In survival analysis, this typically involves comparing survival times between two or more groups. For example, comparing the survival time of patients receiving a new treatment versus those receiving a standard treatment.
+
+**2. Choose the Survival Function**
+Determine which type of survival function or model will be used, such as the exponential, Weibull, or Cox proportional hazards model. The choice depends on the nature of the data and the specific assumptions each model holds.
+
+**3. Determine Endpoint**
+Identify the primary endpoint of the study, such as time until death, disease recurrence, or another event. This will also involve deciding how censored data (participants who leave the study early or do not experience the event by the end of the study) will be handled.
+
+**4. Specify Effect Size**
+Determine the effect size that is clinically meaningful. This could be a difference in median survival times between groups or a hazard ratio.
+
+**5. Set the Parameters for Calculation**
+- **Alpha (Type I error rate):** Typically set at 0.05, representing a 5% chance of falsely declaring a difference in survival.
+- **Beta (Type II error rate):** Commonly set at 0.20, corresponding to an 80% power to detect a difference if one truly exists.
+- **Accrual Time:** The period during which subjects are recruited and followed up.
+- **Follow-up Time:** The time after the end of accrual, during which events are collected.
+
+**6. Estimate Event Rate and Survival Probabilities**
+Estimate the proportion of participants expected to experience the event in each group if you have prior data or studies to inform these estimates. Survival probabilities at specific time points (like 1-year or 5-year survival) are also useful.
+
+**7. Adjust for Dropouts and Non-adherence**
+Finally, adjust the initial sample size estimate to account for potential dropouts and non-adherence to treatment protocols to ensure that the study maintains sufficient power.
+
+## Non-Proportional Hazards (NPH)
+
+In survival analysis, the proportional hazards (PH) assumption is a cornerstone of commonly used methods like the log-rank test and the Cox proportional hazards model. This assumption implies that the hazard ratios between groups are constant over time. However, there are many situations, particularly with newer treatments like immunotherapies, where this assumption does not hold, leading to non-proportional hazards (NPH) scenarios.  
+
+![](./02_Plots/SSC/SSC_Survival_NPHM.png)
+
+Non-proportional hazards occur when the hazard ratio between treatment groups changes over time. This can manifest in several ways:
+
+- **Delayed Effects:** For instance, immunotherapies might not show benefit immediately after treatment begins but may become apparent after a certain period. This delay can result in a crossing hazard function, where the survival curves of treatment groups intersect.
+- **Diminishing Effects:** The initial benefit of a treatment may diminish over time.
+- **Violations Due to Covariates:** Changes in the effect of a covariate over time can also lead to violations of the PH assumption.
+
+![](./02_Plots/SSC/SSC_Survival_NPH.png)
+
+
+## Challenges with NPH
+
+NPH scenarios pose significant challenges in the analysis and interpretation of clinical trial data, as traditional methods may lead to biased or inaccurate estimates of treatment effects. This can affect the statistical power and the type I error rate of a study, potentially leading to incorrect conclusions about a therapy's efficacy.
+
+Due to the limitations of traditional PH-based methods in handling NPH scenarios, there is a growing interest in developing robust alternatives. Here are some approaches:
+
+1. **Extended Cox Models:**
+   - **Time-varying coefficients:** These models allow the effects of covariates (including treatment) to change over time, thus accommodating varying hazard ratios.
+   - **Stratification:** This approach involves performing separate analyses within strata where the PH assumption holds.
+
+2. **Flexible Parametric Models:**
+   - Models such as Royston-Parmar can fit survival data with spline functions to capture complex hazard functions, accommodating varying hazard ratios more flexibly than traditional models.
+
+3. **Landmark Analysis:**
+   - This method involves selecting a point in time ("landmark") and analyzing only those patients who have survived to that point, thus focusing on different segments of the survival curve separately.
+
+4. **Piecewise Exponential Models:**
+   - These models assume that the hazard rate is constant within specified intervals but can change between intervals, allowing for different hazard ratios at different stages of follow-up.
+
+5. **Cure Models:**
+   - Sometimes used in scenarios where a proportion of patients is considered 'cured' and no longer at risk of the event. These models can separate the survival curves into a cured fraction and a susceptible fraction, accommodating delayed effects in the susceptible fraction.
+
+**Ongoing Debate**
+
+The debate over the best approach to handle NPH scenarios is ongoing. No single method can universally handle all types of non-proportional hazards effectively. The choice of method often depends on:
+- The specific nature of the hazard function in the data.
+- The clinical context and the mechanism of action of the treatment.
+- The goal of the analysis (e.g., regulatory submission, exploratory research).
+
+
+## Considerations
 
 1. **Power for TTE related to several choices:**
 
@@ -100,7 +215,10 @@ for (file in files_to_source) {
   - **Hazard Ratios**: Commonly used due to their effectiveness in comparing the risk of an event between two groups over time. However, hazard ratios can be complex to interpret, especially in communicating how they translate into clinical benefit.
   - **Alternative Metrics**: Restricted Mean Survival Time (RMST) or other point estimates like survival proportions at specific times can be easier to communicate and may provide more directly interpretable clinical relevance.
 
-## Log Rank Test (Freedman) 
+
+
+
+# Log Rank Test (Freedman) 
  
 
 **Reference**
@@ -148,7 +266,7 @@ H_0: \frac{\lambda_2}{\lambda_1}=1
 $$
 
  
-#### Calculation in R (Survival Rate)
+### Calculation in R (Survival Rate)
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE} 
 ssc.logRank.Freedman <- function(S.trt, S.ctrl, sig.level = 0.05, power = 0.8, 
@@ -175,12 +293,12 @@ ssc.logRank.Freedman <- function(S.trt, S.ctrl, sig.level = 0.05, power = 0.8,
 }
 ssc.logRank.Freedman(0.5,0.7,power = 0.817) 
 
-## HR
-## log(0.7) / log(0.5)
+# HR
+# log(0.7) / log(0.5)
 ```
  
  
-#### Calculation in R (Median Survival)
+### Calculation in R (Median Survival)
 
 Using an unstratified log-rank test at the one-sided 2.5% significance level, a total of 282 events would allow 92.6% power to demonstrate a 33% risk reduction (hazard ratio for RAD/placebo of about 0.67, as calculated from an anticipated 50% increase in median PFS, from 6 months in placebo arm to 9 months in the RAD001 arm).
 
@@ -200,7 +318,7 @@ With a uniform accrual of approximately 23 patients per month over 74 weeks and 
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE} 
 # Load required library
-library(powerSurvEpi)
+library("powerSurvEpi")
 
 # Define parameters
 power <- 0.926
@@ -235,7 +353,7 @@ print(paste("Total sample size needed, accounting for dropout:", final_sample_si
 ```
 
  
-#### Calculation in SAS (Median Survival)
+### Calculation in SAS (Median Survival)
 
 ```
 proc power;
@@ -254,7 +372,7 @@ run;
 ```
 
 
-## Log Rank Test  
+# Log Rank Test  
 
 
 **Reference**
@@ -283,7 +401,7 @@ In general, it is assumed we have constant hazards (i.e., exponential distributi
 
 
 
-### Calculation in R 
+## Calculation in R 
 
 **Reference**
 
@@ -300,16 +418,16 @@ Note that Schoenfeld approximates the variance of the log hazard ratio by 4/m, w
 
 ```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE} 
 # library("Hmisc")
-## The accrual period is 1.5y, with all patients followed at least 5y and some 6.5y.
+# The accrual period is 1.5y, with all patients followed at least 5y and some 6.5y.
 
-## time at which mortalities estimated = 5
-## total sample size (both groups combined) = 950
-## 5-year mortality, control 18% = 0.18
-## 5-year mortality, intervention 0.10
-## duration of accrual period = 5
-## minimum follow-up time = 1.5, 
-## Drop-in rate (controls):10%
-## Non-adherence rate (intervention):15%
+# time at which mortalities estimated = 5
+# total sample size (both groups combined) = 950
+# 5-year mortality, control 18% = 0.18
+# 5-year mortality, intervention 0.10
+# duration of accrual period = 5
+# minimum follow-up time = 1.5, 
+# Drop-in rate (controls):10%
+# Non-adherence rate (intervention):15%
 
 
 ssc.logrank.Hmisc <- function(tref,   
@@ -328,7 +446,7 @@ ssc.logrank.Hmisc <- function(tref,
   if(mc>1)
     stop("mc (control group mortality ) should be a fraction")
 
-  ## Find mortality in intervention group
+  # Find mortality in intervention group
   # mi <- (1-r/100)*mc
   if(mi>1)
     stop("mi (intervention group mortality) should be a fraction")
@@ -347,7 +465,7 @@ ssc.logrank.Hmisc <- function(tref,
     cat("\n",tref,"-year Mortalities (Events Rate)\n",sep=""); print(m)
   }
 
-  ## Find exponential hazards for all groups
+  # Find exponential hazards for all groups
   lamc <- -logb(1-mc)/tref
   lami <- -logb(1-mi)/tref
 
@@ -358,8 +476,8 @@ ssc.logrank.Hmisc <- function(tref,
     print(lam)
   }
 
-  ## Find probability that a subject will have her event observed during
-  ## the study, for all groups
+  # Find probability that a subject will have her event observed during
+  # the study, for all groups
   tmax <- tmin+accrual
   pc <- if(accrual==0)
           1-exp(-lamc*tmin)
@@ -378,7 +496,7 @@ ssc.logrank.Hmisc <- function(tref,
     print(p)
   }
 
-  ## Find expected number of events, all groups
+  # Find expected number of events, all groups
   mc <- pc*nc
   mi <- pi*ni
 
@@ -389,7 +507,7 @@ ssc.logrank.Hmisc <- function(tref,
     print(round(m,1))
   }
 
-  ## Find expected value of observed log hazard ratio
+  # Find expected value of observed log hazard ratio
   delta <- logb(lami/lamc)
   if(pr)
     cat("\nHazard ratio:",format(exp(delta)),"\n")
@@ -405,9 +523,9 @@ ssc.logrank.Hmisc <- function(tref,
           format(exp(delta)),"\n")
   }
 
-  ## Find its variance
-  ## Schoenfeld approximates the variance of the log hazard ratio by 4/m, where m is the total number of events
-  ## George-Desu method uses the slightly better 1/m1 + 1/m2
+  # Find its variance
+  # Schoenfeld approximates the variance of the log hazard ratio by 4/m, where m is the total number of events
+  # George-Desu method uses the slightly better 1/m1 + 1/m2
   if(GeorgeDesu){
     v <- 1/mc + 1/mi
   } else{
@@ -415,7 +533,7 @@ ssc.logrank.Hmisc <- function(tref,
   }
   
   
-  ## Get same as /sasmacro/samsizc.sas if use 4/(mc+mi)
+  # Get same as /sasmacro/samsizc.sas if use 4/(mc+mi)
 
   sd <- sqrt(v)
   if(pr)
@@ -444,20 +562,20 @@ ssc.logrank.Hmisc(tref=5,nc=450, ni=500,
 
 
 
-### Calculation in SAS  
+## Calculation in SAS  
 
-#### Scenario 1
+### Scenario 1
 
 Patients will be accrued uniformly over two years   and then followed for an additional three years past the accrual period.   Some loss to follow-up is expected, with roughly exponential rates that   would result in about 50% loss with the standard treatment within 10 years.   The loss to follow-up with the proposed treatment is more difficult to predict,   but 50% loss would be expected to occur sometime between years 5 and 20.
 
 ```SAS
-## time at event estimated = 2
-## duration of accrual period = 2
-## minimum follow-up time = 3
-## Standard treatment: 50% loss with the standard treatment within 10 years
-## Proposed treatment: 50% loss would be expected to occur sometime between years 5 and 20
-## The "Standard" curve specifying an exponential form with a survival probability of 0.5 at year 5.
-## The "Proposed" curve is a piecewise linear curve defined by the five points shown
+# time at event estimated = 2
+# duration of accrual period = 2
+# minimum follow-up time = 3
+# Standard treatment: 50% loss with the standard treatment within 10 years
+# Proposed treatment: 50% loss would be expected to occur sometime between years 5 and 20
+# The "Standard" curve specifying an exponential form with a survival probability of 0.5 at year 5.
+# The "Proposed" curve is a piecewise linear curve defined by the five points shown
 
 proc power;
 	twosamplesurvival test= logrank 
@@ -475,7 +593,7 @@ run;
 ```
 
 
-#### Scenario 2
+### Scenario 2
 
 1. 30% of placebo patients are sustained responders (exponential hazard =0.3567)
 2. 45 or 50% for the treatment group (exp. hazard = 0.5978 or 0.6931)
@@ -510,7 +628,7 @@ proc power;
 run;
 ```
 
-#### Scenario 3
+### Scenario 3
 
 Clinical trial to assess new treatment for patients with chronic active hepatitis. 
 
@@ -544,7 +662,7 @@ run;
 ```
 
 
-#### Scenario 4
+### Scenario 4
 
 * Accrual time is accepted as half of the total study time, which is equal to 5 years.
 * Changing curve parameter to curve("Control") = (5):(0.8)will give the exponential distribution of the event
@@ -566,7 +684,7 @@ proc power;
  run;
 ```
 
-#### Scenario 5
+### Scenario 5
 
 **Piecewise linear survival curve**
 
@@ -592,7 +710,7 @@ proc power;
 run;
 ```
 
-#### Scenario 6
+### Scenario 6
 
 **Group sequential design with interim analyses**
 
@@ -614,7 +732,7 @@ proc power;
 run;
 ```
 
-## Log Rank Test with Competing Risk  
+# Log Rank Test with Competing Risk  
 
 **Reference**
 
@@ -728,7 +846,7 @@ $$
 where $p_1$ is the proportion of subjects in group 1 , the control group.
 
 
-#### Calculation in R 
+### Calculation in R 
 
 ```
 Alternative Hypothesis: Two-Sided
@@ -774,7 +892,7 @@ S_cr=S_cr, P1=HighDist, P2=1-HighDist, T=5.0000000001, R=0.0000000001)
 ```
 
 
-## Non-Proportional Hazards Methods
+# Non-Proportional Hazards Methods
 
 | Method                          | Description                                                                                                                       |
 |---------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
@@ -787,7 +905,7 @@ S_cr=S_cr, P1=HighDist, P2=1-HighDist, T=5.0000000001, R=0.0000000001)
 |     Others                      |     Responder-Based, Frailty Models, Renyi Models, Net Benefit (Buyse)                                                            |
 
 
-### Maximum Combination (MaxCombo) Test Overview
+## Maximum Combination (MaxCombo) Test Overview
 
 **1. Concept:**
    - The MaxCombo test is designed to handle multiple linear-rank tests simultaneously and to select the "best" test from the candidate tests. This approach helps in controlling Type I error rates while still allowing flexibility in the choice of statistical tests.
@@ -822,7 +940,7 @@ S_cr=S_cr, P1=HighDist, P2=1-HighDist, T=5.0000000001, R=0.0000000001)
    - It's recommended to use the MaxCombo for analytical purposes but to communicate the results using more interpretable measures such as the Restricted Mean Survival Time (RMST), which provides a direct, clinically meaningful measure of survival benefit.
 
 
-## One Sample Log-Mean Method  
+# One Sample Log-Mean Method  
 
 **Reference**
 
@@ -865,18 +983,18 @@ $$
 $$
 
 
-### Calculation in R (Event)
+## Calculation in R (Event)
 
 Suppose that we are designing a Phase II oncology trial where we plan a 5% level (one-sided) test, and we need 80% power to detect a hazard ratio of 1.5. We can find the required number of deaths as follows:
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE} 
-## Log-mean based approach
-## Expected number of events
+# Log-mean based approach
+# Expected number of events
 ssc.onesample.logMean(HR = 1.5, sig.level = 0.05, power = 0.8)
 ```
 
 
-### Calculation in R (Patient)
+## Calculation in R (Patient)
 
 We wanted to design a Phase II oncology trial where we plan a $5 \%$ level (one-sided) test, and we need $80 \%$ power to detect a hazard ratio of 1.5 .
 
@@ -889,7 +1007,7 @@ ssc.onesample.logMean2(HR = 1.5, sig.level = 0.05, power = 0.8, lambda=0.10, acc
 
 
 
-## One Sample Likelihood-Ratio Based Approach
+# One Sample Likelihood-Ratio Based Approach
 
 **Reference**
 
@@ -935,7 +1053,7 @@ expLRdeaths = function(Delta, alpha, pwr){
 ```
 
 
-#### Calculation in R 
+### Calculation in R 
 
 
 Suppose that we are designing a Phase II oncology trial where we plan a 5% level (one-sided) test, and we need 80% power to detect a hazard ratio of 1.5. We can find the required number of deaths as follows:
@@ -947,7 +1065,7 @@ ssc.onesample.LR(HR = 1.5, sig.level = 0.05, power = 0.8)
 
  
 
-## One Sample Non-Parametric 
+# One Sample Non-Parametric 
 
 **Introduction**
 
@@ -962,3 +1080,155 @@ ssc.onesample.LR(HR = 1.5, sig.level = 0.05, power = 0.8)
 # Reference
 
 * Chow S, Shao J, Wang H. 2008. Sample Size Calculations in Clinical Research. 2nd Ed. Chapman & Hall/CRC Biostatistics Series. 
+
+## Survival Analysis
+ 
+
+1. Cox, D. R., & Oakes, D. (1984). *Analysis of survival data*. CRC Press.
+
+2. Cox, D. R. (1972). Regression models and life‐tables. *Journal of the Royal Statistical Society: Series B (Methodological)*, 34(2), 187-202.
+
+3. Collett, D. (2015). *Modelling survival data in medical research*. CRC Press.
+
+4. Fleming, T. R., & Harrington, D. P. (2013). *Counting processes and survival analysis*. John Wiley & Sons.
+
+5. Klein, J. P., Van Houwelingen, H. C., Ibrahim, J. G., & Scheike, T. H. (Eds.). (2016). *Handbook of survival analysis*. CRC Press.
+
+6. Andersen, P. K., Borgan, O., Gill, R. D., & Keiding, N. (2012). *Statistical models based on counting processes*. Springer Science & Business Media.
+
+7. Lin, H., & Zelterman, D. (2002). *Modeling survival data: Extending the Cox model*. Springer.
+
+8. Klein, J. P., & Moeschberger, M. L. (2003). *Survival analysis: Techniques for censored and truncated data*. Springer.
+
+9. Lemeshow, S., May, S., & Hosmer Jr, D. W. (2011). *Applied survival analysis: Regression modeling of time-to-event data*. John Wiley & Sons.
+
+10. Aalen, O., Borgan, O., & Gjessing, H. (2008). *Survival and event history analysis: A process point of view*. Springer Science & Business Media.
+
+11. U.S. Food and Drug Administration. (2018). *Clinical Trial Endpoints for the Approval of Cancer Drugs and Biologics*. Retrieved from [http://www.fda.gov/downloads/Drugs/GuidanceComplianceRegulatoryInformation/Guidances/ucm071590.pdf](http://www.fda.gov/downloads/Drugs/GuidanceComplianceRegulatoryInformation/Guidances/ucm071590.pdf)
+
+## Survival Power Analysis
+ 
+1. Kilickap, S., Demirci, U., Karadurmus, N., Dogan, M., Akinci, B., & Sendur, M. A. N. (2018). Endpoints in oncology clinical trials. *J BUON*, 23, 1-6.
+
+2. Freedman, L. S. (1982). Tables of the number of patients required in clinical trials using the logrank test. *Statistics in Medicine*, 1(2), 121-129.
+
+3. Schoenfeld, D. A. (1983). Sample-size formula for the proportional-hazards regression model. *Biometrics*, 499-503.
+
+4. Lachin, J. M., & Foulkes, M. A. (1986). Evaluation of sample size and power for analyses of survival with allowance for nonuniform patient entry, losses to follow-up, noncompliance, and stratification. *Biometrics*, 507-519.
+
+5. Lakatos, E. (1988). Sample sizes based on the log-rank statistic in complex clinical trials. *Biometrics*, 229-241.
+
+6. Lakatos, E., & Lan, K. K. G. (1992). A comparison of sample size methods for the logrank statistic. *Statistics in Medicine*, 11(2), 179-191.
+
+7. Bariani, G. M., de Celis, F., Anezka, C. R., Precivale, M., Arai, R., Saad, E. D., & Riechelmann, R. P. (2015). Sample size calculation in oncology trials. *American Journal of Clinical Oncology*, 38(6), 570-574.
+
+8. Tang, Y. (2021). A unified approach to power and sample size determination for log-rank tests under proportional and nonproportional hazards. *Statistical Methods in Medical Research*, 30(5), 1211-1234.
+
+9. Tang, Y. (2022). Complex survival trial design by the product integration method. *Statistics in Medicine*, 41(4), 798-814.
+
+10. Hsieh, F. Y., & Lavori, P. W. (2000). Sample-size calculations for the Cox proportional hazards regression model with nonbinary covariates. *Controlled Clinical Trials*, 21(6), 552-560.
+
+11. Wu, J. (2014). Sample size calculation for the one-sample log-rank test. *Pharmaceutical Statistics*, 14(1), 26-33.
+
+12. Phadnis, M. A. (2019). Sample size calculation for small sample single-arm trials for time-to-event data: Logrank test with normal approximation or test statistic based on exact chi-square distribution? *Contemporary Clinical Trials Communications*, 15, 100360.
+
+13. Jung, S. H. (2008). Sample size calculation for the weighted rank statistics with paired survival data. *Statistics in Medicine*, 27(17), 3350-3365.
+
+14. Lachin, J. M. (2013). Sample size and power for a logrank test and Cox proportional hazards model with multiple groups and strata, or a quantitative covariate with multiple strata. *Statistics in Medicine*, 32(25), 4413-4425.
+
+15. Litwin, S., Wong, Y.-N., & Hudes, G. (2007). Early stopping designs based on progression-free survival at an early time point in the initial cohort. *Statistics in Medicine*, 26(14), 4400-4415.
+
+16. Liu, Y., & Lim, P. (2017). Sample size increase during a survival trial when interim results are promising. *Communications in Statistics-Theory and Methods*, 46(14), 6846-6863.
+
+17. Freidlin, B., & Korn, E. L. (2017). Sample size adjustment designs with time-to-event outcomes: a caution. *Clinical Trials*, 14(6), 597-604.
+
+18. Ren, S., & Oakley, J. E. (2014). Assurance calculations for planning clinical trials with time-to-event outcomes. *Statistics in Medicine*, 33(1), 31-45.
+
+19. Yao, J. C., et al. (2011). Everolimus for advanced pancreatic neuroendocrine tumors. *New England Journal of Medicine*, 364(6), 514-523.
+
+## Non-Proportional Hazards
+
+
+1. Fine, G. D. (2007). Consequences of delayed treatment effects on analysis of time-to-event endpoints. *Drug Information Journal*, 41(4), 535-539.
+
+2. Alexander, B. M., Schoenfeld, J. D., & Trippa, L. (2018). Hazards of hazard ratios-deviations from model assumptions in immunotherapy. *The New England Journal of Medicine*, 378(12), 1158-1159.
+
+3. Public Workshop: Oncology Clinical Trials in the Presence of Non‐Proportional Hazards, The Duke‐Margolis Center for Health Policy, February 2018. Available at: [https://slideplayer.com/slide/14007912/](https://slideplayer.com/slide/14007912/).
+
+4. Royston, P., & Parmar, M. K. (2020). A simulation study comparing the power of nine tests of the treatment effect in randomized controlled trials with a time-to-event outcome. *Trials*, 21(1), 1-17.
+
+5. Logan, B. R., Klein, J. P., & Zhang, M. J. (2008). Comparing treatments in the presence of crossing survival curves: An application to bone marrow transplantation. *Biometrics*, 64(3), 733-740.
+
+6. Fleming, T. R., & Harrington, D. P. (1981). A class of hypothesis tests for one and two-sample censored survival data. *Communications in Statistics-Theory and Methods*, 10(8), 763-794.
+
+7. Pepe, M. S., & Fleming, T. R. (1989). Weighted Kaplan-Meier statistics: A class of distance tests for censored survival data. *Biometrics*, 497-507.
+
+8. Breslow, N. E., Edler, L., & Berger, J. (1984). A two-sample censored-data rank test for acceleration. *Biometrics*, 1049-1062.
+
+9. Lan, K. K. G., & Wittes, J. (1990). Linear rank tests for survival data: Equivalence of two formulations. *The American Statistician*, 44(1), 23-26.
+
+10. Yang, S., & Prentice, R. (2010). Improved log-rank-type tests for survival data using adaptive weights. *Biometrics*, 66, 30-38.
+
+11. Lee, S. H. (2007). On the versatility of the combination of the weighted log-rank statistics. *Computational Statistics & Data Analysis*, 51(12), 6557-6564.
+
+12. Hasegawa, T. (2014). Sample size determination for the weighted log-rank test with the Fleming–Harrington class of weights in cancer vaccine studies. *Pharmaceutical Statistics*, 13(2), 128-135.
+
+13. Karrison, T. (2016). Versatile tests for comparing survival curves based on weighted log-rank statistics. *Stata Journal*, 16(3), 678-690.
+
+14. Lin, R. S., Lin, J., Roychoudhury, S., Anderson, K. M., Hu, T., Huang, B., Leon, L. F., Liao, J. J., Liu, R., Luo, X., & Mukhopadhyay, P. (2020). Alternative analysis methods for time-to-event endpoints under nonproportional hazards: A comparative analysis. *Statistics in Biopharmaceutical Research*, 12(2), 187-198.
+
+15. Roychoudhury, S., Anderson, K. M., Ye, J., & Mukhopadhyay, P. (2021). Robust design and analysis of clinical trials with nonproportional hazards: A straw man guidance from a cross-pharma working group. *Statistics in Biopharmaceutical Research*, 1-15.
+
+16. Mukhopadhyay, P., Ye, J., Anderson, K. M., Roychoudhury, S., Rubin, E. H., Halabi, S., & Chappell, R. J. (2022). Log-rank test vs MaxCombo and difference in restricted mean survival time tests for comparing survival under nonproportional hazards in immuno-oncology trials: A systematic review and meta-analysis. *JAMA Oncology*.
+
+17. Freidlin, B., & Korn, E. L. (2019). Methods for accommodating nonproportional hazards in clinical trials: Ready for the primary analysis? *Journal of Clinical Oncology*, 37(35), 3455.
+
+18. Bartlett, J. W., Morris, T. P., Stensrud, M. J., Daniel, R. M., Vansteelandt, S. K., & Burman, C. F. (2020). The hazards of period-specific and weighted hazard ratios. *Statistics in Biopharmaceutical Research*, 12(4), 518.
+
+19. Magirr, D., & Burman, C. F. (2019). Modestly weighted log-rank tests. *Statistics in Medicine*, 38(20), 3782-3790.
+
+20. Magirr, D. (2021). Non‐proportional hazards in immuno‐oncology: Is an old perspective needed? *Pharmaceutical Statistics*, 20(3), 512-527.
+
+21. Magirr, D., & Burman, C. F. (2023). The MaxCombo Test Severely Violates the Type I Error Rate. *JAMA Oncology*, 9(4), 571–572.
+
+22. Mukhopadhyay, P., Roychoudhury, S., & Anderson, K. M. (2023). The MaxCombo Test Severely Violates the Type I Error Rate—Reply. *JAMA Oncology*, 9(4), 572-572.
+
+23. Royston, P., & Parmar, M. K. (2013). Restricted mean survival time: An alternative to the hazard ratio for the design and analysis of randomized trials with a time-to-event outcome. *BMC Medical Research Methodology*, 13(1), 1-15.
+
+24. Uno, H., Claggett, B., Tian, L., Inoue, E., Gallo, P., Miyata, T., Schrag, D., Takeuchi, M., Uyama, Y., Zhao, L., & Skali, H. (2014). Moving beyond the hazard ratio in quantifying the between-group difference in survival analysis. *Journal of Clinical Oncology*, 32(22), 2380.
+
+25. Uno, H., Wittes, J., Fu, H., Solomon, S., Claggett, B., Tian, L., Cai, T., Pfeffer, M., Evans, S., & Wei, L. (2015). Alternatives to hazard ratios for comparing the efficacy or safety of therapies in noninferiority studies. *Annals of Internal Medicine*, 163(2), 127.
+
+26. Kim, D. H., Uno, H., & Wei, L. J. (2017). Restricted mean survival time as a measure to interpret clinical trial results. *JAMA Cardiology*, 2(11), 1179-1180.
+
+27. Uno, H., & Tian, L. (2020). Is the log-rank and hazard ratio test/estimation the best approach for primary analysis for all trials? *Journal of Clinical Oncology*, 38(17), 2000-2001.
+
+28. Eaton, A., Therneau, T., & Le-Rademacher, J. (2020). Designing clinical trials with (restricted) mean survival time endpoint: Practical considerations. *Clinical Trials*, 17(3), 285-294.
+
+29. Xu, Z., Zhen, B., Park, Y., & Zhu, B. (2017). Designing therapeutic cancer vaccine trials with delayed treatment effect. *Statistics in Medicine*, 36(4), 592-605.
+
+30. Xu, Z., Park, Y., Zhen, B., & Zhu, B. (2018). Designing cancer immunotherapy trials with random treatment time‐lag effect. *Statistics in Medicine*, 37(30), 4589-4609.
+
+31. Xu, Z., Park, Y., Liu, K., & Zhu, B. (2020). Treating non-responders: Pitfalls and implications for cancer immunotherapy trial design. *Journal of Hematology & Oncology*, 13(1), 1-11.
+
+32. Phadnis, M. A., & Mayo, M. S. (2021). Sample size calculation for two-arm trials with time-to-event endpoint for non-proportional hazards using the concept of Relative Time when inference is built on comparing Weibull distributions. *Biometrical Journal*, 63(7), 1406-1433.
+
+33. Anderson, K. M. (1991). A nonproportional hazards Weibull accelerated failure time regression model. *Biometrics*, 281-288.
+
+34. Balan, T. A., & Putter, H. (2020). A tutorial on frailty models. *Statistical Methods in Medical Research*, 29(11), 3424-3454.
+
+35. Chen, L. M., Ibrahim, J. G., & Chu, H. (2014). Sample size determination in shared frailty models for multivariate time-to-event data. *Journal of Biopharmaceutical Statistics*, 24(4), 908-923.
+
+36. Rényi,
+
+ A. (1953). On the theory of order statistics. *Acta Math. Acad. Sci. Hung*, 4(2), 48-89.
+
+37. Buyse, M. (2010). Generalized pairwise comparisons of prioritized outcomes in the two‐sample problem. *Statistics in Medicine*, 29(30), 3245-3257.
+
+
+
+
+
+
+
+

@@ -5,7 +5,7 @@ title: |
 output:
   html_document:
     df_print: paged
-    number_sections: No
+    number_sections: yes
     toc: yes
     toc_float: yes
   word_document:
@@ -88,6 +88,97 @@ From an operational standpoint, stopping a trial early for efficacy doesn't mean
 **5. Adaptive Design:**
    - Depending on the results of the interim analysis, modifications may be made to the trial’s design. This could involve adjusting the sample size or altering the trial’s objective (e.g., shifting from a superiority trial to a non-inferiority trial).
   
+
+
+## Fully Sequential vs. Group Sequential Designs
+
+Group sequential designs (GSDs) are a sophisticated methodology in clinical trials that allow for interim analyses of the data at pre-specified points during the study. These designs can provide the opportunity to stop the trial early for efficacy, futility, or in some cases, safety concerns. This flexibility makes group sequential designs very appealing for both ethical and economic reasons.  
+ 
+
+- **Fully Sequential Designs**: These designs allow for continuous monitoring of data as they become available. Each incoming piece of data can potentially trigger an interim analysis, which might lead to early termination of the trial. This method is very flexible but requires rigorous control of the Type I error rate due to the multiple analyses conducted.
+
+- **Group Sequential Designs**: Unlike fully sequential designs, GSDs involve analyses at specified "looks" or points within the collection of data. These points are usually predetermined and occur after a cohort of subjects has been assessed. The data are evaluated in groups rather than continuously, which can simplify the logistics and statistical handling of interim analyses.
+
+**Key Features of Group Sequential Designs**
+
+- **Early Stopping**: The trial may be terminated early for efficacy if the treatment effect is stronger than expected, or for futility if preliminary results suggest that continuing the trial is unlikely to show a treatment benefit.
+
+- **Adjustments at Interim Analyses**: Adjustments may be made to the trial parameters based on interim findings, such as sample size re-estimation or protocol modifications.
+
+- **Multiple Opportunities for Success**: These designs allow multiple looks at the data, thereby increasing the chances of stopping early if the treatment proves effective or avoiding unnecessary exposure to ineffective or harmful treatments.
+
+## Types of Group Sequential Design
+
+![](./02_Plots/SSC/SSC_GSDType.png)
+
+
+
+**1. Error Spending**
+- **Definition:** This method involves 'spending' alpha (Type I error, related to falsely declaring efficacy) and/or beta (Type II error, related to falsely declaring futility) across multiple interim looks.
+- **Application:** Highly flexible in both the design and analysis stages of a clinical trial, allowing adjustments based on accumulating data.
+
+**2. Haybittle-Peto**
+- **Definition:** Sets boundaries for efficacy in terms of unadjusted p-values. This method adjusts the final p-value to retain the correct Type I error rate.
+- **Application:** Typically involves a more conservative approach to stopping for efficacy, often using a stringent p-value threshold like 0.001 at interim analyses.
+
+**3. Wang-Tsiatis**
+- **Definition:** Includes designs that focus solely on efficacy or both efficacy and futility. The Pampallona-Tsiatis Parameter Method aims to optimize the trial by minimizing the average sample size.
+- **Application:** Provides a structured approach to balance between the number of interim looks and the conservation of statistical power.
+
+**4. “Classic” Designs**
+- **Definition:** Includes well-known methods like O'Brien-Fleming and Pocock designs, which use fixed statistical boundaries for interim analyses.
+- **Application:** These designs are less flexible during monitoring but are well-established for controlling Type I error across multiple looks. They are not to be confused with O'Brien-Fleming and Pocock error spending functions which are more about how the error probability is allocated across the interim analyses.
+
+**5. Unified Family**
+- **Definition:** A unified method that encompasses the Wang-Tsiatis and "Classic" designs using two parameters to define the stopping boundaries.
+- **Application:** Offers less flexibility than error spending approaches but provides a structured framework that can incorporate different statistical considerations.
+
+**6. Whitehead**
+- **Definition:** An extension of the fully sequential probability ratio test (SPRT) adapted to group sequential settings. This method is known for its “Triangular” or “Christmas Tree” design patterns.
+- **Application:** Useful in scenarios where the traditional SPRT needs adaptation to handle grouped sequential data, providing a balance between early stopping for efficacy and overall trial integrity.
+
+**7. Others**
+- **Definition:** Includes custom designs for futility such as Conditional Power, Adaptive GSD (which may include sample size re-estimation and other adaptive features), and Multi-Arm Multi-Stage (MAMS) GSD.
+- **Application:** These methods allow for a high degree of customization and can adapt to the specific needs of a trial, offering flexibility in how interim data are used to make decisions about the trial's continuation.
+
+
+## GSD Simulation
+
+
+Group Sequential Design (GSD) simulation is an essential tool in the design and analysis of clinical trials, allowing researchers to assess the properties of complex GSDs before actual trial data are collected.  
+
+**GSD simulation** uses hypothetical (simulated) study data to predict various characteristics of a group sequential design. It is particularly valuable for:
+
+- **Understanding Complex GSDs:** Simulations help clarify how GSDs will perform under various scenarios, which can be complex and not intuitive, especially with adaptations and interim analyses.
+- **Verification of Design:** By simulating trial outcomes based on the original design specifications, researchers can verify if the design meets the intended statistical properties (e.g., maintaining Type I error rates).
+- **Exploration of Alternative Scenarios:** Simulations allow researchers to test different design modifications, such as changes in the timing of interim analyses or the effect of different sample sizes and information fractions.
+
+**Key Benefits of Simulation in GSD**
+
+- **Type I and II Error Verification:** Ensures that the trial is correctly powered to detect a treatment effect and maintains the correct Type I error rate across multiple interim analyses.
+- **Expected Sample Size and Stopping Time:** Helps predict the likely sample size needed and the potential for early stopping, which are crucial for budgeting and logistical planning.
+- **Boundary and Information Fraction Calculations:** Assists in setting appropriate boundaries for interim analyses and deciding how much information to review at each interim look.
+- **Evaluation of Alternative Hypotheses:** Simulations can test how robust the trial design is against various clinical scenarios, such as weaker or stronger than expected treatment effects.
+- **Flexibility in Design Adjustments:** Allows for the exploration of substantial modifications to the trial without the risk and expense of making these changes in a real-world setting.
+
+**Regulatory Perspective**
+
+Regulatory bodies often view simulation positively as it provides a rigorous framework for evaluating and justifying trial designs. Simulated data can demonstrate to regulators that a trial is likely to meet its objectives and that the statistical methods employed are appropriate and robust.
+
+**Steps in Designing a Simulated GSD**
+
+**Step 1: Generating Model Assumptions**
+- Define the clinical context and parameters for the simulated data, such as the expected rates of events, variability, and the effect size of the intervention.
+
+**Step 2: Design Assumptions**
+- Establish the structure of the trial, including the number of arms, enrollment criteria, and planned duration.
+
+**Step 3: Boundary/Information Assumptions**
+- Set the criteria for interim analyses, including statistical boundaries for efficacy and futility, and decide how much data (information fraction) will be considered at each analysis point.
+
+**Step 4: Simulation Control Assumptions**
+- Determine the number of simulations, the randomization seed, and other technical parameters that control the simulation process. This step ensures that the simulation is both robust and reproducible.
+ 
 
 
 
@@ -522,7 +613,21 @@ sampleSizeResultGS <- getSampleSizeRates(design,pi2 = 0.25,pi1 = 0.4)
 sampleSizeResultGS
 ```
 
-## Survival endpoint
+
+# Survival Group Sequential Designs
+
+These designs are used in trials where the endpoint is time until the occurrence of a specific event (like death or disease progression). The complexity in these designs often comes from several factors:
+
+- **Patient Follow-Up:** Decisions need to be made whether to follow patients until an event occurs or only for a fixed period, which can impact the detection of treatment effects and the overall study duration.
+  
+- **Non-Proportional Hazards:** This occurs when the risk (hazard) of an endpoint varies over time between treatment groups. Handling non-proportional hazards requires more sophisticated statistical techniques to ensure accurate interpretations of the treatment effect over the study period.
+  
+- **Complex Accrual, Survival, Dropout:** Managing varying rates of patient accrual, different survival rates, and dropout rates can complicate the analysis and interpretation of the trial data.
+  
+- **Stratified Analyses:** These are used to control for factors that might affect the outcome, allowing for more precise estimates of the treatment effect within subgroups of patients.
+
+
+## rpact for Survival endpoint
 
 The relevant rpact functions for survival are:
 
@@ -568,7 +673,92 @@ summary(sampleSize1)
 ```
 
 
+## Adaptive Group Sequential Designs
+
+Adaptive designs provide flexibility to modify trial parameters based on interim data without undermining the validity and integrity of the trial. These adjustments include:
+
+- **Treatment Arms - MAMS GSD (Multi-Arm Multi-Stage Group Sequential Design):** This approach allows several treatment arms to be tested simultaneously. Based on interim results, ineffective treatments can be dropped ("drop the loser"), and promising ones can be continued ("pick the winner").
+
+- **Sample Size - BSSR/USSR (Blinded Sample Size Reestimation/Unblinded Sample Size Reestimation):** Adjustments to the sample size based on interim data to maintain statistical power or precision of estimates. BSSR is done without knowledge of the treatment groups' data, whereas USSR involves using this information.
+
+- **Patient Subgroups:** Adaptations can also include focusing on specific patient subgroups that show more significant benefits or lesser side effects, which can be identified as the trial progresses.
+
+- **Bayesian Approach:** Uses prior distributions and updates probabilities with accumulating data, allowing for continuous learning and adaptation within the trial. This approach is particularly useful in adaptive GSDs for handling uncertainty and incorporating real-time data effectively.
+
+
 
 # Reference
+ 
 
-* [Why do we do interim analyses in clinical trials?](https://www.linkedin.com/pulse/why-do-we-interim-analyses-clinical-trials-kaspar-rufibach/?trackingId=4m6sV4oaRFeyrfPyQw%2Bdaw%3D%3D)
+1. Rufibach, K. (n.d.). Why do we do interim analyses in clinical trials? Retrieved from [https://www.linkedin.com/pulse/why-do-we-interim-analyses-clinical-trials-kaspar-rufibach/?trackingId=4m6sV4oaRFeyrfPyQw%2Bdaw%3D%3D](https://www.linkedin.com/pulse/why-do-we-interim-analyses-clinical-trials-kaspar-rufibach/?trackingId=4m6sV4oaRFeyrfPyQw%2Bdaw%3D%3D)
+
+2. Haybittle, J. L. (1971). Repeated assessment of results in clinical trials of cancer treatment. *The British Journal of Radiology*, 44, 793-797.
+
+3. Peto, R., Pike, M. C., Armitage, P., Breslow, N. E., Cox, D. R., Howard, S. V., Mantel, N., McPherson, K., Peto, J., & Smith, P. G. (1976). Design and analysis of randomized clinical trials requiring prolonged observation of each patient. I. Introduction and design. *British Journal of Cancer*, 34(6), 585-612.
+
+4. O'Brien, P. C., & Fleming, T. R. (1979). A multiple testing procedure for clinical trials. *Biometrics*, 35, 549-556.
+
+5. Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. *Biometrika*, 64(2), 191-199.
+
+6. Whitehead, J., & Stratton, I. (1983). Group Sequential clinical trials with triangular continuation regions. *Biometrics*, 39, 227-236.
+
+7. Whitehead, J. (2001). Use of the Triangular Test in Sequential Clinical Trials. In *Handbook of Statistics in Clinical Oncology* (pp. 211-228). New York: Marcel Dekker.
+
+8. Lan, K. K. G., & DeMets, D. L. (1983). Discrete Sequential Boundaries for Clinical Trials. *Biometrika*, 70(3), 659-663.
+
+9. Kim, K., & DeMets, D. L. (1987). Design and Analysis of Group Sequential Tests Based on the Type I Error Spending Rate Function. *Biometrika*, 74, 149-154.
+
+10. Hwang, I. K., Shih, W. J., & DeCani, J. S. (1990). Group sequential designs using a family of type I error probability spending functions. *Statistics in Medicine*, 9, 1439-1445.
+
+11. Lan, K. K. G., Rosenberger, W. F., & Lachin, J. M. (1993). Use of Spending Functions for Occasional or Continuous Monitoring of Data in Clinical Trials. *Statistics in Medicine*, 12(23), 2219-2231.
+
+12. Demets, D. L., & Lan, K. G. (1994). Interim analysis: the alpha spending function approach. *Statistics in Medicine*, 13(13-14), 1341-1352.
+
+13. Wang, S. K., & Tsiatis, A. A. (1987). Approximately optimal one-parameter boundaries for group sequential trials. *Biometrics*, 43, 193-199.
+
+14. Pampallona, S., Tsiatis, A. A., & Kim, K. (2001). Interim monitoring of group sequential trials using spending functions for the type I and type II error probabilities. *Drug Information Journal*, 35, 1113-1121.
+
+15. Emerson, S. S., & Fleming, T. R. (1989). Symmetric Group Sequential Designs. *Biometrics*, 45, 905-923.
+
+16. Kittelson, J. M., & Emerson, S. S. (1999). A Unifying Family of Group Sequential Test Designs. *Biometrics*, 55, 874-882.
+
+17. Jennison, C., & Turnbull, B. W. (1999). Group sequential methods with applications to clinical trials. CRC Press.
+
+18. Gsponer, T., Gerber, F., Bornkamp, B., Ohlssen, D., Vandemeulebroecke, M., Schmidli, H. (2014). A Practical Guide to Bayesian Group Sequential Designs. *Pharmaceutical Statistics*, 13(1), 71-80.
+
+19. Berry, S. M., Carlin, B. P., Lee, J. J., & Muller, P. (2010). Bayesian adaptive methods for clinical trials. CRC Press.
+
+20. ICH E20 Concept Paper. Retrieved from [https://database.ich.org/sites/default/files/E20_FinalConceptPaper_2019_1107_0.pdf](https://database.ich.org/sites/default/files/E20_FinalConceptPaper_2019_1107_0.pdf)
+
+21. Bauer, P., Bretz, F., Dragalin, V., König, F., & Wassmer, G. (2016). Twenty‐five years of confirmatory adaptive designs: opportunities and pitfalls. *Statistics in Medicine*, 35(3), 325-347.
+
+22. Kelly, P. J., Sooriyarachchi, M. R., Stallard, N., & Todd, S. (2005). A practical comparison of group-sequential and adaptive designs. *Journal of Biopharmaceutical Statistics*, 15(4), 719-738.
+
+23. Cui, L., Hung, H. J., & Wang, S. J. (1999). Modification of sample size in group sequential clinical trials. *Biometrics*, 55(3), 853-857.
+
+24. Mehta, C. R., & Tsiatis, A. A. (2001). Flexible Sample Size Considerations under Information Based Interim Monitoring. *Drug Information Journal*, 35, 1095-1112.
+
+25. Chen, Y. J., DeMets, D. L., & Lan, K. K. (2004). Increasing the sample size when the unblinded interim result is promising. *Statistics in Medicine*, 23(7), 1023-1038.
+
+26. Freidlin, B., & Korn, E. L. (2017). Sample size adjustment designs with time-to-event outcomes: a caution. *Clinical Trials*, 14(6), 597-604.
+
+27. Muller, H-H., & Schafer, H. (2001). Adaptive group sequential designs for clinical trials: Combining the advantages of adaptive and of classical group sequential approaches. *Biometrics*, 57, 886-891.
+
+28. Wassmer, G. (2006). Planning and analyzing adaptive group sequential survival trials. *Biometrical Journal: Journal of Mathematical Methods in Biosciences*, 48(4), 714-729.
+
+29. Zelen, M. (1969). Play the winner rule and the controlled clinical trial. *Journal of the American Statistical Association*, 64(325), 131-146.
+
+30. Ghosh, P., Liu, L., Senchaudhuri, P., Gao, P., & Mehta, C. (2017). Design and monitoring of multi‐arm multi‐stage clinical trials. *Biometrics*, 73(4), 1289-1299.
+
+31. Ghosh, P., Liu, L., & Mehta, C. (2020). Adaptive multiarm multistage clinical trials. *Statistics in Medicine*, 73(4), 1289-1299.
+
+
+
+
+
+
+
+
+
+
+
