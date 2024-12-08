@@ -140,6 +140,38 @@ ggcorrplot(corr, hc.order = TRUE,
 
 # Ordinary Least Squares (OLS) 
 
+## General Form of Regression Model
+ 
+**Linear Regression Model (Formula):**
+
+- It presents a linear regression model:
+  \[
+  y = \beta_0 + \beta_1x_1 + \beta_2x_2 + \ldots + \beta_px_p + \epsilon
+  \]
+  where \( y \) is the dependent variable, \( x_1, x_2, \ldots, x_p \) are the independent variables, \( \beta_0, \beta_1, \ldots, \beta_p \) are coefficients to be estimated, and \( \epsilon \) is the random error term.
+
+**Objective and Estimation:**
+
+- The model's goal is to predict the dependent variable based on the independent variables, accounting for random errors.
+- The coefficients \( \beta_i \) are estimated using the OLS method, which aims to minimize the sum of squared residuals between the observed and predicted values.
+
+**Assumptions for the Gauss-Markov Theorem:**
+
+- **Linearity:** The relationship between the dependent and independent variables is linear.
+- **Independence:** Observations are independent of each other.
+- **Homoscedasticity:** Constant variance of error terms across observations.
+- **Zero Mean Error:** The expected value of the error term is zero conditional on the independent variables.
+- **No Perfect Multicollinearity:** There is no exact linear relationship among the independent variables.
+
+**Gauss-Markov Theorem:**
+
+- Under these assumptions, the OLS estimator is the best linear unbiased estimator, meaning it has the smallest variance among all linear unbiased estimators for the coefficients.
+- if the error terms are normally distributed, this leads to additional beneficial properties for hypothesis testing regarding the regression coefficients, including t-tests and F-tests.
+- The errors \( \epsilon_i \) are assumed to be normally distributed \( N(0, \sigma^2) \) and are independent and identically distributed, which simplifies the model’s analysis and inference processes.
+
+
+
+
 ## Assumpions
 
 $${\displaystyle \mathbf {y} =\mathbf {X} {\boldsymbol {\beta }}+{\boldsymbol {\varepsilon }}\;}  \ \ \ \ {\displaystyle \;{\boldsymbol {\varepsilon }}\sim {\mathcal {N}}(\mathbf {0} ,\sigma ^{2}\mathbf {I} _{T})}.$$
@@ -149,6 +181,7 @@ $${\displaystyle \mathbf {y} =\mathbf {X} {\boldsymbol {\beta }}+{\boldsymbol {\
 3. $\operatorname{var}\left(\varepsilon_{i}\right)=\sigma^{2}$
 4. $\operatorname{cov}\left(\varepsilon_{i}, \varepsilon_{j}\right)=0$
 5. $\varepsilon_{i} \sim$ Normal Distribution
+6. $n>p$: number of sample size is greater than the number of explanatory variables.
 
 **Interpretation**
 
@@ -201,423 +234,6 @@ The Gauss-Markov Theorem establishes that the Ordinary Least Squares (OLS) metho
 3. **Nonlinear Relationships**: If the relationship between variables is not linear, OLS cannot be directly applied, as it is designed for linear models. Transforming the relationship into a linear form may allow OLS to be used, but gradient descent is a more flexible option that can handle nonlinear relationships.
 
 4. **Special Cases in Sample Size**: When the number of samples (\(m\)) is very small, specifically smaller than the number of features (\(n\)), the system of equations is underdetermined, making it difficult to fit the data using standard optimization methods. When \(m = n\), the system can be solved using standard equations. If \(m > n\), the system becomes overdetermined, which is the typical scenario where OLS performs effectively.
-
-
-## Model Statistics
-
-**Residuals Standard Error**
-
-```
-## Build Model
-y <- c(8.04,6.95,7.58,8.81,8.33,9.96,7.24,4.26,10.84,4.82,5.68)
-x1 <- c(10,8,13,9,11,14,6,4,12,7,5)
-set.seed(15)
-x2 <- sqrt(y)+rnorm(length(y))
-model <- lm(y~x1+x2)
-
-## Residual Standard error (Like Standard Deviation)
-k <- length(model$coefficients)-1  # Subtract one to ignore intercept
-SSE <- sum(model$residuals**2)
-n <- length(model$residuals)
-Residual_Standard_Error <- sqrt(SSE/(n-(1+k)))
-```
-
-**R-Squared**
- 
-
-R^2^ is a statistic that will give some information about the goodness of fit of a model. In regression, the R^2^ coefficient of determination is a statistical measure of how well the regression predictions approximate the real data points. An R^2^ of 1 indicates that the regression predictions perfectly fit the data.
-
-The total sum of squares
-$${\displaystyle SS_{\text{tot}}=\sum _{i}(y_{i}-{\bar {y}})^{2}}$$
-The sum of squares of residuals
-$${\displaystyle SS_{\text{res}}=\sum _{i}(y_{i}-f_{i})^{2}=\sum _{i}e_{i}^{2}\,}$$
-$${\displaystyle R^{2}=1-{SS_{\rm {res}} \over SS_{\rm {tot}}}\,}$$
-
-```
-## Build Model
-y <- c(8.04,6.95,7.58,8.81,8.33,9.96,7.24,4.26,10.84,4.82,5.68)
-x1 <- c(10,8,13,9,11,14,6,4,12,7,5)
-set.seed(15)
-x2 <- sqrt(y)+rnorm(length(y))
-model <- lm(y~x1+x2)
-
-## Multiple R-Squared
-SSyy <- sum((y-mean(y))**2)
-SSE <- sum(model$residuals**2)
-
-(SSyy-SSE)/SSyy
- 
-# Alternatively
-1-SSE/SSyy
-```
-
-**Adjusted R-Squared**
-
-Adjusted R-Squared normalizes Multiple R-Squared by taking into account how many samples you have and how many variables you’re using. 
-
-$${\displaystyle {\bar {R}}^{2}=1-(1-R^{2}){n-1 \over n-p-1}}$$
-```
-## Adjusted R-Squared
-n <- length(y)
-k <- length(model$coefficients)-1  # Subtract one to ignore intercept
-SSE <- sum(model$residuals**2)
-SSyy <- sum((y-mean(y))**2)
-1-(SSE/SSyy)*(n-1)/(n-(k+1))
-```
-
-**T Statistic** 
-
-Null Hypothesis is that the coefficients associated with the variables is equal to zero. The alternate hypothesis is that the coefficients are not equal to zero (i.e. there exists a relationship between the independent variable in question and the dependent variable).
-
-We can interpret the t-value something like this. A larger t-value indicates that it is less likely that the coefficient is not equal to zero purely by chance. So, higher the t-value, the better.
-
-Pr(>|t|) or p-value is the probability that you get a t-value as high or higher than the observed value when the Null Hypothesis (the β coefficient is equal to zero or that there is no relationship) is true. So if the Pr(>|t|) is low, the coefficients are significant (significantly different from zero). If the Pr(>|t|) is high, the coefficients are not significant.
-
-$$t−Statistic = {β−coefficient \over Std.Error}$$
-
-**F Statistic**
-
-$\mathrm{H}_{0}: \beta_{1}=\ldots \beta_{\mathrm{p}-1}=0$
-
-$$Std. Error = \sqrt{MSE} = \sqrt{\frac{SSE}{n-q}}$$
-$$MSR=\frac{\sum_{i}^{n}\left( \hat{y_{i} - \bar{y}}\right)}{q-1} = \frac{SST - SSE}{q - 1}$$
-$$F-statistic = \frac{MSR}{MSE}$$
-```
-linearMod <- lm(dist ~ speed, data=cars)
-modelSummary <- summary(linearMod)  # capture model summary as an object
-modelCoeffs <- modelSummary$coefficients  # model coefficients
-beta.estimate <- modelCoeffs["speed", "Estimate"]  # get beta estimate for speed
-std.error <- modelCoeffs["speed", "Std. Error"]  # get std.error for speed
-
-t_value <- beta.estimate/std.error  # calc t statistic
-
-p_value <- 2*pt(-abs(t_value), df=nrow(cars)-ncol(cars))  # calc p Value
-
-f_statistic <- modelSummary$fstatistic[1]  # fstatistic
-
-f <- summary(linearMod)$fstatistic  # parameters for model p-value calc
-model_p <- pf(f[1], f[2], f[3], lower=FALSE)
-
-
-## For Calculation
-data(savings)
-g < - 1m (sr ˜ pop15 + pop75 + dpi + ddpi, savings)
-summary (g)
-
-## Test Beta1 = Beta2 = Beta3 = Beta4 = 0
-(tss < - sum((savings$sr-mean (savings$sr))^2))
-(rss < - deviance(g))
-(fstat < - ((tss-rss)/4)/(rss/df.residual(g)))
-## F Test
-1-pf (fstat, 4, df.residual (g)) 
-```
-
-**Model Comparasion**
-
-```
-g2 < - 1m (sr ˜ pop75 + dpi + ddpi, savings)
-
-## d compute the RSS and the F-statistic:
-(rss2 < - deviance (g2))
-(fstat < - (deviance (g2)-deviance (g))/(deviance (g)/df.residual(g)))
-## P value
-1-pf (fstat, l, df.residual(g))
-
-## relate this to the t-based test and p-value by:
-sqrt (fstat) 
-(tstat < - summary(g)$coef[2, 3])
-2 * (l-pt (sqrt (fstat), 45))
-
-## more convenient way to compare two nested models is:
-anova (g2, g)
-
-## Analysis of Variance Table
-## Model 1: sr ˜ pop75 + dpi + ddpi
-## Model 2: sr ˜ pop15 + pop75 + dpi + ddpi
-```
-
-
-**Confidence Intervals**
-
-**Confidence Intervals for $\beta$**
-
-$$\hat{\beta}_{i} \pm t_{n-p}^{(\alpha / 2)} \hat{\sigma} \sqrt{\left(X^{T} X\right)_{i i}^{-1}}$$
-
-Alternatively, a $100(1-\alpha) \%$ confidence region for $\beta$ satisfies:
-
-$$(\hat{\beta}-\beta)^{T} X^{T} X(\hat{\beta}-\beta) \leq p \hat{\sigma}^{2} F_{p, n-p}^{(\alpha)}$$
-
-**Confidence Intervals for Predictions**
-
-It’s essential to distinguish between predicting the future mean response and predicting an individual future observation.
-
-1. **Prediction of a Future Observation**: Suppose a specific house with characteristics \( x_0 \) is on the market. Its selling price would be \( x_0^{T} \beta + \varepsilon \), where \( \varepsilon \) accounts for the random error with mean zero (\( \mathrm{E} \varepsilon = 0 \)). The predicted price is \( x_0^{T} \hat{\beta} \). However, in assessing the variance of this prediction, the variance of \( \varepsilon \) must be included.
-
-2. **Prediction of the Mean Response**: Now consider the question, “What would a house with characteristics \( x_0 \) sell for on average?” Here, the average selling price is \( x_0^{T} \beta \), and it’s predicted by \( x_0^{T} \hat{\beta} \). In this case, only the variance in \( \hat{\beta} \) needs to be considered.
-
-For a **100(1–α)% confidence interval (CI) for a single future response**, we have:
-\[
-\hat{y}_{0} \pm t_{n-p}^{(\alpha / 2)} \hat{\sigma} \sqrt{1 + x_{0}^{T} (X^{T} X)^{-1} x_{0}}
-\]
-
-For a **confidence interval for the mean response** for a given \( x_0 \), the CI is:
-\[
-\hat{y}_{0} \pm t_{n-p}^{(\alpha / 2)} \hat{\sigma} \sqrt{x_{0}^{T} (X^{T} X)^{-1} x_{0}}
-\]
-
-In these formulas:
-- \( \hat{y}_0 = x_0^{T} \hat{\beta} \) is the predicted value.
-- \( t_{n-p}^{(\alpha / 2)} \) is the critical value from the \( t \)-distribution with \( n - p \) degrees of freedom, corresponding to the confidence level.
-- \( \hat{\sigma} \) is the standard error of the estimate.
-
-
-**Likelihood-ratio test**
-
-likelihood-ratio test assesses the goodness of fit of two competing statistical models based on the ratio of their likelihoods, specifically one found by maximization over the entire parameter space and another found after imposing some constraint. If the constraint (i.e., the null hypothesis) is supported by the observed data, the two likelihoods should not differ by more than sampling error.
-
-Suppose that we have a statistical model with parameter space ${\displaystyle \Theta }$. 
-
-* A null hypothesis is often stated by saying that the parameter ${\displaystyle \theta }$ is in a specified subset ${\displaystyle \Theta _{0}}$ of ${\displaystyle \Theta }$. 
-* The alternative hypothesis is thus that ${\displaystyle \theta }$ is in the complement of ${\displaystyle \Theta _{0}}$
-
-$${\displaystyle \lambda _{\text{LR}}=-2\ln \left[{\frac {~\sup _{\theta \in \Theta _{0}}{\mathcal {L}}(\theta )~}{~\sup _{\theta \in \Theta }{\mathcal {L}}(\theta )~}}\right]}$$
-
-Often the likelihood-ratio test statistic is expressed as a difference between the log-likelihoods
-$${\displaystyle \lambda _{\text{LR}}=-2\left[~\ell (\theta _{0})-\ell ({\hat {\theta }})~\right]}$$
-$${\displaystyle \ell ({\hat {\theta }})\equiv \ln \left[~\sup _{\theta \in \Theta }{\mathcal {L}}(\theta )~\right]~}$$
-
-
-
-
-
-**Accuracy**
-
-**Accuracy**: A simple correlation between the actuals and predicted values can be used as a form of accuracy measure. A higher correlation accuracy implies that the actuals and predicted values have similar directional movement, i.e. when the actuals values increase the predicteds also increase and vice-versa.
-$$\text{Min Max Accuracy} = mean \left( \frac{min\left(actuals, predicteds\right)}{max\left(actuals, predicteds \right)} \right)$$
-$$\text{Mean Absolute Percentage Error \ (MAPE)} = mean\left( \frac{abs\left(predicteds−actuals\right)}{actuals}\right)$$
-
-```
-Step 1: Create the training (development) and test (validation) data samples from original data.
-Step 2: Develop the model on the training data and use it to predict the distance on test data
-Step 3: Review diagnostic measures.
-Step 4: Calculate prediction accuracy and error rates
-
-# Create Training and Test data -
-set.seed(100)  # setting seed to reproduce results of random sampling
-trainingRowIndex <- sample(1:nrow(cars), 0.8*nrow(cars))  # row indices for training data
-trainingData <- cars[trainingRowIndex, ]  # model training data
-testData  <- cars[-trainingRowIndex, ]   # test data
-
-# Build the model on training data -
-lmMod <- lm(dist ~ speed, data=trainingData)  # build the model
-distPred <- predict(lmMod, testData)  # predict distance
-
-# Review diagnostic measures.
-summary (lmMod)  # model summary
-AIC (lmMod)  # Calculate akaike information criterion
-
-# Calculate prediction accuracy and error rates
-actuals_preds <- data.frame(cbind(actuals=testData$dist, predicteds=distPred))  # make actuals_predicteds dataframe.
-correlation_accuracy <- cor(actuals_preds)  
-correlation_accuracy
-
-# Now lets calculate the Min Max accuracy and MAPE:
-# 计算最小最大精度和MAPE：
-min_max_accuracy <- mean(apply(actuals_preds, 1, min) / apply(actuals_preds, 1, max))  
-min_max_accuracy
-
-# Mean Absolute Percentage Error 
-mape <- mean(abs((actuals_preds$predicteds - actuals_preds$actuals))/actuals_preds$actuals)  
-mape
-```
-
-
-## Model Diagnostics
-
-The estimation and inference of the regression model depend on several assumptions. These assumptions need to be checked using regression diagnostics. We divide potential problems into three categories:
-
-1. Error We have assumed that $\varepsilon \sim \mathrm{N}\left(0, \sigma^{2} I\right)$ or in words, that the errors are independent, have equal variance and are normally distributed.
-2. Model We have assumed that the structural part of the model $E y=X \beta$ is correct.
-3. Unusual observations Sometimes just a few observations do
-not fit the model. These few observations might change the
-choice and fit of the model.
-
-### 1. Checking Error Assumptions {-}
-
-**Constant Variance (Residuals vs. fitted plots)**
-
-There are two approaches to dealing with nonconstant variance. Use of **weighted least squares** is appropriate when the form of the **nonconstant variance** is either known exactly or there is some known parametric form. Alternatively, one can transform the variables.
-
-
-**Assumptions Checks using Residual Plots**
-
-
-In order for the model to accurately explain the data and for your p-value to represent a meaningful test of the null hypothesis, we need to make some assumptions about the data. Many diagnostics about the regression model can be derived using plots of the residuals of the fitted model. The residuals can easily be obtained and examined, but the crucial concept is that these are sampled from a larger, unobservable population
- 
-
-**The model assumptions are expressed in terms of the error distribution.**
-
-1. Errors are independent
-2. Errors have constant variance
-3. Errors have mean zero
-4. Errors follow a normal distribution
-
-```{r Residums Plot, echo=FALSE, fig.align="center", out.width = '100%',fig.cap="Figure: Residums Plots"}
-knitr::include_graphics("./02_Plots/LR_Residums.png")
-```
-
-
-Here’s a practical example using the built-in `cars` dataset in R, which contains data on car speeds and stopping distances. This example will walk you through scatter plots, box plots, density plots, and a bubble plot. 
-
-#### a. Scatter Plot with Best Fit Line {-}
-
-This scatter plot visualizes the relationship between car speed and stopping distance. The `scatter.smooth()` function will plot the data along with a smoothed line to help visualize the trend.
-
-```R
-# Scatter plot with a smooth line
-scatter.smooth(x = cars$speed, y = cars$dist, main = "Stopping Distance vs Speed",
-               xlab = "Speed (mph)", ylab = "Stopping Distance (ft)")
-```
-
-#### b. Box Plot to Check for Outliers {-}
-
-Box plots help identify any outliers in the `speed` and `distance` variables.
-
-```R
-# Set up the plot area to display two plots side by side
-par(mfrow = c(1, 2))
-
-# Box plot for speed
-boxplot(cars$speed, main = "Box Plot for Speed", 
-        sub = paste("Outliers:", paste(boxplot.stats(cars$speed)$out, collapse = ", ")))
-
-# Box plot for distance
-boxplot(cars$dist, main = "Box Plot for Distance", 
-        sub = paste("Outliers:", paste(boxplot.stats(cars$dist)$out, collapse = ", ")))
-```
-
-#### c. Density Plot to Visualize Distribution {-}
-
-Density plots are useful for checking the distribution of variables. Here, we use the `e1071` package to calculate skewness and visualize the density of `speed` and `distance`.
-
-```R
-# Load the e1071 library to calculate skewness
-library(e1071)
-
-# Set up the plot area to display two plots side by side
-par(mfrow = c(1, 2))
-
-# Density plot for speed
-plot(density(cars$speed), main = "Density Plot: Speed", xlab = "Speed", 
-     ylab = "Density", sub = paste("Skewness:", round(skewness(cars$speed), 2)))
-polygon(density(cars$speed), col = "blue", border = "black")
-
-# Density plot for distance
-plot(density(cars$dist), main = "Density Plot: Distance", xlab = "Distance", 
-     ylab = "Density", sub = paste("Skewness:", round(skewness(cars$dist), 2)))
-polygon(density(cars$dist), col = "blue", border = "black")
-```
-
-#### d. Bubble Plot to Add a Third Dimension {-}
-
-A bubble plot is a scatter plot where the size of the bubbles represents a third variable. Here, we use `speed` for bubble size to illustrate its relationship with `distance`.
-
-```R
-# Bubble plot with bubble size representing speed
-symbols(cars$speed, cars$dist, circles = cars$speed, inches = 0.5,
-        main = "Bubble Plot: Distance vs Speed", xlab = "Speed (mph)", ylab = "Stopping Distance (ft)")
-```
-
-This code provides an initial analysis and visual overview of the relationships and distributions in the dataset, which can be valuable before applying further modeling or statistical techniques.
-
-**2. Normality**
-
-The residuals can be assessed for normality using a Q–Q plot
-
-When the errors are not normal, least squares estimates may not be optimal. They will still be best linear unbiased estimates, but other robust estimators may be more effective. Also tests and confidence intervals are not exact. However, only long-tailed distributions cause large inaccuracies. Mild nonnormality can safely be ignored and the larger the sample size the less troublesome the nonnormality. For short-tailed distributions, the consequences of nonnormality are not serious and can reasonably 
-
- 
-The Shapiro-Wilk test is a formal test for normality, The null hypothesis is that the the residuals are normal.: 
-
-```
-shapiro.test (residuals (g))
-```
-
-**3. Correlated Errors**
-
-Graphical checks include plots of $\hat{\varepsilon}$ against time and
-$\hat{\varepsilon}_{i}$ against $\hat{\varepsilon}_{i-1}$ while the Durbin Watson test uses the statistic (The null distribution based on the assumption of uncorrelated errors follows a linear combination of $\chi^{2}$
-distributions.):
-$$
-D W=\frac{\sum_{i=2}^{n}\left(\hat{\varepsilon}_{i}-\hat{\varepsilon}_{i-1}\right)^{2}}{\sum_{i=1}^{n} \hat{\varepsilon}_{i}^{2}}
-$$
-
-### 2. Finding Unusual Observations
-
-#### Studentized Residuals {-}
-
-The **studentized residual** \( r_i \) is given by:
-\[
-r_{i} = \frac{\hat{\varepsilon}_{i}}{\hat{\sigma} \sqrt{1 - h_{i}}}
-\]
-where \( \hat{\varepsilon}_i \) is the residual for observation \( i \), \( \hat{\sigma} \) is the standard error of the residuals, and \( h_i \) is the leverage for observation \( i \).
-
-If the model assumptions hold, the variance \( \operatorname{var}(r_i) = 1 \), and the correlation \( \operatorname{corr}(r_i, r_j) \) tends to be small. Studentized residuals are often preferred in residual plots because they are standardized to have equal variance, correcting the natural non-constant variance of residuals under constant error variance assumptions. However, if heteroscedasticity is present, studentization alone cannot correct for it.
-
-#### Outlier {-}
-
-An **outlier** is an observation that doesn’t fit the model well, often having a large residual. In linear regression, an outlier is defined as an observation whose value on the dependent variable is unusual given its predictor values. It may indicate a unique sample property or possibly a data entry error.
-
-To identify outliers, compute:
-\[
-\hat{y}_{(i)} = x_{i}^{T} \hat{\beta}_{(i)}
-\]
-where \( \hat{y}_{(i)} \) is the predicted value for observation \( i \) after excluding it from the model fit. If \( \hat{y}_{(i)} - y_i \) is large, then case \( i \) is considered an outlier. To quantify this, the variance of \( y_i - \hat{y}_{(i)} \) is given by:
-\[
-\operatorname{var}\left(y_{i} - \hat{y}_{(i)}\right) = \hat{\sigma}_{(i)}^{2}\left(1 + x_{i}^{T}\left(X_{(i)}^{T} X_{(i)}\right)^{-1} x_{i}\right)
-\]
-We define **jackknife residuals** (or externally studentized residuals) as:
-\[
-t_{i} = \frac{y_{i} - \hat{y}_{(i)}}{\hat{\sigma}_{(i)} \sqrt{1 + x_{i}^{T}\left(X_{(i)}^{T} X_{(i)}\right)^{-1} x_{i}}}
-\]
-which, under correct model assumptions, follows a \( t \)-distribution with \( n - p - 1 \) degrees of freedom if \( \varepsilon \sim \mathrm{N}(0, \sigma^2 I) \). Alternatively, \( t_i \) can be computed as:
-\[
-t_{i} = \frac{\hat{\varepsilon}_{i}}{\hat{\sigma}_{(i)} \sqrt{1 - h_{i}}} = r_{i}\left(\frac{n - p - 1}{n - p - r_{i}^{2}}\right)^{1 / 2}
-\]
-allowing us to avoid performing \( n \) separate regressions. Since \( t_i \sim t_{n - p - 1} \), we can use it to test if case \( i \) is an outlier.
-
-#### Leverage {-}
-
-An observation has **high leverage** if its predictor values are far from the mean, meaning it can exert significant influence on the regression coefficients. The leverage value \( h_i = H_{ii} \) is useful for diagnostics. Since
-\[
-\operatorname{var}(\hat{\varepsilon}_{i}) = \sigma^2 (1 - h_{i}),
-\]
-a high leverage \( h_i \) will reduce \( \operatorname{var}(\hat{\varepsilon}_{i}) \), indicating that observation \( i \) has a significant influence on the model.
-
-#### Influence {-}
-
-An observation is **influential** if its removal significantly changes the estimated regression coefficients. Influence is often seen as a product of leverage and residual size.
-
-The **Cook’s Distance** is a popular diagnostic for influence, summarizing information into a single value for each observation:
-\[
-D_{i} = \frac{(\hat{y} - \hat{y}_{(i)})^{T}(\hat{y} - \hat{y}_{(i)})}{p \hat{\sigma}^{2}} = \frac{1}{p} r_{i}^{2} \frac{h_{i}}{1 - h_{i}}
-\]
-where \( p \) is the number of predictors in the model, and \( r_i \) and \( h_i \) are the studentized residual and leverage for observation \( i \), respectively.
-
-
-
-### 3. Checking the Structure of the Model
-
-We can look at plots of $\hat{\varepsilon}$ against $\hat{y}$ and $x_{i}$ to reveal problems
-or just simply look at plots of $y$ against each $x_{i} .$ 
-
-The disadvantage of these graphs is that other predictor variables affect the relationship. Partial regression or increased variable graph can help isolate the effect of $x_{i}$
-Look at the response that removes the expected effect of other $X_s$:
-**Partial regression (left) and partial residual (right) plots**
-
-$$
-y-\sum_{j \neq i} x_{j} \hat{\beta}_{j}=\hat{y}+\hat{\varepsilon}-\sum_{j \neq i} x_{j} \hat{\beta}_{j}=x_{i} \hat{\beta}_{i}+\hat{\varepsilon}
-$$
 
 
 
@@ -674,11 +290,572 @@ library(car)
 vif(g)
 ```
 
+## Multivariate Linear Regression
+
+Linear regression model \( Y = X\beta + e \), where \( Y \) is the dependent variable, \( X \) are the independent variables, \( \beta \) are the coefficients to be estimated, and \( e \) is the error term.
+
+- The aim is to estimate the vector of coefficients \( \beta \) that minimizes the sum of squared residuals \( Q \), which is the sum of the squared differences between the observed values \( Y_i \) and the predicted values \( \hat{Y}_i \) (fitted values).
+-  while \( \beta_{LS} \) is derived as the least squares estimator under these settings, the method is equivalently the Maximum Likelihood Estimator (MLE) under the assumption of normally distributed errors. This remark ties the least squares estimation to the broader context of statistical estimation, indicating that when the errors are normally distributed, the OLS estimators also maximize the likelihood of observing the data, thus being MLEs.
+
+**Mathematical Derivation:**
+
+- **Sum of Squared Residuals (Q):**
+  \[
+  Q = \sum_{i=1}^n (y_i - \hat{y}_i)^2 = e'e = (Y - X\beta)'(Y - X\beta) = e_1^2 + e_2^2 + \ldots + e_n^2
+  \]
+  where \( e = (e_1, e_2, \ldots, e_n)' \) represents the residuals.
+
+- **Derivation of OLS Estimator:**
+
+  - To find the value of \( \beta \) that minimizes \( Q \), take the derivative of \( Q \) with respect to \( \beta \) and set it to zero:
+    \[
+    \frac{\partial Q}{\partial \beta} = \frac{\partial}{\partial \beta} (Y'Y - \beta'X'Y - Y'X\beta + \beta'X'X\beta)
+    \]
+  - Simplifying this expression using matrix calculus:
+    \[
+    \frac{\partial Q}{\partial \beta} = -2X'Y + 2X'X\beta = 0
+    \]
+  - Solving for \( \beta \):
+    \[
+    X'X\beta = X'Y \quad \Rightarrow \quad \beta_{LS} = (X'X)^{-1}X'Y
+    \]
+    This equation gives the Least Squares estimator of \( \beta \), noted as \( \beta_{LS} \).
+
+## Properties of the OLS Estimator
+
+Least Squares (OLS) estimator in the context of linear regression models. It details statistical proofs and implications for the OLS estimators under the classical linear model assumptions, known as the Gauss-Markov Theorem. Here’s a detailed explanation based on the provided text:
+  
+**Property 1: Unbiasedness**
+
+- The OLS estimator \( \hat{\beta} = (X'X)^{-1}X'y \) is unbiased. This is shown through:
+  \[
+  E(\hat{\beta}) = E((X'X)^{-1}X'y) = (X'X)^{-1}X'E(y) = (X'X)^{-1}X'X\beta = \beta
+  \]
+  Here, the expectation of \( \hat{\beta} \) is shown to be equal to \( \beta \), confirming that OLS provides an unbiased estimate of the regression coefficients under the assumption that the expected value of the errors (E(e)) is zero.
+
+**Property 2: Minimum Variance**
+
+- It's derived that the covariance matrix of \( \hat{\beta} \) is given by:
+  \[
+  D(\hat{\beta}) = \sigma^2 (X'X)^{-1}
+  \]
+  This indicates that the variance of the OLS estimators is minimized, making them the Best Linear Unbiased Estimators (BLUE) under the Gauss-Markov assumptions: linearity, full rank, no perfect multicollinearity, homoscedasticity (constant variance of errors), and independence of errors.
+
+**Property 3: Gauss-Markov Theorem**
+
+- The Gauss-Markov theorem is elaborated upon to argue that the OLS estimator not only produces unbiased estimations but does so with the smallest variance among all linear unbiased estimators when the error terms are homoscedastic and uncorrelated. This is crucial for establishing the efficiency of the OLS method.
+
+**Property 4: Estimation Consistency**
+
+- The estimator \( \hat{\beta} \) is consistent. Consistency is an important property which implies that as the number of observations increases, the estimator converges in probability to the true value of the parameter it estimates.
+
+**Property 5: Covariance between \( \hat{\beta} \) and errors**
+
+- It is shown that the covariance between the OLS estimators \( \hat{\beta} \) and the error vector \( e \) is zero, which is a key property that illustrates the independence of the estimations from the model errors:
+  \[
+  \text{cov}(\hat{\beta}, e) = 0
+  \]
+  This property underpins the assumption that the regressors (X) and the errors (e) are uncorrelated, reinforcing the validity of the OLS estimates.
+
+**Property 6: Distribution of \( \hat{\beta} \) under Normality**
+
+- If the error terms are normally distributed, \( \hat{\beta} \) follows a multivariate normal distribution:
+  \[
+  \hat{\beta} \sim N(\beta, \sigma^2 (X'X)^{-1})
+  \]
+  This aspect ties the theoretical distribution of the estimators to practical statistical inference, enabling hypothesis testing and construction of confidence intervals.
+   
 
 
-# SAS implementation using Proc Reg
+# Model Statistics and Significance Test
 
-## Options
+## Residuals Standard Error
+
+The Residual Standard Error (RSE) in a linear regression model is a measure used to quantify how well the regression line fits the data or, put differently, to assess the typical distance between the observed values and the regression line. It provides an indication of the goodness of fit of the model and is particularly useful for comparing the fitting accuracy across different models.
+ 
+The Residual Standard Error is calculated from the residuals, which are the differences between the observed values (data points) and the predicted values (points on the regression line). The formula for RSE is:
+
+\[
+\text{RSE} = \sqrt{\frac{1}{n - p} \sum_{i=1}^n (y_i - \hat{y}_i)^2}
+\]
+
+Where:
+- \( n \) is the number of observations.
+- \( p \) is the number of predictors in the model (including the intercept).
+- \( y_i \) are the observed values.
+- \( \hat{y}_i \) are the predicted values from the model.
+
+**Interpretation:**
+
+- **Unit Consistency**: RSE has the same units as the dependent variable \( y \), making it easy to interpret in the context of the data.
+- **Fit Quality**: A smaller RSE value indicates that the model has a better fit to the data because the distances between the observed data points and the model's predictions are smaller on average.
+- **Comparison**: RSE can be used to compare the performance of models. When choosing between models, one with a lower RSE is generally preferred because it suggests less discrepancy between the observed and predicted values.
+
+**Usage in Model Diagnostics:**
+
+- **Goodness of Fit**: In addition to the coefficient of determination (R-squared), RSE provides a measure of model fit. While R-squared gives a proportionate account of fit quality, RSE gives an absolute scale that can be compared directly to the magnitude of the dependent variable.
+- **Error Estimation**: It estimates the standard deviation of the error term \( \epsilon \) in the regression equation \( y = \beta X + \epsilon \). This estimation reflects the typical size of the prediction errors.
+
+**Limitations:**
+
+- **Not a Complete Measure**: Like any single metric, RSE does not capture all aspects of model accuracy or the potential influences of outliers, high leverage points, or violations of model assumptions like homoscedasticity.
+- **Dependence on Sample Size**: The denominator \( n - p \) suggests that RSE might be influenced by the number of observations and the number of predictors in the model, which can make comparisons between models with different numbers of parameters or different sample sizes less straightforward.
+
+```
+## Build Model
+y <- c(8.04,6.95,7.58,8.81,8.33,9.96,7.24,4.26,10.84,4.82,5.68)
+x1 <- c(10,8,13,9,11,14,6,4,12,7,5)
+set.seed(15)
+x2 <- sqrt(y)+rnorm(length(y))
+model <- lm(y~x1+x2)
+
+## Residual Standard error (Like Standard Deviation)
+k <- length(model$coefficients)-1  # Subtract one to ignore intercept
+SSE <- sum(model$residuals**2)
+n <- length(model$residuals)
+Residual_Standard_Error <- sqrt(SSE/(n-(1+k)))
+```
+
+## R-Squared and Adjusted R-Squared
+
+**R-squared**, also known as the coefficient of determination, is a statistical measure that represents the proportion of the variance in the dependent variable that is predictable from the independent variables in a regression model. It is a key indicator of the effectiveness of a model at predicting or explaining the outcome in the specific context of the data used in the model.
+ 
+R-squared is defined mathematically as follows:
+
+\[
+R^2 = 1 - \frac{\text{Sum of Squares of Residuals (SSR)}}{\text{Total Sum of Squares (SST)}}
+\]
+
+Where:
+- **SSR (Sum of Squares of Residuals)** is the sum of the squares of the model residuals, which are the differences between observed values and the values predicted by the model: \( SSR = \sum_{i=1}^n (y_i - \hat{y}_i)^2 \)
+- **SST (Total Sum of Squares)** measures the total variance in the dependent variable and is defined as: \( SST = \sum_{i=1}^n (y_i - \overline{y})^2 \), where \( \overline{y} \) is the mean of the observed data.
+
+**Interpretation:**
+
+- **Value Range**: R-squared values range from 0 to 1. An R-squared of 0 indicates that the model explains none of the variability of the response data around its mean, while an R-squared of 1 indicates that the model explains all the variability of the response data around its mean.
+- **Goodness of Fit**: A higher R-squared value typically indicates a better fit of the model to the data. However, a high R-squared value is not always indicative of a model that appropriately fits the data, especially if the model is overly complex or overfitted.
+
+**Usage in Model Evaluation:**
+
+- **Comparative Metric**: R-squared is often used to compare the explanatory power of different models. For instance, in multiple regression setups, adding more predictors to a model can increase the R-squared value, although this doesn't always mean an improvement in model quality due to potential overfitting.
+- **Limitations**: R-squared alone cannot determine whether the coefficient estimates and predictions are biased, which is why other statistics such as adjusted R-squared, AIC, BIC, and residual plots must also be considered.
+
+
+```
+## Build Model
+y <- c(8.04,6.95,7.58,8.81,8.33,9.96,7.24,4.26,10.84,4.82,5.68)
+x1 <- c(10,8,13,9,11,14,6,4,12,7,5)
+set.seed(15)
+x2 <- sqrt(y)+rnorm(length(y))
+model <- lm(y~x1+x2)
+
+## Multiple R-Squared
+SSyy <- sum((y-mean(y))**2)
+SSE <- sum(model$residuals**2)
+
+(SSyy-SSE)/SSyy
+ 
+# Alternatively
+1-SSE/SSyy
+```
+
+**Adjusted R-squared:**
+
+Given that R-squared tends to increase as more predictors are added to a model, regardless of the effectiveness of those additions, the adjusted R-squared is an alternative that incorporates the model's degrees of freedom. The adjusted R-squared is computed as:
+
+\[
+\text{Adjusted } R^2 = 1 - \left(\frac{(1-R^2)(n-1)}{n-p-1}\right)
+\]
+
+where \( n \) is the number of observations and \( p \) is the number of predictors. Unlike R-squared, the adjusted R-squared can decrease if the gain from including a new variable does not offset the loss of degrees of freedom (particularly useful in model selection).
+ 
+```
+## Adjusted R-Squared
+n <- length(y)
+k <- length(model$coefficients)-1  # Subtract one to ignore intercept
+SSE <- sum(model$residuals**2)
+SSyy <- sum((y-mean(y))**2)
+1-(SSE/SSyy)*(n-1)/(n-(k+1))
+```
+
+
+## F Statistic
+
+The F-test is a statistical test used to determine whether there are significant relationships between the independent variables and the dependent variable in a regression model. It is particularly useful for testing the overall significance of a regression model or comparing nested models.
+ 
+**Purpose:**
+
+- The F-test in regression is used to test the null hypothesis that a model with no independent variables fits the data as well as a model with one or more independent variables. Essentially, it tests if all regression coefficients are zero (excluding the intercept).
+
+**Hypotheses:**
+
+- **Null Hypothesis (H0):** All coefficients of the independent variables are equal to zero (\(\beta_1 = \beta_2 = ... = \beta_p = 0\)).
+- **Alternative Hypothesis (H1):** At least one coefficient is not zero (indicating that the corresponding variable contributes to the model).
+
+**Calculation:**
+
+- The F-test uses the ratio of the variance explained by the model to the unexplained variance:
+  \[
+  F = \frac{\text{Explained Variance per Degree of Freedom}}{\text{Residual Variance per Degree of Freedom}} = \frac{MSR}{MSE}
+  \]
+  where \( MSR \) (Mean Square Regression) is the mean squared due to the regression (explained variation) and \( MSE \) (Mean Square Error) is the mean squared due to the residuals (unexplained variation).
+
+**Formulas:**
+
+- \( MSR = \frac{SSR}{p} \)
+- \( MSE = \frac{SSE}{n-p-1} \)
+- \( SSR \) (Sum of Squares due to Regression) is calculated as \(\sum (\hat{y}_i - \overline{y})^2\)
+- \( SSE \) (Sum of Squares due to Error) is \(\sum (y_i - \hat{y}_i)^2\)
+- \( SST \) (Total Sum of Squares) is \(\sum (y_i - \overline{y})^2\), and is equal to \( SSR + SSE \).
+
+**Decomposition of Variance:**
+
+- The total variability in the observed data (SST) can be decomposed into the sum of the variability explained by the regression model (SSR) and the variability that is unexplained by the model (SSE).
+
+**Decision Rule:**
+
+- An F-statistic is computed from the ratio of MSR to MSE. If the calculated F-statistic exceeds the critical value from the F-distribution (for a given significance level \( \alpha \) and degrees of freedom \( p \) and \( n-p-1 \)), the null hypothesis is rejected. This indicates that the regression model provides a better fit to the data than the intercept-only model, suggesting that at least one of the predictors is significantly related to the outcome.
+
+**Usage:**
+
+- The F-test is very common in the analysis of variance (ANOVA) and is widely used in the context of multiple regression analysis to test whether the entire set of regressors has predictive value.
+
+```
+linearMod <- lm(dist ~ speed, data=cars)
+modelSummary <- summary(linearMod)  # capture model summary as an object
+modelCoeffs <- modelSummary$coefficients  # model coefficients
+beta.estimate <- modelCoeffs["speed", "Estimate"]  # get beta estimate for speed
+std.error <- modelCoeffs["speed", "Std. Error"]  # get std.error for speed
+
+t_value <- beta.estimate/std.error  # calc t statistic
+
+p_value <- 2*pt(-abs(t_value), df=nrow(cars)-ncol(cars))  # calc p Value
+
+f_statistic <- modelSummary$fstatistic[1]  # fstatistic
+
+f <- summary(linearMod)$fstatistic  # parameters for model p-value calc
+model_p <- pf(f[1], f[2], f[3], lower=FALSE)
+
+
+## For Calculation
+data(savings)
+g < - 1m (sr ˜ pop15 + pop75 + dpi + ddpi, savings)
+summary (g)
+
+## Test Beta1 = Beta2 = Beta3 = Beta4 = 0
+(tss < - sum((savings$sr-mean (savings$sr))^2))
+(rss < - deviance(g))
+(fstat < - ((tss-rss)/4)/(rss/df.residual(g)))
+## F Test
+1-pf (fstat, 4, df.residual (g)) 
+```
+
+
+
+
+## T Statistic
+
+Null Hypothesis is that the coefficients associated with the variables is equal to zero. The alternate hypothesis is that the coefficients are not equal to zero (i.e. there exists a relationship between the independent variable in question and the dependent variable).
+
+We can interpret the t-value something like this. A larger t-value indicates that it is less likely that the coefficient is not equal to zero purely by chance. So, higher the t-value, the better.
+
+Pr(>|t|) or p-value is the probability that you get a t-value as high or higher than the observed value when the Null Hypothesis (the β coefficient is equal to zero or that there is no relationship) is true. So if the Pr(>|t|) is low, the coefficients are significant (significantly different from zero). If the Pr(>|t|) is high, the coefficients are not significant.
+
+$$t−Statistic = {β−coefficient \over Std.Error}$$
+
+ 
+## Confidence Intervals
+
+**Confidence Intervals for $\beta$**
+
+$$\hat{\beta}_{i} \pm t_{n-p}^{(\alpha / 2)} \hat{\sigma} \sqrt{\left(X^{T} X\right)_{i i}^{-1}}$$
+
+Alternatively, a $100(1-\alpha) \%$ confidence region for $\beta$ satisfies:
+
+$$(\hat{\beta}-\beta)^{T} X^{T} X(\hat{\beta}-\beta) \leq p \hat{\sigma}^{2} F_{p, n-p}^{(\alpha)}$$
+
+**Confidence Intervals for Predictions**
+
+It’s essential to distinguish between predicting the future mean response and predicting an individual future observation.
+
+1. **Prediction of a Future Observation**: Suppose a specific house with characteristics \( x_0 \) is on the market. Its selling price would be \( x_0^{T} \beta + \varepsilon \), where \( \varepsilon \) accounts for the random error with mean zero (\( \mathrm{E} \varepsilon = 0 \)). The predicted price is \( x_0^{T} \hat{\beta} \). However, in assessing the variance of this prediction, the variance of \( \varepsilon \) must be included.
+
+2. **Prediction of the Mean Response**: Now consider the question, “What would a house with characteristics \( x_0 \) sell for on average?” Here, the average selling price is \( x_0^{T} \beta \), and it’s predicted by \( x_0^{T} \hat{\beta} \). In this case, only the variance in \( \hat{\beta} \) needs to be considered.
+
+For a **100(1–α)% confidence interval (CI) for a single future response**, we have:
+\[
+\hat{y}_{0} \pm t_{n-p}^{(\alpha / 2)} \hat{\sigma} \sqrt{1 + x_{0}^{T} (X^{T} X)^{-1} x_{0}}
+\]
+
+For a **confidence interval for the mean response** for a given \( x_0 \), the CI is:
+\[
+\hat{y}_{0} \pm t_{n-p}^{(\alpha / 2)} \hat{\sigma} \sqrt{x_{0}^{T} (X^{T} X)^{-1} x_{0}}
+\]
+
+In these formulas:
+- \( \hat{y}_0 = x_0^{T} \hat{\beta} \) is the predicted value.
+- \( t_{n-p}^{(\alpha / 2)} \) is the critical value from the \( t \)-distribution with \( n - p \) degrees of freedom, corresponding to the confidence level.
+- \( \hat{\sigma} \) is the standard error of the estimate.
+
+
+## Likelihood-ratio test
+
+likelihood-ratio test assesses the goodness of fit of two competing statistical models based on the ratio of their likelihoods, specifically one found by maximization over the entire parameter space and another found after imposing some constraint. If the constraint (i.e., the null hypothesis) is supported by the observed data, the two likelihoods should not differ by more than sampling error.
+
+Suppose that we have a statistical model with parameter space ${\displaystyle \Theta }$. 
+
+* A null hypothesis is often stated by saying that the parameter ${\displaystyle \theta }$ is in a specified subset ${\displaystyle \Theta _{0}}$ of ${\displaystyle \Theta }$. 
+* The alternative hypothesis is thus that ${\displaystyle \theta }$ is in the complement of ${\displaystyle \Theta _{0}}$
+
+$${\displaystyle \lambda _{\text{LR}}=-2\ln \left[{\frac {~\sup _{\theta \in \Theta _{0}}{\mathcal {L}}(\theta )~}{~\sup _{\theta \in \Theta }{\mathcal {L}}(\theta )~}}\right]}$$
+
+Often the likelihood-ratio test statistic is expressed as a difference between the log-likelihoods
+$${\displaystyle \lambda _{\text{LR}}=-2\left[~\ell (\theta _{0})-\ell ({\hat {\theta }})~\right]}$$
+$${\displaystyle \ell ({\hat {\theta }})\equiv \ln \left[~\sup _{\theta \in \Theta }{\mathcal {L}}(\theta )~\right]~}$$
+
+
+
+
+
+## Accuracy
+
+**Accuracy**: A simple correlation between the actuals and predicted values can be used as a form of accuracy measure. A higher correlation accuracy implies that the actuals and predicted values have similar directional movement, i.e. when the actuals values increase the predicteds also increase and vice-versa.
+$$\text{Min Max Accuracy} = mean \left( \frac{min\left(actuals, predicteds\right)}{max\left(actuals, predicteds \right)} \right)$$
+$$\text{Mean Absolute Percentage Error \ (MAPE)} = mean\left( \frac{abs\left(predicteds−actuals\right)}{actuals}\right)$$
+
+```
+Step 1: Create the training (development) and test (validation) data samples from original data.
+Step 2: Develop the model on the training data and use it to predict the distance on test data
+Step 3: Review diagnostic measures.
+Step 4: Calculate prediction accuracy and error rates
+
+# Create Training and Test data -
+set.seed(100)  # setting seed to reproduce results of random sampling
+trainingRowIndex <- sample(1:nrow(cars), 0.8*nrow(cars))  # row indices for training data
+trainingData <- cars[trainingRowIndex, ]  # model training data
+testData  <- cars[-trainingRowIndex, ]   # test data
+
+# Build the model on training data -
+lmMod <- lm(dist ~ speed, data=trainingData)  # build the model
+distPred <- predict(lmMod, testData)  # predict distance
+
+# Review diagnostic measures.
+summary (lmMod)  # model summary
+AIC (lmMod)  # Calculate akaike information criterion
+
+# Calculate prediction accuracy and error rates
+actuals_preds <- data.frame(cbind(actuals=testData$dist, predicteds=distPred))  # make actuals_predicteds dataframe.
+correlation_accuracy <- cor(actuals_preds)  
+correlation_accuracy
+
+# Now lets calculate the Min Max accuracy and MAPE:
+# 计算最小最大精度和MAPE：
+min_max_accuracy <- mean(apply(actuals_preds, 1, min) / apply(actuals_preds, 1, max))  
+min_max_accuracy
+
+# Mean Absolute Percentage Error 
+mape <- mean(abs((actuals_preds$predicteds - actuals_preds$actuals))/actuals_preds$actuals)  
+mape
+```
+
+
+# Model Diagnostics
+
+The estimation and inference of the regression model depend on several assumptions. These assumptions need to be checked using regression diagnostics. We divide potential problems into three categories:
+
+1. Error We have assumed that $\varepsilon \sim \mathrm{N}\left(0, \sigma^{2} I\right)$ or in words, that the errors are independent, have equal variance and are normally distributed.
+2. Model We have assumed that the structural part of the model $E y=X \beta$ is correct.
+3. Unusual observations Sometimes just a few observations do
+not fit the model. These few observations might change the
+choice and fit of the model.
+
+## 1. Checking Error Assumptions {-}
+
+
+
+
+
+**Constant Variance (Residuals vs. fitted plots)**
+
+There are two approaches to dealing with nonconstant variance. Use of **weighted least squares** is appropriate when the form of the **nonconstant variance** is either known exactly or there is some known parametric form. Alternatively, one can transform the variables.
+
+
+**Assumptions Checks using Residual Plots**
+
+
+In order for the model to accurately explain the data and for your p-value to represent a meaningful test of the null hypothesis, we need to make some assumptions about the data. Many diagnostics about the regression model can be derived using plots of the residuals of the fitted model. The residuals can easily be obtained and examined, but the crucial concept is that these are sampled from a larger, unobservable population
+ 
+
+**The model assumptions are expressed in terms of the error distribution.**
+
+1. Errors are independent
+2. Errors have constant variance
+3. Errors have mean zero
+4. Errors follow a normal distribution
+
+```{r Residums Plot, echo=FALSE, fig.align="center", out.width = '100%',fig.cap="Figure: Residums Plots"}
+knitr::include_graphics("./02_Plots/LR_Residums.png")
+```
+
+
+Here’s a practical example using the built-in `cars` dataset in R, which contains data on car speeds and stopping distances. This example will walk you through scatter plots, box plots, density plots, and a bubble plot. 
+
+**a. Scatter Plot with Best Fit Line**
+
+This scatter plot visualizes the relationship between car speed and stopping distance. The `scatter.smooth()` function will plot the data along with a smoothed line to help visualize the trend.
+
+```R
+# Scatter plot with a smooth line
+scatter.smooth(x = cars$speed, y = cars$dist, main = "Stopping Distance vs Speed",
+               xlab = "Speed (mph)", ylab = "Stopping Distance (ft)")
+```
+
+**b. Box Plot to Check for Outliers**
+
+Box plots help identify any outliers in the `speed` and `distance` variables.
+
+```R
+# Set up the plot area to display two plots side by side
+par(mfrow = c(1, 2))
+
+# Box plot for speed
+boxplot(cars$speed, main = "Box Plot for Speed", 
+        sub = paste("Outliers:", paste(boxplot.stats(cars$speed)$out, collapse = ", ")))
+
+# Box plot for distance
+boxplot(cars$dist, main = "Box Plot for Distance", 
+        sub = paste("Outliers:", paste(boxplot.stats(cars$dist)$out, collapse = ", ")))
+```
+
+**c. Density Plot to Visualize Distribution**
+
+Density plots are useful for checking the distribution of variables. Here, we use the `e1071` package to calculate skewness and visualize the density of `speed` and `distance`.
+
+```R
+# Load the e1071 library to calculate skewness
+library(e1071)
+
+# Set up the plot area to display two plots side by side
+par(mfrow = c(1, 2))
+
+# Density plot for speed
+plot(density(cars$speed), main = "Density Plot: Speed", xlab = "Speed", 
+     ylab = "Density", sub = paste("Skewness:", round(skewness(cars$speed), 2)))
+polygon(density(cars$speed), col = "blue", border = "black")
+
+# Density plot for distance
+plot(density(cars$dist), main = "Density Plot: Distance", xlab = "Distance", 
+     ylab = "Density", sub = paste("Skewness:", round(skewness(cars$dist), 2)))
+polygon(density(cars$dist), col = "blue", border = "black")
+```
+
+**d. Bubble Plot to Add a Third Dimension**
+
+A bubble plot is a scatter plot where the size of the bubbles represents a third variable. Here, we use `speed` for bubble size to illustrate its relationship with `distance`.
+
+```R
+# Bubble plot with bubble size representing speed
+symbols(cars$speed, cars$dist, circles = cars$speed, inches = 0.5,
+        main = "Bubble Plot: Distance vs Speed", xlab = "Speed (mph)", ylab = "Stopping Distance (ft)")
+```
+
+This code provides an initial analysis and visual overview of the relationships and distributions in the dataset, which can be valuable before applying further modeling or statistical techniques.
+
+**2. Normality**
+
+The residuals can be assessed for normality using a Q–Q plot
+
+When the errors are not normal, least squares estimates may not be optimal. They will still be best linear unbiased estimates, but other robust estimators may be more effective. Also tests and confidence intervals are not exact. However, only long-tailed distributions cause large inaccuracies. Mild nonnormality can safely be ignored and the larger the sample size the less troublesome the nonnormality. For short-tailed distributions, the consequences of nonnormality are not serious and can reasonably 
+
+ 
+The Shapiro-Wilk test is a formal test for normality, The null hypothesis is that the the residuals are normal.: 
+
+```
+shapiro.test (residuals (g))
+```
+
+**3. Correlated Errors**
+
+Graphical checks include plots of $\hat{\varepsilon}$ against time and
+$\hat{\varepsilon}_{i}$ against $\hat{\varepsilon}_{i-1}$ while the Durbin Watson test uses the statistic (The null distribution based on the assumption of uncorrelated errors follows a linear combination of $\chi^{2}$
+distributions.):
+$$
+D W=\frac{\sum_{i=2}^{n}\left(\hat{\varepsilon}_{i}-\hat{\varepsilon}_{i-1}\right)^{2}}{\sum_{i=1}^{n} \hat{\varepsilon}_{i}^{2}}
+$$
+
+## 2. Finding Unusual Observations {-}
+
+### Studentized Residuals {-}
+
+The **studentized residual** \( r_i \) is given by:
+\[
+r_{i} = \frac{\hat{\varepsilon}_{i}}{\hat{\sigma} \sqrt{1 - h_{i}}}
+\]
+where \( \hat{\varepsilon}_i \) is the residual for observation \( i \), \( \hat{\sigma} \) is the standard error of the residuals, and \( h_i \) is the leverage for observation \( i \).
+
+If the model assumptions hold, the variance \( \operatorname{var}(r_i) = 1 \), and the correlation \( \operatorname{corr}(r_i, r_j) \) tends to be small. Studentized residuals are often preferred in residual plots because they are standardized to have equal variance, correcting the natural non-constant variance of residuals under constant error variance assumptions. However, if heteroscedasticity is present, studentization alone cannot correct for it.
+
+### Outlier {-}
+
+An **outlier** is an observation that doesn’t fit the model well, often having a large residual. In linear regression, an outlier is defined as an observation whose value on the dependent variable is unusual given its predictor values. It may indicate a unique sample property or possibly a data entry error.
+
+To identify outliers, compute:
+\[
+\hat{y}_{(i)} = x_{i}^{T} \hat{\beta}_{(i)}
+\]
+where \( \hat{y}_{(i)} \) is the predicted value for observation \( i \) after excluding it from the model fit. If \( \hat{y}_{(i)} - y_i \) is large, then case \( i \) is considered an outlier. To quantify this, the variance of \( y_i - \hat{y}_{(i)} \) is given by:
+\[
+\operatorname{var}\left(y_{i} - \hat{y}_{(i)}\right) = \hat{\sigma}_{(i)}^{2}\left(1 + x_{i}^{T}\left(X_{(i)}^{T} X_{(i)}\right)^{-1} x_{i}\right)
+\]
+We define **jackknife residuals** (or externally studentized residuals) as:
+\[
+t_{i} = \frac{y_{i} - \hat{y}_{(i)}}{\hat{\sigma}_{(i)} \sqrt{1 + x_{i}^{T}\left(X_{(i)}^{T} X_{(i)}\right)^{-1} x_{i}}}
+\]
+which, under correct model assumptions, follows a \( t \)-distribution with \( n - p - 1 \) degrees of freedom if \( \varepsilon \sim \mathrm{N}(0, \sigma^2 I) \). Alternatively, \( t_i \) can be computed as:
+\[
+t_{i} = \frac{\hat{\varepsilon}_{i}}{\hat{\sigma}_{(i)} \sqrt{1 - h_{i}}} = r_{i}\left(\frac{n - p - 1}{n - p - r_{i}^{2}}\right)^{1 / 2}
+\]
+allowing us to avoid performing \( n \) separate regressions. Since \( t_i \sim t_{n - p - 1} \), we can use it to test if case \( i \) is an outlier.
+
+### Leverage {-}
+
+An observation has **high leverage** if its predictor values are far from the mean, meaning it can exert significant influence on the regression coefficients. The leverage value \( h_i = H_{ii} \) is useful for diagnostics. Since
+\[
+\operatorname{var}(\hat{\varepsilon}_{i}) = \sigma^2 (1 - h_{i}),
+\]
+a high leverage \( h_i \) will reduce \( \operatorname{var}(\hat{\varepsilon}_{i}) \), indicating that observation \( i \) has a significant influence on the model.
+
+### Influence {-}
+
+An observation is **influential** if its removal significantly changes the estimated regression coefficients. Influence is often seen as a product of leverage and residual size.
+
+The **Cook’s Distance** is a popular diagnostic for influence, summarizing information into a single value for each observation:
+\[
+D_{i} = \frac{(\hat{y} - \hat{y}_{(i)})^{T}(\hat{y} - \hat{y}_{(i)})}{p \hat{\sigma}^{2}} = \frac{1}{p} r_{i}^{2} \frac{h_{i}}{1 - h_{i}}
+\]
+where \( p \) is the number of predictors in the model, and \( r_i \) and \( h_i \) are the studentized residual and leverage for observation \( i \), respectively.
+
+
+
+## 3. Checking the Structure of the Model {-}
+
+We can look at plots of $\hat{\varepsilon}$ against $\hat{y}$ and $x_{i}$ to reveal problems
+or just simply look at plots of $y$ against each $x_{i} .$ 
+
+The disadvantage of these graphs is that other predictor variables affect the relationship. Partial regression or increased variable graph can help isolate the effect of $x_{i}$
+Look at the response that removes the expected effect of other $X_s$:
+**Partial regression (left) and partial residual (right) plots**
+
+$$
+y-\sum_{j \neq i} x_{j} \hat{\beta}_{j}=\hat{y}+\hat{\varepsilon}-\sum_{j \neq i} x_{j} \hat{\beta}_{j}=x_{i} \hat{\beta}_{i}+\hat{\varepsilon}
+$$
+
+
+# Implementation   
+    
+## Implementation using SAS Proc Reg
+ 
+### Options {-} 
 
 Here's an overview of various options used in regression analysis and diagnostic plotting, along with their descriptions:
 
@@ -697,7 +874,7 @@ Here's an overview of various options used in regression analysis and diagnostic
 | **DW**                   | Outputs the Durbin-Watson statistic to check for autocorrelation.           |
 | **Influence**            | Diagnoses outliers by outputting statistics for each observation. Cook's D > 50% or defits/debetas > 2 suggests a significant influence of the point. |
 
-## Plot Options
+**Plot Options**
 
 | Plot Options             | Description                                                                 |
 |--------------------------|-----------------------------------------------------------------------------|
@@ -715,7 +892,7 @@ Here's an overview of various options used in regression analysis and diagnostic
 
 These options and plots are valuable for evaluating model fit, diagnosing potential issues such as multicollinearity, identifying outliers, and checking assumptions like normality and homoscedasticity of residuals.
 
-## Diagnose
+### Diagnose {-} 
 
 **Hat matrix diagonal SAS**
 
@@ -762,7 +939,7 @@ run;
 
 
 
-# R implementation 
+## Implementation using R  
 
 
 Here's a summary of commonly used functions in R for model diagnostics and checking assumptions, particularly useful when working with linear models (`lm` objects). These functions help evaluate model fit, detect heteroscedasticity, multicollinearity, and autocorrelation, and identify high leverage or influential points.
@@ -789,13 +966,155 @@ These functions can be run on an `lm` model object (e.g., `bank.lm`) to examine 
 
 # Model Selection
 
+
+## Statistical Measures to Assess Model Fit and Compare Models
+
+These statistical measures are essential tools in regression analysis. They help determine the best model fit by balancing the complexity of the model (number of predictors) and its accuracy in predicting new data. RMSE and MSE are direct measures of residual errors, adjusted \( R^2 \) provides a context-sensitive quality metric, Mallows' \( C_p \) offers a method for model comparison, and AIC/BIC guide the selection of models based on their information loss with a focus on preventing overfitting. 
+
+**1. Root Mean Square Error (RMSE) and Residual Sum of Squares (RSS):**
+
+   - **RMSE** is defined as the square root of the average of squared residuals, computed as \( \text{RMSE} = \sqrt{\frac{\text{RSS}}{n-p}} \), where \( n \) is the number of observations and \( p \) is the number of explanatory variables (including the intercept).
+   - **RSS** is the sum of the squares of residuals, reflecting the total squared deviation of predicted values from observed values.
+
+**2. Mean Square Error (MSE):**
+
+   - **MSE** measures the average of the squares of the errors, essentially quantifying the quality of an estimator in reproducing the observed values.
+   - It is calculated by dividing RSS by the degrees of freedom, \( (n-p) \), giving \( \text{MSE} = \frac{\text{RSS}}{n-p} \).
+
+**3. Adjusted R-Squared (Adjusted \( R^2 \)):**
+
+   - This statistic adjusts the R-squared value to account for the number of predictors in a model, providing a measure that penalizes excessive use of predictors.
+   - It is calculated as:
+     \[
+     \text{adj} R^2 = 1 - \left(1-R^2\right)\frac{n-1}{n-p}
+     \]
+   - **Adjusted \( R^2 \)** compares the explanatory power of regression models that contain different numbers of predictors.
+
+**4. Mallows' C_p:**
+
+   - Introduced by Colin Mallows in 1964, this criterion is used to assess the quality of regression models based on their predictive accuracy.
+   - It is defined as:
+     \[
+     C_p = \frac{\text{RSS}}{s^2} + 2p - n
+     \]
+   - **Mallows' \( C_p \)** aims to identify models with the correct number of predictors, where a good model has a \( C_p \) roughly equal to \( p \) (the number of predictors).
+
+**5. Akaike Information Criterion (AIC) and Bayesian Information Criterion (BIC):**
+
+   - **AIC** and **BIC** are used to evaluate model fit with a penalty for the number of parameters, helping to avoid overfitting.
+   - **AIC** is calculated as:
+     \[
+     \text{AIC} = n \ln\left(\frac{\text{RSS}}{n}\right) + 2p
+     \]
+   - **BIC** is calculated as:
+     \[
+     \text{BIC} = n \ln\left(\frac{\text{RSS}}{n}\right) + p \ln(n)
+     \]
+   - Both criteria are based on the likelihood of the data under the model, with **BIC** adding a stronger penalty for the number of parameters than **AIC**.
+   
+
 Here's an overview of three popular model selection methods in regression analysis: forward stepwise selection, backward stepwise regression, and best subset regression. Each approach can be used to choose the most appropriate predictors in a model.
 
-## 1. Forward Stepwise Selection
 
-Forward stepwise selection starts with a model that has no features and adds one feature at a time. At each step, the feature that most reduces the residual sum of squares (RSS) is added, aiming to improve the model’s R-squared. However, adding a feature does not always improve model fit and interpretability.
+## Model Comparasion
+
+Model comparison in linear regression involves statistically evaluating whether one model provides a significantly better fit to the data than another. This comparison is crucial when determining the most appropriate set of predictors, assessing model complexity, or validating theoretical expectations against empirical data. Several techniques are commonly used for this purpose, including F-tests for nested models, adjusted R-squared, Akaike Information Criterion (AIC), and Bayesian Information Criterion (BIC).
+
+### 1. **F-test for Nested Models** {-}
+
+The F-test is used to compare models where one model is a special case of the other (i.e., a nested model). The test evaluates whether the more complex model (with more predictors) significantly improves the fit of the model compared to the simpler model.
+
+- **Null Hypothesis (H0)**: The simpler model is sufficient, and the additional predictors in the complex model do not significantly improve the fit.
+- **Alternative Hypothesis (H1)**: The complex model provides a significantly better fit to the data.
+
+The F-statistic is calculated as:
+\[
+F = \frac{(\text{RSS}_{\text{simple}} - \text{RSS}_{\text{complex}}) / (p_{\text{complex}} - p_{\text{simple}})}{\text{RSS}_{\text{complex}} / (n - p_{\text{complex}})}
+\]
+Where:
+- \(\text{RSS}_{\text{simple}}\) and \(\text{RSS}_{\text{complex}}\) are the residual sums of squares from the simpler and more complex models, respectively.
+- \(p_{\text{simple}}\) and \(p_{\text{complex}}\) are the number of parameters in the simpler and more complex models.
+- \(n\) is the number of observations.
+
+If the calculated F-value exceeds the critical value from the F-distribution for a given significance level (usually 0.05), the null hypothesis is rejected, indicating that the more complex model provides a better fit.
+
+### 2. **Adjusted R-squared** {-}
+
+Adjusted R-squared is used to compare models with different numbers of predictors. Unlike R-squared, which always increases as more predictors are added, adjusted R-squared penalizes for the number of predictors in the model, providing a more accurate measure of model performance.
+
+- A higher adjusted R-squared value indicates a better model, provided the increase is significant.
+
+### 3. **Information Criteria: AIC and BIC** {-}
+
+Both AIC and BIC provide a means of model comparison by balancing goodness of fit with model complexity:
+- **AIC (Akaike Information Criterion)**: 
+  \[
+  \text{AIC} = 2k - 2\ln(L)
+  \]
+  Where \(k\) is the number of parameters and \(L\) is the likelihood of the model.
+  
+- **BIC (Bayesian Information Criterion)**: 
+  \[
+  \text{BIC} = k\ln(n) - 2\ln(L)
+  \]
+  Where \(n\) is the number of observations.
+
+For both criteria, a lower value indicates a better model. BIC typically imposes a heavier penalty for the number of parameters than AIC, making it more stringent against complex models.
+
+### 4. **Analysis of Variance (ANOVA)** {-}
+
+ANOVA can be used to compare models by examining the variance explained by each model. It's particularly useful for comparing models that are not nested.
+
+- The ANOVA table will show whether the addition of variables significantly increases the explained variance, indicating a better model.
+
+
+```
+g2 < - 1m (sr ˜ pop75 + dpi + ddpi, savings)
+
+## d compute the RSS and the F-statistic:
+(rss2 < - deviance (g2))
+(fstat < - (deviance (g2)-deviance (g))/(deviance (g)/df.residual(g)))
+## P value
+1-pf (fstat, l, df.residual(g))
+
+## relate this to the t-based test and p-value by:
+sqrt (fstat) 
+(tstat < - summary(g)$coef[2, 3])
+2 * (l-pt (sqrt (fstat), 45))
+
+## more convenient way to compare two nested models is:
+anova (g2, g)
+
+## Analysis of Variance Table
+## Model 1: sr ˜ pop75 + dpi + ddpi
+## Model 2: sr ˜ pop15 + pop75 + dpi + ddpi
+```
+
+## Four Method
+
+### 1. Forward Stepwise Selection {-}
+
+
+Forward selection is a stepwise approach in regression analysis where predictors are added one at a time into the model, and at each step, the variable that provides the most statistically significant improvement to the model is included. This method is particularly useful when dealing with a large number of variables, as it helps in identifying a potentially optimal subset of predictors that contribute meaningfully to predicting the response variable.
+
+**Process:**
+1. **Initiation**: Begin with a model that includes no predictors. This means starting from a baseline model where only the intercept is considered.
+
+2. **Selection of Predictors**: At each step, each variable not yet in the model is considered for addition. The selection criterion for each potential new variable is based on the F-statistic, where the variable with the maximum F-statistic that exceeds a certain threshold is added to the model.
+
+3. **Criteria for Adding Variables**: The variable to be added is chosen based on its ability to maximize the F-statistic among all variables not already in the model. The F-statistic here measures how much a variable improves the model fit by comparing the change in residual sum of squares before and after the inclusion of the variable.
+
+4. **Stop Condition**: This process continues until adding a new variable does not significantly improve the model anymore, based on the F-statistic. Typically, a pre-defined significance level (such as 0.05) is used as a cutoff. If the highest F-statistic among the remaining variables does not meet this threshold, the process stops.
+
+5. **Final Model**: The result is a model that includes a subset of variables that have been systematically chosen to optimize the model's predictive accuracy and explanatory power, based on the criterion of the F-statistic.
+
+**Advantages and Limitations**:
+- **Advantage**: Forward selection is computationally efficient and can be particularly useful when the number of observations is much greater than the number of variables. It allows for the building of parsimonious models that avoid overfitting by limiting the number of predictors.
+  
+- **Limitation**: One major limitation of this method is its potential to overlook the effects of combining variables. Since it evaluates variables sequentially rather than in combination, interactions or combined effects that might be significant could be missed. Moreover, this method is greedy; once a variable is included, it is never removed, which might lead to suboptimal models if a variable becomes redundant after additional variables are added.
 
 **Example Code in SAS:**
+
 ```sas
 title2 'Forward stepwise selection';
 proc reg;
@@ -803,9 +1122,31 @@ proc reg;
 run;
 ```
 
-## 2. Backward Stepwise Regression
+### 2. Backward Stepwise Regression {-} 
 
-Backward stepwise regression begins with a model that includes all features, then removes the least significant feature one by one. A mixed approach can combine forward and backward selection to refine the model further, adding features initially and then removing those that no longer contribute to the model fit.
+Backward elimination is a stepwise regression technique that starts with a full model, including all potential predictors, and systematically removes the least significant predictors one by one to simplify the model while attempting to maintain its explanatory power. This method is especially useful when you have a large number of predictors and are looking to identify a more parsimonious model that still effectively captures the relationships in the data.
+
+**Process:**
+
+1. **Start with a Full Model**: Initiate the process with a full model that includes all candidate predictors.
+
+2. **Evaluate and Remove**: At each step, evaluate the statistical significance of the predictors. The predictor with the highest p-value (least significant) is removed from the model, provided its p-value exceeds a pre-specified significance level (often set at 0.05).
+
+3. **Iterate**: Repeat the process of removing the least significant predictor until all remaining predictors have a p-value below the threshold, indicating that they are statistically significant contributors to the model.
+
+4. **Stopping Criterion**: The process stops when removing any further predictors would lead to a model where all remaining variables are statistically significant, or when removing additional predictors significantly worsens the model according to a specific criterion (e.g., a substantial decrease in R-squared or increase in AIC/BIC).
+
+**Advantages and Limitations**:
+
+- **Advantages**:
+  - Provides an automated approach to model simplification, which can be invaluable in scenarios with large datasets.
+  - Helps in focusing on the most significant predictors, reducing the complexity and potentially enhancing the interpretability of the model.
+
+- **Limitations**:
+  - The choice of significance level for removal can impact the final model. Setting this threshold too low might retain unnecessary predictors, while setting it too high might exclude important ones.
+  - It can lead to suboptimal models if the removed variables have significant interaction effects with the variables left in the model.
+  - It does not account for the possibility that a predictor insignificant in a full model may become significant when non-informative predictors are removed.
+  
 
 **Example Code in SAS:**
 ```sas
@@ -814,11 +1155,76 @@ proc reg;
 run;
 ```
 
-## 3. Best Subset Regression
 
-Best subset regression fits all possible models and allows the analyst to choose the best one based on criteria such as adjusted R-squared, Mallow’s \( C_p \), and Bayesian Information Criterion (BIC). This method becomes computationally intensive as the number of predictors increases, making it less practical for very large datasets.
+### 3. Stepwise Selection Method {-}
+
+**Overview:**
+Stepwise selection is a systematic procedure for adding and removing predictors based on their statistical significance in a regression model. It is a popular approach due to its ability to handle large datasets with many variables, refining the model to include only those variables that have a significant impact on the dependent variable.
+
+**Process:**
+
+1. **Starting Point**: The stepwise procedure can start with no variables in the model and then add them sequentially (similar to forward selection), or it can start with all potential predictors in the model and remove them one by one (akin to backward elimination).
+
+2. **Forward Step**:
+    - Variables are added one at a time based on a specified criterion, typically the F-statistic.
+    - Each potential new variable is assessed to determine whether its inclusion significantly improves the model fit.
+    - If adding the variable substantially improves the model (based on a predetermined threshold like a p-value or an increase in R-squared), it is included in the model.
+
+3. **Backward Step**:
+    - After adding variables, the model is then assessed to see if all variables still contribute significantly.
+    - Variables that do not meet the significance criterion are considered for removal.
+    - This involves testing each variable in the model to see if removing it significantly worsens the model fit. If not, the variable is removed.
+
+4. **Criteria for Adding and Removing Variables**:
+    - The decision to add or remove a variable is based on specific criteria such as the p-value, with common thresholds being 0.05 for inclusion and 0.10 for removal.
+    - The process continues iteratively, with variables being added or removed, refining the model progressively until no further variables meet the criteria for entry or removal.
+
+**Evaluation and Iteration**:
+
+- The method evaluates at each step whether any variables previously removed could now be significant and should be re-introduced, making the process dynamic and iterative.
+- This iteration continues until adding or removing any more variables does not improve the model significantly.
+
+**Advantages and Limitations**:
+
+- **Advantages**: Stepwise selection can be more efficient than manually testing all possible combinations of variables, especially in datasets with a large number of variables. It helps in identifying a model that is simpler and still explains the data adequately.
+- **Limitations**: This method can lead to models that are dependent on the order of the variables entered and might include variables that are marginally significant. It also tends to capitalize on chance correlations in the sample data, which may not generalize well to other datasets. The method can also overlook interaction effects unless explicitly included.
+
+     
+### 4. Best Subset Regression {-}
+
+**Best Subset Regression** is a method used in statistical modeling, specifically in regression analysis, to select a subset of predictors that provide the best fit to the model according to a specified criterion. This technique is considered exhaustive as it evaluates all possible combinations of predictors to identify the model that best explains the outcome variable.
+ 
+Best subset regression is often used when there are a moderate number of predictors, and the analyst wants to determine which combination of variables predicts the outcome most effectively. Unlike stepwise selection methods that incrementally add or remove variables based on statistical tests, best subset regression reviews all potential models that can be created from the predictor set.
+
+Best subset regression is particularly useful in situations where:
+
+- The dataset is not excessively large.
+- The number of predictors is moderate but the analyst wishes to ensure that all potential interactions and effects are considered.
+- There is a need to rigorously test which predictors are most important for predicting the outcome.
+
+**Process**
+
+1. **Generate All Possible Models**:
+    - For each possible combination of the predictor variables, a separate model is fit. For example, if there are three predictors, this method would evaluate all possible models: each predictor alone, each pair of predictors, and the model containing all three predictors.
+
+2. **Evaluate Model Fit**:
+    - Each model is assessed based on a predetermined statistical criterion, commonly the Akaike Information Criterion (AIC), Bayesian Information Criterion (BIC), adjusted R-squared, or Mallows' Cp. These criteria balance model fit with complexity to prevent overfitting.
+
+3. **Select the Best Model**:
+    - The model with the best value (lowest for AIC/BIC, highest for adjusted R-squared) is selected as the optimal model. This step involves comparing the performance of potentially many models.
+
+**Advantages and Limitations**
+
+- **Advantages**:
+  - **Comprehensiveness**: By considering every possible combination of variables, best subset regression can be very thorough, making it less likely to miss combinations that provide a good fit.
+  - **Flexibility**: It allows the analyst to review and choose from models based on various criteria, tailoring the selection to the specific needs of the analysis.
+  
+- **Limitations**:
+  - **Scalability**: The number of potential models increases exponentially with the number of predictors, making this method computationally expensive and practically infeasible for large datasets.
+  - **Risk of Overfitting**: Despite using criteria that penalize model complexity, there's still a risk of overfitting, especially when the number of predictors is large relative to the sample size.
 
 **Example Code in SAS:**
+
 ```sas
 title2 'Selecting the best of all possible regression models';
 proc reg;
@@ -828,6 +1234,7 @@ run;
 The `/ selection = cp adjrsq r` option directs SAS to use Mallow’s \( C_p \) criterion to rank models, displaying both adjusted and unadjusted R-squared statistics. `best=5` specifies that SAS should display the top 5 models.
 
 **Example Code in R:**
+
 ```R
 # Load necessary libraries
 library(leaps) 
@@ -863,6 +1270,7 @@ This R code performs best subset regression on the `water` dataset. The `regsubs
 ## k-Fold Cross-Validation
 
 **Background:**  
+
 Professor Tappi from Wright State University highlights the importance of testing regression models rigorously for predicting future observations. When a model is trained and tested on the same dataset, it can lead to overly optimistic conclusions about the model’s predictive performance, as it may not generalize well to new data. For a more unbiased assessment of prediction accuracy, a common approach is to hold back one observation, fit the model on the remaining data, and then use the held-out observation to test the prediction. This leave-one-out method reduces bias in evaluating model performance.
 
 **Purpose of k-Fold Cross-Validation:**
@@ -878,10 +1286,7 @@ While splitting the data into training and test sets (e.g., 80/20 split) might p
 
 This cross-validated error estimate can then be used to compare models and helps determine which model generalizes best to new data.
 
-
-
-
-
+ 
 
 # Skewness
 
@@ -1091,11 +1496,84 @@ interact_plot(model_3, pred = x_2, modx = w, data = data_2, linearity.check = TR
 
 These examples illustrate various ways to use `interact_plot` for visualizing interaction effects, adding data points, adjusting labels, and checking the linearity assumption.
 
-# Collinearity
+# Multicollinearity and Heteroskedasticity
 
+## Introduction
+
+Multicollinearity occurs when two or more predictor variables in a multiple regression model are highly correlated, leading to instability in the estimation of the regression coefficients. This instability can increase the variance of the coefficient estimates and make the model sensitive to changes in the model, such as which variables are included or excluded from the model.
+ 
 When some predictors are linear combinations of others, the matrix \( X^{T} X \) becomes singular, leading to exact collinearity. In this case, there is no unique least squares estimate of \( \beta \). If \( X^{T} X \) is nearly singular, this results in collinearity (often called multicollinearity), which can cause serious issues with estimating \( \beta \), interpreting the model, and assessing associated quantities.
 
-## Detecting Collinearity
+   - Multicollinearity does not reduce the predictive power or reliability of the model as a whole, nor does it affect the model’s ability to fit the data (i.e., it doesn't affect the goodness of fit).
+   - However, it makes it difficult to assess the individual effect of each predictor on the dependent variable because it increases the standard errors of the coefficients. This can lead to coefficients being statistically insignificant when they should be significant.
+   - Due to the high correlation among predictors, it becomes challenging to pinpoint the exact contribution of each predictor to the outcome variable. 
+   - It can also result in overestimating the importance of one variable while underestimating the importance of others, or it can cause the signs of coefficients to be counterintuitive (e.g., positive instead of negative and vice versa).
+
+**Diagnosis and Solutions**:
+
+   - Multicollinearity can be diagnosed through various statistical methods such as examining the correlation matrix of the predictors, Variance Inflation Factor (VIF), and Tolerance.
+   - To address multicollinearity, one might consider removing or combining highly correlated variables, applying principal component analysis, or increasing the sample size to help stabilize the estimates.
+
+In practical terms, if you suspect multicollinearity in your regression model, you should:
+
+- Check correlation matrices and calculate VIF scores for the predictors. A VIF exceeding 5 (some suggest 10 as a threshold) is typically considered an indication of significant multicollinearity.
+- Consider using regularization techniques like Ridge or Lasso, which can help in mitigating the impact of multicollinearity by penalizing large coefficients.
+
+
+## Impact on Linear Regression
+
+Multicollinearity in linear regression occurs when two or more predictor variables are highly correlated, meaning they contain similar information about the variance in the dependent variable. This phenomenon can significantly affect the accuracy and interpretability of the regression analysis.
+
+
+**Effects of Multicollinearity on Linear Regression:**
+
+1. **Coefficient Estimation**:
+   - **Instability**: Multicollinearity makes the coefficient estimates unstable. Small changes in the model or the data can lead to large variations in the coefficients. This instability can result in significant challenges when interpreting the results, as the coefficients may not accurately reflect the relationship between the predictors and the outcome.
+   - **Inflated Variances**: The presence of multicollinearity increases the variances of the coefficient estimates. High variances result in wider confidence intervals and less reliable coefficient estimates, making it difficult to ascertain the true effect of each predictor.
+
+2. **Statistical Significance**:
+   - **Reduced Precision**: Due to the inflated variances, the standard errors of the coefficient estimates are also increased. This leads to a decrease in the t-statistic for each predictor, which can mask the true statistical significance of predictors. Important variables might appear statistically insignificant, leading to their exclusion from the model.
+
+3. **Model Interpretation**:
+   - **Ambiguity in Results**: With high multicollinearity, the coefficient for a predictor variable can be misleading. For instance, the sign of the coefficient might be opposite to what is expected intuitively, or it might suggest a larger or smaller effect than actually exists. This ambiguity complicates the interpretation and decision-making processes based on the model's outputs.
+
+4. **Predictive Accuracy**:
+   - While multicollinearity affects the coefficients and their interpretation, it does not reduce the predictive accuracy of the model as a whole. If the goal is solely prediction, multicollinearity may not pose a serious issue. However, if the objective is to understand the influence of individual predictors, multicollinearity can significantly impair the clarity of these insights.
+   
+## Detecting Normality, Independence, and Equality of Variance of Residuals
+
+
+**1. Normality of Residuals**
+
+- **Assumption**: The residuals \( e_i \) from the regression model are normally distributed. This assumption is crucial for the validity of inferential statistics related to the regression, such as hypothesis tests and confidence intervals for the coefficients.
+- **Implication**: If the residuals are normally distributed, it implies that the estimates of the coefficients obtained through ordinary least squares (OLS) are the most efficient (smallest variance among unbiased estimators), and the statistical inference derived from these estimates (like t-tests for coefficients) will be valid.
+
+**2. Independence of Residuals**
+
+- **Assumption**: The residuals are independent of each other, which means that the value of one residual should not predict the value of another.
+- **Implication**: Independence is key to preventing autocorrelation, particularly in time series data where the assumption can often be violated. When residuals are not independent, it can lead to misleadingly high or low estimates of the regression coefficients, affecting the reliability of the model's predictions.
+
+**3. Homoscedasticity (Equal Variance of Residuals)**
+
+- **Assumption**: The variance of the residuals is constant across all levels of the independent variables. This assumption, called homoscedasticity, opposes the presence of heteroscedasticity, where the variance of residuals varies at different levels of the predictors.
+- **Implication**: When residuals exhibit constant variance, it ensures that the regression model provides equal weight to all observations. If heteroscedasticity is present (i.e., the variance of residuals increases or decreases with the predicted values), it can lead to inefficiency in the estimates and affect the standard errors, which in turn can mislead conclusions about the significance of predictors.
+
+**Statistical Tests and Diagnostics**
+
+- To check these assumptions, various diagnostic tools and plots are used:
+  - **Normality**: Histograms of residuals or Q-Q (quantile-quantile) plots can help visualize if residuals follow a normal distribution.
+  - **Independence**: Autocorrelation functions (ACF) or plots of residuals against time can detect patterns that would suggest non-independence.
+  - **Homoscedasticity**: Plots of residuals against predicted values or independent variables can be used to observe whether the spread of residuals remains constant across the range of predictions.
+
+**Addressing Violations**
+
+- **If normality is violated**: Transformations such as log, square root, or Box-Cox transformations can be applied to the response variable.
+- **If independence is violated**: Adding lag variables or using time series analysis techniques might be necessary.
+- **If homoscedasticity is violated**: Using robust standard errors or transforming the dependent variable can help mitigate this issue.
+ 
+ 
+
+## Detecting and Addressing Multicollinearity
 
 There are several ways to detect collinearity:
 
@@ -1105,8 +1583,79 @@ There are several ways to detect collinearity:
 
 3. **Eigenvalues of \( X^{T} X \)**: Compute the eigenvalues of \( X^{T} X \), where \( \lambda_1 \) is the largest eigenvalue and others decrease. Small eigenvalues signal potential collinearity problems.
  
- 
-# Problems with the Error
+**Solutions**: To mitigate the effects of multicollinearity, analysts might consider:
+
+  - **Removing Highly Correlated Predictors**: If two variables convey similar information, consider removing one of them.
+  - **Combining Predictors**: Creating a new variable that combines the information of highly correlated variables can reduce multicollinearity.
+  - **Principal Component Analysis (PCA)**: PCA can be used to transform the predictors into a set of orthogonal (uncorrelated) components, which can then be used in regression without the problems of multicollinearity.
+
+
+### Variance Inflation Factor (VIF) {-}
+
+**Definition and Calculation:**
+The Variance Inflation Factor (VIF) is a statistical measure that quantifies the extent of correlation and multicollinearity between independent variables in a regression analysis. High VIF values indicate high levels of multicollinearity, which can undermine the statistical significance of an independent variable and destabilize the regression coefficients.
+
+The VIF for each variable is calculated using the following formula:
+
+\[
+\text{VIF}_j = \frac{1}{1 - R_j^2}
+\]
+
+
+- \( R_j^2 \) is the coefficient of determination from a regression of independent variable \( j \) on all the other independent variables.
+
+**Process:**
+
+1. **Determine \( R_j^2 \)**: For each independent variable in the model, regress this variable against all other independent variables and calculate the \( R^2 \) value, which represents how well the other independent variables can predict this variable.
+  
+2. **Calculate VIF**: Use the \( R^2 \) value obtained to calculate the VIF according to the formula provided. A VIF value greater than 1 indicates some level of multicollinearity, with higher values indicating higher multicollinearity.
+
+**Interpretation:**
+
+- **Thresholds for VIF**: Typically, a VIF value greater than 10 is considered indicative of significant multicollinearity, suggesting that the variable is highly collinear with at least one other variable. This threshold is used as a rule of thumb to diagnose problematic levels of multicollinearity.
+- **Impact of High VIF**: High VIF values can lead to inflated variances for the coefficient estimates, which increases the standard errors and makes it difficult to determine the true effect of independent variables. This can result in unstable estimates of coefficients and misleading statistical tests.
+
+
+### Eigenvalues Criterion Method {-}
+
+The Eigenvalue Criterion method, also known as the Eigenvalue Decomposition method, is a sophisticated technique used to detect multicollinearity in multiple regression analyses. This method involves analyzing the eigenvalues of the correlation or covariance matrix derived from the predictor variables.  
+
+**Step 1: Construct the Correlation or Covariance Matrix**
+
+Start by creating a correlation or covariance matrix for all predictor variables in your regression model. The choice between using a correlation matrix or a covariance matrix generally depends on the scaling of the variables; a correlation matrix, which standardizes variables, is often preferred because it allows for comparison on the same scale.
+
+**Step 2: Compute Eigenvalues**
+
+Calculate the eigenvalues of the matrix constructed in Step 1. Eigenvalues are calculated from the determinant equation of the matrix, which involves solving for roots where the determinant of (Matrix - Eigenvalue * Identity matrix) equals zero. This step can typically be executed using statistical software or packages that support linear algebra operations, such as R, Python (NumPy or SciPy), or MATLAB.
+
+**Step 3: Analyze the Eigenvalues**
+
+Examine the eigenvalues obtained from the computation:
+
+- **Zero or Near-Zero Eigenvalues**: The presence of zero or very small eigenvalues indicates strong multicollinearity. This is because a zero eigenvalue suggests that the matrix is singular, implying that at least one variable is a perfect linear combination of others.
+- **Small Eigenvalues Relative to Others**: If some eigenvalues are significantly smaller than others (but not zero), it suggests that there are near-linear dependencies among some of the variables.
+
+**Step 4: Consider the Condition Index**
+
+For a more detailed analysis, compute the Condition Index for the matrix, which is defined as the square root of the ratio of the maximum eigenvalue to each respective eigenvalue. A Condition Index:
+- Above 30 typically indicates a multicollinearity problem.
+- Values between 10 and 30 suggest moderate multicollinearity.
+- Values below 10 generally imply that multicollinearity is not a concern.
+
+**Step 5: Investigate Problematic Variables**
+
+If high multicollinearity is detected (through zero or small eigenvalues or high condition indices), further investigate to identify which variables are causing the issue. This might involve:
+- Looking at the eigenvectors corresponding to small eigenvalues, which can help identify which variables are contributing to multicollinearity.
+- Performing sensitivity analysis by sequentially removing variables and observing the effect on eigenvalues.
+
+**Step 6: Remedial Measures**
+
+Depending on the findings, consider taking remedial actions such as:
+- Removing one or more of the highly collinear variables.
+- Combining variables to reduce dimensionality.
+- Using regularization techniques such as Ridge or Lasso, which can help in handling multicollinearity by penalizing large coefficients.
+
+# Alternative with OLS
 
 The standard assumptions for the error term \( \varepsilon \) are that it is independent and identically distributed (i.i.d.) with variance \( \sigma^2 I \) and that it follows a normal distribution for standard statistical inference. However, these assumptions are often violated, so we need alternative approaches:
 
