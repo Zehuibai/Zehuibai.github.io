@@ -358,6 +358,10 @@ We can check the causality of the events reported in the above plot along with t
 
 A volcano plot is a type of scatter-plot that is used to quickly identify changes in large data sets composed of replicate data. It plots significance versus fold-change on the y and x axes, respectively. It is constructed by plotting the negative log of the p value on the y axis (usually base 10). This results in data points with low p values (highly significant) appearing toward the top of the plot. The x axis is the log of the fold change between the two conditions. The log of the fold change is used so that changes in both directions appear equidistant from the center. In the clinical domain, a volcano plot is used to view Risk Difference (RD), Relative Risk or Odds Ratio of AE occurrence between the treatment groups by preferred term.
 
+
+![](./02_Plots/Visualization/AEs/Volcano.png)
+
+
 **VOLCANO PLOT OF TREATMENT EMERGENT ADVERSE EVENT AT PT LEVEL**
 
 Volcano plots are also generated on the same data which is used for heat maps. Here, we have plotted negative log10-transformed p-value calculated using Fisher exact test on Y-axis and Log2-transformed relative risk on x-axis.
@@ -438,6 +442,128 @@ In the plot, the length and direction of each tendril illustrate the incidence a
 ![](./02_Plots/Visualization/AEs/AE_Tendril.png)
 
 
+```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+# packages
+pacman::p_load(tidyverse, rio)
+pacman::p_load(lubridate)
+pacman::p_load(labelled)
+pacman::p_load(Tendril)
+pacman::p_load(ggtext)
+pacman::p_load(colorspace)
+
+# import
+ae <- read_csv("./01_Datasets/2020-08-12_ae_example_dataset.csv") %>% 
+  mutate(rando_date = ymd(rando_date),
+         aestdat = ymd(aestdat),
+         aeeddat = ymd(aeeddat)) %>% 
+  mutate(day = as.numeric(aestdat - rando_date)) %>% 
+  as.data.frame()
+
+# Fixed mistake in subject 2011
+ae[ae$usubjid == "2011", "arm"] <- "Intervention"
+
+# add labels
+var_label(ae) <- list(
+  usubjid = "unique subject identifier",
+  arm = "treatment assignment name",
+  armn = "treatment assignment numeric (0: placebo; 1:intervention)",
+  rando_date = "date of randomisation (yyyymmdd)",
+  repeatnum = "unique event identifier within usubjid",
+  aept = "adverse event code at preferred term/lower level",
+  aebodsys = "adverse event code at body system/higher level",
+  aesev = "adverse event severity grade (mild, moderate, severe)",
+  aesevn = "adverse event severity grade number (1: mild, 2: moderate, 3: severe)",
+  aeser = "serious adverse event (no, yes)",
+  aesern = "serious adverse event (0: no, 1: yes)",
+  aestdat = "adverse event start date (yyyymmdd)",
+  aeeddat = "adverse event end date (yyyymmdd)",
+  dur = "adverse event duration (days)")
+ 
+
+# Tendril
+subj <- ae %>%
+  count(usubjid, arm) %>% 
+  #add_row(usubjid = 3000, arm = "Intervention", n = 0) %>% 
+  #add_row(usubjid = 3001, arm = "Placebo",      n = 0) %>%
+  select(-n) %>% 
+  as.data.frame()
+
+pt <- Tendril(mydata = ae,
+              rotations = rep(3, nrow(ae)),
+              AEfreqThreshold = 5,
+              Tag = "Comment",
+              Treatments = c("Intervention", "Placebo"),
+              Unique.Subject.Identifier = "usubjid",
+              Terms = "aebodsys",
+              #Terms = "aept",
+              Treat = "arm",
+              StartDay = "day",
+              # SubjList = subj,
+              # SubjList.subject = "usubjid",
+              # SubjList.treatment = "arm",
+              # filter_double_events = TRUE
+)
+
+# working with terms 
+Terms <- pt$data %>% 
+  group_by(Terms) %>% 
+  summarise(n = n(),
+            x = x[n]) %>% 
+  ungroup() %>% 
+  arrange(x) %>% 
+  mutate(text = str_glue("{Terms} (n={n})")) 
+
+# Reorder guides
+pt$data$Terms <- fct_relevel(pt$data$Terms,
+                             Terms %>% 
+                               pull(Terms) %>% 
+                               as.vector()
+)
+
+levels(pt$data$Terms) <- Terms %>% pull(text) %>% as.vector()
+
+# plot Results
+plot(pt) +
+  geom_point(alpha = 0.25) +
+  geom_path(alpha = 0.25) +
+  geom_vline(xintercept = 0, color = 'gray50', linetype = "dashed") +
+  geom_hline(yintercept = 0, color = 'gray50', linetype = "dashed") +
+  #scale_color_brewer(type = "qual", palette = "Set1") +
+  scale_color_discrete_qualitative(palette = "Dark3")+
+  scale_x_continuous(limits = c(-100, 200)) +
+  labs(title = "**Tendril Plot** of System Organ Class Adverse Events (AE) having at least 5 incidences",
+       # caption ="The Tendril Plot: a novel visual summary of the incidence, significance and temporal aspects of AE in clinical trials (JAMIA 2018; 25(8): 1069-1073)"
+       caption = 
+       "Each MedDRA adverse event code at body system/higher level is
+       represented by a line (tendril) and each point is an event. Since time runs
+       along each tendril, it is the shape that carries the important information,
+       rather than the x and y coordinates. An event on the Intervention treatment
+       arm will tilt tendril direction to the *right*, and an event on the placebo arm will
+       tilt tendril direction to the *left*.
+       <br>
+       *The Tendril Plot: a novel visual summary of the incidence, significance and temporal aspects of AE in clinical trials (JAMIA 2018; 25(8): 1069-1073)*"
+       ) +
+  guides(color = guide_legend(title = "AE at Body System")) +
+  theme(aspect.ratio = 0.70,
+        plot.title = element_markdown(),
+        plot.caption = element_textbox_simple(
+          size = 8,
+          lineheight = 1,
+          hjust = 0, vjust = 1,
+          padding = margin(1, 1, 1, 1),
+          margin = margin(1, 1, 1, 1)
+        ),
+        plot.caption.position = "plot",
+        legend.position       = c(0.99,0.92),
+        legend.justification  = c(1,1),
+        legend.background     = element_rect(fill  = 'gray90'),
+        legend.key            = element_rect(fill  = 'gray90'))
+
+# ggsave("./tendril_plot.png",
+#        width = 7.5, height = 6, units = "in")
+```
+
+
 ## Double Dot Plot 
 
 ![](./02_Plots/Visualization/ForestPlot/DoubleDot.png)
@@ -491,7 +617,32 @@ risk_plot <- ggplot(data, aes(x = Category, y = RelativeRisk)) +
 grid.arrange(double_dot_plot, risk_plot, ncol = 2)
 
 ```
- 
+
+
+## Triangles Plot
+
+This visualisation has been submitted as an html file and can be found [here](https://vis-sig.github.io/blog/posts/2020-10-17-wonderful-wednesdays-september-2020/).
+
+
+![](./02_Plots/Visualization/AEs/Triangles.png)
+
+The above visualization is based on clinical trial data for an active treatment for eczema compared to placebo in adolescents that are unresponsive to standard care.
+
+An analysis revealed that more adverse events were recorded for subjects that were assigned to an intervention treatment arm, compared to those assigned to a placebo.
+
+
+## Pie Chart
+
+This visualisation has been submitted as an html file and can be found [here](https://vis-sig.github.io/blog/posts/2020-10-17-wonderful-wednesdays-september-2020/).
+
+
+![](./02_Plots/Visualization/AEs/Pie.png)
+
+## Boxplot for Duration AEs
+
+![](./02_Plots/Visualization/AEs/BoxplotDuration.png)
+
+Subjects assigned to placebo treatment arm that reported an adverse event had their event treated in a duration of 6 days, on average. Participants assigned to interevention treatment, on average, saw the end of their adverse event in 8 days.
 
 
 ## Bar Chart - 10 Highest Reported Adverse Events
@@ -575,6 +726,50 @@ rbind(male,female) %>%
 ```
 
 
+
+## AdEPro App: development of AEs over time
+
+This is definitely more than just a visualisation - it’s a tool. You can upload your data and all AEs are represented in the middle pane. Each patient is represented by a circle / pie chart. You can kick it off by pushing the go button and the app will show you the development of AEs over time. Each AE is represented by a “slice of the pie” and the color as well as the location of it will tell you which AE is showing. If an AE disappears, it will still be shown as an “empty slice”. The size of the slice represents the severity. You have several different options you can work with, like changing which AEs will be shown (color coded), stop at a specific point in time, etc. You can even switch to a barplot representation instead of pie charts.
+
+This is a fully developed app and thus, it is very useful and innovative. Its interactivity brings additional benefits to the user. Furthermore, this is available as an R package called “AdEPro”.
+
+
+
+```
+library(adepro)
+library(tidyverse)
+library(lubridate)
+
+#Run this code to put the variables in the dataset provided into the correct format
+AE <- read.csv("./01_Datasets/2020-08-12_ae_example_dataset.csv")%>%
+  mutate(TRTSDT=ymd(rando_date)) %>%
+  mutate(SUBJIDN = usubjid) %>%
+  mutate(AEDECOD = aept) %>%
+  mutate(TRT01A = arm) %>%
+  mutate(TRT01A = if_else(TRT01A=="Intervention","Experimental","Control")) %>%
+  mutate(LVDT = 365) %>%
+  mutate(DTHDT = "NA") %>%
+  mutate(SAFFN = 1) %>%
+  mutate(AETRTEMN = 1) %>%
+  mutate(AESERN = aesern) %>%
+  mutate(AERELN = 1) %>%
+  mutate(AE_Start = ymd(aestdat)) %>%
+  mutate(AESTDY = AE_Start - TRTSDT + 1)%>%
+  mutate(AEENDY = AESTDY + dur + 1) %>%
+  mutate(AESEVN = aesevn) %>%
+  mutate(TRTSDT=0) %>%
+  mutate(AGE="NA") %>%
+  mutate(SEX="NA") %>%
+  mutate(REGION="NA") %>%
+  select(c(SUBJIDN,AEDECOD,AESTDY, AEENDY,AESEVN,AETRTEMN,AESERN,AERELN, TRT01A, TRTSDT, LVDT, DTHDT,AGE, SEX, REGION, SAFFN))
+
+#write this back to CSV
+write.csv(AE,"./01_Datasets/adepro_app_AE.csv",row.names=FALSE)
+
+#Run the following line to run the app.
+#CSV must be loaded into the app
+launch_adepro()
+```
 
 # Disease Incidence
 

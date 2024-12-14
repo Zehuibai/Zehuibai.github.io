@@ -22,7 +22,6 @@ colorlinks: yes
 # <!--                           Basic system settings                        -->
 # <!-- ---------------------------------------------------------------------- -->
 
-
 library(car)      # package to calculate Variance Inflation Factor
 library(corrplot) # correlation plots
 library(leaps)    # best subsets regression
@@ -95,7 +94,7 @@ When λ = 0, the model reduces to ordinary least squares (OLS) regression, as th
 
 # Model Selection
 
-## Data preparation
+## Data Preparation
 
 * lcavol: logarithm of tumor volume
 * lweight: logarithm of prostate weight
@@ -153,90 +152,171 @@ str(test)
 ## Best subset regression 
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-# 通过regsubsets()命令建立一个最小子集对象
+# Create a minimum subset object using the regsubsets() command
 subfit <- regsubsets(lpsa ~ ., data = train)
 b.sum <- summary(subfit)
-# 使用贝叶斯信息准则，三特征模型具有最小的BIC值
+# Using the Bayesian Information Criterion, the three-feature model has the smallest BIC value
 which.min(b.sum$bic)
-# 通过一个统计图查看模型性能和子集组合之间的关系
-plot(b.sum$bic, type = "l", xlab = "# of Features", ylab = "BIC", 
-     main = "BIC score by Feature Inclusion")
-# 对实际模型做出统计图，进行更详细的检查，上图告诉我们具有最小BIC值的模型中的3个特征是:lcavol、lweight和gleason
+# Use a statistical plot to see the relationship between model performance and subset combinations
+plot(b.sum$bic, type = "l", xlab = "# of Features", ylab = "BIC",
+main = "BIC score by Feature Inclusion")
+# Make a statistical plot of the actual model for a more detailed inspection. The figure above tells us that the three features in the model with the smallest BIC value are: lcavol, lweight, and gleason
 plot(subfit, scale = "bic", main = "Best Subset Features")
 
-# 用以上3个变量建立一个线性模型
+# Use the above three variables to create a linear model
 ols <- lm(lpsa ~ lcavol + lweight + gleason, data = train)
-# 线性拟合表现得很好，也不存在异方差性
-plot(ols$fitted.values, train$lpsa, xlab = "Predicted", ylab = "Actual", 
-     main = "Predicted vs Actual")
-# 模型在测试集上的表现
+# The linear fit is good and there is no heteroskedasticity
+plot(ols$fitted.values, train$lpsa, xlab = "Predicted", ylab = "Actual",
+main = "Predicted vs Actual")
+# Model performance on the test set
 pred.subfit = predict(ols, newdata=test)
-plot(pred.subfit, test$lpsa , xlab = "Predicted", 
-     ylab = "Actual", main = "Predicted vs Actual")
-# 计算均方误差MSE，以便在不同模型构建技术之间进行比较
+plot(pred.subfit, test$lpsa , xlab = "Predicted",
+ylab = "Actual", main = "Predicted vs Actual")
+# Calculate the mean squared error MSE to compare between different model building techniques
 resid.subfit = test$lpsa - pred.subfit
 mean(resid.subfit^2)
 ```
-
-
-
+ 
 
 # Ridge Regression
 
-岭回归(Ridge regression, Tikhonov regularization) 是一种专用于**共线性数据分析**的有偏估计回归方法，实质上是一种改良的最小二乘估计法，通过放弃最小二乘法的无偏性，以损失部分信息、降低精度为代价获得回归系数更为符合实际、更可靠的回归方法，对病态数据的拟合要强于最小二乘法。
+## Introduction 
 
-在岭回归中，规范化项是所有 系数的平方和，称为L2-norm(L2范数)。在我们的模型中就是试图最小化RSS + λ(sumβj2)。
-当λ增加时，系数会缩小，趋向于0但永远不会为0。
-岭回归的优点是可以提高预测准确度，但因为它不能使任何一个特征的系数为0，所以在模型解释性上会有些问题
+Ridge regression, also referred to as Tikhonov regularization, is designed to handle issues of multicollinearity among predictors in regression models by introducing a bias into the estimates. This method improves upon ordinary least squares (OLS) by incorporating a penalty term to the loss function, typically the L2-norm, which is the sum of the squares of the coefficients.
 
-Hoerl and Kennard (1970) proposed that potential instability in the LS estimator
+The primary objective in ridge regression is to minimize the residual sum of squares (RSS) along with an additional penalty term, λ(sumβj²). This term adjusts the coefficients towards zero but not exactly to zero, which helps in reducing the variance of the estimates and prevents overfitting, especially in scenarios where predictor variables are highly correlated. However, because coefficients are shrunk towards zero but never fully eliminated, ridge regression does not inherently perform feature selection, which may impact the interpretability of the model.
+
+The formulation of ridge regression was notably advanced by Hoerl and Kennard in 1970. They proposed a solution to the instability in the OLS estimates that occurs when the matrix \(X'X\) is near-singular (nearly collinear predictors). Their method modifies the ordinary least squares estimator, given by:
 $$
 \hat{\beta}=\left(X^{\prime} X\right)^{-1} X^{\prime} Y,
 $$
-could be improved by adding a small constant value $\lambda$ to the diagonal entries of the matrix $X^{\prime} X$ before taking its inverse.
-The result is the ridge regression estimator
+by adding a small constant value, λ, to the diagonal entries of \(X'X\) prior to its inversion, thus stabilizing the inversion process. This leads to the ridge estimator:
 $$
-\hat{\beta}_{\text {ridge }}=\left(X^{\prime} X+\lambda I_{p}\right)^{-1} X^{\prime} Y
+\hat{\beta}_{\text{ridge}} = \left(X^{\prime} X + \lambda I_{p}\right)^{-1} X^{\prime} Y,
 $$
-Ridge regression places a particular form of constraint on the parameters $\left(\beta^{\prime} \mathrm{s}\right): \hat{\beta}_{\text {ridge }}$ is chosen to minimize the penalized sum of squares:
+where \(I_p\) is the identity matrix, and λ serves as the regularization parameter. The ridge estimator minimizes:
 $$
-\sum_{i=1}^{n}\left(y_{i}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2}+\lambda \sum_{j=1}^{p} \beta_{j}^{2}
+\sum_{i=1}^{n}\left(y_{i}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2} + \lambda \sum_{j=1}^{p} \beta_{j}^{2}.
 $$
-which is equivalent to minimization of $\sum_{i=1}^{n}\left(y_{i}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2}$ subject to, for some $c>0, \sum_{j=1}^{p} \beta_{j}^{2}<c$, i.e. constraining the sum of the squared coefficients.
-Therefore, ridge regression puts further constraints on the parameters, $\beta_{j}$ 's, in the linear model. In this case, what we are doing is that instead of just minimizing the residual sum values, the optimization function is penalized. We would prefer to take smaller $\beta_{j}$ 's, or $\beta_{j}$ 's that are close to zero to drive the penalty term small.
+This is equivalent to minimizing the RSS under the constraint that the sum of the squared coefficients remains below a certain threshold. This constraint effectively limits the magnitude of the regression coefficients, promoting smaller and more stable estimates, which can significantly enhance the model's prediction accuracy and robustness against multicollinearity.
+
+Furthermore, when λ = 0, the ridge estimate reduces to the OLS estimate, illustrating how ridge regression extends OLS by allowing for regularization to manage ill-conditioned data or highly correlated predictors. As λ increases, the bias in the estimates increases, but the variance decreases, providing a trade-off between bias and variance, thus potentially enhancing the model's predictive performance at the cost of losing some interpretability due to the non-zero shrinkage of all coefficients.
 
 
-## Modeling
+## Property 
 
-岭回归的命令形式为glmnet(x=输入矩阵, y=响应变量, family= 分布函数, alpha=0)。
-* alpha为0时，表示进行岭回归;
-* alpha为1时，表示进行LASSO
+Based on the information from the image you uploaded, here is a detailed explanation in English of the three properties of ridge regression estimates:
 
-glmnet包会在计算λ值之前首先对输入进行标准化， 然后计算非标准化系数。 需要指定响应变量的分布为gaussian，因为它是连续的;还要指定 alpha = 0，表示进行岭回归。
+**Property 1: Bias of the Ridge Estimator**
 
+The ridge estimator \(\hat{\beta}(k)\) introduces a bias to the coefficients compared to the ordinary least squares (OLS) estimator. This bias arises from the penalty term, which shrinks the coefficients towards zero as a function of the regularization parameter \(k\). The expected value of the ridge estimator can be described as:
+$$
+E[\hat{\beta}(k)] = E[(X'X + kI)^{-1}X'Y] = (X'X + kI)^{-1}X'X\beta
+$$
+When \(k = 0\), the ridge estimator reduces to the OLS estimator, \(E[\hat{\beta}(0)] = \beta\). However, for \(k > 0\), the estimator exhibits bias, as it pulls the coefficients towards zero. The term \((X'X + kI)^{-1}X'X\) acts to decrease each coefficient's magnitude, making the ridge estimator biased but potentially more stable in the presence of multicollinearity.
+
+**Property 2: Variance of the Ridge Estimator**
+
+Ridge regression also affects the variance of the estimator. The variance of the ridge estimator tends to be lower than that of the OLS estimator due to the shrinkage effect. This shrinkage reduces the influence of individual data points and lessens the model's sensitivity to noise in the data, leading to a lower variance of the estimates:
+$$
+Var[\hat{\beta}(k)] = (X'X + kI)^{-1}X'X(X'X + kI)^{-1} \sigma^2
+$$
+This equation shows that as \(k\) increases, the overall variance of the estimator decreases, trading off some bias for reduced variance.
+
+**Property 3: Norm and Mean Squared Error (MSE)**
+
+The norm of the ridge estimator \(||\hat{\beta}(k)||\) is always less than or equal to the norm of the OLS estimator \(||\beta||\) as long as \(k > 0\). This property stems from the constraint imposed by the regularization term, which inherently limits the size of the coefficients' vector, reducing the complexity of the model:
+$$
+||\hat{\beta}(k)|| \leq ||\beta||
+$$
+Additionally, the MSE of the ridge estimator is generally lower than that of the OLS estimator when \(k > 0\). This reduction in MSE is due to the balance between the increase in bias and the decrease in variance:
+$$
+MSE[\hat{\beta}(k)] < MSE[\hat{\beta}]
+$$
+As \(k\) increases from zero, the MSE initially decreases until it reaches a minimum, after which it may start to increase if \(k\) is too large. This behavior highlights the importance of selecting an appropriate value of \(k\) to optimize the trade-off between bias and variance, aiming to achieve the best generalization performance of the ridge regression model.
+
+## Ridge Trace Analysis
+
+Ridge trace analysis is a graphical technique used in ridge regression to select the optimal regularization parameter, typically denoted as \( \lambda \) or \( k \). This method involves plotting how regression coefficients change with different values of the regularization parameter. The purpose of ridge trace analysis is to help analysts find a balance between bias and variance in the model, thus enhancing the model’s prediction accuracy and stability.
+
+**Steps and Objectives of Ridge Trace Analysis:**
+
+1. **Choosing a Range of \( \lambda \) Values**:
+   - Ridge trace analysis begins by choosing a range of relatively large \( \lambda \) values and gradually decreasing them. This range should be extensive enough to show how coefficients shrink from their least squares estimates down to near zero.
+
+2. **Plotting the Coefficients**:
+   - For each value of \( \lambda \), the corresponding set of regression coefficients is calculated. These coefficients are then plotted on a graph, with \( \lambda \) on the x-axis (often on a log scale) and the coefficient values on the y-axis.
+
+3. **Analyzing the Ridge Trace**:
+   - The resulting plot, known as a "ridge trace", shows the trajectory of each coefficient as \( \lambda \) increases. Analysts look for a point where the coefficients stabilize before they start to approach zero too closely. This point indicates a good trade-off between reducing the model's complexity (and hence its variance) and retaining enough flexibility to capture the underlying data patterns without introducing significant bias.
+
+4. **Selecting the Optimal \( \lambda \)**:
+   - The optimal value of \( \lambda \) is typically chosen where the coefficients have stabilized on the ridge trace. This value is critical because it represents where the model is neither too complex (overfitting) nor too simple (underfitting), providing a robust generalization performance.
+
+5. **Validation**:
+   - To confirm the effectiveness of the chosen \( \lambda \), it is often validated through techniques like cross-validation. This further ensures that the model performs well on unseen data, minimizing the prediction error.
+
+Ridge trace analysis is particularly valuable in scenarios with multicollinearity among predictors or when the number of predictors is high relative to the number of observations. By providing a clear visual of how each \( \lambda \) affects the coefficients, it aids in making informed decisions about the level of regularization that best suits the specific characteristics of the data.
+
+
+## Selection of Ridge Parameter
+
+Based on the content in the images you provided, there are three key methods outlined for selecting the ridge parameter (\(k\) or \(\lambda\)) in ridge regression. These methods are crucial for optimizing the balance between bias and variance in the model, thereby enhancing model accuracy and stability. 
+
+- **Choice of \(k\) value range**: It is essential to test a wide range of \(k\) values to ensure that the entire spectrum of model behaviors is considered. Often, a logarithmic scale is used for \(k\) to explore both very small and larger values comprehensively.
+- **Stability of \(k\)**: In all methods, it is crucial to look for stability in the choice of \(k\). A small change in \(k\) should not lead to a large change in the coefficients or the MSE, suggesting that the chosen \(k\) is robust.
+
+**1. Ridge Trace Analysis**
+
+Ridge trace analysis involves plotting the coefficients of the regression variables against different values of the regularization parameter \(k\). By visually inspecting these plots, one can determine the best value of \(k\) by identifying the point where the coefficients stabilize before becoming too small or converging towards zero. This method is especially useful for seeing how each predictor is affected by changes in \(k\) and choosing a \(k\) that keeps all important variables in a stable range without over-shrinking them.
+
+**2. Generalized Cross-Validation (GCV)**
+
+Generalized Cross-Validation (GCV) is a more systematic approach that involves evaluating the model's predictive performance for different values of \(k\). The objective is to select a \(k\) that minimizes the GCV score, which is an estimate of the model’s prediction error. This method automatically accounts for the trade-off between fit and complexity (model variance and bias), making it highly effective for datasets where direct validation through splitting may be impractical due to size constraints.
+
+**3. Minimization of Mean Squared Error (MSE)**
+
+This method focuses on the mean squared error associated with different \(k\) values. By calculating or estimating the MSE for a range of \(k\) values and selecting the \(k\) that minimizes this MSE, one can theoretically find the optimal balance between bias (due to underfitting) and variance (due to overfitting). The MSE can be calculated directly from the training data, or more robustly, it can be estimated via cross-validation to ensure the chosen \(k\) generalizes well to new data. 
+
+## Modeling using `glmnet`
+
+The `glmnet` package in R is a powerful and efficient tool for fitting generalized linear models (GLMs) with regularization, specifically ridge regression and LASSO (Least Absolute Shrinkage and Selection Operator). It is widely used for handling high-dimensional data, where the number of predictors is large, and multicollinearity or sparsity is present. Regularization techniques like ridge and LASSO help improve model accuracy and stability by adding penalty terms to the loss function.
+ 
+1. **Flexibility with Regularization**:
+
+   - Ridge regression (\(\alpha = 0\)): Shrinks the coefficients towards zero without eliminating any predictors.
+   - LASSO (\(\alpha = 1\)): Performs variable selection by shrinking some coefficients to exactly zero.
+   - Elastic Net (\(0 < \alpha < 1\)): Combines the benefits of ridge and LASSO by applying both L2 and L1 penalties.
+
+2. **Automatic Standardization**:
+
+   - By default, `glmnet` standardizes the input variables (mean 0, variance 1) before fitting the model to ensure that the penalty is applied uniformly across all predictors. After fitting, the coefficients are returned in their original, unstandardized scale.
+
+3. **Efficient Computation**:
+
+   - The package implements efficient algorithms for calculating solutions across a range of penalty values (\(\lambda\)) in a single function call, making it computationally efficient.
+   
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
 x <- as.matrix(train[, 1:8])
 y <- train[, 9]
 ridge <- glmnet(x, y, family = "gaussian", alpha = 0)
-# print()命令，它会展示非0 系数的数量，解释偏差百分比以及相应的λ值。程序包中算法默认的计算次数是100，但如果偏差 百分比在两个λ值之间的提高不是很显著的话，算法会在100次计算之前停止。也就是说，算法收 敛于最优解
-# 第100行为例。可以看出非0系数，即模型中包含的特征的数量为8。在岭回归中，这个数是不变的。还可以看出解释偏差百分比为0.6971，以及这一行的调优系数λ的值为0.08789。
 print(ridge)
 
-# Y轴是系数值，X轴是L1范数，图中显示了系数值和L1范数之间的关系
+# The Y axis is the coefficient value, the X axis is the L1 norm, and the figure shows the relationship between the coefficient value and the L1 norm
 plot(ridge, label = TRUE)
-# 看系数值 如何随着λ的变化而变化
+# See how the coefficient value changes with the change of λ
 plot(ridge, xvar = "lambda", label = TRUE)
-# 看系数值如何随解释偏差百分比变化，将lamda换成dev
-# 当λ减小时，系数会增大，解释偏差百分比也 会增大。如果将λ值设为0，就会忽略收缩惩罚，模型将等价于OLS
+# See how the coefficient value changes with the percentage of explained deviation, replace lamda with dev
+# When λ decreases, the coefficient will increase, and the percentage of explained deviation will also increase. If the lambda value is set to 0, the shrinkage penalty will be ignored and the model will be equivalent to OLS
 plot(ridge, xvar = "dev", label = TRUE)
 
-# 在测试集上证明
+# Prove it on the test set
 newx <- as.matrix(test[, 1:8])
 ridge.y = predict(ridge, newx = newx, type = "response", s=0.1)
-# 画出表示预测值和实际值关系的统计图
-plot(ridge.y, test$lpsa, xlab = "Predicted", 
-     ylab = "Actual", main = "Ridge Regression")
-# 计算MSE
+# Draw a statistical graph showing the relationship between predicted values ​​and actual values
+plot(ridge.y, test$lpsa, xlab = "Predicted",
+ylab = "Actual", main = "Ridge Regression")
+# Calculate MSE
 ridge.resid <- ridge.y - test$lpsa 
 mean(ridge.resid^2)
 ```
@@ -244,6 +324,9 @@ mean(ridge.resid^2)
  
 
 # Lasso Regression
+
+
+## Introduction 
 
 区别于岭回归中的L2-norm，LASSO使用L1-norm，即所有特征权重的绝对值之和，
 也就是要最小化RSS + λ(sum|βj|)。这个收缩惩罚项确实可以使特征权重收缩到0.
@@ -263,8 +346,8 @@ A ridge solution can be hard to interpret because it is not sparse (no $\beta$ '
 This is a subtle, but important change. Some of the coefficients may be shrunk exactly to zero.
 The least absolute shrinkage and selection operator, or lasso, as described in Tibshirani (1996) is a technique that has received a great deal of interest.
 As with ridge regression we assume the covariates are standardized. Lasso estimates of the coefficients (Tibshirani, 1996) achieve min $(Y-X \beta)^{\prime}(Y-X \beta)+\lambda \sum_{j=1}^{p}\left|\beta_{j}\right|$, so that the L2 penalty of ridge regression $\sum_{j=1}^{p} \beta_{j}^{2}$ is replaced by an L1 penalty, $\sum_{j=1}^{p}\left|\beta_{j}\right|$.
-4 
-## Modelling
+
+## Modeling using `glmnet`
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
 lasso <- glmnet(x, y, family = "gaussian", alpha = 1)
@@ -340,8 +423,7 @@ mean(lasso.cv.resid^2)
 * 实质上，通过对β系数的二次项引入一个第二调优参数，将L1惩罚项和L2惩罚项混合在一起。 通过最小化(RSS + λ[(1-α)(sum|βj|2)/2 + α(sum|βj|)]/N)完成目标。
 
 
-
-## Modelling
+## Modeling using `glmnet`
 
 弹性网络参数α。回忆一下，α = 0表示岭回归惩罚，α = 1表示LASSO惩罚，
 弹性网络参数为0≤α≤1。同时解出两个不同的参数会非常麻烦，求助于R中的老朋友——caret包。

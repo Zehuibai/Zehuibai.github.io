@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Principal Component Analysis</title>
+
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Biosimilar-Trials.html">Statistical Considerations for the Design and Analysis of Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Alternatives-to-Power.html">Bayesian methods - Alternatives to Power</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Continuous-Endpoint.html">Sample Size Determination for Continuous Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Categorical-Endpoint.html">Sample Size Determination for Categorical Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Survival-Endpoint.html">Sample Size Determination for Survival Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Repeated-Measures.html">Sample Size Determination for Repeated Measures</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Sequential-Design.html">Statistical Considerations for Group Sequential Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Adaptive-Design.html">Statistical Considerations for Adaptive Design</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-Estimands-Framework.html">Estimands Framework</a>
+    </li>
+    <li>
+      <a href="04-Design-Estimands-Practice.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Complex-Sequential-Trials.html">Design and Evaluation of Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Monitoring-of-Adaptive-Clinical-Trials.html">Design and Monitoring of Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Single-Arm-Clinical-Trials.html">Single Arm Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+    <li>
+      <a href="04-Design-Regulatory-Submission.html">Regulatory Submission from Stats Perspective</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot-Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Time-To-Event.html">Time to Event Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-PRO-Data.html">Patient Reported Outcome Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-SSC-and-Power-Calculation.html">Sample Size and Power Calculations Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Correlation.html">Correlation Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Model-Table.html">Clinical Data and Model visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-ScatterPlot.html">Scatter and Line Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-BarPlot.html">Bar Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-PieChart.html">Pie Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-BoxPlot.html">Box Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Histogram.html">Histogram</a>
+    </li>
+    <li>
+      <a href="05-Plot-Forest-Plot.html">Forest Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Flow-Chart.html">Flow Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-calculator"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Linear-Regression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Meta-Analysis.html">Meta Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Time-Series-Analysis.html">Time Series Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-SEM.html">Structural Equation Modeling</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Factor-Analysis.html">Factor Analysis</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-bar-chart"></span>
+     
+    Machine Learning
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="07-ML-Bayesian-Theory.html">Bayesian Theory</a>
+    </li>
+    <li>
+      <a href="07-ML-Bayesian-Analysis.html">Bayesian Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Regularization-Penalized-Regression.html">Regularization Penalized Regression</a>
+    </li>
+    <li>
+      <a href="07-ML-Loss-Regression.html">Loss Functions in Machine Learning</a>
+    </li>
+    <li>
+      <a href="07-ML-PCA.html">Principal Component Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-KNN.html">K-Nearest Neighbors</a>
+    </li>
+    <li>
+      <a href="07-ML-SVM.html">Support Vector Machine</a>
+    </li>
+    <li>
+      <a href="07-ML-Tree-Models.html">Tree Models</a>
+    </li>
+    <li>
+      <a href="07-ML-LDA.html">Linear Discriminant Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Cluster-Analysis.html">Cluster Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Neural-Networks.html">Neural Network</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="08-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+<li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Principal Component Analysis</p></h1>
+
+</div>
+
+
+<div id="introduction" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<p>Principal Component Analysis (PCA) is a statistical method first
+introduced by Hotelling in 1933. It is primarily used for dimensionality
+reduction and data transformation. The goal of PCA is to reduce the
+number of variables in a dataset while preserving as much information as
+possible. This is achieved by transforming the original variables into a
+smaller set of uncorrelated variables called principal components.</p>
+<p>Applications of PCA:</p>
+<ul>
+<li><strong>Feature Extraction</strong>: Simplifying datasets for
+machine learning tasks.</li>
+<li><strong>Data Compression</strong>: Reducing storage space while
+retaining meaningful information.</li>
+<li><strong>Exploratory Data Analysis</strong>: Understanding patterns
+and relationships in complex datasets.</li>
+</ul>
+<div id="core-idea-of-pca" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Core Idea of PCA</h2>
+<ol style="list-style-type: decimal">
+<li><p><strong>Original Data Representation</strong>: Suppose there are
+<span class="math inline">\(p\)</span> original variables denoted as
+<span class="math inline">\(X_1, X_2, ..., X_p\)</span>. These variables
+can be highly correlated, leading to redundancy in the dataset. PCA
+seeks to represent these variables in terms of new composite variables
+that capture the maximum variance in the data.</p></li>
+<li><p><strong>Transformation to Principal Components</strong>: PCA
+transforms the original variables into <span
+class="math inline">\(p\)</span> new variables <span
+class="math inline">\(Y_1, Y_2, ..., Y_p\)</span>, called principal
+components. Each principal component is a linear combination of the
+original variables: <span class="math display">\[
+Y_1 = a_{11}X_1 + a_{12}X_2 + \dots + a_{1p}X_p
+\]</span> <span class="math display">\[
+Y_2 = a_{21}X_1 + a_{22}X_2 + \dots + a_{2p}X_p
+\]</span> <span class="math display">\[
+Y_p = a_{p1}X_1 + a_{p2}X_2 + \dots + a_{pp}X_p
+\]</span> Here, the coefficients <span
+class="math inline">\(a_{ij}\)</span> are chosen such that:</p>
+<ul>
+<li>The principal components <span class="math inline">\(Y_1, Y_2, ...,
+Y_p\)</span> are uncorrelated.</li>
+<li>Each successive component captures the maximum possible variance in
+the data, subject to being orthogonal to the previous components.</li>
+</ul></li>
+<li><p><strong>Variance Maximization</strong>: The variance of each
+principal component is maximized, and the total variance of the data is
+preserved across all principal components. Mathematically, this means:
+<span class="math display">\[
+\text{Var}(Y_1) \geq \text{Var}(Y_2) \geq \dots \geq \text{Var}(Y_p)
+\]</span> The first principal component <span
+class="math inline">\(Y_1\)</span> captures the largest portion of the
+total variance in the dataset, followed by <span
+class="math inline">\(Y_2\)</span>, and so on.</p></li>
+<li><p><strong>Orthogonality</strong>: The principal components are
+mutually orthogonal, meaning there is no correlation between them: <span
+class="math display">\[
+\text{Cov}(Y_i, Y_j) = 0 \quad \text{for all } i \neq j
+\]</span></p></li>
+</ol>
+<p><strong>Key Steps in PCA:</strong></p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Standardize the Data</strong>: The original data is often
+standardized (mean-centered and scaled to unit variance) to ensure that
+all variables contribute equally to the analysis, regardless of their
+original scale.</p></li>
+<li><p><strong>Compute the Covariance Matrix</strong>: Calculate the
+covariance matrix of the standardized data to understand the
+relationships and correlations between the variables.</p></li>
+<li><p><strong>Find Eigenvalues and Eigenvectors</strong>: Solve for the
+eigenvalues and eigenvectors of the covariance matrix. The eigenvalues
+represent the amount of variance captured by each principal component,
+and the eigenvectors determine the direction of the components.</p></li>
+<li><p><strong>Form the Principal Components</strong>: Multiply the
+original data by the eigenvectors to project it onto the new axes,
+forming the principal components.</p></li>
+</ol>
+<p><strong>Benefits of PCA:</strong></p>
+<ul>
+<li><p><strong>Dimensionality Reduction</strong>:</p>
+<p>PCA reduces the number of variables while retaining most of the
+important information in the dataset.</p></li>
+<li><p><strong>Elimination of Multicollinearity</strong>: The
+transformed variables (principal components) are uncorrelated,
+addressing issues caused by multicollinearity.</p></li>
+<li><p><strong>Data Visualization</strong>: By reducing data to 2 or 3
+dimensions, PCA enables easier visualization of high-dimensional
+datasets.</p></li>
+</ul>
+</div>
+<div id="five-basic-properties-of-principal-components"
+class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> Five Basic Properties
+of Principal Components</h2>
+<p><strong>Summary of Importance:</strong></p>
+<ol style="list-style-type: decimal">
+<li><strong>Property 1</strong> confirms that PCA preserves the overall
+variance of the dataset.</li>
+<li><strong>Property 2</strong> highlights the relative contribution of
+each principal component to the total variance, enabling dimensionality
+reduction.</li>
+<li><strong>Property 3</strong> explains how the components relate to
+the original variables, aiding interpretability.</li>
+<li><strong>Property 4</strong> reinforces the link between eigenvalues
+and the variance captured by each component.</li>
+<li><strong>Property 5</strong> guarantees that the principal components
+are independent, eliminating multicollinearity.</li>
+</ol>
+<p>Principal Component Analysis (PCA) transforms a set of correlated
+variables into a smaller set of uncorrelated variables called principal
+components, ranked by the variance they capture. Here are the five
+fundamental properties of principal components in detail:</p>
+<p><strong>Property 1: Total Variance is Preserved</strong></p>
+<ul>
+<li>The total variance of the original variables is equal to the sum of
+the variances of all the principal components: <span
+class="math display">\[
+\sum_{i=1}^p \text{Var}(X_i) = \sum_{i=1}^p \lambda_i
+\]</span> Here:
+<ul>
+<li><span class="math inline">\(\lambda_1, \lambda_2, \dots,
+\lambda_p\)</span> are the eigenvalues of the covariance matrix of the
+original variables.</li>
+<li>The eigenvalues represent the variances of the corresponding
+principal components.</li>
+</ul></li>
+</ul>
+<p>This property ensures that PCA does not lose information regarding
+the total variability of the dataset, even as it transforms the data
+into a new coordinate system.</p>
+<hr />
+<p><strong>Property 2: Proportional Variance Contribution</strong></p>
+<ul>
+<li>Each principal component contributes a proportion of the total
+variance. The proportion of variance explained by the <span
+class="math inline">\(k\)</span>-th principal component is: <span
+class="math display">\[
+\frac{\lambda_k}{\sum_{i=1}^p \lambda_i}
+\]</span></li>
+<li>The cumulative contribution of the first <span
+class="math inline">\(k\)</span> principal components is: <span
+class="math display">\[
+\frac{\sum_{i=1}^k \lambda_i}{\sum_{i=1}^p \lambda_i}
+\]</span></li>
+</ul>
+<p>This property helps identify how much of the total variance is
+captured by the first few principal components, aiding in dimensionality
+reduction. Often, a small number of components explain most of the
+variability.</p>
+<hr />
+<p><strong>Property 3: Correlation Between Principal Components and
+Original Variables</strong></p>
+<ul>
+<li>The correlation between the <span
+class="math inline">\(k\)</span>-th principal component (<span
+class="math inline">\(Y_k\)</span>) and the original variable (<span
+class="math inline">\(X_i\)</span>) is given by: <span
+class="math display">\[
+\rho(Y_k, X_i) = \frac{\mu_{ik}}{\sqrt{\lambda_k \sigma_{ii}}}
+\]</span> Here:
+<ul>
+<li><span class="math inline">\(\mu_{ik}\)</span> is the <span
+class="math inline">\(i\)</span>-th element of the eigenvector
+associated with the <span class="math inline">\(k\)</span>-th principal
+component.</li>
+<li><span class="math inline">\(\sigma_{ii}\)</span> is the variance of
+the <span class="math inline">\(i\)</span>-th original variable.</li>
+</ul></li>
+</ul>
+<p>This property shows how strongly each principal component is
+associated with the original variables, providing insight into the
+interpretation of the components.</p>
+<hr />
+<p><strong>Property 4: Variance of Each Principal Component</strong></p>
+<ul>
+<li>The variance of the <span class="math inline">\(k\)</span>-th
+principal component is equal to its corresponding eigenvalue: <span
+class="math display">\[
+\text{Var}(Y_k) = \lambda_k
+\]</span> This property directly links the eigenvalues of the covariance
+matrix with the variability captured by each principal component.</li>
+</ul>
+<hr />
+<p><strong>Property 5: Orthogonality of Principal
+Components</strong></p>
+<ul>
+<li>Principal components are uncorrelated, which means their pairwise
+covariance is zero: <span class="math display">\[
+\text{Cov}(Y_i, Y_j) = 0 \quad \text{for } i \neq j
+\]</span></li>
+</ul>
+<p>This property ensures that each principal component represents unique
+information, free from redundancy present in the original correlated
+variables.</p>
+</div>
+<div id="algorithm-detailed-explanation" class="section level2"
+number="1.3">
+<h2><span class="header-section-number">1.3</span> Algorithm: Detailed
+Explanation</h2>
+<p>Principal Component Analysis (PCA) is a dimensionality reduction
+technique that identifies the most significant patterns or directions in
+a dataset. The goal of PCA is to reduce the number of dimensions in the
+dataset (from <span class="math inline">\(n\)</span> to <span
+class="math inline">\(n&#39;\)</span>) while retaining as much of the
+original data’s variability as possible. Although some information loss
+is inevitable, PCA minimizes this loss to ensure that the
+reduced-dimensional data represents the original dataset
+effectively.</p>
+<p><strong>Input and Output</strong></p>
+<ul>
+<li><strong>Input</strong>:
+<ul>
+<li><span class="math inline">\(n\)</span>-dimensional dataset <span
+class="math inline">\(D = \{x^{(1)}, x^{(2)}, \dots, x^{(m)}\}\)</span>,
+where <span class="math inline">\(m\)</span> is the number of data
+points and each data point <span class="math inline">\(x^{(i)}\)</span>
+is in <span class="math inline">\(\mathbb{R}^n\)</span>.</li>
+<li>The target number of dimensions, <span
+class="math inline">\(n&#39;\)</span>, such that <span
+class="math inline">\(n&#39; &lt; n\)</span>.</li>
+</ul></li>
+<li><strong>Output</strong>:
+<ul>
+<li>The transformed dataset <span class="math inline">\(D&#39; =
+\{z^{(1)}, z^{(2)}, \dots, z^{(m)}\}\)</span>, where each <span
+class="math inline">\(z^{(i)}\)</span> is in <span
+class="math inline">\(\mathbb{R}^{n&#39;}\)</span>.</li>
+</ul></li>
+</ul>
+<p><strong>PCA Algorithm Steps</strong></p>
+<p><strong>Step 1: Center the Data</strong></p>
+<ul>
+<li>Centering the data ensures that the dataset has zero mean along each
+dimension.</li>
+<li>For each data point <span class="math inline">\(x^{(i)}\)</span>,
+subtract the mean of all data points: <span class="math display">\[
+x^{(i)} = x^{(i)} - \frac{1}{m} \sum_{j=1}^m x^{(j)}
+\]</span></li>
+<li>After this step, the mean of the dataset along each dimension is
+zero.</li>
+</ul>
+<p><strong>Step 2: Compute the Covariance Matrix</strong></p>
+<ul>
+<li>The covariance matrix captures the relationships between different
+dimensions of the dataset. It is defined as: <span
+class="math display">\[
+C = \frac{1}{m} X X^T
+\]</span> where <span class="math inline">\(X\)</span> is the <span
+class="math inline">\(n \times m\)</span> matrix of centered data
+points, and <span class="math inline">\(C\)</span> is an <span
+class="math inline">\(n \times n\)</span> symmetric matrix.</li>
+</ul>
+<p><strong>Step 3: Perform Eigenvalue Decomposition</strong></p>
+<ul>
+<li>Perform eigenvalue decomposition on the covariance matrix <span
+class="math inline">\(C = X X^T\)</span> to obtain:
+<ul>
+<li>The eigenvalues (<span class="math inline">\(\lambda_1, \lambda_2,
+\dots, \lambda_n\)</span>), which indicate the amount of variance
+captured by each principal component.</li>
+<li>The eigenvectors (<span class="math inline">\(w_1, w_2, \dots,
+w_n\)</span>), which are the directions of the principal
+components.</li>
+</ul></li>
+</ul>
+<p><strong>Step 4: Select the Top <span
+class="math inline">\(n&#39;\)</span> Principal Components</strong></p>
+<ul>
+<li>Sort the eigenvalues in descending order (<span
+class="math inline">\(\lambda_1 \geq \lambda_2 \geq \dots \geq
+\lambda_n\)</span>).</li>
+<li>Select the top <span class="math inline">\(n&#39;\)</span>
+eigenvalues and their corresponding eigenvectors (<span
+class="math inline">\(w_1, w_2, \dots, w_{n&#39;}\)</span>).</li>
+<li>Normalize these eigenvectors and form the feature vector matrix
+<span class="math inline">\(W\)</span>, where: <span
+class="math display">\[
+W = [w_1 \, w_2 \, \dots \, w_{n&#39;}]
+\]</span> <span class="math inline">\(W\)</span> is an <span
+class="math inline">\(n \times n&#39;\)</span> matrix that projects the
+data into the reduced <span
+class="math inline">\(n&#39;\)</span>-dimensional space.</li>
+</ul>
+<p><strong>Step 5: Transform the Original Dataset</strong></p>
+<ul>
+<li>For each data point <span class="math inline">\(x^{(i)}\)</span>,
+compute the new representation <span
+class="math inline">\(z^{(i)}\)</span> in the reduced <span
+class="math inline">\(n&#39;\)</span>-dimensional space: <span
+class="math display">\[
+z^{(i)} = W^T x^{(i)}
+\]</span></li>
+<li>Here, <span class="math inline">\(W^T\)</span> is the transpose of
+the matrix <span class="math inline">\(W\)</span>, and <span
+class="math inline">\(z^{(i)}\)</span> is the <span
+class="math inline">\(n&#39;\)</span>-dimensional representation of the
+data point <span class="math inline">\(x^{(i)}\)</span>.</li>
+</ul>
+<p><strong>Step 6: Output the Transformed Dataset</strong></p>
+<ul>
+<li>The transformed dataset is: <span class="math display">\[
+D&#39; = \{z^{(1)}, z^{(2)}, \dots, z^{(m)}\}
+\]</span> where each <span class="math inline">\(z^{(i)}\)</span> is a
+data point in the reduced <span
+class="math inline">\(n&#39;\)</span>-dimensional space.</li>
+</ul>
+</div>
+<div id="partial-least-squares-pls" class="section level2" number="1.4">
+<h2><span class="header-section-number">1.4</span> Partial Least Squares
+(PLS)</h2>
+<p>Partial Least Squares (PLS) is a regression and dimensionality
+reduction technique designed to address challenges such as
+multicollinearity and situations where the number of predictors exceeds
+the number of observations. Unlike Principal Component Analysis (PCA),
+which focuses solely on the predictors (<span
+class="math inline">\(X\)</span>), PLS incorporates the response
+variable (<span class="math inline">\(Y\)</span>) into the
+dimensionality reduction process, making it particularly effective for
+predictive tasks.</p>
+<p>PLS works by decomposing both <span class="math inline">\(X\)</span>
+and <span class="math inline">\(Y\)</span> into latent variables, which
+are linear combinations of the original variables. These latent
+variables are chosen to maximize the covariance between <span
+class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span>, ensuring that the reduced
+representation of <span class="math inline">\(X\)</span> is most
+relevant for predicting <span class="math inline">\(Y\)</span>.</p>
+<p>The algorithm can be summarized as follows:</p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(X\)</span> is decomposed into <span
+class="math inline">\(T\)</span>, a set of latent variables (or scores),
+and <span class="math inline">\(P\)</span>, the corresponding loadings,
+along with a residual matrix <span class="math inline">\(E\)</span>:
+<span class="math display">\[
+X = T P^T + E
+\]</span></li>
+<li><span class="math inline">\(Y\)</span> is decomposed into <span
+class="math inline">\(U\)</span>, the latent variables for <span
+class="math inline">\(Y\)</span>, and <span
+class="math inline">\(Q\)</span>, the loadings, with residuals <span
+class="math inline">\(F\)</span>: <span class="math display">\[
+Y = U Q^T + F
+\]</span></li>
+<li>The latent variables <span class="math inline">\(T\)</span> and
+<span class="math inline">\(U\)</span> are computed such that their
+covariance is maximized. Regression is then performed using <span
+class="math inline">\(T\)</span> as the predictor for <span
+class="math inline">\(Y\)</span>: <span class="math display">\[
+Y = T B + F
+\]</span></li>
+</ol>
+<p>PCA, on the other hand, transforms <span
+class="math inline">\(X\)</span> into a set of uncorrelated components
+by maximizing the variance in <span class="math inline">\(X\)</span>
+alone, without considering <span class="math inline">\(Y\)</span>. The
+components in PCA are orthogonal and represent directions of maximum
+variability in <span class="math inline">\(X\)</span>. The primary goal
+of PCA is to reduce the dimensionality of <span
+class="math inline">\(X\)</span> while retaining as much information as
+possible about the original data structure.</p>
+<p>The key difference between PCA and PLS lies in their objectives. PCA
+focuses solely on <span class="math inline">\(X\)</span>, identifying
+components that explain the most variance, and is therefore
+unsupervised. In contrast, PLS is a supervised method, as it
+incorporates <span class="math inline">\(Y\)</span> into the
+dimensionality reduction process, ensuring that the extracted components
+are not only informative about <span class="math inline">\(X\)</span>
+but also predictive of <span class="math inline">\(Y\)</span>.</p>
+<p>PLS and PCA share a close mathematical relationship. In fact, PLS can
+be thought of as an extension of PCA that aligns the component selection
+with the prediction of <span class="math inline">\(Y\)</span>. The first
+step of PLS often involves a PCA-like transformation of <span
+class="math inline">\(X\)</span>, but PLS proceeds to optimize the
+components based on their relevance to <span
+class="math inline">\(Y\)</span>.</p>
+<p><strong>Summary of Assumptions for Different Regression
+Methods</strong></p>
+<table>
+<colgroup>
+<col width="26%" />
+<col width="73%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Regression Methods</strong></th>
+<th><strong>Assumptions</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Ordinary Least Squares (OLS), Ridge Regression, Variable
+Selection</strong></td>
+<td>- Predictors must be independent. <br> - The values of predictors
+must be precise. <br> - Residuals must be random.</td>
+</tr>
+<tr class="even">
+<td><strong>Principal Component Regression (PCR), Partial Least Squares
+(PLS)</strong></td>
+<td>- Predictors can be correlated. <br> - Predictors can have
+measurement errors. <br> - Residuals can have some structure.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="principal-component-rotation" class="section level2"
+number="1.5">
+<h2><span class="header-section-number">1.5</span> Principal Component
+Rotation</h2>
+<p>Principal Component Rotation is a technique used in factor analysis
+or Principal Component Analysis (PCA) to make the interpretation of the
+components easier and more meaningful. Rotation reorients the axes of
+the principal components without altering their explanatory power,
+aiming to simplify the factor structure and make it easier to link
+components to specific variables.</p>
+<p><strong>Why is Rotation Needed?</strong></p>
+<p>The components obtained from PCA or factor analysis often involve a
+mix of many variables contributing to each component. This complexity
+makes it challenging to interpret the components. Rotation helps
+simplify this by redistributing the variance among the components,
+aiming for a clearer pattern of high and low loadings (the coefficients
+showing the relationship between variables and components).</p>
+<p><strong>Comparison of Varimax and Promax</strong></p>
+<table>
+<colgroup>
+<col width="18%" />
+<col width="40%" />
+<col width="41%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th><strong>Varimax (Orthogonal)</strong></th>
+<th><strong>Promax (Oblique)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Component Correlation</strong></td>
+<td>Components remain uncorrelated (independent).</td>
+<td>Components are allowed to be correlated.</td>
+</tr>
+<tr class="even">
+<td><strong>Interpretability</strong></td>
+<td>Simple structure with clear distinction between variables and
+components.</td>
+<td>Similar simple structure but with more flexibility.</td>
+</tr>
+<tr class="odd">
+<td><strong>Use Cases</strong></td>
+<td>When independence of components is important (e.g., engineering
+data).</td>
+<td>When factors are expected to be interrelated (e.g., social
+sciences).</td>
+</tr>
+<tr class="even">
+<td><strong>Complexity</strong></td>
+<td>Relatively simple to compute and interpret.</td>
+<td>Slightly more complex, as it provides correlations among
+components.</td>
+</tr>
+</tbody>
+</table>
+<div id="orthogonal-rotation-e.g.-varimax"
+class="section level3 unnumbered">
+<h3 class="unnumbered"><strong>1. Orthogonal Rotation (e.g.,
+Varimax)</strong></h3>
+<ul>
+<li><p><strong>Definition</strong>: Orthogonal rotation maintains the
+independence (non-correlation) of the components while redistributing
+the loadings for better interpretability.</p></li>
+<li><p><strong>Method</strong>: The most popular orthogonal rotation
+method is <strong>Varimax Rotation</strong>. It attempts to maximize the
+variance of squared loadings in each column of the loading matrix,
+aiming to “sharpen” the components.</p></li>
+<li><p><strong>Objective</strong>:</p>
+<ul>
+<li>Simplify the factor structure such that each component is primarily
+associated with a small subset of variables.</li>
+<li>This means that each column of the loading matrix will have a few
+high loadings (strongly related variables) and many near-zero loadings
+(weakly related or unrelated variables).</li>
+</ul></li>
+<li><p><strong>Advantages</strong>:</p>
+<ul>
+<li>Components remain uncorrelated, preserving their independence.</li>
+<li>Interpretation is straightforward since variables are distinctly
+associated with specific components.</li>
+</ul></li>
+<li><p><strong>Example</strong>: After Varimax rotation, a specific
+principal component might strongly relate to only two or three
+variables, making it easier to interpret what that component
+represents.</p></li>
+</ul>
+</div>
+<div id="oblique-rotation-e.g.-promax"
+class="section level3 unnumbered">
+<h3 class="unnumbered"><strong>2. Oblique Rotation (e.g.,
+Promax)</strong></h3>
+<ul>
+<li><p><strong>Definition</strong>: Oblique rotation allows the
+components to become correlated. This type of rotation is useful when
+the underlying factors are expected to be related, which is common in
+social sciences or behavioral data.</p></li>
+<li><p><strong>Method</strong>: A popular oblique rotation method is
+<strong>Promax Rotation</strong>. It adjusts the axes to allow some
+degree of correlation among the components while still simplifying the
+factor structure.</p></li>
+<li><p><strong>Objective</strong>:</p>
+<ul>
+<li>Similar to Varimax, it simplifies the structure by maximizing
+variance. However, it allows for correlations between components, which
+might better reflect real-world relationships among latent factors.</li>
+</ul></li>
+<li><p><strong>Advantages</strong>:</p>
+<ul>
+<li>More flexible and realistic for many datasets where underlying
+factors are likely to be interrelated.</li>
+<li>Provides both the rotated loadings and the correlations between
+components, offering a richer view of the data.</li>
+</ul></li>
+<li><p><strong>Example</strong>: If two components are related to
+overlapping sets of variables, Promax rotation might show them as
+correlated components, making the relationships more realistic.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="application" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Application</h1>
+<div id="data-preparation" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Data preparation</h2>
+<pre><code>## tidyverse     knitr 
+##      TRUE      TRUE</code></pre>
+</div>
+<div id="modeling" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Modeling</h2>
+<p>对于模型构建过程，我们按照以下几个步骤进行:</p>
+<ul>
+<li><p>抽取主成分并决定保留的数量;</p>
+<ul>
+<li>通过psych包抽取主成分要使用principal()函数，语法中要包括数据和是否要进行主成分旋转</li>
+<li>pca &lt;- principal(train.scale, rotate=“none”)</li>
+<li>碎石图可以帮助你评估能解释大部分数据方差的主成分,
+需要在碎石图中找出使变化率降低的那个点，
+也就是我们常说的统计图中的“肘点”或弯曲点。</li>
+<li>肘点表示在这个点上新增加一个主成分时，对方差的解释增加得并不太多。换句话说，这个点就是曲线由陡变平的转折点</li>
+</ul></li>
+<li><p>对留下的主成分进行旋转;</p>
+<ul>
+<li>旋转背后的意义是使变量在某个主成分上的载荷最大化</li>
+<li>可以减少(或消灭)主成分之间的相关性，有助于对主成分的解释。</li>
+<li>进行正交旋转的方法称为“方差最大法”。还有其他非正交旋转方法，这种方法允许主成分(因子)之间存在相关性</li>
+</ul></li>
+<li><p>对旋转后的解决方案进行解释; 生成各个因子的得分;
+使用得分作为输入变量进行回归分析</p></li>
+<li><p>使用测试数据评价模型效果。</p></li>
+</ul>
+<p><img src="07-ML-PCA_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre><code>## Principal Components Analysis
+## Call: principal(r = train.scale, nfactors = 5, rotate = &quot;varimax&quot;)
+## Standardized loadings (pattern matrix) based upon correlation matrix
+##                 RC1   RC2   RC5   RC3   RC4   h2   u2 com
+## Goals_For     -0.21  0.82  0.21  0.05 -0.11 0.78 0.22 1.3
+## Goals_Against  0.88 -0.02 -0.05  0.21  0.00 0.82 0.18 1.1
+## Shots_For     -0.22  0.43  0.76 -0.02 -0.10 0.81 0.19 1.8
+## Shots_Against  0.73 -0.02 -0.20 -0.29  0.20 0.70 0.30 1.7
+## PP_perc       -0.73  0.46 -0.04 -0.15  0.04 0.77 0.23 1.8
+## PK_perc       -0.73 -0.21  0.22 -0.03  0.10 0.64 0.36 1.4
+## CF60_pp       -0.20  0.12  0.71  0.24  0.29 0.69 0.31 1.9
+## CA60_sh        0.35  0.66 -0.25 -0.48 -0.03 0.85 0.15 2.8
+## OZFOperc_pp   -0.02 -0.18  0.70 -0.01  0.11 0.53 0.47 1.2
+## Give          -0.02  0.58  0.17  0.52  0.10 0.65 0.35 2.2
+## Take           0.16  0.02  0.01  0.90 -0.05 0.83 0.17 1.1
+## hits          -0.02 -0.01  0.27 -0.06  0.87 0.83 0.17 1.2
+## blks           0.19  0.63 -0.18  0.14  0.47 0.70 0.30 2.4
+## 
+##                        RC1  RC2  RC5  RC3  RC4
+## SS loadings           2.69 2.33 1.89 1.55 1.16
+## Proportion Var        0.21 0.18 0.15 0.12 0.09
+## Cumulative Var        0.21 0.39 0.53 0.65 0.74
+## Proportion Explained  0.28 0.24 0.20 0.16 0.12
+## Cumulative Proportion 0.28 0.52 0.72 0.88 1.00
+## 
+## Mean item complexity =  1.7
+## Test of the hypothesis that 5 components are sufficient.
+## 
+## The root mean square of the residuals (RMSR) is  0.08 
+##  with the empirical chi square  28.59  with prob &lt;  0.19 
+## 
+## Fit based upon off diagonal values = 0.91</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["RC1"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["RC2"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["RC5"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["RC3"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["RC4"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"-2.21526408","2":"0.002821488","3":"0.3161588","4":"-0.1572320","5":"1.5278033","_rn_":"1"},{"1":"0.88147630","2":"-0.569239044","3":"-1.2361419","4":"-0.2703150","5":"-0.0113224","_rn_":"2"},{"1":"0.10321189","2":"0.481754024","3":"1.8135052","4":"-0.1606672","5":"0.7346531","_rn_":"3"},{"1":"-0.06630166","2":"-0.630676083","3":"-0.2121434","4":"-1.3086231","5":"0.1541255","_rn_":"4"},{"1":"1.49662977","2":"1.156905747","3":"-0.3222194","4":"0.9647145","5":"-0.6564827","_rn_":"5"},{"1":"-0.48902169","2":"-2.119952370","3":"1.0456190","4":"2.7375097","5":"-1.3735777","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre><code>## 
+## Call:
+## lm(formula = ppg ~ ., data = pca.scores)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.163274 -0.048189  0.003718  0.038723  0.165905 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.111333   0.015752  70.551  &lt; 2e-16 ***
+## RC1         -0.112201   0.016022  -7.003 3.06e-07 ***
+## RC2          0.070991   0.016022   4.431 0.000177 ***
+## RC5          0.022945   0.016022   1.432 0.164996    
+## RC3         -0.017782   0.016022  -1.110 0.278044    
+## RC4         -0.005314   0.016022  -0.332 0.743003    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.08628 on 24 degrees of freedom
+## Multiple R-squared:  0.7502, Adjusted R-squared:  0.6981 
+## F-statistic: 14.41 on 5 and 24 DF,  p-value: 1.446e-06</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = ppg ~ RC1 + RC2, data = pca.scores)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.18914 -0.04430  0.01438  0.05645  0.16469 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.11133    0.01587  70.043  &lt; 2e-16 ***
+## RC1         -0.11220    0.01614  -6.953  1.8e-07 ***
+## RC2          0.07099    0.01614   4.399 0.000153 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.0869 on 27 degrees of freedom
+## Multiple R-squared:  0.7149, Adjusted R-squared:  0.6937 
+## F-statistic: 33.85 on 2 and 27 DF,  p-value: 4.397e-08</code></pre>
+<pre><code>## [1] 0.08244449</code></pre>
+<pre><code>## [1] 0.08244449</code></pre>
+<p><img src="07-ML-PCA_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<pre><code>## [1] 0.1011561</code></pre>
+</div>
+</div>
+<div id="kernelized-principal-component-analysis-kpca"
+class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Kernelized Principal
+Component Analysis (KPCA)</h1>
+<div id="introduction-1" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Introduction</h2>
+<p>Kernelized Principal Component Analysis (KPCA) is an extension of
+Principal Component Analysis (PCA) designed to handle non-linear data.
+While traditional PCA works well for data that can be linearly
+separated, it struggles with non-linear datasets. KPCA addresses this
+limitation by applying the <strong>kernel trick</strong>, a method also
+used in support vector machines (SVMs), to map data into a
+higher-dimensional space where it becomes linearly separable, and then
+performing dimensionality reduction in that space.</p>
+<p><strong>Key Idea</strong></p>
+<p>In PCA, the assumption is that the data lies on or near a linear
+subspace, and the goal is to project the data onto a lower-dimensional
+linear subspace. However, for data that is non-linearly distributed,
+this assumption does not hold. KPCA solves this problem by:</p>
+<ol style="list-style-type: decimal">
+<li>Mapping the data from the original <span
+class="math inline">\(n\)</span>-dimensional space to a much
+higher-dimensional space (e.g., <span class="math inline">\(N &gt;
+n\)</span>) using a non-linear mapping function <span
+class="math inline">\(\phi\)</span>: <span class="math display">\[
+x^{(i)} \rightarrow \phi(x^{(i)})
+\]</span></li>
+<li>Performing PCA in this high-dimensional space.</li>
+<li>Reducing the data back to a lower-dimensional space <span
+class="math inline">\(n&#39;\)</span>, where <span
+class="math inline">\(n&#39; &lt; n &lt; N\)</span>.</li>
+</ol>
+<p>This approach makes it possible to capture non-linear structures in
+the data while retaining the benefits of PCA for dimensionality
+reduction.</p>
+<hr />
+</div>
+<div id="mathematical-framework" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Mathematical
+Framework</h2>
+<ol style="list-style-type: decimal">
+<li><strong>PCA in Original Space</strong><br />
+In traditional PCA, the eigenvalue problem is defined for the covariance
+matrix of the dataset: <span class="math display">\[
+\sum_{i=1}^m x^{(i)} x^{(i)T} W = \lambda W
+\]</span> Here:
+<ul>
+<li><span class="math inline">\(x^{(i)}\)</span> represents the <span
+class="math inline">\(i\)</span>-th data point.</li>
+<li><span class="math inline">\(W\)</span> is the eigenvector (principal
+component).</li>
+<li><span class="math inline">\(\lambda\)</span> is the eigenvalue
+(explaining the variance along the eigenvector).</li>
+</ul></li>
+<li><strong>Mapping to High-Dimensional Space</strong><br />
+KPCA replaces <span class="math inline">\(x^{(i)}\)</span> with <span
+class="math inline">\(\phi(x^{(i)})\)</span>, mapping the data into a
+high-dimensional feature space where it is linearly separable. The
+eigenvalue equation becomes: <span class="math display">\[
+\sum_{i=1}^m \phi(x^{(i)}) \phi(x^{(i)})^T W = \lambda W
+\]</span> Here:
+<ul>
+<li><span class="math inline">\(\phi(x^{(i)})\)</span> is the mapped
+representation of the <span class="math inline">\(i\)</span>-th data
+point in the high-dimensional space.</li>
+</ul></li>
+<li><strong>Kernel Trick</strong><br />
+In practice, computing <span
+class="math inline">\(\phi(x^{(i)})\)</span> explicitly in a
+high-dimensional space is computationally expensive or even infeasible.
+Instead, KPCA uses the <strong>kernel trick</strong>, where the dot
+product <span class="math inline">\(\phi(x^{(i)}) \cdot
+\phi(x^{(j)})\)</span> is computed indirectly using a kernel function
+<span class="math inline">\(K(x^{(i)}, x^{(j)})\)</span>: <span
+class="math display">\[
+K(x^{(i)}, x^{(j)}) = \phi(x^{(i)})^T \phi(x^{(j)})
+\]</span> Popular kernel functions include:
+<ul>
+<li><strong>Linear Kernel</strong>: <span class="math inline">\(K(x, y)
+= x^T y\)</span> (equivalent to standard PCA).</li>
+<li><strong>Polynomial Kernel</strong>: <span class="math inline">\(K(x,
+y) = (x^T y + c)^d\)</span>.</li>
+<li><strong>Gaussian (RBF) Kernel</strong>: <span
+class="math inline">\(K(x, y) = \exp(-\|x-y\|^2 /
+2\sigma^2)\)</span>.</li>
+</ul></li>
+<li><strong>Eigenvalue Decomposition in Kernel Space</strong><br />
+Using the kernel function, the covariance matrix in the high-dimensional
+space is represented by the Gram matrix <span
+class="math inline">\(K\)</span>: <span class="math display">\[
+K_{ij} = \phi(x^{(i)})^T \phi(x^{(j)})
+\]</span> The eigenvalue problem in the kernel space becomes: <span
+class="math display">\[
+K \alpha = \lambda \alpha
+\]</span> Here:
+<ul>
+<li><span class="math inline">\(\alpha\)</span> are the eigenvectors of
+the Gram matrix.</li>
+<li><span class="math inline">\(\lambda\)</span> are the
+eigenvalues.</li>
+</ul></li>
+<li><strong>Dimensionality Reduction</strong><br />
+The data in the high-dimensional space is projected onto the top <span
+class="math inline">\(n&#39;\)</span> eigenvectors, corresponding to the
+largest <span class="math inline">\(n&#39;\)</span> eigenvalues. The
+transformed data points in the lower-dimensional space are computed as:
+<span class="math display">\[
+z^{(i)} = \sum_{j=1}^m \alpha_j K(x^{(i)}, x^{(j)})
+\]</span> This provides the reduced representation of the data while
+preserving non-linear relationships.</li>
+</ol>
+</div>
+<div id="comparison-with-pca" class="section level2" number="3.3">
+<h2><span class="header-section-number">3.3</span> Comparison with
+PCA</h2>
+<table>
+<colgroup>
+<col width="18%" />
+<col width="40%" />
+<col width="41%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Aspect</strong></th>
+<th><strong>PCA</strong></th>
+<th><strong>KPCA</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Assumption</strong></td>
+<td>Data is linearly distributed or approximately so.</td>
+<td>Data may be non-linear; kernel mapping addresses this.</td>
+</tr>
+<tr class="even">
+<td><strong>Computation</strong></td>
+<td>Eigenvalue decomposition on covariance matrix.</td>
+<td>Eigenvalue decomposition on kernel (Gram) matrix.</td>
+</tr>
+<tr class="odd">
+<td><strong>Mapping</strong></td>
+<td>Works in original space.</td>
+<td>Maps data to high-dimensional space using kernel functions.</td>
+</tr>
+<tr class="even">
+<td><strong>Flexibility</strong></td>
+<td>Limited to linear subspaces.</td>
+<td>Captures non-linear patterns.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><strong>Applications of KPCA</strong></p>
+<ol style="list-style-type: decimal">
+<li><strong>Non-Linear Dimensionality Reduction</strong>:
+<ul>
+<li>KPCA is ideal for data that lies on a non-linear manifold, such as
+data with curved or complex structures.</li>
+</ul></li>
+<li><strong>Pattern Recognition</strong>:
+<ul>
+<li>Commonly used in image processing, facial recognition, and
+handwriting analysis, where patterns are inherently non-linear.</li>
+</ul></li>
+<li><strong>Data Preprocessing</strong>:
+<ul>
+<li>KPCA is often used as a preprocessing step for machine learning
+models to reduce dimensionality while preserving complex relationships
+in the data.</li>
+</ul></li>
+<li><strong>Anomaly Detection</strong>:
+<ul>
+<li>In high-dimensional feature spaces, KPCA can identify non-linear
+anomalies that are not easily captured by linear models.</li>
+</ul></li>
+</ol>
+<hr />
+<p><strong>Advantages of KPCA</strong></p>
+<ul>
+<li>Handles non-linear relationships in the data effectively.</li>
+<li>Uses the kernel trick to avoid explicitly computing high-dimensional
+transformations, making it computationally feasible.</li>
+<li>Extends the applicability of PCA to more complex datasets.</li>
+</ul>
+<p><strong>Disadvantages of KPCA</strong></p>
+<ul>
+<li>Selecting the appropriate kernel function and its parameters (e.g.,
+<span class="math inline">\(\sigma\)</span> in RBF kernel) can be
+challenging and problem-specific.</li>
+<li>Computational complexity increases with the size of the dataset due
+to the need to compute the Gram matrix.</li>
+</ul>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

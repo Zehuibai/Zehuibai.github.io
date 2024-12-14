@@ -17,7 +17,7 @@ editor_options:
 
 
 ```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
-packages<-c("tidyverse", "kableExtra")
+packages<-c("tidyverse", "kableExtra","readxl")
 
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
@@ -28,8 +28,9 @@ ipak <- function(pkg){
 ipak(packages)
 
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
-library(readxl)
-ClinicalTrials_D01 <- read_excel("./01_ClinicalTrials/ClinicalTrial.xlsx", sheet = "Study")
+ 
+ClinicalTrials_D01 <- read_excel("./01_ClinicalTrials/ClinicalTrial.xlsx", sheet = "Study Plan") %>%
+  filter(Keep=="Y")
 ```
   
 <!--   my-header-img -->
