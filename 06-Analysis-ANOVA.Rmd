@@ -2,20 +2,13 @@
 title: |
   ![](logo.png){width=3in}  
   Analysis of Variance
-author: "Zehui Bai"
-date: '`r format(Sys.time())`'
 output:
   html_document:
     df_print: paged
-    number_sections: yes
+    number_sections: No
     toc: yes
-    toc_float:
-      collapsed: yes
-    theme: flatly # <!-- https://bootswatch.com/3/  -->
-    highlight: tango
+    toc_float: yes
   word_document:
-    toc: yes
-  pdf_document:
     toc: yes
 fontsize: 10pt
 editor_options:
@@ -128,21 +121,116 @@ for(f_path in file_path_vec){source(f_path)}
 ```
 
  
- 
+
+
 # ANOVA
 
-## Unstructured Models
+## Regression analysis
 
-These are models where **little is assumed about distributions, correlations**, etc. Nonparametric procedures fall in this class. The models for the actual data in this case may be quite complicated, but the assumption is that the analysis has been distilled down to a collection of pvalues. Multiple inference methods in this class consist essentially of adjusting these p-values for the purposes of making tests. Such methods work reasonably well for a variety of models, and if you have a model that is not contained in one of the major classes given below, then you can choose an MCP that assumes little structure. In particular, these methods are valid, though typically conservative when there are correlations. Generalized Bonferroni methods and standard false discovery rate controlling methods are in this group. 
+Regression analysis attempts to explain data (the dependent variable scores) in terms of a set of independent variables or predictors (the model) and a residual component (error). Typically, a researcher who applies regression is interested in predicting a quantitative dependent variable from one or more quantitative independent variables, and in determining the relative contribution of each independent variable to the prediction: there is interest in what proportion of the variation in the dependent variable can be attributed to variation in the independent variable(s). 
 
+Regression also may employ categorical (also known as nominal or qualitative) predictors: the use of independent variables such as sex, marital status and type of teaching method is common. 
+
+Moreover, as regression is the elementary form of GLM, it is possible to construct regression GLMs equivalent to any ANOVA and ANCOVA GLMs by selecting and organizing quantitative variables to act as categorical variables. Nevertheless, the convention of referring to these particular quantitative variables as categorical variables will be maintained.
+
+## Analysis of variance
+
+ANOVA also can be thought of in terms of a model plus error. Here, the dependent variable scores constitute the data, the experimental conditions constitute the model and the component of the data not accommodated by the model, again, is represented by the error term. Typically, the researcher applying ANOVA is interested in whether the mean dependent variable scores obtained in the experimental conditions differ significantly. This is achieved by determining how much variation in the dependent variable scores is attributable to differences between the scores obtained in the experimental conditions, and comparing this with the error term, which is attributable to variation in the dependent variable scores within each of the experimental conditions: there is interest in what proportion of variation in the dependent variable can be attributed to the manipulation of the experimental variable(s).
+
+Although the dependent variable in ANOVA is most likely to be measured on a quantitative scale, the statistical comparison is drawn between the groups of subjects receiving different experimental conditions and is categorical in nature, even when the experimental conditions differ along a quantitative scale. Therefore, ANOVA is a particular type of regression analysis that employs quantitative predictors to act as categorical predictors.
+
+## Analysis of covariance
+
+As ANCOVA is the statistical technique that combines regression and ANOVA, it too can be described in terms of a model plus error. As in regression and ANOVA, the dependent variable scores constitute the data, but the model includes not only experimental conditions, but also one or more quantitative predictor variables. These quantitative predictors, known as covariates (also concomitant or control variables), represent sources of variance that are thought to influence the dependent variable, but have not been controlled by the experimental procedures. ANCOVA determines the covariation (correlation) between the covariate(s) and the dependent variable and then removes that variance associated with the covariate(s) from the dependent variable scores, prior to determining whether the differences between the experimental condition (dependent variable score) means are significant.
+
+As mentioned, this technique, in which the influence of the experimental conditions remains the major concern, but one or more quantitative variables that predict the dependent variable also are included in the GLM, is labelled ANCOVA most frequently, and in psychology is labelled ANCOVA exclusively (e.g. Cohen & Cohen, 1983; Pedhazur, 1997, cf. Cox & McCullagh, 1982). A very important, but seldom emphasized, aspect of the ANCOVA method is that the relationship between the covariate(s) and the dependent variable, upon which the adjustments depend, is determined empirically from the data.
+
+## GLM approach
+
+	1. Conceptually, a major advantage is the continuity the GLM reveals between regression, ANOVA and ANCOVA. Rather than having to learn about three apparently discrete techniques, it is possible to develop an understanding of a consistent modelling approach that can be applied to the different circumstances covered by regression, ANOVA and ANCOVA. A number of practical advantages also stem from the utility of the simply conceived and easily calculated error terms. The GLM conception divides data into model and error, and it follows that the better the model explains the data, the less the error. Therefore, the set of predictors constituting a GLM can be selected by their ability to reduce the error term. Comparing a GLM of the data that contains the predictor(s) under consideration with a GLM that does not, in terms of error reduction, provides a way of estimating effects that is both intuitively appreciable and consistent across regression, ANOVA and ANCOVA applications. 
+	2. Moreover, as most GLM assumptions concern the error terms, residuals, the error term estimates, provide a common means by which the assumptions underlying regression, ANOVA and ANCOVA can be assessed. This also opens the door for sophisticated statistical techniques, developed primarily to assist regression error analysis, to be applied to both ANOVA and ANCOVA. 
+	3. Finally, recognizing ANOVA and ANCOVA as instances of the GLM also provides connection to an extensive and useful literature on methods, analysis strategies and related techniques, such as structural equation modelling, which are pertinent to experimental and non-experimental analyses alike
+
+## ANCOVA
+
+
+
+**ANCOVA (Analysis of Covariance) Overview**
+
+ANCOVA is a blend of ANOVA and regression, allowing researchers to adjust for the effects of one or more continuous covariates that might influence the dependent variable. This method is useful for enhancing the precision of the analysis by controlling for variables that are not the main focus of the study but could affect the outcome.
  
 
-## Balanced One-Way Analysis-of-Variance (ANOVA) 
+- **Covariates**: These are variables that are expected to influence the dependent variable. They are included in the ANCOVA model to control for their effects, thus isolating the effect of the independent variable(s) more effectively. Covariates are continuous predictor variables, unlike the categorical factors in ANOVA.
+
+- **Confounding Variables**: Unlike covariates, which are related only to the dependent variable, confounding variables affect both the independent and dependent variables. They introduce spurious associations, making it hard to discern the true effect of the independent variable.
+
+![](./02_Plots/ANOVA/ACNOVA_Overview.png)
+
+**Reducing Within-Group Error Variance**
+
+By incorporating covariates into the analysis, ANCOVA can minimize the error variance within groups. This is crucial for:
+
+- Maximizing the between-groups variance, which helps in detecting true effects of the treatments or conditions being studied.
+- Enhancing the statistical power of the test, leading to a larger F-statistic and more robust conclusions.
+ 
+
+- **Importance of Independence**: The covariate should not be affected by the treatment or condition. If there is a significant relationship between the covariate and the treatment, then the covariate may actually be a confounder rather than just a covariate. This complicates the analysis because it suggests that adjustments for this variable might need more sophisticated methods like mediation analysis, rather than just control through ANCOVA.
+
+- **Testing Independence**: This can be assessed by using a one-way ANOVA to check if the covariate significantly varies across the treatment groups. If it does, this violates the assumption of independence, indicating that the covariate might interact with the independent variable(s) in influencing the dependent variable.
+
+**ANCOVA Model**
+
+The general linear model (GLM) for ANCOVA is expressed as:
+\[ Y_{ij} = \mu + \alpha_j + \beta Z_{ij} + \epsilon_{ij} \]
+
+- \( \mu \) is the overall mean.
+- \( \alpha_j \) is the effect of the jth treatment.
+- \( \beta \) is the regression coefficient for the covariate.
+- \( Z_{ij} \) is the score of the covariate for the ith subject in the jth group.
+- \( \epsilon_{ij} \) represents the random error.
+
+This model combines the categorical treatment effects (as in ANOVA) with the continuous influence of the covariates (as in regression). The regression coefficient \( \beta \) shows how changes in the covariate are associated with changes in the dependent variable, independent of the treatment effect.
+
+
+# One-way ANOVA
+
+## Introduction
 
 These are models for data from experiments where several groups are compared, and where the sample sizes are equal for all groups. Independence of data values is a crucial assumption for these models. If they are not independent, then you might be able to use one of the alternatives. Other assumptions strictly needed for these models are homogeneity of error variance and normality of the observations within each group. But these are not as important as the independence assumption (unless severely violated).  
  
+The one-way analysis of variance (ANOVA) is used to test the difference in our dependent variable between three or more different groups of observations. Our grouping variable is our independent variable. In other words, we use the one-way ANOVA when we have a research question with a continuous dependent variable and a categorical independent variable with three or more categories in which different participants are in each category.
 
-### Modeling Assumptions and Basic Analysis
+The one-way ANOVA is also known as an independent factor ANOVA (note that it is NOT the same as a factorial ANOVA, which means there are two or more IVs!).
+
+The mathematical formula for one-way ANOVA can be expressed as: Total Sum of Squares (SST) = Sum of Squares Between Groups (SSB) + Sum of Squares Within Groups (SSW)
+
+
+**Model Representation:**
+
+\( Y_{ij} = \mu + \alpha_j + \epsilon_{ij} \)
+
+  - \( Y_{ij} \): The response variable.
+  - \( \mu \): The overall mean of the response.
+  - \( \alpha_j \): The effect of the \(j\)th group.
+  - \( \epsilon_{ij} \): The random error component.
+
+**Components of Variance:**
+- **Total Sum of Squares (SST)**: Represents the total variation in the data.
+- **Sum of Squares Between Groups (SSB)**: Represents the variation between the means of the groups.
+- **Sum of Squares Within Groups (SSW)**: Represents the variation within each group.
+
+**Purpose and Hypotheses of One-way ANOVA:**
+- **Omnibus Test**: One-way ANOVA is an omnibus statistic used to test if there is any difference among the group means.
+- **Null Hypothesis (H0)**: There is no difference in means between the groups; all group means are the same.
+- **Alternative Hypothesis (H1)**: There is a difference in means between the groups; at least one group has a significantly different mean compared to the other groups.
+
+**Additional Notes:**
+- One-way ANOVA does not specify where the differences lie between the means. For identifying specific differences, one needs to perform planned contrasts or post-hoc procedures, which are discussed in subsequent chapters.
+
+This summary captures the essence of the concepts related to one-way ANOVA as presented in the image. If you need further explanation on any of these points or additional statistical concepts, feel free to ask!
+
+
+## Modeling Assumptions and Basic Analysis
 
 The model for the data throughout this chapter is assumed to be
 $$
@@ -218,7 +306,53 @@ run;
 ```
 
 
-### Parameter Estimates
+**Check Assumptions for One-Way ANOVA**
+
+**Assumptions for One-Way ANOVA:**
+1. **Normal Distribution of the Dependent Variable**:
+   - Methods to check:
+     - Shapiro-Wilk test
+     - Q-Q plot
+     - Analysis of skewness and kurtosis
+     - Visual inspection of data distribution
+
+2. **Homogeneity of Variances**:
+   - Tested using Levene’s test.
+
+3. **Dependent Variable is Interval or Ratio**:
+   - This indicates that the dependent variable should be continuous.
+
+4. **Independence of Scores**:
+   - Scores must be independent between groups.
+
+**Assumptions Cannot be Directly Tested:**
+- Assumptions 3 and 4 are based on knowledge of the data rather than empirical testing.
+
+**Response to Assumption Violations**
+
+- **Normality Satisfied and Homogeneity of Variance Satisfied**:
+  - Use one-way ANOVA (standard ANOVA function).
+
+- **Normality Satisfied but Homogeneity of Variance Not Satisfied**:
+  - Use Welch’s F-test (modified ANOVA function that does not assume equal variances).
+
+- **Normality Not Satisfied (Regardless of Homogeneity of Variance)**:
+  - Use Kruskal-Wallis test, which is a non-parametric alternative to the one-way ANOVA.
+
+**Robustness of ANOVA**
+
+- One-way ANOVA is somewhat robust to violations of normality and homogeneity of variance, but this robustness applies primarily when:
+  - Group sizes and variances are equal or nearly equal.
+  - Variances should not differ drastically (e.g., no more than a 2:1 ratio).
+  - Group sizes should not be extremely unbalanced (e.g., no fewer than 10 cases in the smallest group).
+
+**Implications of Violation:**
+
+- If the group with the larger variance also has more cases, it can lead to an F-statistic that is non-significant or smaller than it should be.
+- Conversely, if the group with the larger variance has fewer cases, the F-statistic can be misleadingly high (significant or larger than it should be).
+
+
+## Parameter Estimates
 
 **Means and SD**
 
@@ -251,8 +385,35 @@ However, when you look at many intervals (say, $k$ of them) then all $k$ interva
 the value $c_{\alpha}=t_{1-\alpha^{\prime} / 2, g(n-1)}$ is larger than it needs to be, in the sense that the actual simultaneous confidence level will be somewhat larger than the nominal level $100(1-\alpha) \%$.
 
 
+## Relationship Between F-test and T-test
 
-### R Implementation
+ 
+**Relationship Between F-test and T-test**
+
+- **ANOVA (Analysis of Variance)** simultaneously examines for differences between any number of conditions while maintaining the Type I error rate at a specified significance level, typically 0.05. ANOVA can be thought of as an extension of the t-test for more than two conditions, maintaining Type I error constancy. This is evident when ANOVA is applied to just two conditions, in which case it effectively becomes identical to performing a t-test. The F and t statistics derived in such cases will directly correspond, resulting in identical p-values.
+
+- **Transformation Between F and T Statistics**: If you are working with two groups and conduct an F-test, you can directly convert the F-value to a t-statistic (and vice versa) using the following formulas:
+  \[
+  F = t^2
+  \]
+  \[
+  t = \sqrt{F}
+  \]
+  This conversion is useful if you initially conduct one test and then realize you need the other for comparison or consistency in reporting.
+
+- **One-Tailed T-Test vs. ANOVA**: Despite the direct relationship between t and F values, confusion may arise, especially under specific testing conditions like directional hypotheses. For instance, a one-tailed t-test assessing a directional hypothesis may yield significant results (e.g., \( t(20) = 1.725, p = 0.05 \)), but an ANOVA performed on the same data could yield an F-value (e.g., \( F(1,20) = 2.976, p = 0.100 \)) that is not significant at a 0.05 level. This discrepancy arises because the F-test inherently addresses a two-tailed question even when used in a one-tailed format, as it does not inherently support directional hypotheses due to its reliance on squared differences (removing directionality).
+
+- **Implications of F-test Characteristics**: The F-test is fundamentally a one-tailed test, but it does not inherently support testing directional hypotheses. It's designed to compare variances and, as such, examines whether one variance is significantly greater than another without implying a direction (positive or negative difference). This is critical to understand when choosing between a one-tailed or two-tailed F-test:
+  - **One-Tailed F-Test**: Appropriate if your research hypothesis predicts a specific directional effect (positive or negative).
+  - **Two-Tailed F-Test**: More suitable for non-directional hypotheses or when the direction of the effect is not specified.
+
+- **Understanding Test Distributions**: The choice between a one-tailed and a two-tailed test also reflects the underlying distribution of the test statistic. Symmetrical distributions like the t and z distributions inherently support two-tailed testing. In contrast, asymmetrical distributions like those used in F-tests and chi-square tests inherently do not have a "one-tailed vs. two-tailed" option as they are based on distributions with only one tail. This structural aspect of the test statistic dictates how hypothesis testing is approached, influencing the interpretation and application of test results.
+
+- **Statistical Power**: A one-tailed test provides greater statistical power than a two-tailed test at the same alpha level, assuming the direction of the effect is correctly specified. This is because a one-tailed test focuses the statistical analysis on one direction, increasing the ability to detect an effect if one exists in that specified direction.
+ 
+
+
+## R Implementation
 
 * `df.residual` returns the degrees of freedom of the residual
 * `coef` returns the estimated coefficients (and sometimes their standard deviations)
@@ -296,7 +457,7 @@ summary(Intelligenz.aov)
 ```
 
 
-### SAS Implementation
+## SAS Implementation
 
 Comparing Weight Loss for Five Different Regimens Ott (1988) reports an experiment undertaken to evaluate the effectiveness of five weightreducing agents. There are 10 male subjects in each group who have been randomly assigned to one of the regimens A, B, C, D, or E. This is a classic example of the balanced one-way ANOVA setup. After a fixed length of time, the weight loss of each of the 50 subjects is measured. The goal of the study is to rank the treatments, to the extent possible, using the observed weight loss data for the 50 subjects. 
 These box plots are convenient for depicting and comparing the distributions of the data in each treatment group.
@@ -323,7 +484,7 @@ proc sgplot data=Wloss;
 run;
 ```
 
-### Model Diagnosis
+## Model Diagnosis
 
 1. Homogeneity Test
     + Homogeneity of variance assumption using Plot
@@ -332,7 +493,7 @@ run;
 2. Normality assumption
 3. Multiple Test
 
-#### Homogeneity Test
+### Homogeneity Test {-}
 
 ```{r Homogeneity Test,echo = T,message = FALSE, error = FALSE, warning = FALSE}
 ## Check the homogeneity of variance assumption
@@ -346,7 +507,7 @@ leveneTest(IQ.Werte ~ Fach, data = Intelligenz)
 oneway.test(IQ.Werte~Fach, data=Intelligenz)
 ```
 
-#### Normality assumption
+### Normality assumption {-}
 
 Using QQ Plot or Shapiro–Wilk test to test residuals
 
@@ -361,7 +522,7 @@ shapiro.test(x = aov_residuals )
 ```
 
 
-#### Violation of assumptions
+### Violation of assumptions {-}
 
 **Random Effects Models**
 
@@ -380,22 +541,133 @@ Non-parametric alternative to one-way ANOVA test, **Kruskal-Wallis rank sum test
 ```
 kruskal.test(IQ.Werte~Fach, data=Intelligenz)
 ```
-
-
+ 
 
 ## Unbalanced One-Way ANOVA and Analysis-of-Covariance (ANCOVA)
 
 These data are similar to the balanced ANOVA except that sample sizes may be unbalanced, or the comparisons between means might be done while controlling one or more covariates (e.g., confounding variables, pre-experimental measurements). The distributional assumptions are identical to those of the ANOVA, with the exception that for ANCOVA, the **normality assumption must be evaluated by using residuals** and not actual data values. 
- 
+ When discussing statistical analysis involving **Unbalanced One-Way ANOVA** and **Analysis-of-Covariance (ANCOVA)**, it's crucial to consider how these methods differ from a balanced ANOVA and what specific challenges and adjustments they require.
+
+### Unbalanced One-Way ANOVA
+
+Unbalanced ANOVA refers to situations where the sample sizes across the groups being compared are not equal. This imbalance can affect the analysis in several ways:
+
+1. **Power and Error Rates**: Unequal group sizes can lead to reductions in statistical power and can impact the error rates. In general, when group sizes are equal, the power of the ANOVA test is maximized, and the estimation of variance is more reliable.
+
+2. **Variance Estimation**: In a balanced ANOVA, the estimation of within-group and between-group variances are straightforward and less susceptible to sample size differences. In an unbalanced design, the variances might be estimated with bias if the larger sample sizes overly influence the mean estimates.
+
+3. **Statistical Techniques**: Certain adjustments may be necessary when dealing with unbalanced data. For instance, using Type III sum of squares in the ANOVA calculations helps handle the imbalance by making the sums of squares independent of the order in which variables are entered into the model. This is particularly important in software like SAS or SPSS, where the type of sums of squares can be specified.
+
+### Analysis-of-Covariance (ANCOVA)
+
+ANCOVA is an extension of ANOVA that introduces covariates into the analysis. These covariates are continuous variables that potentially influence the dependent variable but are not the main focus of the research. For instance, if you are studying the effect of a diet on weight loss, age might be a covariate if it's believed to affect weight loss but is not the main variable of interest.
+
+1. **Control for Confounding**: ANCOVA allows researchers to statistically control for the effects of covariates, which might confound the relationship between the dependent variable and the independent variable(s). This enhances the accuracy of the conclusions about the main effects.
+
+2. **Assumption of Homogeneity of Regression Slopes**: One critical assumption in ANCOVA is that the relationship (slope) between the covariate(s) and the dependent variable must be the same across all groups (levels of the independent variable). This assumption is known as the homogeneity of regression slopes and is crucial for the proper application of ANCOVA.
+
+3. **Evaluating Normality Using Residuals**: Unlike ANOVA, where normality is typically assessed using the actual data values or transformed values, ANCOVA requires the evaluation of normality through the residuals. Residuals are the differences between the observed values and the values predicted by the covariate(s). Analyzing residuals helps ensure that the adjustments made for the covariates are appropriately accounting for their effects, and that the error terms (residuals) of the model distribute normally.
+
+### Practical Implications
+
+- **Statistical Software**: When performing either unbalanced ANOVA or ANCOVA, statistical software like R, SPSS, or SAS can be utilized to handle complex calculations, and they offer options to adjust for imbalances and include covariates effectively.
+- **Diagnostic Checks**: It is essential to perform diagnostic checks to validate the assumptions of homogeneity of variances, normality of residuals, and homogeneity of regression slopes. Plots like residual plots, Q-Q plots, or leverage plots can be particularly helpful.
+
+In summary, while unbalanced ANOVA and ANCOVA introduce more complexity into the analysis, they provide powerful tools for dealing with real-world data where conditions are rarely perfectly balanced or free from confounding variables. Understanding how to adjust for these complexities can significantly enhance the validity and reliability of the study's findings.
 
 
 
-## Two-Ways ANOVA Test
-
-You consider the effects of two or more factors, with possibly unbalanced sample sizes and/or covariates. The distributional assumptions are the same as for the unbalanced oneway ANOVA or ANCOVA (if there are covariates). 
+# Factorial ANOVA 
 
 
-### Introduction
+## Independent Factorial ANOVA
+
+Factorial ANOVA is a statistical method that extends the basic principles of a one-way ANOVA to analyze the effects of two or more independent variables simultaneously on a continuous dependent variable. This methodology is highly versatile, supporting designs that assess both the main effects of each factor and the interactions between them, which can reveal more complex patterns of influence on the dependent variable. Here’s a breakdown of the different types of factorial designs, along with explanations of factorial ANOVA and its implications for interpreting experimental results:
+
+**Types of Factorial Designs:**
+
+1. **Independent Factorial Design**: This design involves multiple between-group independent variables (IVs). Each factor is manipulated across different groups of subjects without any repetition within the same subject.
+
+2. **Repeated Measures Factorial Design**: Known as within-group designs, these involve one or more factors being repeated within the same subjects. This can also be referred to as a two-way (or three-way, etc., depending on the number of IVs) repeated measures ANOVA, where each subject is exposed to each condition.
+
+3. **Mixed Factorial Design**: This design incorporates elements of both independent and repeated measures designs, where some factors are manipulated between groups and others within the same subjects.
+
+**Understanding Factorial ANOVA:**
+
+- **One-way ANOVA**: Primarily tests for differences among two or more independent groups based on a single independent variable. It’s used to determine whether the means of the groups are significantly different, such as comparing the performance of students from different schools.
+
+- **Factorial ANOVA**: Unlike one-way ANOVA, factorial ANOVA can test the effects of two or more independent variables on a dependent variable. This approach not only examines the main effects of each independent variable but also explores the interaction effects between them. For instance, it could assess how different teaching methods (one factor) affect various age groups (another factor) concerning student performance.
+
+
+## Repeated Factorial ANOVA
+
+Repeated measures factorial designs are specialized instances of randomized block designs, designed to handle data where measurements are taken on the same subjects under different conditions. Unlike designs where each measure is taken on independent subjects, these designs consider the correlation between measures on the same subjects.
+
+**Randomized Block and Repeated Measures Designs**
+
+In randomized block designs, subjects are grouped into blocks based on one or more characteristics that are expected to affect the outcome. For example, subjects in one block might have high IQ scores, while those in another have low IQ scores. Each block of subjects then experiences the same experimental conditions, allowing the experiment to control for the blocking variable.
+
+When each block consists of only one subject who undergoes all conditions, this setup becomes a repeated measures design. This design is powerful for reducing variability caused by differences between subjects because each subject acts as their own control.
+
+**Counterbalancing in Crossover Designs**
+
+Counterbalancing is used to control for order effects in studies where subjects undergo multiple conditions. This is crucial because the order in which conditions are presented can influence the results. For instance, fatigue or learning might skew results in later conditions if not properly managed.
+
+To manage this, researchers can use several strategies:
+
+- **Full Crossover Design:** All possible orders of conditions are used. For example, with three conditions (A, B, C), six permutations (ABC, ACB, BAC, BCA, CAB, CBA) ensure that each condition's effect is not confounded by its position in the sequence. Subjects are assigned to each order, balancing out any order effects.
+
+- **Factorial Model Construction:** By including all orders and crossing them with other experimental factors, a factorial model can be constructed. This model will account for variances due to order effects and their potential interactions with other variables in the study.
+
+**Latin Square Designs**
+
+Latin square designs offer a structured way to arrange treatments so that each treatment appears only once in each row or column. This design is particularly effective for controlling order effects when there are more conditions:
+
+- **Basic Setup:** Each condition appears exactly once in each row and each column, an approach that efficiently manages the number of required subjects and conditions.
+
+- **Balanced Latin Squares:** Sometimes referred to as "digram-balanced," these are designed such that each condition precedes and follows every other condition. This balance only works when the number of conditions is even.
+
+- **Adaptation for Odd Numbers of Conditions:** When the number of conditions is odd, balanced Latin squares are not feasible. Instead, researchers might use randomly permuted Latin squares to achieve a similar balance.
+
+
+## Mixed factorial design
+
+**Mixed Factorial Design Overview**
+
+Mixed factorial designs blend characteristics of both repeated measures and independent groups factorial designs. In this type of design, at least one factor is a "within-subjects" factor (meaning the same subjects are measured under different conditions), and at least one factor is a "between-subjects" factor (meaning different groups of subjects are measured under each condition).
+
+**General Linear Model (GLM) for Mixed Factorial ANOVA**
+
+The GLM for mixed factorial ANOVA accommodates the interaction between independent and repeated measures within the same experimental framework. This model allows researchers to assess not only the main effects of each type of factor but also their interaction effects, which can reveal how different levels of one factor affect responses at different levels of another factor across different groups of subjects.
+
+**Equation:**
+
+\[ Y_{ijk} = \mu + \tau_i + \alpha_j + (\tau\alpha)_{ij} + \beta_k + (\tau\beta)_{ik} + (\alpha\beta)_{jk} + (\tau\alpha\beta)_{ijk} + \epsilon_{ijk} \]
+
+- \( \mu \) is the overall mean or grand mean of all observations.
+- \( \tau_i \) is the effect of the ith level of the within-subjects factor.
+- \( \alpha_j \) is the effect of the jth level of the between-subjects factor.
+- \( \beta_k \) represents the random effects of subjects within the between-subjects factor.
+- \( (\tau\alpha)_{ij} \) is the interaction effect between the within-subjects factor and the between-subjects factor.
+- \( (\tau\beta)_{ik} \), \( (\alpha\beta)_{jk} \), and \( (\tau\alpha\beta)_{ijk} \) are the higher-level interactions involving subjects.
+- \( \epsilon_{ijk} \) is the random error associated with each observation.
+
+**Key Features of Mixed Factorial Designs:**
+
+1. **Complex Interactions**: This design allows for the examination of interactions between subject-based (within-subject) factors and group-based (between-subject) factors, providing a deeper understanding of how different variables influence each other.
+
+2. **Efficient Use of Data**: By combining both within-subjects and between-subjects factors, mixed designs can make more efficient use of data than pure between-subjects designs, particularly in terms of controlling for potential confounding variables that vary between individuals.
+
+3. **Flexibility**: Mixed designs offer great flexibility in experimental setup, allowing researchers to tailor their studies to specific research questions that involve both repeated measures and independent group comparisons.
+
+**Statistical Analysis Considerations:**
+
+- **Error Terms**: The error structure in mixed factorial designs can be complex. The model must account for variability between subjects within groups and variability due to repeated measures on the same subjects.
+- **Sphericity**: The assumption of sphericity, which is required in repeated measures ANOVA, must be checked and corrected if violated. This assumption tests whether the variances of the differences between all combinations of related group (level) means are equal.
+- **Multiple Comparisons**: When significant interactions are found, post-hoc tests are often necessary to explore these interactions further. These tests can help clarify which specific levels of the factors differ from each other.
+
+
+## Introduction
 
 $$
 Y_{i j k}=\mu+\alpha_{i}+\beta_{j}+(\alpha \beta)_{i j}+\epsilon_{i j k}
@@ -417,7 +689,23 @@ $$
 * $SS_T = \sum_{i=1}^a \sum_{j=1}^b \sum_{k=1}^n (y_{ijk} - \overline{y}_{\cdot\cdot\cdot})^2$ “total”
 
 
-### R implementation
+### Marginal Means in Factorial Designs
+
+Marginal means are computed by averaging the means across the levels of other factors in the design, thus isolating the effect of one particular factor. These means are essential for:
+- Understanding how each factor influences the dependent variable while controlling for the influence of other factors.
+- Comparing the effects of each level of a factor on the outcome, averaged over the levels of other factors involved in the study.
+
+In factorial ANOVA, marginal means are particularly informative because they reflect the composite effect of interactions between factors on the dependent variable. For example:
+
+- If Factor A (e.g., teaching method) and Factor B (e.g., study time) are being tested, the marginal mean for each level of Factor A would be the average outcome across all levels of Factor B, and vice versa.
+- This averaging helps identify if the performance differences are primarily due to one factor regardless of the levels of another, or if the differences are specifically due to interactions between these factors.
+
+**Interpretation of Marginal Means**:
+
+- In the context of a factorial design, marginal means allow for the comparison of factor effects across different conditions or settings.
+- They help in discerning whether the observed differences in outcomes are due to systematic effects of the factors under study or if they stem from the particular combinations of these factors (i.e., interactions).
+
+## R implementation
 
 ```{r Two-Ways ANOVA Test,echo = T,message = FALSE, error = FALSE, warning = FALSE}
 ## Date exploration
@@ -504,7 +792,7 @@ aov_residuals <- residuals(object = res.aov3)
 shapiro.test(x = aov_residuals )
 ```
 
-### SAS Implementation
+## SAS Implementation
 
 ```
 data Waste;
@@ -535,7 +823,7 @@ ods graphics off;
 
 
 
-### Unbalanced design
+## Unbalanced design
 
 With unbalanced designs, LS-means typically are more relevant than arithmetic means for quantifying general population characteristics, since the LS-means estimate the marginal means over a balanced population, whether or not the design itself is balanced; the arithmetic means only estimate the marginal means for a population whose margins match those of the design. In particular, the arithmetic means estimate balanced population margins only when the design itself is balanced. Moreover, the LS-means match the arithmetic means when the design is balanced. 
 
@@ -600,6 +888,52 @@ run;
 ```
 
 
+# MANOVA - Multivariate Analysis of Variance
+
+A repeated measures ANOVA is used to determine whether or not there is a statistically significant difference between the means of three or more groups in which the same subjects show up in each group. A repeated measures ANOVA is typically used in two specific situations:
+
+1. Measuring the mean scores of subjects during three or more time points.
+2. Measuring the mean scores of subjects under three different conditions. 
+
+![](./02_Plots/ANOVA/ANOVA_Repeat1.png)
+
+![](./02_Plots/ANOVA/ANOVA_Repeat2.png)
+
+## General Linear Model (GLM) for Repeated Measures ANOVA
+
+The equation for repeated measures ANOVA is:
+\[ Y_{ij} = \mu + \pi_i + \alpha_j + (\pi\alpha)_{ij} + \epsilon_{ij} \]
+
+- **\( \mu \)** is the overall mean or grand mean of the data.
+- **\( \pi_i \)** represents the effect due to the \( i \)-th subject.
+- **\( \alpha_j \)** is the effect of the \( j \)-th condition or treatment.
+- **\( (\pi\alpha)_{ij} \)** is the interaction between subject \( i \) and condition \( j \), which usually is not included (set to zero) in simple models for ease and clarity.
+- **\( \epsilon_{ij} \)** is the error term, capturing random effects not explained by the model.
+
+This model accounts for the repeated measures on the same subjects by including a term for each subject, allowing it to analyze within-subject variations effectively.
+ 
+
+To ensure valid results from a repeated measures ANOVA, certain assumptions must be met:
+
+1. **Independence**: Each observation should be independent of others. This assumption is crucial for any statistical test involving inference. In the context of repeated measures, the design inherently involves related observations (repeated on the same subjects); hence the independence primarily concerns the error terms \( \epsilon_{ij} \), which should be independent.
+
+2. **Normality**: The distribution of residuals (not the raw data) should be approximately normally distributed. This can be checked through:
+   - Histograms or Q-Q plots of the residuals.
+   - Formal tests of normality such as the Shapiro-Wilk test.
+
+   Repeated measures ANOVA is robust against mild violations of normality, especially with larger sample sizes. For severe violations, data transformation or non-parametric alternatives like the Friedman test might be necessary.
+
+3. **Sphericity**: The variances of the differences among all combinations of related groups (conditions) must be equal. This assumption, unique to repeated measures and multivariate designs, can be tested using Mauchly’s Test of Sphericity. If sphericity is violated, adjustments such as Huynh-Feldt, Greenhouse-Geisser, or lower-bound corrections are used to correct the degrees of freedom used in F-tests, affecting the p-values.
+
+
+If assumptions are violated, several strategies can be employed:
+
+- Transforming the data to improve normality or stabilize variances.
+- Using corrections for violations of sphericity to ensure valid F-tests.
+- Resorting to non-parametric methods when the data significantly deviate from these assumptions.
+
+
+# Other
 
 
 ## Heteroscedastic Responses
@@ -628,6 +962,39 @@ As an example, suppose you know that the observations are counts of defects on a
 Following the previous example, suppose you know that the counts of defects on manufactured items are associated with different machines. You still wish to compare shifts A, B, and C, but you want to account for the machine effect. In this case, you may model the observations on a common machine as dependent, using a random effects model, where the machine effect is considered random. Again the model may be Poisson, but with a repeated measures component. In this case, you can use PROC GLIMMIX both to perform the repeated measures modeling and to perform the multiple comparisons.
 
 # Multiple Comparison
+
+## Post-hoc Comparisons
+
+Significance of F Statistic: If the overall F statistic from an ANOVA is not statistically significant (i.e., p-value exceeds the alpha level, typically 0.05), it indicates that there is no statistical evidence to suggest that there are any differences among the group means. In such cases, it is standard practice not to perform any further contrasts or post hoc tests because the initial analysis did not reject the null hypothesis of no group differences.
+
+If the F statistic is significant, suggesting differences among the group means, post hoc tests can be used to find out which specific groups differ from each other. Here are some commonly used post hoc tests:
+
+1. **Tukey’s Honestly Significant Difference (HSD) Test**:
+   - **Pros**: Well-balanced in terms of Type I error control; not as conservative as Bonferroni, leading to slightly more powerful results where moderate control is sufficient.
+   - **Cons**: Can still be too conservative compared to tests without any corrections.
+
+2. **Bonferroni Correction**:
+   - **Method**: This test adjusts the p-values by multiplying them by the number of comparisons. For instance, if three t-tests are conducted, each p-value is multiplied by three.
+   - **Pros**: Highly conservative, minimizing the risk of Type I errors (false positives).
+   - **Cons**: Can drastically reduce statistical power, particularly when many comparisons are made, possibly leading to Type II errors (false negatives).
+
+3. **Holm-Bonferroni Method**:
+   - **Method**: A sequential adjustment where the smallest p-value is multiplied by the total number of tests, the next smallest by one fewer, and so on. This provides a step-down method that is less conservative than Bonferroni.
+   - **Pros**: Offers a good balance between controlling Type I error and maintaining statistical power.
+
+4. **Scheffe’s Test**:
+   - **Method**: A complex formula for calculating adjustments, rarely used due to its complexity and conservativeness.
+   - **Pros**: Very robust, as it allows for all possible comparisons post-hoc.
+   - **Cons**: May be too conservative and complex for practical use.
+ 
+5. **Welch’s F-test**:
+   - **Method**: Adjusts the degrees of freedom used in the F-test to account for group variances that are unequal. This test is especially useful when the assumption of homogeneity of variances is violated.
+   - **Pros**: Provides a more accurate assessment of the significance of the group differences when variances are unequal.
+
+6. **Kruskal-Wallis Test**:
+   - **Method**: A non-parametric alternative to ANOVA, used when the data does not meet the assumptions necessary for ANOVA. It compares medians from two or more groups.
+   - **Pros**: Does not assume a normal distribution and is useful for ordinal data or skewed distributions.
+   - **Cons**: Generally less powerful than ANOVA in detecting differences when the normality assumption is met.
 
 ## Introduction
 
@@ -3213,13 +3580,20 @@ run;
 title;
 ```
 
+# Reference
+
+Andrew Rutherford, Introducing Anova and Ancova: A GLM Approach
+	https://books.google.co.uk/books/about/Introducing_Anova_and_Ancova.html?id=T6uvhsy8d_8C&source=kp_book_description&redir_esc=y
 
 
+One-Way ANOVA Test in R
+https://www.sthda.com/english/wiki/one-way-anova-test-in-r?title=one-way-anova-test-in-r
 
+Two-Way ANOVA Test in R
+https://www.sthda.com/english/wiki/two-way-anova-test-in-r?title=two-way-anova-test-in-r
 
-
-
- 
+MANOVA Test in R: Multivariate Analysis of Variance
+https://www.sthda.com/english/wiki/manova-test-in-r-multivariate-analysis-of-variance?title=manova-test-in-r-multivariate-analysis-of-variance
 
 
  
