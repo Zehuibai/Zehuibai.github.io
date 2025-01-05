@@ -1287,6 +1287,345 @@ The consistent colour-coding across all panels is helpful, and the colours are s
 
 ![](./02_Plots/Visualization/PRO/Dashboard.png)
 
+# SDQ-12
+
+The dataset includes item level data for a 12 item (question) Simulated Disease Questionnaire (SDQ-12) at four different timepoints and for 2000 patients. Each item is scored on a 0-3 scale (0 representing worst possible health state/most severe symptoms, 3 representing best possible health state and no symptoms), and a sum score is also calculated by adding all item responses. Each of the 12 items has been simulated to represent a distinct symptom
+
+## Item Response Distribution Plot
+
+This visualization displays the distribution of the individual items over each of the four days available in the data. Each horizontal bar is coloured in varying shades of blue with darker shades indicating higher levels of severity in the corresponding item for that day.
+
+The visualization allows the viewer to quickly identify the greater severities observed on Day 4, and to compare the individual items on each day. This provides a nice overview of the data which is quick and easy to understand. The use of darker shades to represent darker colours is intuitive.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library(tidyverse)
+library(mirt)
+library(ggpubr)
+
+library(forcats)
+library(psych)
+library(polycor)
+library(GPArotation)
+library(xtable)
+library(lavaan)
+library(lavaanPlot)
+
+library(WrightMap)
+library(data.table)
+library(ggcorrplot)
+library(lme4)
+library(Matrix) 
+library(stringr)
+library(hrbrthemes)
+library(viridis)
+library(gmodels)
+library(pander)
+library(rtf)
+library(difR)
+
+#Clear environment
+rm(list=ls())
+
+#Colour scheme
+Turquoise100 <- "#00a3e0"
+Turquoise75 <- "#40bae8"
+Turquoise50 <- "#7fd1ef"
+Turquoise25 <- "#bfe8f7"
+Blue100 <- "#005587"
+Blue50 <- "#7FAAC3"
+Green100 <- "#43b02a"
+Green50 <- "#a1d794"
+Purple100 <-"#830065"
+Purple50 <- "#c17fb2"
+
+Names <- c(
+  'Dry Cough',
+  'Loss of Smell',
+  'Skin Rash',
+  'Fever',
+  'Headache',
+  'Short of Breath',
+  'Diarrhoea',
+  'Sore Throat',
+  'Fatigue',
+  'Runny Nose',
+  'Ocular Issues',
+  'Loss of Taste')
+
+ 
+ 
+dat <-read.csv("./01_Datasets/sdq_raw.csv")
+
+### Make dataset for each timepoint ====
+dat_t1 <- dat %>%
+  select(c(ends_with("T1"))) %>%
+  select(-c(starts_with("PGIC")))
+
+colnames(dat_t1) <- Names
+
+dat_t2 <- dat %>%
+  select(c(ends_with("T2"))) %>%
+  select(-c(starts_with("PGIC")))
+
+colnames(dat_t2) <- Names
+
+dat_t3 <- dat %>%
+  select(c(ends_with("T3"))) %>%
+  select(-c(starts_with("PGIC")))
+
+colnames(dat_t3) <- Names
+
+dat_t4 <- dat %>%
+  select(c(ends_with("T4"))) %>%
+  select(-c(starts_with("PGIC")))
+
+colnames(dat_t4) <- Names
+
+# Start data manip =========
+
+myplot <- function(df, timepoint,graphname){
+
+Resp_Dist <<- df %>% #set the dataset
+  apply(2, table) %>% # tabulate response distributions
+  as.data.frame() %>% #apply on the above line makes a matrix. This converts to a dataframe.
+  mutate(Response = as.factor(c(0:3))) #Here we make sure that we have a column labelling the response options
+#select(Response, starts_with("item")) #And move response to the front of the dataset
+
+colnames(Resp_Dist) <<- c(Names,"Response")
+
+#Make a staked barchart for one of the timepoints
+#First transpose the dataset to long format
+Resp_Dist <<- Resp_Dist %>%
+  pivot_longer(cols = c(1:12), names_to = "Item", values_to = "Frequency") %>% #this is the line which makes a long dataset. here we are selecting all columns (ie columns relating to time 3) and keeping the item names in a new variable called "item" and the number that select each response option in a new variable called  "Frequency"
+  mutate(Item = as.factor(Item)) %>% #make item a factor rather than just a character variable. important for plotting
+  mutate(Response = as.factor(if_else(Response == 0, "Severe", 
+                                      (if_else(Response == 1, "Moderate", 
+                                               (if_else(Response == 2, "Mild",
+                                                        "None")))))))
+
+
+Resp_Dist$Response <- factor(Resp_Dist$Response, levels = c("Severe", "Moderate", "Mild", "None"))
+
+
+Plot_Resp_Dist <<- ggplot(data=Resp_Dist, mapping = aes(fill = Response, x=reorder(Item, desc(Item)), y=Frequency)) + #start with a ggplot statement
+  geom_bar(aes(fill=factor(Response)),position="fill", stat="identity")+ #tell it you want a bar chart. position "fill" makes it a stacked bar chart
+  scale_fill_manual(name = "Response Option",values=c(Turquoise100, Turquoise75, Turquoise50, Turquoise25), guide = guide_legend(reverse = TRUE)) + #set the colours. Reverse makes sure that the bars are 0-3 rather than 3-0
+  theme_classic() + #just removes gridlines etc 
+  ggtitle(paste(timepoint))+ 
+  labs(y= "Frequency of response option use", x = NULL) +
+  scale_y_continuous(labels = scales::percent) + #makes the axis percent
+  coord_flip() + #flips to a horizontal chart 
+  theme(panel.background = element_blank(), axis.line = element_blank(),
+        axis.text=element_text(size=10),
+        axis.title=element_text(size=10),
+        legend.text=element_text(size=10),
+        legend.title=element_text(size=10),
+        plot.title = element_text(size=16, face="bold"),
+        plot.subtitle = element_text(size=14, face="bold"),
+        legend.position="right")
+
+#view plot
+Plot_Resp_Dist
+
+assign(graphname, Plot_Resp_Dist, envir = .GlobalEnv)
+
+}
+DAY1 <- vector(mode = "list", length = 9)
+myplot(dat_t1, "Day 1", "DAY1")
+
+DAY2 <- vector(mode = "list", length = 9)
+myplot(dat_t2, "Day 2", "DAY2")
+
+DAY3 <- vector(mode = "list", length = 9)
+myplot(dat_t3, "Day 3", "DAY3")
+
+DAY4 <- vector(mode = "list", length = 9)
+myplot(dat_t4, "Day 4", "DAY4")
+
+DAY1
+DAY2
+DAY3
+DAY4
+
+Response_Distributions <- ggarrange(DAY1, DAY2, DAY3, DAY4, common.legend = TRUE, legend = "bottom")
+
+Response_Distributions <- annotate_figure(Response_Distributions, 
+                top = text_grob("Symptom severity increased each day", color = "black", face = "bold", size = 20),
+                bottom = NULL,
+                left = "SDQ-12 item name",
+                right = NULL)
+
+Response_Distributions
+# png(filename = "Response Distributions.png",  width = 920, height = 540, units = "px", pointsize = 10,bg = "white")
+# Response_Distributions
+# dev.off()
+```
+
+
+## Waterfall plot
+
+This waterfall plot displays the individual change score of each patient. The bars are coloured by the patients’ self-reported conditions, allowing us to easily see the tools’ ability to detect change. 
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+#Clear environment
+rm(list=ls())
+
+#Colour scheme
+Turquoise100 <- "#00a3e0"
+Turquoise75 <- "#40bae8"
+Turquoise50 <- "#7fd1ef"
+Turquoise25 <- "#bfe8f7"
+Blue100 <- "#005587"
+Blue50 <- "#7FAAC3"
+Green100 <- "#43b02a"
+Green50 <- "#a1d794"
+Purple100 <-"#830065"
+Purple50 <- "#c17fb2"
+
+Names <- c(
+  'Dry Cough',
+  'Loss of Smell',
+  'Skin Rash',
+  'Fever',
+  'Headache',
+  'Short of Breath',
+  'Diarrhoea',
+  'Sore Throat',
+  'Fatigue',
+  'Runny Nose',
+  'Ocular Issues',
+  'Loss of Taste',
+  'SDQ TOTAL',
+  'FLU PRO',
+  'Fatigue PRO')
+
+
+dat <-read.csv("./01_Datasets/sdq_raw.csv")
+
+dat_t4 <- dat %>%
+  head(2000) %>%
+  select(c(starts_with("T4"), "PGIC_T4" )) %>%
+  mutate(Group = if_else(PGIC_T4<=3, "Improved",
+                         if_else(PGIC_T4 == 4, "No change", 
+                                 if_else(PGIC_T4 == 5, "Worsened a little", "Worsened a lot")))) %>%
+  arrange(desc(T4_SDQ_PRO_SUM_CHG)) %>%
+  mutate(x = seq(1:2000))
+
+dat_t4$Group <- as.factor(dat_t4$Group)
+dat_t4$x <- as.factor(dat_t4$x)
+
+
+Plot <- dat_t4 %>%
+  ggplot() + 
+  geom_col(aes(x=x, y=T4_SDQ_PRO_SUM_CHG, fill=Group), width = 1,  na.rm = TRUE) +
+  ggtitle("Patients self-reported improvement and worsening \nmatched their SDQ-12 change scores", subtitle = "Supporting the ability of the SDQ-12 to detect change") +
+  xlab("Patients, in order of SDQ-12 change score") + 
+  ylab("SDQ-12 change score") +
+  scale_fill_manual(breaks = c("Improved", "No change", "Worsened a little", "Worsened a lot"), 
+                    values=c(Green50, Turquoise100, Blue100, Purple100), name = "Self-Reported Condition") +
+  scale_y_continuous(limits = c(-35,30), breaks=c(-35, -15, 0, 15)) +
+  theme_classic() + #formatting
+  theme(panel.background = element_blank(), axis.line = element_blank(),
+        axis.text=element_text(size=14),
+        axis.title=element_text(size=16),
+        legend.text=element_text(size=14),
+        legend.title=element_text(size=16),
+        plot.title = element_text(size=22, face="bold"),
+        plot.subtitle = element_text(size=14, face="bold")) +
+  theme(axis.text.x=element_blank(), # remove the participant numbers 
+        axis.ticks.x=element_blank())  # remove x-axis ticks 
+Plot
+
+# png(filename = "Ability_to_detect_change.png",  width = 920, height = 540, units = "px", pointsize = 10,bg = "white")
+# Plot
+# dev.off()
+```
+
+
+## Wright Map
+
+This final visualization has two features: a histogram displaying the underlying characteristics of the patient population and a supplementary graph displaying the expected response thresholds for the different severity levels in relation to the underlying latent scores.
+
+Again, the plot takes a moment to interpret, but once understood provides a message that is easy to understand. It may help the viewer understood more quickly if the vertical gridlines were continued up to the histogram (or alternatively if the x-axis was positioned between the two plots) to make clear that the two aspects of the visual are connected.
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+dat <--read.csv("./01_Datasets/sdq_raw.csv")
+
+### Make dataset for each timepoint ====
+dat_t1 <- dat %>%
+  select(c(ends_with("T1"))) %>%
+  select(-c(starts_with("PGIC")))
+
+###### 4 - Cat Long Form ####### 
+#run the model. remember that for rasch models, these are 1 parameter models and will have the same slope across all items
+GRM_model <- mirt(data=dat_t1, model = 1, itemtype = 'graded', SE=TRUE, verbose=FALSE)
+
+
+#extract the coefficients
+GRM_model_coef <- coef(GRM_model, IRTpars=TRUE, simplify=TRUE)
+
+#save them as a dataframe
+GRM_model_items <- round(as.data.frame(GRM_model_coef$items), 2)
+Items <- rownames(GRM_model_items)
+
+GRM_model_items <- cbind(Items, GRM_model_items)
+ 
+#create rasch based scores if this is necessary - are used in the person item map below. 
+Scores <- (fscores(GRM_model, model = 'EAP'))
+
+
+
+#Take threshold (b) parameters
+thresholds <- GRM_model_items[3:5] 
+
+#plot and save
+###USING GGPLOT
+#Data
+thresholds_long <- thresholds %>%
+  rownames_to_column() %>%
+  rename(Item = rowname) %>%
+  arrange(b1) %>%
+  mutate(Item = fct_reorder(Item, b1)) %>%
+  pivot_longer(cols=-Item, names_to = "threshold", values_to = "AVAL")
+#Itemside
+WrightMap_item <- ggplot(data = thresholds_long, aes(x=factor(Item), y=AVAL)) +
+  geom_line(aes(group=factor(Item))) +
+  geom_point(aes(colour=threshold), size=5) +
+  scale_colour_manual(name="Response Threshold", labels = c("Severe/Moderate", "Moderate/Mild", "Mild/None"), values = c(Turquoise100, Blue100, Green100)) +
+  labs( x = "Item", y = "Latent Score")  +
+  theme_bw() + 
+  theme(text = element_text(size=16),
+        axis.text.x=element_text(colour="black"),
+        axis.text.y=element_text(colour="black"))+
+  theme(axis.text = element_text(size = 10)) + 
+  theme(
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )+
+  scale_y_continuous(breaks = seq(from = -2.5, to = 2.5, by = 1),limits=c(-2.5,2.5)) +
+  coord_flip() +
+  theme(legend.position="bottom") 
+WrightMap_item
+
+#PersonSide
+Scores <- as.data.frame(Scores)
+WrightMap_person <- ggplot(data = Scores) +
+  geom_bar(aes(x=F1)) +
+  scale_x_binned(breaks = seq(from = -2.5, to = 2.5, by = 0.25),limits=c(-2.5,2.5)) +
+  #theme_bw()
+  theme_void()
+WrightMap_person
+
+WrightMap <- ggarrange(WrightMap_person,WrightMap_item + font("x.text", size = 10),
+                               ncol = 1, nrow = 2, align = "v", heights=c(0.75,2.25))
+
+WrightMap
+
+# png(filename = "Wrightmap.png",  width = 920, height = 540, units = "px", pointsize = 10,bg = "white")
+# WrightMap
+# dev.off()
+```
 # Responder Rate
 
 In a Phase III study involving patients suffering from hidradenitis suppurativa, an active drug was compared to a placebo. Each group consisted of 200 subjects, and the primary endpoint was the HiSCR, which is a binary endpoint. This endpoint is based on three continuous components:
@@ -1516,6 +1855,81 @@ The app can be found [here](https://vis-sig.github.io/blog/posts/2022-06-06-wond
 
 ![](./02_Plots/Visualization/PRO/HiSCR_fig.png)
 
+# Variability plot
+
+In this plot, the variability (represented by the standard deviation) is plotted over time and by treatment group. This is a very good idea to present the stability of the values.
+
+The title is very nicely done. The first line provides already a very clear message. The second line uses a smaller font size and provides additional information. This plot is very clear and easy to read. Only the coloring could be chosen in a different way as already discussed above.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+Orange <- "#EF7F04"
+Green <- "#68B937"
+Blue <- "#00A6CB"
+Grey <- "#4E5053"
+Darkblue <- "#003569"
+Yellow <- "#FFBB2D"
+
+## Read in dataset ----
+
+data <- read_csv('./01_Datasets/simulated_data.csv')
+
+data$VISITNUM <- as.character(data$VISITNUM)
+data$TREATMENT <- as.factor(data$TREATMENT)
+
+## Set up data frame for changing visitnum to visit name
+
+visits <- data.frame(VISITNUM = c('3', '17', '21'),
+                     Visit = c('Baseline', 'Week 26', 'Week 52'))
+
+## join it on
+
+dataa <- data %>% 
+  full_join(visits)
+
+levels(data$TREATMENT)
+
+## reorder factor for treatment
+
+
+dataa$Treatment <- factor(dataa$TREATMENT, levels = c("Rx high", "Rx medium", "Rx low", "SOC"))
+
+## Add in mean and sd for each patient and visit combination ----
+
+data1 <- dataa %>% 
+  group_by(SUBJID, Visit, Treatment) %>% 
+  summarise(mean_cgmsim = mean(Simulated_CGMValue), sd_cgmsim = sd(Simulated_CGMValue), 
+            mean_cgm = mean(Original_CGMValue), sd_cgm = sd(Simulated_CGMValue),
+            med_cgm = median(Original_CGMValue), iqr_cgm = IQR(Original_CGMValue),
+            med_cgmsim = median(Simulated_CGMValue), iqr_cgmsim = IQR(Simulated_CGMValue))
+
+
+
+
+# plotdata <- ggplot(data= data1, aes(x=mean_cgmsim, y = sd_cgmsim, colour= TREATMENT, shape= Visit))
+# plotdata <- ggplot(data= data1, aes(x=mean_cgm, y = sd_cgm, colour= TREATMENT, shape= VISITNUM))
+plotdata <- ggplot(data= data1, aes(x=mean_cgmsim, y = sd_cgmsim, colour= Treatment))
+# plotdata <- ggplot(data= data1, aes(x=med_cgmsim, y = iqr_cgmsim, colour= TREATMENT))
+
+
+plotdata + geom_point() +
+  ggtitle('Medium treatment dose leads to glucose levels within a safe range,') +
+  xlab('Mean glucose levels per patient (mg/dL)') +
+  ylab('Variablity of glucose measurements per patient (Standard Deviation)') +
+  scale_colour_manual(values = c(Green, Blue, Darkblue, Orange)) +
+  geom_vline(aes(xintercept=140), linetype=2, colour=Grey) +
+  facet_wrap(vars(Visit),labeller = labeller(Visit = label_wrap_gen(55))) +
+  labs(caption = "Glucose levels between 72 and 140 mg/dL are considered to indicate good glycemic control",
+       subtitle = "and decreased variability compared to SOC and other treatment doses") +
+  theme_bw() +
+  theme(panel.background = element_blank(), axis.line = element_blank(),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=14),
+        # legend.position="none",
+        legend.title = element_text(size=14),
+        legend.text= element_text(size=12),
+        plot.title = element_text(size=18, face="bold"),
+        plot.subtitle = element_text(size=14, face="bold"))
+```
 
 # Clinical Improvement 
 

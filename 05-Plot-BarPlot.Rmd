@@ -23,10 +23,10 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 # getwd()
 # Sys.setlocale("LC_ALL","English")
  
-## devtools::install_github("kupietz/kableExtra")
+# devtools::install_github("kupietz/kableExtra")
 packages<-c("tidyverse", "kableExtra", 
             "ggpubr","gridExtra","ggtext",
-            "plotly",
+            "plotly","RColorBrewer",
             "glue","viridis","hrbrthemes")
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
@@ -38,7 +38,7 @@ ipak(packages)
 ```
 
  
-## Basic Aesthetic
+# Basic Aesthetic
  
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # Color Aesthetic
@@ -59,9 +59,9 @@ ggplot(data = diamonds, mapping = aes(x = cut, fill = clarity)) +
 ```
 
 
-## Grouped and Stacked Barplot
+# Grouped and Stacked Barplot
 
-### Position Option
+## Position Option
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # library(viridis)
@@ -91,7 +91,7 @@ p3
 ```
 
 
-### Facet Option
+## Facet Option
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 ggplot(data = diamonds, mapping = aes(x = cut, colour = clarity)) + 
@@ -111,7 +111,7 @@ ggplot(data = diamonds, mapping = aes(x = cut, colour = clarity)) +
 ```
 
 
-## Negative Values
+# Negative Values
   
 Stacked barplot with negative values with ggplot2
 
@@ -141,9 +141,9 @@ ggplot(data_long, aes(fill=group, y=value, x=x)) +
   xlab("Month")
 ```
 
-## Percentage Plot
+# Percentage Plot
 
-### Calculate Percentage in Data
+## Calculate Percentage in Data
 
 ```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
 data <- data.frame(
@@ -181,14 +181,14 @@ data %>% ggplot(aes(x = group, y = value)) +
 ```
 
 
-### Transfer Percentage in ggplot
+## Transfer Percentage in ggplot
 
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 data(tips, package = "reshape2")
 library(scales)  # for percentage scales
 
-## Alternative 1
+# Alternative 1
 ggplot(data = tips) + 
   geom_bar(mapping = aes(x = day, 
                          y = ..prop.., 
@@ -202,7 +202,7 @@ ggplot(data = tips) +
   theme_classic()
 
 
-## Alternative 2
+# Alternative 2
 ggplot(tips, aes(x = day)) +  
   geom_bar(aes(y = (..count..)/sum(..count..), fill=day))+
   scale_y_continuous(labels = scales::percent) +
@@ -210,14 +210,14 @@ ggplot(tips, aes(x = day)) +
   ylab("relative frequencies")+
   theme_classic()
 
-## Alternative 3
+# Alternative 3
 ggplot(tips, aes(day, group = sex)) + 
           geom_bar(aes(y = ..prop.., fill = factor(..x..)), stat="count") + 
           scale_y_continuous(labels=scales::percent) +
           ylab("relative frequencies") +
           facet_grid(~sex)
  
-## Alternative 4
+# Alternative 4
 ggplot(tips, aes(x= day,  group=sex)) + 
     geom_bar(aes(y = ..prop.., fill = factor(..x..)), stat="count") +
     geom_text(aes( label = scales::percent(..prop..),
@@ -227,11 +227,13 @@ ggplot(tips, aes(x= day,  group=sex)) +
     scale_y_continuous(labels = scales::percent)
 ```
 
-## Text
 
-### Add Text by Group
 
-```{r identity, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# Text
+
+## Add Text by Group 1
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 Rotation_5 <- readRDS(file = "./01_Datasets/Rotation_5.rds")
 
 ggplot(data = Rotation_5, aes(x = Visit, y= Percentage, fill=Treatment)) +
@@ -251,7 +253,43 @@ ggplot(data = Rotation_5, aes(x = Visit, y= Percentage, fill=Treatment)) +
 ```
 
 
-### Change Text and Bar Color
+## Add Text by Group 2
+
+In this bar plot, the relatively complex data set is boiled down to a very simple visualization. The relative amount of time is plotted against time and treatment group. Furthermore, the coloring is chosen in a sensible way. Grey is used for SOC whereas different shades of green are used for the Rx treatments using increasing intensities with higher dose levels. The horizontal lines and the y-axis tick marks could have been removed to make it even less cluttered, because the percentage is shown in each bar.
+
+```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+dat <- read.csv("./01_Datasets/simulated_data.csv", sep = ",", dec = ".")
+# Create function to calculate the percentage per patient:
+num.f <- function(x) length(which(x >= 72 & x <= 140)) / length(x)
+
+# Calculate mean values:
+res <- aggregate(dat$Simulated_CGMValue, list(dat$SUBJID, dat$TREATMENT, dat$VISITNUM), num.f)
+res <- aggregate(res$x, list(res$Group.2, res$Group.3), mean)
+
+# Prepare the results to be plotted:
+names(res) <- c("TREATMENT", "VISITNUM", "Value")
+res$VISITNUM <- factor(res$VISITNUM, levels = c(3, 17, 21), labels = c("baseline", "26 weeks", "52 weeks"))
+res$TREATMENT <- factor(res$TREATMENT, ordered = T,
+                        levels = c("SOC", "Rx low", "Rx medium", "Rx high"))
+res$Value <- res$Value*100
+res$val.t <- format(round(res$Value, 1), nsmall = 1)
+ 
+# library(RColorBrewer)
+ggplot(res, aes(y=Value, x=VISITNUM, fill=TREATMENT)) + 
+  geom_bar(position="dodge", stat="identity") +
+  ylab("Time under good glycemic control (%)") + xlab ("Study visit number") +
+  theme_minimal() + #scale_fill_brewer(palette="Set1")
+  scale_fill_manual(breaks = c("SOC", "Rx low", "Rx medium", "Rx high"),
+                    values = c("lightgrey", brewer.pal(n = 3, name = "Greens"))) +
+  geom_text(aes(label=val.t), vjust = 1.5, size = 4, position = position_dodge(.9)) +
+  ggtitle("The relative amount of time (averaged over all patients) under good glycemic control
+(in the range of 72 and 140 mg/dL) was the highest in the medium and high dose.")
+# ggsave("barplot.png")
+```
+
+
+
+## Change Text and Bar Color
 
 
 The ggtext package defines two new theme elements, element_markdown() and element_textbox(). Both behave similarly to element_text() but render the provided text as markdown/html. element_markdown() is meant as a direct replacement for element_text(), and it renders text without word wrapping. To start a new line, use the <br> tag or add two spaces before the end of a line.
@@ -285,7 +323,7 @@ data %>% mutate(
   
   
   
-## Change Coordinate
+# Change Coordinate
 
 ```{r coordinary system, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # coord_polar() uses polar coordinates
@@ -302,10 +340,10 @@ bar + coord_polar()
 ```
 
 
-## Ordered Bar Plot
+# Ordered Bar Plot
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-## Ordered Bar Chart 
+# Ordered Bar Chart 
 cty_mpg <- aggregate(mpg$cty, by=list(mpg$manufacturer), FUN=mean)  # aggregate
 colnames(cty_mpg) <- c("make", "mileage")  # change column names
 cty_mpg <- cty_mpg[order(cty_mpg$mileage), ]  # sort
@@ -355,10 +393,10 @@ ggbarplot(dfm, x = "name", y = "mpg",
 
 
 
-## Lollipop Chart
+# Lollipop Chart
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-## Lollipop charts conveys the same information as in bar charts. By reducing the thick bars into thin lines, it reduces the clutter and lays more emphasis on the value. It looks nice and modern.
+# Lollipop charts conveys the same information as in bar charts. By reducing the thick bars into thin lines, it reduces the clutter and lays more emphasis on the value. It looks nice and modern.
 ggplot(cty_mpg, aes(x=make, y=mileage)) + 
   geom_point(size=3) + 
   geom_segment(aes(x=make, 
@@ -372,7 +410,7 @@ ggplot(cty_mpg, aes(x=make, y=mileage)) +
 ```
 
 
-## Deviation Graphs
+# Deviation Graphs
  
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
@@ -430,7 +468,7 @@ mtcars %>%
 ```
 
 
-## Means and Error Bars
+# Means and Error Bars
 
 ```{r geom_errorbar, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 PrimEnd <- data.frame('Primary Endpoint'=c("Primary Analysis", 
@@ -544,9 +582,9 @@ ggplot(tgc2, aes(x=dose, y=len, fill=supp)) +
 ```
 
 
-## Circular Barplot
+# Circular Barplot
 
-### Basic Using coord_polar() 
+## Basic Using coord_polar() 
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # Create dataset
@@ -595,7 +633,7 @@ p <- ggplot(data, aes(x=as.factor(id), y=value)) +       # Note that id is a fac
 p
 ```
 
-### Circular barplot with gap 
+## Circular barplot with gap 
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # Create dataset
@@ -637,7 +675,7 @@ p <- ggplot(data, aes(x=as.factor(id), y=value)) +       # Note that id is a fac
 p
 ```
 
-### Groups
+## Groups
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # Create dataset
@@ -684,7 +722,7 @@ p <- ggplot(data, aes(x=as.factor(id), y=value, fill=group)) +       # Note that
 p
 ```
 
-### Customization
+## Customization
 
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
@@ -757,7 +795,7 @@ ggplot(data, aes(x=as.factor(id), y=value, fill=group)) +       # Note that id i
 ```
 
 
-### Circular Stacked Barplot
+## Circular Stacked Barplot
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # Create dataset
@@ -845,9 +883,9 @@ p
 ```
  
  
-## Interactive Plot 
+# Interactive Plot 
 
-### plotly package
+## plotly package
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # library(viridis)
@@ -879,10 +917,10 @@ ggplotly(p3)
 
 
 
-### ggiraph package
+## ggiraph package
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-## reference https://rkabacoff.github.io/datavis/Interactive.html#ggiraph
+# reference https://rkabacoff.github.io/datavis/Interactive.html#ggiraph
 library("ggiraph")
 library("patchwork")
 data(gapminder, package="gapminder")
