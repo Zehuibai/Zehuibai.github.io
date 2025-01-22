@@ -1,0 +1,175 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Design and Evaluation of Bayesian Clinical Trials
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+packages<-c("tidyverse", "kableExtra")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+```
+
+
+# Introduction
+
+## Bayesian Clinical Trials Overview
+
+Bayesian analysis is a statistical methodology where prior knowledge about a parameter, denoted as θ, is updated based on new data to form a posterior distribution. This process involves three key components:
+
+- **Prior**: The initial belief about the parameter before new data is considered.
+- **Likelihood**: The probability of observing the data given a parameter value.
+- **Posterior Distribution**: The updated belief about the parameter after considering the new data. It is calculated using Bayes' theorem:
+
+\[ P(\theta | D) = \frac{P(D | \theta) \times P(\theta)}{P(D)} \]
+
+where:
+- \( P(\theta | D) \) is the posterior probability of the parameter given the data.
+- \( P(D | \theta) \) is the likelihood of the data given the parameter.
+- \( P(\theta) \) is the prior probability of the parameter.
+- \( P(D) \) is the probability of the data, serving as a normalizing constant.
+
+**Advantages of Bayesian Analysis**
+
+- **Flexibility**: Bayesian methods can incorporate prior knowledge, which can be particularly useful in areas with previous research or expert consensus.
+- **Intuitiveness**: It provides a probabilistic interpretation that is often more intuitive for decision making.
+- **Integration of Priors**: Allows seamless integration of external information through priors, which can be especially powerful in complex models.
+
+
+## Application in Clinical Trials
+
+- **Phase I Trials**: Bayesian methods are replacing traditional "3+3" dose-escalation designs, as they allow for more nuanced decision-making processes, including considerations of both toxicity and efficacy (e.g., determining MTD and OBD).
+- **Phase II Trials**: There is a growing use of Bayesian methods, which are well suited for adaptive designs such as Simon's two-stage design and extensions like BOP2 (Biased Coin Design for Phase II). These designs facilitate interim analyses that can adjust the trial based on accumulating data, enhancing efficiency and potentially reducing patient exposure to ineffective treatments.
+- **Phase III Trials**: Interest in Bayesian methods is expanding to include more complex elements like seamless Phase II/III designs, where data from Phase II can be directly used to inform the conduct and continuation into Phase III.
+ 
+The use of Bayesian methods is also growing in areas involving more complex statistical considerations, such as:
+
+- **Real-World Data**: Leveraging post-market data to inform ongoing clinical decisions.
+- **Bayesian Frameworks**: Integration with Bayesian frameworks to address complex modeling challenges and facilitate borrowing information across similar trials, enhancing the robustness and efficiency of the analyses.
+
+
+# Phase I Trials: Enhancing Dose-Escalation Designs
+
+In Phase I clinical trials, Bayesian methods are increasingly used to replace the traditional "3+3" dose-escalation design. The "3+3" design, which traditionally enrolls groups of three patients at increasing dose levels until toxicity is observed, offers limited flexibility and often insufficient exploration of the dose-response curve. Bayesian approaches provide a more sophisticated framework that considers both toxicity and efficacy metrics more dynamically:
+
+- **MTD (Maximum Tolerated Dose)**: Bayesian methods can integrate historical data and current trial results to update beliefs about the toxicity profile of a drug dynamically. This helps in more accurately identifying the MTD, where the probability of severe toxicity remains within an acceptable range.
+- **OBD (Optimal Biological Dose)**: Unlike traditional methods that primarily focus on toxicity, Bayesian techniques also evaluate efficacy data to estimate the dose that achieves the best therapeutic effect with acceptable toxicity. This is particularly useful in oncology, where the balance between efficacy and toxicity is critical.
+  
+The Bayesian framework allows for continuous data monitoring and adjustment of hypotheses about dose safety and efficacy, which can lead to quicker decisions about dose adjustments, potentially speeding up the trial process and improving patient safety.
+
+
+# Phase II Trials: Adapting with Interim Analyses
+
+In Phase II, Bayesian methods are well-suited for adaptive designs, which are crucial for making go/no-go decisions based on interim data. This adaptability reduces resource expenditure and patient exposure to potentially ineffective treatments:
+
+- **Simon's Two-Stage Design**: Traditionally used for determining if a treatment has sufficient activity to warrant further study, the Bayesian adaptation allows for modifications based on accrued data at interim points. This could include early stopping for success if the treatment effect is clearly beneficial or stopping for futility if the effect is not as expected.
+- **BOP2 (Biased Coin Design for Phase II)**: This method introduces a probability mechanism that adjusts the likelihood of continuing the trial based on interim results. It's designed to be more responsive and efficient than fixed designs, allowing for a better balance between type I and type II errors.
+
+These adaptive designs enable more flexible and efficient testing of hypotheses and quicker adaptations to new data, enhancing the overall development process.
+
+# Phase III Trials: Seamless Integration of Phases
+
+Bayesian methods in Phase III trials are increasingly used to facilitate seamless designs, where data from an earlier phase (like Phase II) directly informs the conduct of the trial as it moves into Phase III:
+
+- **Seamless Phase II/III Designs**: These designs treat phases II and III as a continuum, where promising results from the intermediate analysis of Phase II can lead directly into expanded Phase III studies without the need for separate initiation processes. This approach can significantly shorten the timeline from development to market approval.
+  
+Bayesian statistics support these designs by providing a methodological framework to update the trial parameters based on cumulative data. This enables ongoing trials to adapt based on interim outcomes, potentially leading to more efficient resource use and faster decision-making regarding the drug's efficacy and safety.
+
+
+
+## Limited Use in Bayesian Phase III Trials
+
+- **Reasons for Rarity**: Bayesian methods are less common in Phase III trials primarily due to unfamiliarity, lack of specific regulatory guidance, and stringent statistical requirements, such as maintaining a Type I error rate at 0.025. This traditional threshold poses challenges in a Bayesian context where probabilities are updated as data accumulates.
+
+**Recent Uptick in Bayesian Application**
+
+- **Examples of Bayesian Usage**: There has been an increase in the use of Bayesian methods in Phase III trials across various diseases:
+  - **COVID-19 Vaccine**: Employed Bayesian Sequential Design, which allows for more flexible and quicker decision-making.
+  - **Lymphoma and Psoriasis**: Utilized External Control Arms (ECA) where historical control data is used to enhance the statistical power or to replace missing control groups.
+  - **Pediatric Multiple Sclerosis and Epilepsy**: Techniques such as borrowing from adult data (extrapolation) and using data from similar but distinct patient groups (borrowing) are used to enhance the robustness of findings and address small patient populations.
+
+**Draft FDA Guidance by 2025**
+
+- **Draft FDA Guidance**: Expected by the end of 2025 under PDUFA VII (Prescription Drug User Fee Act), which will address Bayesian methodology in clinical trials of drugs and biologics.
+- **Adaptive Guidance Principles**: The guidance is anticipated to align with adaptive trial design principles, advocating for pre-specification, early engagement, and the use of simulations to validate trial designs.
+- **Common Use Cases and Success Stories**: The guidance may include examples of successful Bayesian applications in early-stage trials, particularly Phase I, and provide an overview of common use cases such as data borrowing, interim analysis, and adaptations based on cumulative data.
+- **Key Assessment Criteria**: In Phase III, while an open approach is expected, there will be a strong emphasis on justifying the value and maintaining traditional statistical rigor, including Type I error and power considerations. Specific Bayesian success criteria might be proposed, such as setting explicit posterior probability thresholds.
+- **Value in Specific Areas**: Bayesian methods are seen as particularly valuable in areas like rare diseases and pediatrics, where patient populations are small, and traditional trial designs might not be feasible.
+- **Decision-Theoretic Measures**: Although less common, there might be discussions on integrating decision-theoretic approaches to measure the success probabilities of treatments, reflecting a more nuanced and sponsor-oriented consideration.
+
+
+# Reference
+
+## Bayesian Trials
+
+Ionan, A.C., Clark, J., Travis, J., Amatya, A., Scott, J., Smith, J.P., Chattopadhyay, S., Salerno, M.J. and Rothmann, M., 2023. Bayesian methods in human drug and biological products development in CDER and CBER. Therapeutic Innovation & Regulatory Science, 57(3), pp.436-444.
+McElreath, R., 2020. Statistical Rethinking: A Bayesian Course with Examples in R and STAN. New York: Chapman; Hall/CRC
+Berry, D.A., 2006. Bayesian clinical trials. Nature reviews Drug discovery, 5(1), pp.27-36.
+Berry, S.M., Carlin, B.P., Lee, J.J. and Muller, P., 2010. Bayesian adaptive methods for clinical trials. CRC press.
+Lee, J.J. and Yin, G., 2021. Principles and reporting of Bayesian trials. Journal of Thoracic Oncology, 16(1), pp.30-36.
+Muehlemann, N., Zhou, T., Mukherjee, R., Hossain, M.I., Roychoudhury, S. and Russek-Cohen, E., 2023. A tutorial on modern Bayesian methods in clinical trials. Therapeutic Innovation & Regulatory Science, 57(3), pp.402-416.
+U.S. Food and Drug Administration, Guidance for the Use of Bayesian Statistics in Medical Device Clinical Trials, February 2010 Available from: https://www.fda.gov/media/71512/download
+
+
+## Early Stage Bayesian Trials
+
+Kurzrock, R., Lin, C.C., Wu, T.C., Hobbs, B.P., Pestana, R.C. and Hong, D.S., 2021. Moving beyond 3+ 3: the future of clinical trial design. American Society of Clinical Oncology Educational Book, 41, pp.e133-e144.
+Zhou, H., Yuan, Y., & Nie, L., 2018. Accuracy, safety, and reliability of novel phase I trial designs. Clinical Cancer Research, 24(18), 4357-4364.
+Liu, M., Wang, S.J. and Ji, Y., 2020. The i3+ 3 design for phase I clinical trials. Journal of biopharmaceutical statistics, 30(2), pp.294-304.
+Lin, X. and Ji, Y., 2020. The Joint i3+ 3 (Ji3+ 3) design for phase I/II adoptive cell therapy clinical trials. Journal of Biopharmaceutical Statistics, 30(6), pp.993-1005.
+Cheung, Y. K., 2011. Dose Finding by the continual reassessment method. CRC Press.
+Yan, F., Mandrekar, S.J. and Yuan, Y., 2017. Keyboard: a novel Bayesian toxicity probability interval design for phase I clinical trials. Clinical Cancer Research, 23(15), pp.3994-4003.
+Zhou, Y., Lin, R., Kuo, Y. W., Lee, J. J., & Yuan, Y., 2021. BOIN Suite: A Software Platform to Design and Implement Novel Early-Phase Clinical Trials. JCO Clinical Cancer Informatics, 5, 91-101.
+Zhou, Y., Li, R., Yan, F., Lee, J.J. and Yuan, Y., 2021. A comparative study of Bayesian optimal interval (BOIN) design with interval 3+ 3 (i3+ 3) design for phase I oncology dose-finding trials. Statistics in biopharmaceutical research, 13(2), pp.147-155.
+Yuan, Y., Lee, J.J. and Hilsenbeck, S.G., 2019. Model-assisted designs for early-phase clinical trials: simplicity meets superiority. JCO Precision Oncology, 3, pp.1-12.
+Thall, P.F. and Simon, R., 1994. Practical Bayesian guidelines for phase IIB clinical trials. Biometrics, pp.337-349.
+Zhou, H., Lee, J. and Yuan, Y., 2017. BOP2: Bayesian Optimal Design for Phase II Clinical Trials with Simple and Complex Endpoints. Statistics in Medicine, 36, 3302-3314.
+Woodcock J., LaVange LM., 2017. Master Protocols to Study Multiple Therapies, Multiple Diseases, or Both, N Engl J Med, 377:62-70
+Zhou, T. and Ji, Y., 2024. Bayesian Methods for Information Borrowing in Basket Trials: An Overview. Cancers, 16(2), p.251.
+Ouma, L.O., Wason, J.M., Zheng, H., Wilson, N. and Grayling, M., 2022. Design and analysis of umbrella trials: Where do we stand?. Frontiers in Medicine, 9, p.1037439.
+Freidlin, B. and Korn, E.L., 2013. Borrowing information across subgroups in phase II trials: is it useful?. Clinical Cancer Research, 19(6), pp.1326-1334.
+Beall, J., Cassarly, C. and Martin, R., 2022. Interpreting a Bayesian phase II futility clinical trial. Trials, 23(1), p.953.
+
+
+## Confirmatory Bayesian Trials
+
+Ruberg, S.J., Harrell Jr, F.E., Gamalo-Siebers, M., LaVange, L., Jack Lee, J., Price, K. and Peck, C., 2019. Inference and decision making for 21st-century drug development and approval. The American Statistician, 73(sup1), pp.319-327.
+Medical Outreach Subteam of the Drug Information Association Bayesian Scientific Working Group, Clark, J., Muhlemann, N., Natanegara, F., Hartley, A., Wenkert, D., Wang, F., Harrell, F.E. and Bray, R., 2022. Why are not there more Bayesian clinical trials? Perceived barriers and educational preferences among medical researchers involved in drug development. Therapeutic Innovation & Regulatory Science, pp.1-9.
+Medical Outreach Team of the Drug Information Association Bayesian Scientific Working Group, Bray, R., Hartley, A., Wenkert, D., Muehlemann, N., Natanegara, F., Harrell Jr, F.E., Wang, F. and Clark, J., 2023. Why are there not more Bayesian clinical trials? Ability to interpret Bayesian and conventional statistics among medical researchers. Therapeutic Innovation & Regulatory Science, 57(3), pp.426-435.
+Ruberg, S.J., Beckers, F., Hemmings, R., Honig, P., Irony, T., LaVange, L., Lieberman, G., Mayne, J. and Moscicki, R., 2023. Application of Bayesian approaches in drug development: starting a virtuous cycle. Nature Reviews Drug Discovery, 22(3), pp.235-250.
+Lee, S.Y., 2024. Using Bayesian statistics in confirmatory clinical trials in the regulatory setting: a tutorial review. BMC Medical Research Methodology, 24(1), p.110.
+Garczarek, U., Muehlemann, N., Richard, F., Yajnik, P. and Russek-Cohen, E., 2023. Bayesian strategies in rare diseases. Therapeutic Innovation & Regulatory Science, 57(3), pp.445-452.
+Senn, S., 2022. The design and analysis of vaccine trials for COVID‐19 for the purpose of estimating efficacy. Pharmaceutical Statistics, 21(4), pp.790-807.
+U.S. Food and Drug Administration, CID Case Study: External Control in Diffuse B-Cell Lymphoma, Available from: https://www.fda.gov/media/155405/download
+U.S. Food and Drug Administration, CID Case Study: A Study in Pediatric Patients with Multiple Sclerosis, Available from: https://www.fda.gov/media/172313/download
+U.S. Food and Drug Administration, CID Case Study: A Study in Patients with Epilepsy with Myoclonic-Atonic Seizures, Available from: https://www.fda.gov/media/172312/download
+You, R., Weber, S., Bieth, B. and Vandemeulebroecke, M., 2022. Innovative pediatric development for secukinumab in psoriasis: faster patient access, reduction of patients on control. Clinical Pharmacology & Therapeutics, 111(3), pp.697-704.
+U.S. Food and Drug Administration, PDUFA VII Commitment Letter, August 2021. Available from: https://www.fda.gov/media/151712/download
+Zhou, T., & Ji, Y., 2023. On Bayesian Sequential Clinical Trial Designs. The New England Journal of Statistics in Data Science, 2(1), 136-151. 
+
+
