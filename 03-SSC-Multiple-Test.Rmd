@@ -1,0 +1,121 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Sample Size for Multiple Tests
+output:
+  html_document:
+    df_print: paged
+    number_sections: No
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+packages<-c("tidyverse", "kableExtra")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+Sys.setlocale("LC_ALL","English")
+```
+
+
+# Multigroup Dose-Finding Trial
+
+ 
+## Dunnett Test 
+
+The Dunnett test is used when there are multiple active arms and one common control arm in a clinical trial. It involves multiple tests; each test compares an active treatment arm to the control arm. The null hypotheses for these tests are given by:
+
+\[ H_i : \mu_i = \mu_0, \quad i = 1, \ldots, K. \tag{2.14} \]
+
+**Distribution Assumption**
+
+Dunnett's test assumes the test statistics follow a K-variate normal distribution:
+
+\[ T \sim N(\mu, \Sigma). \tag{2.15} \]
+
+**Critical Value and Error Rate**
+
+Dunnett proposed using a single critical value, \(c_\alpha\), for all \(K\) tests, ensuring the rejection probability under the global null hypothesis \(H_G\) is \(\alpha\). This method involves using the maximum test statistic among all \(T_i (i = 1, \ldots, K)\) to determine \(c_\alpha\), thereby controlling the type-I error rate under the global null hypothesis at \(\alpha\) because:
+1. If any \(H_i\) is rejected, the one with the maximum test statistic \(T\) is also likely to be rejected.
+2. If the \(H_i\) with the maximum test statistic \(T\) is not rejected, then no other \(H_i\) should be rejected.
+
+This method effectively controls the familywise type-I error in multiple comparisons scenarios.
+
+**Mathematical Representation**
+
+Chang (2014) provided that the cumulative distribution function (c.d.f.) for the maximum test statistic \(T\) can be expressed as:
+
+\[ F_T(t) = \int_{-\infty}^{\infty} \left[ \Phi(z) \right]^K \phi(\sqrt{2t} - z) \, dz. \tag{2.16} \]
+
+**Critical Values Table**
+
+Tables often accompany this explanation to show the critical values for the maximum Dunnett test for significance levels such as \(\alpha = 0.025\) and \(\alpha = 0.05\).
+ 
+
+**Additional Explanation**
+
+Dunnett's test is valuable in situations where multiple treatment groups are compared against a single control, common in pharmaceutical studies testing different dosages of a drug against a placebo.
+
+The formula for \( F_T(t) \) integrates the probability density function \( \phi \) of a standardized normal and raises the cumulative distribution function \( \Phi \) to the power of \( K \). This accounts for the correlation among the test statistics due to the shared control group, adjusting the critical value to maintain the familywise error rate at a desired level.
+
+This method ensures robust control over Type I errors across multiple comparisons, preventing the potential inflation of error rates that could occur if each test were conducted independently without adjustments for multiple testing.
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+## R Function: Dunnett Test for Multiple Arms with Common Control
+powerDunnett <- function(n0, u0, sigma0, nArms, cAlpha, nSims) {
+    powers <- rep(0, nArms)
+    tValue <- rep(0, nArms)
+    yCtl <- rep(0, nArms)
+    yTest <- rep(0, nArms)
+    power <- 0
+
+    for (i in 1:nSims) {
+        yCtl <- rnorm(n0, mean = u0, sd = sigma0)
+        OverSig <- 0
+
+        for (j in 1:nArms) {
+            yTest <- rnorm(ns[j], mean = us[j], sd = sigmas[j])
+            tValue <- t.test(yTest, yCtl)$statistic
+
+            if (tValue >= cAlpha) {
+                powers[j] <- powers[j] + 1 / nSims
+                OverSig <- 1
+            }
+        }
+        power <- power + OverSig / nSims
+    }
+    return (c("power=" , power, "Rejection Probs = ", powers))
+}
+
+## Determine critical value Zalpha for alpha (power) =0.025 ##
+ns <- c(288, 288, 288)
+us <- c(0, 0, 0)
+sigmas <- c(2, 2, 2)
+powerDunnett(n0 = 288, u0 = 0, sigma0 = 2, nArms = 3, cAlpha = 2.361, nSims = 100000)
+
+## Determine Power ##
+ns <- c(288, 288, 288)
+us <- c(0.3, 0.4, 0.5)
+sigmas <- c(2, 2, 2)
+powerDunnett(n0 = 288, u0 = 0, sigma0 = 2, nArms = 3, cAlpha = 2.361, nSims = 10000)
+
+```

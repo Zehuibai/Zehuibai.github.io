@@ -54,13 +54,214 @@ Sys.setlocale("LC_ALL","English")
 5. **Consideration of Covariates and Disease States**:
    - Evaluating how different covariates and patient-specific disease states affect drug exposure is essential for tailoring therapy to individual needs.
 
-## FDA’s Project Optimus 
+ 
 
-(FDA’s Project Optimus: Redefining Oncology Drug Dosage for Better Patient Outcomes)[https://www.cytel.com/perspectives/fdas-project-optimus-redefining-oncology-drug-dosage-for-better-patient-outcomes/]
 
-## Dose Escalation 
 
-### Dose Ranging {-}
+# Dose Escalation in Early Phase Clinical Trials
+
+## SAD/MAD/Dose Escalation
+
+**SAD (Single Ascending Dose) and MAD (Multiple Ascending Dose)**
+
+
+1. **Sequential Cohorts**:
+   - **SAD**: Involves administering a single dose to a small group of participants, with each subsequent group receiving a higher dose. This continues until a predefined dose level is reached or unacceptable toxicity is observed.
+   - **MAD**: Similar to SAD but involves multiple doses administered to the same group to assess safety and pharmacokinetics over a longer period.
+
+2. **Dose Escalation**:
+   - The process starts with Dose 1 and progresses sequentially through Dose 2, Dose 3, and so on, up to Dose 5 as depicted. This systematic incrementation helps identify the maximum tolerated dose (MTD).
+
+3. **Expansion Cohort**:
+   - Once an optimal dose is established, an expansion cohort may be enrolled to further evaluate the drug’s safety and efficacy at this dose, providing additional data to support phase II trial designs.
+   
+
+The SAD/MAD dose escalation strategy is crucial for:
+
+- Minimizing risks to study participants by starting at lower doses.
+- Efficiently finding the dose that maximizes potential therapeutic effects while minimizing adverse effects.
+- Laying the groundwork for effective and safe dosing strategies in later-phase trials.
+
+
+![](./02_Plots/IA/AD_Dose1.png)
+
+
+**Key Considerations in Dose Escalation**
+
+- **Dose Limiting Toxicities (DLT)**:
+  - The primary consideration during dose escalation is the observation of DLTs, which are side effects severe enough to prevent an increase in dose. These help define the MTD.
+
+- **Dose Escalation Committee (DEC)**:
+  - A group of experts that governs dose escalation decisions, ensuring that the process adheres to safety standards while achieving the necessary pharmacologic endpoint.
+
+- **Pharmacokinetic (PK) Data**:
+  - Critical for determining how the drug is absorbed, distributed, metabolized, and excreted in the body. PK data guide decisions on dose levels and scheduling.
+
+- **Response Biomarkers**:
+  - Biomarkers that respond to the drug treatment can provide early indications of how well the drug is working at different doses, aiding in identifying the optimal dose for further studies.
+
+
+
+![](./02_Plots/IA/AD_Dose2_Range.png)
+1. **Is there a range of safe doses where we can explore efficacy?**
+   - Yes, the therapeutic window shown indicates a range of doses where the efficacy is high and toxicity is minimal. This range allows for the exploration of optimal dosing to maximize therapeutic benefits while minimizing adverse effects.
+
+2. **Is there a Maximum Tolerated Dose (MTD)?**
+   - The Maximum Tolerated Dose typically refers to the highest dose of a drug that does not cause unacceptable side effects. Based on the graph, the MTD would be near the dose where the probability of toxicity begins to approach an unacceptable level, potentially around the right boundary of the therapeutic window or where the toxicity curve starts to steepen significantly. However, the exact dose isn't specified clearly in the graph but would likely be determined by where the risk of toxicity begins to outweigh the benefits of increased efficacy.
+
+
+
+## Dose Escalation Process
+
+The dose escalation process is crucial in clinical trials for several reasons:
+
+- **Safety Assessment**: It allows for the careful assessment of a drug's safety profile at increasing dose levels.
+- **Efficacy Indicators**: Early indications of efficacy can also be observed and used to make decisions about further development.
+- **MTD Identification**: Finding the maximum tolerated dose is essential for determining the dose for Phase II trials, which will focus more on efficacy.
+
+**Methodology of a dose escalation process in clinical trials.**
+
+1. **Sequential Doses**:
+   - **Dose 1 to Dose 5**: The process begins with the lowest dose (Dose 1) and progresses through increasingly higher doses (Dose 2 to Dose 5). Each subsequent dose is determined based on the safety and tolerability data from the previous dose.
+
+2. **Cohort Design**:
+   - **Small Cohorts**: Typically involves a small number of participants in each dose level to minimize risk.
+   - **Randomization to Placebo**: Some participants receive a placebo, which helps in the unbiased assessment of the drug's effects and side effects.
+
+3. **Dose Levels**:
+   - **Logarithmically Spaced Doses**: The doses are usually logarithmically spaced, often doubled, to efficiently find the maximum tolerated dose without causing significant harm from too large an increment.
+
+4. **Starting Dose**:
+   - The initial dose is typically less than 1/100 of the predicted dose that would cause harm in humans, based on preclinical models. This conservative start helps ensure participant safety.
+
+5. **Data Review and Escalation Decision**:
+   - **Data Review Committee**: After each cohort has been dosed, a Data Review Committee (DRC) assesses the safety data. This committee plays a critical role in deciding whether it is safe to proceed to the next dose level.
+   - **Dose Limiting Toxicities (DLT)**: The decision to escalate the dose is primarily based on the presence or absence of DLTs. The occurrence of DLTs can halt the escalation process or necessitate dose adjustments.
+
+6. **Escalation Rules**:
+   - **3+3 Design**: This is a common method used in dose escalation studies. In this design, three participants are initially dosed, and if there are no DLTs, three more are dosed at a higher level. If one participant experiences a DLT, an additional three participants may be dosed at the same level to better assess the risk.
+ 
+ 
+## Escalation Rules
+
+
+![](./02_Plots/IA/AD_Dose3_Rules.png)
+
+
+### Algorithm-Based Rules {-}
+
+1. **3+3**:
+   - The most traditional and simplest approach, where three patients are treated at a given dose level. If none or one patient experiences a dose-limiting toxicity (DLT), the dose is escalated. If two or more patients experience a DLT, the dose is not escalated, and further evaluation may occur.
+
+2. **mTPI (modified Toxicity Probability Interval)**:
+   - An extension of the traditional interval designs that uses a Bayesian framework to better estimate the probability of toxicity at each dose level, allowing for more refined adjustments in dose escalation.
+
+3. **i3+3 (interval 3+3)**:
+   - This method integrates features of both rule-based and model-based approaches, using toxicity intervals to guide dose escalations more systematically than the traditional 3+3 method.
+
+4. **Adaptive Dose Insertion**:
+   - Allows for the insertion of intermediate dose levels based on accumulating data from the trial. This can help refine the understanding of the dose-response relationship.
+
+5. **Dual Agent PIPE (Product of Independent beta Probabilities Escalation)**:
+   - Used for trials involving two drugs, this method considers the probability of toxicity for each drug independently and adjusts dosing accordingly, suitable for combination therapy studies.
+
+### Model-Based Rules {-}
+
+1. **CRM (Continual Reassessment Method)**:
+   - A Bayesian model that continually updates the probability of toxicity based on patient outcomes at all dose levels tested. The model aims to more quickly identify the dose closest to the target toxicity level.
+
+2. **TITE-CRM (Time-to-Event CRM)**:
+   - An adaptation of CRM that accounts for the time it takes for a DLT to occur, which is useful in trials where DLTs may not be immediately apparent.
+
+3. **BOIN (Bayesian Optimal Interval design)**:
+   - Aims to identify the maximum tolerated dose (MTD) with higher accuracy and fewer patients by defining optimal dose-escalation intervals based on Bayesian calculations.
+
+4. **BLRM (Bayesian Logistic Regression Model)**:
+   - Utilizes logistic regression to estimate the probability of toxicity, allowing for more complex dose-response relationships and the incorporation of patient covariates into the decision-making process.
+   - BLRM employs logistic regression to model the relationship between the probability of experiencing a dose-limiting toxicity (DLT) and different dose levels of a drug. This is typically expressed using a logistic function, which transforms a linear combination of predictors into a probability between 0 and 1.
+   - The typical logistic model used in BLRM is represented as \( \text{logit}(p_i) = \ln(\alpha) + \beta \ln(x_i/x_{\text{ref}}) \), where:
+     - \( p_i \) is the probability of toxicity at dose \( x_i \).
+     - \( x_{\text{ref}} \) is a reference dose, often the lowest or starting dose.
+     - \( \alpha \) and \( \beta \) are parameters to be estimated, capturing the intercept and the effect of changing the dose level, respectively.
+     
+5. **Dual Agent BLRM**:
+   - Similar to the single-agent BLRM but designed for use in trials involving two therapeutic agents, allowing for the modeling of joint toxicity probabilities.
+   
+## Decision Making
+
+**Early Phase Decision-Making Stages**
+
+![](./02_Plots/IA/AD_Dose4_Decision.png)
+
+1. **FTIM (First Time in Man)**
+   - **Focus**: Safety, Biomarker activity
+   - This initial stage involves administering the investigational drug to humans for the first time. The primary goals are to assess the drug's safety profile and to begin evaluating its pharmacokinetics and pharmacodynamics, often using biomarkers as early indicators of biological activity.
+
+2. **POM (Proof of Mechanism)**
+   - **Focus**: Safety, On-target activity
+   - At this stage, the focus is on confirming that the drug acts on the intended target within the body and elucidates the mechanism of action. This phase continues to monitor safety while starting to establish a connection between the drug mechanism and its potential therapeutic effects.
+
+3. **POC (Proof of Concept)**
+   - **Focus**: Safety, Efficacy, Phase 3 Translation
+   - Proof of Concept is a critical phase where the drug’s efficacy is tested, often in a small number of patients who have the disease or condition the drug is intended to treat. The main objectives are to establish that the drug works in the intended disease context and to continue evaluating safety. Successful POC studies provide a rationale for moving into larger, more definitive trials, and often involve preliminary discussions on how results could translate into Phase 3 studies.
+
+4. **P3ID (Phase 3 Investment Decision)**
+   - This stage is not a trial phase but rather a decision point based on data gathered from earlier phases. The decision to move forward to Phase 3 involves substantial investment, so this point focuses on evaluating all data to ensure the candidate has a high likelihood of success in larger, more costly Phase 3 trials. The evaluation includes further analysis of safety and efficacy data, along with regulatory considerations and market potential.
+
+**Decision Making Approaches**
+
+By employing adaptive designs, Bayesian methods, and biomarker-based endpoints, clinical trials can become more flexible and responsive to emerging data, potentially reducing development times and improving patient outcomes. These strategies also align well with modern regulatory frameworks that encourage innovation and efficiency in drug development.
+
+1. **Interim Decisions**:
+   - Interim decisions during trials are common and serve to evaluate the data partway through the study to make go/no-go decisions. This helps in optimizing resources and potentially stopping trials early for efficacy or safety reasons.
+
+2. **Single Indication**:
+   - Trials often focus on a single therapeutic indication to streamline the study and concentrate on a specific patient population. This approach helps in clear interpretation and strong alignment with regulatory expectations for particular disease areas.
+
+3. **Biomarker Endpoint**:
+   - Utilizing biomarkers as endpoints in clinical trials can provide early signals of a drug's effectiveness or safety. Biomarkers are measurable indicators of biological processes, pathogenic processes, or pharmacologic responses to a therapeutic intervention.
+
+4. **Sized to Exceed a Minimum Target Response**:
+   - Clinical trials are designed to have sufficient power to detect a clinically meaningful effect. This sizing ensures that the study can conclusively determine whether the investigational drug has the desired impact, exceeding a predetermined threshold of response.
+
+5. **Simon’s 2 Stage Design**:
+   - This is an adaptive trial design used primarily in phase II clinical trials to minimize patient exposure to potentially ineffective treatments. The design includes two stages:
+     - The first stage assesses initial efficacy (often stopping for futility if efficacy criteria are not met).
+     - If criteria are met, the trial proceeds to the second stage to further confirm efficacy.
+
+6. **Bayesian Interim Decisions**:
+   - Bayesian methods are increasingly common for making interim decisions in clinical trials. These methods use probabilities to make decisions, such as continuing or stopping a trial based on the probability that the treatment response exceeds a predefined threshold:
+     - **Go**: Continue if \( P(\text{Response} > p_0) > 80\% \)
+     - **Stop**: Discontinue if \( P(\text{Response} > p_0) < 10\% \)
+
+7. **Expansion to Pivotal for Accelerated Approval**:
+   - Early phase studies may be designed in a way that allows them to expand into pivotal trials if the interim data is promising. This strategy can accelerate the path to regulatory approval, especially under breakthrough therapy designations or accelerated approval pathways.
+
+8. **Determine Baseline Biomarker Cut-off Values**:
+   - Defining baseline biomarker cut-off values is critical for selecting the right patient population or for stratifying patients according to their predicted response to the treatment. This can optimize the therapeutic impact and improve the trial’s success rate.
+
+9. **Bayesian Learning about Biomarker Cut-off Points**:
+   - Bayesian statistics can be used to refine biomarker cut-off points based on accumulating data from the trial. This adaptive learning approach allows for more precise and individualized treatment decisions.
+
+10. **SCUBA and SBATT Methods**:
+    - These are advanced statistical methods employed in clinical trials.
+    - **SCUBA (Sequential Cohort Utility-Based Algorithm)**: A method that aims to optimize trial designs by evaluating the utility of adding new patient cohorts based on previous results.
+    - **SBATT (Sequential Bayesian Adaptive Therapeutic Trials)**: Uses Bayesian methods to adaptively manage trials based on interim data, optimizing trial outcomes and efficiency.
+
+
+**Decision Framework**
+
+![](./02_Plots/IA/AD_Dose5_Outcome1.png)
+
+![](./02_Plots/IA/AD_Dose5_Outcome2.PNG)
+
+![](./02_Plots/IA/AD_Dose5_Outcome3.PNG)
+
+
+
+# Dose Escalation 
+
+## Dose Ranging {-}
 
 The evolution of cancer treatment strategies and trial designs has undergone significant transformations since the 1960s and 1970s. Initially, the predominant treatment for cancer involved chemotherapeutics, guided by the principle that the largest feasible dose was likely the most effective. This notion shaped early clinical trial designs, which were primarily based on establishing the maximum tolerated dose (MTD) of a drug, assuming that the highest dose that a patient could tolerate without severe toxicity would also be the most effective for treating cancer.
 
@@ -77,7 +278,7 @@ Modern trial designs also consider the dynamics of how drugs affect the body ove
 
 Additionally, the patient population for these trials is often selected based on specific biomarkers, which can predict a more favorable response to certain therapies. This biomarker-driven selection is part of a broader strategy of personalized medicine, which tailors treatments based on individual patient characteristics, potentially improving outcomes and reducing unnecessary exposure to ineffective treatments.
 
-### Challenges in Targeted Oncology Drug Development {-}
+## Challenges in Targeted Oncology Drug Development {-}
 
 The challenges in contemporary oncology trials include:
 
@@ -113,7 +314,7 @@ To tackle these complexities, adaptive trial designs are increasingly used. Thes
 knitr::include_graphics("./02_Plots/DOSE_ExampleP12.png")
 ```
  
-### Issues associated with the 3+3 design {-}
+## Issues associated with the 3+3 design {-}
 
 3+3 design, a traditional method used in the dose-escalation phase of clinical oncology trials. This design has historically been a cornerstone in determining the maximum tolerated dose (MTD) but has encountered significant criticism for various limitations.  
 
@@ -150,7 +351,7 @@ knitr::include_graphics("./02_Plots/DOSE_Escalation Methods Comp.png")
 - **Basket Trials and Multi-Indication Studies**: Modern trial designs, like basket trials, allow the testing of a drug across multiple indications simultaneously. This is particularly useful for targeted therapies where the drug may be effective across different cancers with the same genetic mutations. This approach helps in identifying the most promising application to accelerate into further development.
 - **Adaptive Designs**: These designs allow for modifications based on interim data. This flexibility can lead to more efficient trials by accommodating changes in trial protocols in response to early results, which is crucial in rapidly evolving fields like oncology.
 
-### Regulatory and Methodological Innovations {-}
+## Regulatory and Methodological Innovations {-}
 
 - **FDA Guidance on Dose Optimization**: Recent FDA draft guidance and other materials focus on optimizing dosing strategies before large-scale trial phases. This includes recommendations for randomizing between doses to better establish efficacy and safety profiles without the constraints of traditional dose escalation methods.
 
@@ -166,9 +367,9 @@ knitr::include_graphics("./02_Plots/DOSE_Example Combination.png")
 
 
  
-## Dose Optimization Design 
+# Dose Optimization Design 
 
-### Project Optimus Guidance (FDA) {-}
+## Project Optimus Guidance (FDA) {-}
 
 [Optimizing the Dosage of Human Prescription Drugs and Biological Products for the Treatment of Oncologic Diseases](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/optimizing-dosage-human-prescription-drugs-and-biological-products-treatment-oncologic-diseases)
 
@@ -191,34 +392,34 @@ The Guidance is designed to enhance the clinical trial process by focusing on op
 
 
 
-### Dose Comparison Study Design {-}
+## Dose Comparison Study Design {-}
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
 knitr::include_graphics("./02_Plots/DOSE_Comparison Study.png")
 ```
 
-#### Objectives {-}
+### Objectives {-}
 
 - **Safety, Toxicity, PK, PD, PGenomics**: The primary objectives of a dose comparison study are to evaluate the safety profile of the drug, understand its toxicity levels, and assess its pharmacokinetics (PK) and pharmacodynamics (PD). Pharmacogenomics (PGenomics) may also be included to understand how genetic variations influence drug responses and adverse effects across different patient groups.
 
-#### Design {-}
+### Design {-}
 
 - **Randomized, Parallel, Dose Response Trial**: The study design is typically randomized and parallel, meaning each participant is randomly assigned to a treatment group, and multiple groups are treated simultaneously with different doses. This design helps to minimize bias and allows for direct comparison of the responses to each dose.
 - **Two or More Doses**: Multiple dosing levels are tested to identify the dose-response relationship, determining the optimal therapeutic dose that balances efficacy and safety.
 - **Adaptive Design is Recommended**: An adaptive design is suggested because it allows the study to be modified based on interim results. For example, doses may be adjusted, or dosing groups may be added or removed based on early safety and efficacy data. This flexibility can lead to more efficient trials that are better tailored to finding the most appropriate dosage.
 
-#### Sample Size {-}
+### Sample Size {-}
 
 - **Sized for Sufficient Assessment of Activity, Safety, and Toxicity**: The trial should have enough participants to reliably assess the drug's effects and safety at each dose level.
 - **Not Sized to Statistically Compare Between Dose Groups**: While the study aims to collect data on multiple doses, it is typically not powered enough to provide definitive statistical comparisons between doses. The primary goal is to rule out suboptimal doses rather than to provide a detailed comparison of all dosages.
 - **In Practice, 20-30 Subjects Per Dose Group**: This number of participants is generally considered sufficient to observe the drug’s effects while managing resource allocation efficiently.
 
-#### Decision Making {-}
+### Decision Making {-}
 
 - **Safety**: Safety assessments are paramount, ensuring that the drug does not produce intolerable or dangerous side effects.
 - **Bayesian Probability Response Rate > Target Levels**: Decision-making often incorporates Bayesian statistics, where prior knowledge and current trial results are combined to update the probability of a dose being optimal. Decisions are made based on whether the probability that a dose achieves a target response rate exceeds a pre-specified threshold, which allows for more dynamic and informed decision-making during the trial.
 
-#### Example Dose Escalation + Dose Comparison {-}
+### Example Dose Escalation + Dose Comparison {-}
 
 ```{r , echo=FALSE, fig.align="center", out.width = '75%'} 
 knitr::include_graphics("./02_Plots/DOSE_Example Escalation Comparison.png")
@@ -230,9 +431,9 @@ knitr::include_graphics("./02_Plots/DOSE_Example Escalation Comparison.png")
 - **Interim and Final Analysis**: The process culminates in interim and final analyses where efficacy biomarkers and other outcomes are assessed to determine the optimal therapeutic dose.
 
 
-## Modelling and Simulation
+# Modelling and Simulation
 
-### Traditional vs. Targeted Therapies in Oncology {-}
+## Traditional vs. Targeted Therapies in Oncology {-}
 
 Shift in paradigms for dose determination in oncology from the traditional Maximum Tolerated Dose (MTD) to the Minimally Active Dose (MAD) in the context of targeted immuno-oncology agents.
 
@@ -270,7 +471,7 @@ knitr::include_graphics("./02_Plots/DOSE_MTD MAD Example.png")
 ```
 
 
-### Improve ImmunoOncology Drug Development {-}
+## Improve ImmunoOncology Drug Development {-}
 
 1. **Use of Informative Biomarkers During Dose Escalation to Confirm Target Engagement**:
    - **Purpose**: To ensure that the drug engages effectively with its intended target in the body. Biomarkers are biological molecules found in blood, other body fluids, or tissues that are a sign of a normal or abnormal process, or of a condition or disease. They are used here to verify that the drug is interacting with its target, which is crucial for its intended therapeutic effect.
@@ -291,7 +492,7 @@ knitr::include_graphics("./02_Plots/DOSE_MTD MAD Example.png")
    - **Choosing Distinct Doses**: It’s important to select doses that are sufficiently distinct to clearly delineate their effects, avoiding minimal differences like choosing doses of 100 and 110, which would not provide clear comparative data.
    - **Trial Advancement**: Insights gained from early phase trials using these methods can seamlessly feed into later-stage studies, including randomized trials and phase 2 studies with interim analyses.
 
-### Exposure-Response Modeling {-}
+## Exposure-Response Modeling {-}
 
 **Exposure-Response Modeling in Clinical Development**
 
@@ -332,7 +533,7 @@ knitr::include_graphics("./02_Plots/DOSE_Finding.png")
 - **Modeling and simulation** play a crucial role across all phases, providing a robust framework for decision-making based on quantitative data.
 - These techniques help in predicting outcomes, optimizing trial design, and ultimately ensuring that the drug development process is both efficient and tailored to produce the best therapeutic outcomes.
 
-### Advantages of performing a dose-finding trial after the dose escalation study {-}
+## Advantages of performing a dose-finding trial after the dose escalation study {-}
 
 - **Comprehensive Assessment**: Beyond merely establishing safety and tolerability, this approach integrates the evaluation of how well the drug engages its target and the corresponding biomarker responses. This holistic assessment helps in making a scientifically grounded decision about the optimal therapeutic dose that should be carried forward into further clinical trials.
 
@@ -353,9 +554,9 @@ Overall, incorporating a dose-finding trial after initial dose escalation is cru
 > Recent regulatory changes emphasize the need for informative PD biomarkers in trial designs. These changes are expected to play a significant role in future clinical trial setups and drug development strategies.
 
 
-## Data for Exposure Response
+# Data for Exposure Response
 
-### Challenges in Pharmacokinetics Sampling in Oncology Trials {-}
+## Challenges in Pharmacokinetics Sampling in Oncology Trials {-}
 
 1. **Typical Phase 1 Sampling Limitations**:
    - **Outpatient Basis**: Many Phase 1 trials are conducted on an outpatient basis, which limits the availability of participants for frequent sampling necessary for PK studies.
@@ -372,7 +573,7 @@ Overall, incorporating a dose-finding trial after initial dose escalation is cru
    - **Common Delays**: There are often delays in the analysis of collected samples, which can affect the timeliness and potentially the reliability of pharmacokinetic data due to degradation or changes in the sample integrity over time.
    
    
-### Sampling Strategies {-}
+## Sampling Strategies {-}
 
 1. **Adaptive Sampling Protocol**:
    - The PK section of the clinical protocol should be designed flexibly to allow changes in the sampling schedule based on emerging data. This adaptability helps to refine the sampling strategy as more is learned about the drug's behavior in real time.
@@ -392,6 +593,7 @@ Overall, incorporating a dose-finding trial after initial dose escalation is cru
 6. **Cost-Effectiveness of Real-Time Analysis**:
    - While costly, real-time sample analysis provides valuable data that can significantly influence decision-making processes during the clinical trial, potentially leading to more effective dosing strategies and outcomes.
   
-## Source
+# Source
 
-Project Optimus, Dose Escalation and Stratification Designs in Early Oncology Development
+* Project Optimus, Dose Escalation and Stratification Designs in Early Oncology Development
+* (FDA’s Project Optimus: Redefining Oncology Drug Dosage for Better Patient Outcomes)[https://www.cytel.com/perspectives/fdas-project-optimus-redefining-oncology-drug-dosage-for-better-patient-outcomes/]
