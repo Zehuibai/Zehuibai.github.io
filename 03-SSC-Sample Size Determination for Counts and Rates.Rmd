@@ -1,0 +1,479 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Sample Size and Power for Counts and Rates
+output:
+  html_document:
+    df_print: paged
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                    1. load the required packages                       -->
+# <!-- ---------------------------------------------------------------------- --> 
+
+## if(!require(psych)){install.packages("psych")}
+packages<-c("tidyverse",  
+            "kableExtra")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+
+## get the wd path
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+```
+ 
+
+# Introduction to Counts & Rates
+
+## Incidence Rate and Counts
+
+In clinical trials and observational studies, endpoints involving **repeated or recurrent events** are commonly encountered. Two main approaches to characterize such endpoints are through **Incidence Rates** and **Counts**.
+ 
+---
+
+**Incidence Rate** is a measure of the frequency with which a particular event—typically a medical condition or health-related episode—occurs over a specified unit of time. This metric is particularly useful when the **time at risk** varies among individuals.
+
+- **Definition**: Number of events per unit time (e.g., per month, per year).
+- **Example Applications**:
+  - Frequency of **COPD exacerbations** (Chronic Obstructive Pulmonary Disease).
+  - **Hospital readmissions** within a year.
+
+These rates incorporate a time component, making them useful when follow-up times differ across subjects or when events are ongoing over time.
+
+---
+
+**Counts**
+
+**Counts** represent the total number of occurrences of an outcome within a defined **unit of observation**, but without necessarily incorporating time as a component.
+
+- **Definition**: Number of times an event happens per unit (not necessarily time).
+- **Example Applications**:
+  - Number of **MRI scans** per subject in multiple sclerosis trials.
+  - Number of **lesions** or affected areas in a single diagnostic scan.
+
+Counts are appropriate when the observation period is fixed or uniform across individuals, or when the interest lies in a static count rather than a time-based rate.
+ 
+
+---
+
+**Relationship Between Counts and Rates**
+
+While **rates** and **counts** differ in their inclusion of time as a denominator, **both aim to measure the frequency or burden of repeated events**. In practice, **counts can be treated as rates** by setting the time unit \( t = 1 \), making the rate interpretation mathematically equivalent to a count per unit.
+
+> **Conceptually**:  
+> - Rates = events per unit time  
+> - Counts = events per unit X (e.g., per patient, per scan)  
+>  
+> **Practically**: Analyzed similarly when time is constant or not a focus.
+
+
+
+## Modeling Strategies for Analysis
+
+There are **multiple modeling strategies** available for analyzing rate and count data. These fall into **two main categories**:
+
+1. **Rate Models**
+
+These models explicitly account for the time at risk and the number of events per unit time.
+
+- Examples:
+  - **Poisson regression**
+  - **Negative binomial regression** (accounts for overdispersion)
+  - **Andersen-Gill models**
+
+2. **Survival-based Models**
+
+These models focus on **time-to-event** data, including **gap times** between events or cumulative hazard.
+
+- Examples:
+  - **Recurrent event survival models**
+  - **Time to nth event (TT(S)E)** frameworks
+
+These models offer flexibility to estimate different **effect sizes**, such as:
+- Event rate
+- Time between events (gap times)
+- Cumulative number of events over time
+
+---
+
+**Common Misuses in Practice**
+
+Despite the availability of appropriate methods, **recurrent event data is often misanalyzed using models not designed for such structure**, leading to loss of information and reduced efficiency.
+
+- **Typical (but suboptimal) approaches**:
+  - Using only the **first event** per subject (Cox proportional hazards model).
+  - Collapsing the outcome into a **binary endpoint** (e.g., logistic regression).
+  - Ignoring repeated measures entirely (e.g., simple t-tests).
+
+These approaches effectively **discard valuable information** on additional events, underutilizing the full potential of the data.
+
+---
+
+**Scope of Current Focus**
+
+In this context, the analysis is restricted to **independent events** and assumes **no informative censoring** (i.e., dropouts or event loss not related to prognosis).
+
+- This avoids complexities introduced by within-subject dependence or censoring mechanisms.
+- **Composite endpoints** and **within-subject correlation modeling** (e.g., frailty models or random effects) are acknowledged as critical areas under active statistical research but are beyond the current focus.
+
+
+## Statistical Methods for Counts & Rates
+
+
+| **Method**                                | **Model Type**     | **Key Features**                                                                 | **Assumptions / Notes**                                                                                 | **Use Case**                                                                                   |
+|-------------------------------------------|--------------------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| **Poisson Model**                         | Rate Model         | Mean = Variance; can be extended for overdispersion and zero inflation           | Assumes events occur independently and uniformly over time                                               | Basic count data with equal mean-variance; uniform event risk                                 |
+| **Negative Binomial (NB) Regression**     | Rate Model         | Adds Gamma-distributed random effect per subject (dispersion parameter)          | Handles overdispersion; allows for subject-specific event variability                                    | Overdispersed count data or when individuals have varying risk                                |
+| **Andersen-Gill (AG) Model**              | Survival Model     | Extends Cox model for recurrent events using counting process formulation         | Assumes independent increments; resets risk interval after each event                                    | Recurrent events with time-varying covariates and no memory                                   |
+| **Prentice, Williams, Peterson (PWP)**    | Survival Model     | Models **gap times** between events; stratified by event order                   | Accounts for correlated events and differing baseline hazard per event number                            | Dependent events, gap-time modeling, and different risk for 1st, 2nd, ... events              |
+| **Wei, Lin, Weissfeld (WLW)**             | Survival Model     | Marginal models for each event; cumulative effect estimation                     | Assumes independent risk processes across events, which may not hold in practice                         | Exploratory analysis with multiple event types or marginal modeling                           |
+| **Frailty Models**                        | Survival Model     | Adds random effect (frailty) to account for unobserved heterogeneity             | Assumes subject-level shared frailty affecting all event hazards                                         | When some patients are more susceptible to repeated events                                    |
+| **Multi-State Models**                    | Survival Model     | Tracks transitions across states (e.g., Healthy → Ill → Recovered)               | Requires well-defined states and transition pathways                                                     | Disease progression or event history modeling                                                  |
+| **GT-UR, TT-R**                           | Survival Model     | General transition/time-to-recurrence models                                     | Complex parametric survival modeling of transitions and recurrence                                       | Advanced analysis of structured recurrent processes                                           |
+| **Mean Cumulative Function (MCF)**        | Non-parametric     | Estimates E[# Events] over time without strong model assumptions                 | Does not adjust for covariates; primarily used for descriptive summaries                                 | Visualizing burden of events over time; comparing treatment groups descriptively              |
+
+
+---
+
+**1. Poisson Models**
+
+- **Key Idea**: Assumes the number of events follows a Poisson distribution.
+- **Assumption**: Mean = Variance (equidispersion).
+- **Extensions**:
+  - Handles **overdispersion** (variance > mean) via quasi-Poisson or Negative Binomial extensions.
+  - Can also be extended to **zero-inflated** models when there are excessive zeros (no events).
+- **Use Case**: Basic count data with homogeneous event risk across individuals.
+
+---
+
+ **2. Negative Binomial (NB) Regression**
+
+- **Key Idea**: Generalizes Poisson by adding a **random effect** to account for overdispersion.
+- **Mechanism**:
+  - Assumes the Poisson rate for each subject is drawn from a **Gamma distribution**.
+  - The **dispersion parameter** captures variability between subjects.
+- **Use Case**: Repeated event data with heterogeneous risk profiles across subjects.
+- **Advantage**: Accommodates extra-Poisson variation, common in real-world studies.
+
+---
+
+**3. Andersen-Gill Model**
+
+- **Key Idea**: Extension of the **Cox proportional hazards model** for recurrent events.
+- **Data Structure**: Each event is treated as a new risk interval (count process approach).
+- **Assumptions**:
+  - Time is reset to the beginning of study for each event.
+  - Independent increments (next event hazard is independent of prior event history).
+- **Use Case**: Analyzing recurrent events using **time-to-event** methodology.
+- **Note**: Shares data structure with Poisson/NB (long format).
+
+---
+
+**4. Prentice, Williams, Peterson (PWP) Model**
+
+- **Key Idea**: Focuses on the **gap time** (time since last event) for each k-th event.
+- **Stratification**: Stratifies the model by event order.
+- **Strengths**:
+  - Accounts for within-subject **correlation** and **event dependence**.
+  - Baseline hazard allowed to differ by event order (e.g., different risk for first vs. second hospitalization).
+- **Use Case**: Appropriate when **timing between events** and **prior event history** are important.
+
+---
+
+
+**5. Wei, Lin and Weissfeld (WLW) Model**
+
+- **Key Idea**: Models each k-th event **marginally** as if it were independent.
+- **Approach**:
+  - Multiple time-to-event models for each event.
+  - Allows **multiple event types** and cumulative event modeling.
+- **Limitation**: May **violate independence assumptions** in recurrent settings.
+- **Use Case**: Simplified analysis of **multiple failure times** per subject.
+
+---
+
+**6. Other Survival-Based Models**
+
+These encompass a range of models built for more complex recurrent event processes:
+
+- **Frailty Models**: Include random effects (frailty) to account for **subject-specific heterogeneity**.
+- **Multi-State Models**: Model **transitions** between different states (e.g., healthy → sick → hospitalized).
+- **GT-UR / TT-R**: General transition or **time to recurrence** frameworks.
+- **Use Case**: Complex longitudinal event histories, particularly when **state-dependence** or **recovery periods** exist.
+
+---
+
+**7. Mean Cumulative Function (MCF)**
+
+- **Key Idea**: A **non-parametric estimator** for the **expected number of cumulative events** over time.
+- **Interpretation**: Provides an intuitive picture of the burden of disease/events.
+- **Use Case**:
+  - Visualizing or summarizing the mean number of events over time.
+  - Especially useful in **descriptive analyses** before choosing a formal model.
+  
+# Sample Size Determination 
+
+## Introduction
+
+**Sample Size Determination for Counts and Rates**
+
+Sample size calculation for analyses involving rates and counts has historically been a limiting factor for widespread adoption of more advanced models in clinical trials. While traditional methods for simpler endpoints (like proportions or means) are well established, the development of robust SSD methods for repeated events data—especially under more realistic assumptions—has only gained traction in recent years.
+
+
+**Challenges and Concepts**
+
+1. **Lack of Established Methods Historically**
+   - Early clinical trials often relied on simpler models (e.g., binary outcomes or time to first event).
+   - There was a **scarcity of reliable sample size formulas** for recurrent event analyses, which discouraged their use despite being statistically more powerful.
+
+2. **What Constitutes “Sample Size” for Counts/Rates?**
+   - Unlike binary outcomes, where “N” usually refers to the number of subjects, for rates/counts, the effective sample size is defined differently:
+     - Either **total follow-up time** across all subjects (e.g., measured in person-years)
+     - Or **total number of expected events**
+   - Hence, sample size estimation depends not just on the number of subjects, but also on:
+     - The **duration of follow-up per subject**
+     - The **expected event rate per unit time**
+
+3. **Recent Developments**
+   - There has been a notable increase in research and methodological development to handle:
+     - **Complex designs** (e.g., dose-finding, crossover trials, >2 arms)
+     - **More flexible models**, such as Negative Binomial and Andersen-Gill models
+     - **Adaptive designs** that adjust based on interim analyses or information
+
+
+## Evolution of SSD Methods
+
+**1. Early Methods (1990s)**
+
+- **Lehr (1992)**:
+  - Developed a basic sample size formula for comparing two Poisson rates using normal approximations.
+  - The formula:  
+    \[
+    n_{\text{group}} = \frac{4}{(\sqrt{\lambda_1} - \sqrt{\lambda_2})^2}
+    \]
+  - This assumes equal follow-up time, equal variance, and Poisson-distributed counts.
+
+- **Signorini (1991)**:
+  - Extended SSD for **Poisson regression**, allowing inclusion of covariates.
+
+**2. Mid-Stage Developments (2010s)**
+
+- **Zhu & Lakkis (2014)**:
+  - Proposed SSD formulas for **Negative Binomial regression**, addressing overdispersion and allowing for unequal rates and variances.
+  - Their formula involves estimating log rate ratios and accounts for power, type I error, and dispersion.
+    \[
+    n_0 \geq \left( \frac{z_{1-\alpha/2}\sqrt{V_0} + z_{1-\beta}\sqrt{V_1}}{\log(r_1/r_0)} \right)^2
+    \]
+  - These developments made it more practical to plan trials involving overdispersed count data.
+
+**3. Modern Methods (Tang, 2015+)**
+
+- **Y. Tang’s framework** represents the current frontier of SSD for recurrent event data:
+  - Accounts for **unequal follow-up and accrual patterns**
+  - Handles **heterogeneous dispersion** across treatment groups
+  - Adjusts for **dropouts**, **missing data**, and **adaptive designs**
+  - Offers **closed-form approximations** and simulation-based methods for:
+    - **Group sequential designs**
+    - **MCP-Mod** (Multiple Comparison Procedures – Modeling)
+  - These methods are particularly important for modern drug development, where:
+    - Event rates are uncertain
+    - Variability between patients is high
+    - Trial designs are more flexible or adaptive
+
+---
+
+**Practical Considerations in SSD for Counts & Rates**
+
+- **Assumptions Must Be Clear**:
+  - SSD depends heavily on assumptions about:
+    - Event rate per group
+    - Variability or dispersion (if overdispersed)
+    - Follow-up length and dropout rates
+  - Sensitivity analyses are recommended to account for uncertainty.
+
+- **More Sophisticated SSD = Better Power and Efficiency**:
+  - Using accurate SSD methods for rates (rather than collapsing to binary or time-to-first-event endpoints) improves trial **power** and **data utilization**.
+  - However, these methods often require more detailed planning, collaboration between statisticians and clinicians, and computational resources.
+
+## Example
+
+
+### Example 1: COPD Exacerbation Trial
+
+This is a published trial comparing **fluticasone furoate + vilanterol** to **vilanterol alone** for the prevention of **COPD exacerbations**.
+
+- Patients with COPD frequently experience **recurrent exacerbations**.
+- The goal of the trial was to determine whether a **combination treatment** could reduce the rate of exacerbations compared to monotherapy.
+- The analysis focuses on **count data** over a **fixed follow-up period** (1 year), making **rate modeling** with **overdispersion** appropriate.
+
+**Design Assumptions and Statistical Parameters**
+
+| **Parameter**                          | **Value**                |
+|----------------------------------------|---------------------------|
+| Significance Level (Two-Sided)         | 0.05                      |
+| Control Incidence Rate (per year)      | 1.4 events per subject    |
+| Rate Ratio (Treatment vs. Control)     | 0.75                      |
+| Exposure Time                          | 1 year                    |
+| Dispersion Parameter                   | 0.7                       |
+| Power                                  | 90%                       |
+| **Sample Size per Group**              | **390 subjects**          |
+
+**Interpretation of Assumptions**
+
+- **Control Rate = 1.4**: On average, patients in the control group are expected to have 1.4 exacerbations per year.
+- **Rate Ratio = 0.75**: The treatment group is expected to reduce exacerbation frequency by **25%** relative to the control.
+- **Dispersion Parameter = 0.7**: Accounts for **overdispersion**, i.e., variability in exacerbation counts that exceeds the Poisson assumption (where variance equals the mean).
+- **Power = 90%**: The study is designed to have a 90% chance of detecting the treatment effect, assuming it exists.
+- **α = 0.05**: A standard two-sided test with a 5% probability of Type I error.
+
+**Sample Size Calculation**
+
+The formula for Negative Binomial sample size—such as those proposed by Zhu & Lakkis (2014) or Tang (2015)—takes into account:
+
+- Baseline incidence rate (λ₀)
+- Relative rate or rate ratio (RR)
+- Follow-up duration
+- Overdispersion (ϕ)
+- Desired power and significance level
+
+Using these inputs, the researchers calculated that **390 subjects per group** would be sufficient to detect the expected treatment effect under these conditions.
+
+
+
+# Group Sequential Design for Counts & Rates
+
+**Group Sequential Design (GSD) Considerations for Counts and Rates**
+
+Group Sequential Designs (GSDs) allow for **interim analyses** during a clinical trial, enabling early stopping for efficacy, futility, or safety. While GSDs are well-established for simple endpoints like means or proportions, applying them to **rates and counts**, particularly for recurrent event models (e.g., Poisson or Negative Binomial), presents new challenges and recent developments.
+
+**Recent Developments in GSD for Poisson and Negative Binomial Models**
+
+GSD methods have only recently been tailored for recurrent event models:
+
+- **Poisson**: Standard tools are available using **normal approximations**. These allow straightforward GSD implementation based on approximated distributions of test statistics.
+- **Negative Binomial (NB)**: More complex, because:
+  - There is **no closed-form expression** for the test statistic’s distribution.
+  - Maximum likelihood estimation (MLE) for the NB model depends on:
+    - **Per-subject follow-up time**
+    - **Estimated event rates**
+    - **Estimated dispersion (overdispersion parameter)**
+
+As a result, estimating the "maximum information" (a measure of total statistical information needed to make a final decision) is **much harder** in the NB case.
+
+---
+
+**Interim Analysis Timing: A Key Open Question**
+
+The **timing of interim analyses** is critical in any GSD framework and is particularly complex in recurrent event trials:
+
+- **For Poisson Models**:
+  - Interim looks can be scheduled based on:
+    - A fixed **percentage of total planned follow-up time**, or
+    - A fixed **percentage of accrued total events** (event-driven design)
+  - These timings are relatively predictable because the Poisson process is memoryless and has constant rates.
+
+- **For Negative Binomial Models**:
+  - Much more **data-dependent** because of overdispersion.
+  - Interim timing must account for:
+    - The total **interim follow-up duration**
+    - **Estimated event rates**
+    - **Estimated dispersion**
+  - This makes precise scheduling difficult; one can only **approximate the timing** before the trial begins.
+  - This uncertainty poses challenges for Independent Data Monitoring Committees (IDMCs) who rely on timely and valid interim results.
+
+
+
+# Reference
+
+## Counts & Rates Analysis
+
+Fleiss, J.L., Levin, B. and Paik, M.C., 2013. Statistical methods for rates and proportions. John Wiley & Sons.
+
+McCullagh, P. and Nelder, J.A., 1989. Generalized linear models. Chapman and Hall. London, UK.
+
+Hilbe, J.M., 2014. Modeling count data. Cambridge University Press.
+
+Cook, R.J. and Lawless, J.F., 2007. The statistical analysis of recurrent events. New York: Springer.
+
+Cameron, A.C. and Trivedi, P.K., 2013. Regression analysis of count data. Cambridge University Press.
+
+Rogers J, The Analysis of Recurrent Events: A Summary of Methodology, Presentation to Statisticians in the 
+Pharmaceutical Industry. URL: https://www.psiweb.org/docs/default-source/resources/psi-subgroups/scientific/2016/time-to-event-and-recurrent-event-endpoints/jrogers.pdf
+
+Rogers, J.K., Pocock, S.J., McMurray, J.J., Granger, C.B., Michelson, E.L., Östergren, J., Pfeffer, M.A., Solomon, S.D., 
+
+Swedberg, K. and Yusuf, S., 2014. Analysing recurrent hospitalizations in heart failure: a review of statistical methodology, with application to CHARM‐Preserved. European journal of heart failure, 16(1), pp.33-40.
+
+Yadav, C.P., Sreenivas, V., Khan, M.A. and Pandey, R.M., 2018. An overview of statistical models for recurrent events analysis: a review. Epidemiology (Sunnyvale), 8(4), p.354.
+
+Andersen, P.K. and Gill, R.D., 1982. Cox's regression model for counting processes: a large sample study. The annals of statistics, pp.1100-1120.
+
+Wei, L.J., Lin, D.Y. and Weissfeld, L., 1989. Regression analysis of multivariate incomplete failure time data by modeling marginal distributions. Journal of the American statistical association, 84(408), pp.1065-1073.
+
+Prentice, R.L., Williams, B.J. and Peterson, A.V., 1981. On the regression analysis of multivariate failure time data. Biometrika, 68(2), pp.373-379.
+
+Andersen, P.K. and Keiding, N., 2002. Multi-state models for event history analysis. Statistical methods in medical research, 11(2), pp.91-115.
+
+Liu, L., Wolfe, R.A. and Huang, X., 2004. Shared frailty models for recurrent events and a terminal event. Biometrics, 60(3), pp.747-756.
+
+Box‐Steffensmeier, J.M. and De Boef, S., 2006. Repeated events survival models: the conditional frailty model. Statistics in medicine, 25(20), pp.3518-3533.
+
+Rogers, J.K., Yaroshinsky, A., Pocock, S.J., Stokar, D. and Pogoda, J., 2016. Analysis of recurrent events with an associated informative dropout time: application of the joint frailty model. Statistics in medicine, 35(13), pp.2195-2205.
+
+Jahn-Eimermacher, A., 2008. Comparison of the Andersen–Gill model with Poisson and negative binomial regression on recurrent event data. Computational Statistics & Data Analysis, 52(11), pp.4989-4997.
+
+Keene, O.N., Jones, M.R., Lane, P.W. and Anderson, J., 2007. Analysis of exacerbation rates in asthma and chronic obstructive pulmonary disease: example from the TRISTAN study. Pharmaceutical Statistics: The Journal of Applied Statistics in the Pharmaceutical Industry, 6(2), pp.89-97.
+
+Keene, O.N., Calverley, P.M.A., Jones, P.W., Vestbo, J. and Anderson, J.A., 2008. Statistical analysis of exacerbation rates in COPD: TRISTAN and ISOLDE revisited. European Respiratory Journal, 32(1), pp.17-24.
+
+Sormani, M.P., Bruzzi, P., Miller, D.H., Gasperini, C., Barkhof, F. and Filippi, M., 1999. Modelling MRI enhancing lesion counts in multiple sclerosis using a negative binomial model: implications for clinical trials. Journal of the neurological sciences, 163(1), pp.74-80.
+
+
+## SSD for Counts & Rates
+
+Lehr, R.,1 992. Sixteen S‐squared over D‐squared: A relation for crude sample size estimates. Statistics in medicine, 11(8), 1099-1102.
+
+Signorini, D.F., 1991. Sample size for Poisson regression. Biometrika, 78(2), pp.446-450.
+
+Shieh, G., 2001. Sample size calculations for logistic and Poisson regression models. Biometrika, 88(4), pp.1193-1199.
+
+Gu, K., Ng, H. K. T., Tang, M. L., & Schucany, W. R., 2008. Testing the ratio of two poisson rates. Biometrical Journal, 50(2), 283-298.
+
+Guenther, W.C., 1977. Sampling Inspection in statistical quality control. Macmillan.
+
+Zhu, H., & Lakkis, H., 2014. Sample size calculation for comparing two negative binomial rates. Statistics in medicine, 33(3), 376-387.
+
+Zhu, H., 2017. Sample size calculation for comparing two poisson or negative binomial rates in noninferiority or equivalence trials. Statistics in Biopharmaceutical Research, 9(1), 107-115.
+
+Tang, Y., 2015. Sample size estimation for negative binomial regression comparing rates of recurrent events with unequal follow-up time. Journal of biopharmaceutical statistics, 25(5), 1100-1113.
+
+Tang, Y., 2017. Sample size for comparing negative binomial rates in noninferiority and equivalence trials with unequal follow-up times. Journal of biopharmaceutical statistics, 1-17
+
+Tang, Y. and Fitzpatrick, R., 2019. Sample size calculation for the Andersen‐Gill model comparing rates of recurrent events. Statistics in Medicine, 38(24), pp.4819-4827.
+
+Zhu, L., Li, Y., Tang, Y., Shen, L., Onar‐Thomas, A. and Sun, J., 2022. Sample size calculation for recurrent event data with additive rates models. Pharmaceutical Statistics, 21(1), pp.89-102.
+
+Lui, K.J., 2016. Crossover designs: testing, estimation, and sample size. John Wiley & Sons.
+
+Mai, Y. and Zhang, Z., 2016, July. Statistical power analysis for comparing means with binary or count data based on analogous ANOVA. In The Annual Meeting of the Psychometric Society (pp. 381-393). Springer, Cham.
+
+Dransfield, M. T., et. al. (2013). Once-daily inhaled fluticasone furoate and vilanterol versus vilanterol only for prevention of exacerbations of COPD: two replicate double-blind, parallel-group, randomised controlled trials. The lancet Respiratory medicine, 1(3), 210-223.
+

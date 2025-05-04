@@ -273,32 +273,143 @@ The predictive distribution in Bayesian inference uses the posterior distributio
 - **Simplicity of Construction**:
   - Determining the best credible interval in Bayesian terms is typically simpler than constructing classical confidence intervals because it directly targets the areas of highest probability density without regard to potential sampling variability.
   
+ 
+
+
+
 
 ## Hypothesis Testing
 
+### Bayesian Theorem for Two Hypotheses {-}
+
+In Bayesian inference, we often deal with two **mutually exclusive and exhaustive hypotheses**:
+
+* $H_0$: the null hypothesis (e.g. "the person has HIV")
+* $H_1$: the alternative hypothesis (e.g. "the person does not have HIV")
+
+Let:
+
+* $p(H_0)$ and $p(H_1)$ be the **prior probabilities** (our beliefs before seeing the data)
+* $p(y \mid H_0)$ and $p(y \mid H_1)$ be the **likelihoods**, i.e., the probability of observing the data $y$ assuming each hypothesis is true
+
+Bayes’ Theorem allows us to update our beliefs after observing data $y$. The **posterior probability** for $H_0$ is:
+
+$$
+p(H_0 \mid y) = \frac{p(y \mid H_0) \cdot p(H_0)}{p(y)}
+$$
+
+Where the denominator $p(y)$ is the **marginal likelihood** or **evidence**:
+
+$$
+p(y) = p(y \mid H_0) \cdot p(H_0) + p(y \mid H_1) \cdot p(H_1)
+$$
+
+Since $H_1 = \text{not } H_0$, we also have $p(H_1) = 1 - p(H_0)$.
+ 
+Bayes’ Theorem can also be written in terms of **odds**:
+
+$$
+\frac{p(H_0 \mid y)}{p(H_1 \mid y)} = \frac{p(y \mid H_0)}{p(y \mid H_1)} \cdot \frac{p(H_0)}{p(H_1)}
+$$
+
+In this expression:
+
+* $\frac{p(H_0)}{p(H_1)}$ is the **prior odds**
+* $\frac{p(y \mid H_0)}{p(y \mid H_1)}$ is the **likelihood ratio**
+* $\frac{p(H_0 \mid y)}{p(H_1 \mid y)}$ is the **posterior odds**
+
+This version shows that:
+
+$$
+\text{Posterior odds} = \text{Likelihood ratio} \times \text{Prior odds}
+$$
+
+Taking the logarithm of both sides:
+
+$$
+\log(\text{Posterior odds}) = \log(\text{Likelihood ratio}) + \log(\text{Prior odds})
+$$
+
+The term $\log(\text{Likelihood ratio})$ is known as the **weight of evidence**, a concept first introduced by **Alan Turing** during World War II in his work on decoding the Enigma machine.
+  
+![](./02_Plots/Bayesian/Bayer_Relationship likelihood ratio.png)
+A typical graph of Bayes’ Theorem under different **likelihood ratios** illustrates how prior and posterior probabilities relate:
+
+* **X-axis**: Prior probability $p(H_0)$ — your belief in the hypothesis before seeing data
+* **Y-axis**: Posterior probability $p(H_0 \mid y)$ — your updated belief after observing data
+
+Each curve represents a different likelihood ratio (e.g., 1, 5, 10, 20, 50).
+
+**Interpretation examples**:
+
+* If your prior probability is **0.01** (a very low initial belief), then **even a strong likelihood ratio (e.g., 50)** may only raise the posterior probability to around **0.33**
+* But if your prior is **0.5** and the likelihood ratio is **20**, the posterior probability can increase to **around 0.95**
+ 
+
+> **The result of Bayesian inference depends not only on the strength of the evidence (likelihood ratio) but also heavily on the initial belief (prior probability).**
+
+In particular:
+
+* With a **low prior**, even strong evidence may not produce high posterior belief
+* With a **moderate or high prior**, strong evidence can sharply raise your confidence
+
+### Bayes Factors (Likelihood Ratios)
+
 In Bayesian hypothesis testing, the likelihood of two competing hypotheses \(H_0\) and \(H_1\) (for example, \(H_0: \theta = 0\) and \(H_1: \theta = 1\)) is evaluated based on the data, taking into account prior beliefs about these hypotheses.
 
-**Bayes Factors**:
-   - The Bayes factor (BF) is a crucial metric in Bayesian hypothesis testing. It is used to provide a quantifiable measure of support for one hypothesis over another, based on the observed data.
+**Bayes Factors**: is a crucial metric in Bayesian hypothesis testing. It is used to provide a quantifiable measure of support for one hypothesis over another, based on the observed data.
+ 
+ 
 
-1. **Calculation of Bayes Factors**:
+The **Bayes Factor** is essentially the same as the likelihood ratio when comparing two simple hypotheses. It quantifies the evidence provided by the data in favor of one hypothesis over another:
 
-   - For two hypotheses \(H_0\) and \(H_1\), Bayes factors are calculated as follows:
-     \[
-     B_1 = \frac{p(\theta = 1 | \text{data})}{p(\theta = 0 | \text{data})} = \frac{p(\text{data} | \theta = 1) \cdot p(\theta = 1)}{p(\text{data} | \theta = 0) \cdot p(\theta = 0)}
-     \]
-     \[
-     B_0 = \frac{p(\theta = 0 | \text{data})}{p(\theta = 1 | \text{data})} = \frac{p(\text{data} | \theta = 0) \cdot p(\theta = 0)}{p(\text{data} | \theta = 1) \cdot p(\theta = 1)}
-     \]
-   - Here, \(p(\text{data} | \theta = i)\) is the likelihood of the data under hypothesis \(i\), and \(p(\theta = i)\) is the prior probability of hypothesis \(i\).
+$$
+\text{Bayes Factor (BF)} = \frac{p(y \mid H_0)}{p(y \mid H_1)}
+$$
 
-2. **Interpretation of Bayes Factors**:
+Interpretation:
 
-   - A Bayes factor \(B_1\) greater than 1 indicates stronger support for \(H_1\) relative to \(H_0\), while a \(B_1\) less than 1 supports \(H_0\) more.
-   - \(B_0\) is the reciprocal of \(B_1\) and interprets support in the opposite direction.
-   
+* If BF > 1, the evidence favors $H_0$
+* If BF < 1, the evidence favors $H_1$
+* The further BF is from 1, the stronger the evidence
+
+This is also referred to by Cornfield as the **"relative betting odds"** and is central to Bayesian inference.
+
+---
+ 
+
+Bayes factors are used to transform **prior odds** into **posterior odds**:
+
+$$
+\frac{p(H_0 \mid y)}{p(H_1 \mid y)} = \text{Bayes Factor} \times \frac{p(H_0)}{p(H_1)}
+$$
+
+This shows how evidence from data (through the BF) updates our prior beliefs to form our posterior beliefs.
+ 
+---
+
+Interpreting the Bayes Factor: Jeffreys' Scale
+
+The strength of evidence indicated by the Bayes factor can be interpreted using **Harold Jeffreys’ scale** (see Table 3.2):
+
+| Bayes Factor (BF) | Evidence Strength (in favor of $H_0$) |
+| ----------------- | ------------------------------------- |
+| > 100             | Decisive                              |
+| 32 to 100         | Very strong                           |
+| 10 to 32          | Strong                                |
+| 3.2 to 10         | Substantial                           |
+| 1 to 3.2          | Barely worth mentioning               |
+
+| Bayes Factor (BF) | Evidence Strength (in favor of $H_1$) |
+| ----------------- | ------------------------------------- |
+| 1 to 1/3.2        | Barely worth mentioning               |
+| 1/3.2 to 1/10     | Substantial                           |
+| 1/10 to 1/32      | Strong                                |
+| 1/32 to 1/100     | Very strong                           |
+| < 1/100           | Decisive                              |
   
-## P-values and Bayes factors 
+  
+### P-values and Bayes Factors {-}
 
 P-values and Bayes factors  are two approaches for hypothesis testing and assessing evidence, but they represent fundamentally different statistical paradigms. Here's a comparison and detailed explanation:
 
@@ -381,8 +492,7 @@ A **Bayes factor (BF)** is a Bayesian measure of evidence that compares two hypo
 | **Effect of Sample Size** | Large sample size can lead to small \(P\)-values even for trivial effects. | Directly incorporates data strength.          |
 | **Interpretation**        | Often misinterpreted as evidence for \(H_1\). | Provides explicit evidence for one hypothesis over another. |
 
- 
-  
+
    
 ## Parameter Estimates
 
@@ -535,10 +645,602 @@ Bayesian modeling distinguishes itself by considering the entire distribution of
 
 
 
+## Predictions
+
+**Making predictions** is a central goal of statistical modeling. In the **Bayesian framework**, predictions are straightforward and intuitively built upon the prior and posterior distributions.
+ 
+
+### Predictive Distribution in the Bayesian Framework {-}
+
+Suppose you have observed some data $y$ and wish to predict future observations $x$. The **predictive distribution** is:
+
+$$
+p(x \mid y) = \int p(x \mid \theta) \cdot p(\theta \mid y) \, d\theta
+$$
+
+This is a **weighted average of the sampling distribution** $p(x \mid \theta)$ over the **posterior distribution** of the parameter $\theta$. It accounts for both:
+
+* Uncertainty in the future data (given $\theta$)
+* Uncertainty in the parameter $\theta$ itself
+
+If $x$ and $y$ are conditionally independent given $\theta$, then:
+
+$$
+p(x \mid y) = \int p(x \mid \theta) \cdot p(\theta \mid y) \, d\theta
+$$
+
+This integration provides a **posterior predictive distribution**, useful for:
+
+* Power calculations
+* Interim monitoring
+* Decision-making in health economics or clinical trial design
+
+### Predictions for Binary Data {-}
+
+Suppose:
+
+* The unknown success rate is $\theta$
+* The prior or posterior distribution of $\theta$ has a mean $\mu$
+* You plan to observe $n$ new Bernoulli trials
+
+Then:
+
+* The **expected number of successes** is:
+
+  $$
+  E(Y_n) = n \cdot \mu
+  $$
+* For a **single future trial**, the predicted probability of success is simply the current mean:
+
+  $$
+  P(Y = 1) = E(\theta)
+  $$
+
+If your current distribution for $\theta$ is **Beta\[a, b]**, the **predictive distribution** for the number of future successes $Y_n$ follows a **beta-binomial distribution**:
+
+$$
+p(y_n) = \binom{n}{y_n} \cdot \frac{B(a + y_n, b + n - y_n)}{B(a, b)}
+$$
+
+Where $B(a, b)$ is the Beta function.
+
+Key properties:
+
+* Mean:
+
+  $$
+  E(Y_n) = n \cdot \frac{a}{a + b}
+  $$
+* Variance:
+
+  $$
+  V(Y_n) = n \cdot \frac{ab}{(a + b)^2} \cdot \frac{a + b + n}{a + b + 1}
+  $$
+
+**Laplace’s Law of Succession** is a special case: if all $m$ past outcomes were successes and the prior is uniform (Beta\[1, 1]), the posterior becomes Beta\[m+1, 1], and the predicted success probability for the next trial is:
+
+$$
+P(Y = 1) = \frac{m + 1}{m + 2}
+$$
+
+---
+
+**Example: Drug Trial Prediction (Binary)**
+
+* Prior: Beta\[9.2, 13.8]
+* Data: 15 successes in 20 trials
+* Posterior: Beta\[24.2, 18.8], with mean 0.56
+
+Now suppose you want to predict the number of successes in **40 future patients**. The prediction follows a beta-binomial distribution with:
+
+* Mean ≈ 22.5
+* Standard deviation ≈ 4.3
+
+If your decision rule is to continue development **only if at least 25 out of 40** are successful, the **posterior predictive probability** of this happening is:
+
+$$
+P(Y \geq 25) \approx 0.329
+$$
+
+This probability can be computed by summing the right-hand tail of the beta-binomial.
+
+
+### Predictions for Normal Data {-}
+
+Suppose:
+
+* You’re predicting future data $Y_n$ which is assumed to follow:
+
+  $$
+  Y_n \sim N(\theta, \sigma^2/n)
+  $$
+* The parameter $\theta$ itself has a **prior**:
+
+  $$
+  \theta \sim N(\mu, \sigma^2/n_0)
+  $$
+
+Then the **predictive distribution** for $Y_n$ is:
+
+$$
+Y_n \sim N\left(\mu, \sigma^2 \left(\frac{1}{n} + \frac{1}{n_0}\right)\right)
+$$
+
+The **mean** of the predictive distribution is the prior mean $\mu$, and the **variance** reflects both the sampling error of future data and the uncertainty in the parameter estimate.
+
+If you already observed data $y_m$, and now have a **posterior**:
+
+$$
+\theta \sim N\left(\frac{n_0 \mu + m y_m}{n_0 + m}, \frac{\sigma^2}{n_0 + m}\right)
+$$
+
+Then the **updated predictive distribution** becomes:
+
+$$
+Y_n \sim N\left(\frac{n_0 \mu + m y_m}{n_0 + m}, \sigma^2\left(\frac{1}{n_0 + m} + \frac{1}{n}\right)\right)
+$$
+
+This means we’re more confident in our prediction when:
+
+* The prior is strong (large $n_0$)
+* We have more data (large $m$)
+* The future sample is large (large $n$)
+
+---
+
+**Example: The GREAT Study (Normal Prediction)**
+
+Goal: Predict log(OR) for 100 future patients in each trial arm.
+
+* Observed mortality \~10% ⇒ around 20 events
+* Prior + data ⇒ posterior for log(OR): $N(-0.31, \sigma^2/267.2)$
+* Predictive variance:
+
+  $$
+  \sigma^2 \left(\frac{1}{267.2} + \frac{1}{20}\right) = \sigma^2/18.6 \Rightarrow \text{SD} ≈ 0.462
+  $$
+
+Without prior (flat prior):
+
+* Posterior becomes likelihood-based only: $N(-0.74, \sigma^2/30.5)$
+* Predictive variance becomes:
+
+  $$
+  \sigma^2 \left(\frac{1}{30.5} + \frac{1}{20}\right) = \sigma^2/12.1 \Rightarrow \text{SD} ≈ 0.582
+  $$
+
+This shows:
+
+* Predictions based solely on data are more uncertain
+* Including prior reduces predictive variance and shifts the mean
+
+**Probability of achieving OR < 0.5 in the future:**
+
+* With prior: 21%
+* Without prior: 53%
+
+This demonstrates how prior beliefs can significantly influence **posterior predictive probabilities**, especially in small or uncertain samples.
 
 
 # Prior Distribution
 
+ 
+
+## Sampling Distributions (Likelihood) and Prior Distributions (Beliefs about Parameters)
+
+These describe how the **data** are generated given certain parameters. They are foundational to both classical and Bayesian statistics, as they provide the **likelihood function** — the probability of observing the data given specific parameter values.
+
+* **Standard distributions** often used:
+
+  * **Normal distribution** – commonly used for continuous data, assumes symmetry and homoscedasticity.
+  * **Binomial distribution** – used for binary or success/failure data (e.g., number of heads in coin tosses).
+  * **Poisson distribution** – used for count data (e.g., number of events in a time interval).
+
+* **Non-standard distributions**:
+
+  * **Log-normal distribution** – used especially for **cost or income data**, where values are strictly positive and typically skewed.
+
+In Bayesian analysis, selecting an appropriate sampling distribution is critical because it influences how information from the observed data is incorporated.
+
+ 
+ 
+Prior Distributions (Beliefs about Parameters) represent our **beliefs about parameter values** *before* observing the data. This is where Bayesian methods diverge significantly from classical methods.
+
+* The **shape of the prior** is crucial, as it reflects the plausibility of different parameter values. It needs to be:
+
+  * **Flexible** to represent various forms of uncertainty
+  * Capable of expressing features like:
+
+    * **Skewness** (asymmetric beliefs)
+    * **Heavy tails** (more weight on extreme values)
+
+* Common prior distributions:
+
+  * **Normal distribution** – often used due to its simplicity and analytic convenience.
+  * **Beta distribution** – bounded between 0 and 1, ideal for parameters like probabilities.
+  * **Root-inverse-gamma** – used particularly in hierarchical models or for variances.
+  * **Half-normal** – used for strictly positive parameters, such as standard deviations.
+
+
+
+
+
+
+| Distribution           | Support              | PDF / PMF                                                                                     | Mean                             | Variance                                         |
+|------------------------|----------------------|-----------------------------------------------------------------------------------------------|----------------------------------|--------------------------------------------------|
+| Binomial               | y ∈ {0, ..., n}      | P(Y=y) = C(n, y) θ^y (1−θ)^(n−y)                                                              | nθ                               | nθ(1−θ)                                          |
+| Bernoulli              | y ∈ {0, 1}           | P(Y=1)=θ, P(Y=0)=1−θ                                                                          | θ                                | θ(1−θ)                                           |
+| Poisson                | y ∈ {0, 1, 2, ...}   | P(Y=y) = λ^y e^(−λ) / y!                                                                      | λ                                | λ                                                |
+| Beta                   | y ∈ (0, 1)           | f(y) = [Γ(a+b)/(Γ(a)Γ(b))] y^(a−1)(1−y)^(b−1)                                                 | a / (a + b)                      | ab / [(a + b)^2 (a + b + 1)]                     |
+| Uniform                | y ∈ (a, b)           | f(y) = 1 / (b − a)                                                                            | (a + b)/2                        | (b − a)^2 / 12                                   |
+| Gamma                  | y > 0                | f(y) = (b^a / Γ(a)) y^(a−1) e^(−by)                                                           | a / b                            | a / b²                                           |
+| Root-Inverse-Gamma     | y > 0                | f(y) = [2b^a / Γ(a)] × y^(−2a−1) × exp(−b / y²)                                               | √b × Γ(a−½)/Γ(a)                 | b / (a − 1) − [E(Y)]² (defined if a > 1)         |
+| Half-Normal            | y > 0                | f(y) = √(2 / πσ²) × exp(−y² / (2σ²))                                                          | σ√(2/π)                          | σ² (1 − 2/π)                                     |
+| Log-Normal             | y > 0                | f(y) = (1 / y√(2πσ²)) × exp(−(log y − μ)² / (2σ²))                                            | e^(μ + σ² / 2)                   | e^(2μ + σ²)(e^σ² − 1)                            |
+| Student’s t            | y ∈ ℝ                | f(y) ∝ [1 + (y−μ)² / (νσ²)]^(−(ν+1)/2)                                                       | μ (if ν > 1)                     | (νσ²) / (ν − 2) (defined if ν > 2)               |
+| Bivariate Normal       | (x, y) ∈ ℝ²          | f(x,y) = 1 / (2πσ_Xσ_Y√(1−ρ²)) × exp(−Q / [2(1−ρ²)])                                          | (μ_X, μ_Y)                       | Var(Y|X) = σ_Y²(1−ρ²), Cov(X,Y) = ρσ_Xσ_Y        |
+
+ 
+
+---
+
+### Binomial and Bernoulli Distributions {-}
+
+A binomial distribution models the number of successes in $n$ independent trials, each with success probability $\theta$.
+If $Y \sim \text{Binomial}(n, \theta)$, then:
+
+* Probability mass function (pmf):
+
+  $$
+  P(Y = y) = \binom{n}{y} \theta^y (1 - \theta)^{n - y}, \quad y = 0, 1, \dots, n
+  $$
+* Mean:
+
+  $$
+  E(Y) = n\theta
+  $$
+* Variance:
+
+  $$
+  \text{Var}(Y) = n\theta(1 - \theta)
+  $$
+
+If $n = 1$, the binomial becomes a **Bernoulli distribution**.
+
+
+
+This delve into the application of Bayesian statistics for Poisson-distributed data using a Gamma distribution as a conjugate prior. This scenario is commonly encountered in settings where the data consists of counts or events that follow a Poisson process, and the prior information about the event rate (λ, lambda) is modeled using a Gamma distribution. 
+ 
+**Context and Setup**
+
+- **Bernoulli Distribution**: This is used to model binary data, where each trial has two possible outcomes, typically represented as 0 or 1. In the context given, each trial (or observation) can result in success (1) or failure (0).
+- **Beta Distribution for Prior**: The Beta distribution is commonly used as a prior in Bayesian analysis for binomial and Bernoulli distributions due to its conjugate properties. The Beta distribution is parameterized by two positive shape parameters, α (alpha) and β (beta), which represent prior knowledge about the probability of success in Bernoulli trials.
+
+**Mathematical Formulation**
+
+- The likelihood of observing a particular set of Bernoulli data given a probability of success θ is:
+  \[
+  p(X|\theta) = \theta^{\sum x_i} (1-\theta)^{n - \sum x_i}
+  \]
+  where \( \sum x_i \) is the total number of successes, and \( n \) is the total number of trials.
+- The conjugate prior for θ in this scenario is a Beta distribution:
+  \[
+  p(\theta) \propto \theta^{\alpha - 1} (1-\theta)^{\beta - 1}
+  \]
+- The posterior distribution, after observing the data, remains a Beta distribution:
+  \[
+  p(\theta|X) = \text{Beta}(\alpha + \sum x_i, \beta + n - \sum x_i)
+  \]
+  This formula shows that the parameters of the Beta distribution are updated by adding the number of successes to α and the number of failures to β.
+
+
+![](./02_Plots/Bayesian/Bayer_Distribution_Bernoulli.png)
+ 
+
+**Statistical Inference**
+
+- **Posterior Mean**: The expectation of the posterior distribution \( \theta|X \) can be estimated as:
+  \[
+  E[\theta|X] = \frac{\alpha + \sum x_i}{\alpha + \beta + n}
+  \]
+  This represents a weighted average between the prior belief and the observed data, where the influence of the prior diminishes as more data is collected.
+- **Practical Example**: Suppose a prior belief models the probability of success as somewhat uncertain but leaning towards being less likely (e.g., \( \alpha = 2, \beta = 18 \)). After observing 15 successes out of 20 trials, the posterior parameters would be updated to \( \alpha' = 2+15 = 17 \) and \( \beta' = 18+5 = 23 \). The posterior distribution would then be Beta(17, 23).
+
+ 
+ 
+---
+
+### Poisson Distribution {-}
+
+Models the number of events in a fixed interval when events happen independently and at a constant rate $\lambda$.
+If $Y \sim \text{Poisson}(\lambda)$, then:
+
+* Probability mass function:
+
+  $$
+  P(Y = y) = \frac{\lambda^y e^{-\lambda}}{y!}, \quad y = 0, 1, 2, \dots
+  $$
+* Mean:
+
+  $$
+  E(Y) = \lambda
+  $$
+* Variance:
+
+  $$
+  \text{Var}(Y) = \lambda
+  $$
+
+
+
+This delve into the application of Bayesian statistics for Poisson-distributed data using a Gamma distribution as a conjugate prior. This scenario is commonly encountered in settings where the data consists of counts or events that follow a Poisson process, and the prior information about the event rate (λ, lambda) is modeled using a Gamma distribution.  
+
+1. **Poisson Distribution**:
+   - The Poisson distribution is used to model the probability of a given number of events happening in a fixed interval of time or space, given the average number of events (rate λ).
+   - The likelihood function for observing data \( y = (y_1, y_2, \dots, y_n) \) under a Poisson model is:
+     \[
+     p(y|\lambda) = \prod_{i=1}^n \frac{\lambda^{y_i} e^{-\lambda}}{y_i!}
+     \]
+
+2. **Gamma Distribution as a Conjugate Prior**:
+   - The Gamma distribution is a suitable choice as a conjugate prior for λ in Poisson models because it results in a posterior distribution that is also a Gamma, facilitating computational ease and analytical tractability.
+   - The Gamma distribution is parameterized by a shape parameter (α, alpha) and a rate parameter (β, beta), with the probability density function given by:
+     \[
+     p(\lambda) = \frac{\beta^\alpha}{\Gamma(\alpha)} \lambda^{\alpha-1} e^{-\beta \lambda}
+     \]
+
+3. **Posterior Distribution**:
+   - By Bayes’ theorem, the posterior distribution of λ after observing data \( y \) combines the prior and the likelihood, yielding another Gamma distribution:
+     \[
+     p(\lambda|y) \propto p(y|\lambda) p(\lambda) = \text{Gamma}(\alpha + \sum y_i, \beta + n)
+     \]
+   - Here, \( \sum y_i \) is the sum of the observed counts, and \( n \) is the number of observations or trials.
+
+
+![](./02_Plots/Bayesian/Bayer_Distribution_Poisson.png)
+
+**Example Illustration**
+
+- Suppose we have a set of counts over ten time periods, and we assume that these counts are Poisson-distributed with an unknown rate λ. Using a Gamma prior for λ with parameters α = 1 and β = 1, we incorporate the observed data to update these parameters.
+
+- After observing the data, the posterior parameters become:
+  - New alpha (α'): α + sum of observed counts
+  - New beta (β'): β + number of observations
+
+- If the observed counts sum to 77 over 10 periods, the posterior distribution for λ becomes:
+  - Alpha: 1 + 77 = 78
+  - Beta: 1 + 10 = 11
+  - Resulting in a posterior distribution Gamma(78, 11).
+  
+---
+
+### Beta Distribution {-}
+
+Defined on the interval $(0, 1)$, flexible for modeling probabilities.
+If $Y \sim \text{Beta}(a, b)$, then:
+
+* Probability density function (pdf):
+
+  $$
+  f(y) = \frac{\Gamma(a + b)}{\Gamma(a)\Gamma(b)} y^{a - 1} (1 - y)^{b - 1}, \quad 0 < y < 1
+  $$
+* Mean:
+
+  $$
+  E(Y) = \frac{a}{a + b}
+  $$
+* Variance:
+
+  $$
+  \text{Var}(Y) = \frac{ab}{(a + b)^2(a + b + 1)}
+  $$
+
+---
+
+### Uniform Distribution {-}
+
+Models equal probability over an interval $(a, b)$.
+If $Y \sim \text{Uniform}(a, b)$, then:
+
+* Probability density function:
+
+  $$
+  f(y) = \frac{1}{b - a}, \quad a < y < b
+  $$
+* Mean:
+
+  $$
+  E(Y) = \frac{a + b}{2}
+  $$
+* Variance:
+
+  $$
+  \text{Var}(Y) = \frac{(b - a)^2}{12}
+  $$
+
+---
+
+### Gamma Distribution {-}
+
+Defined on $(0, \infty)$, often used for modeling rates or waiting times.
+If $Y \sim \text{Gamma}(a, b)$ with shape $a$ and rate $b$, then:
+
+* Probability density function:
+
+  $$
+  f(y) = \frac{b^a}{\Gamma(a)} y^{a - 1} e^{-b y}, \quad y > 0
+  $$
+* Mean:
+
+  $$
+  E(Y) = \frac{a}{b}
+  $$
+* Variance:
+
+  $$
+  \text{Var}(Y) = \frac{a}{b^2}
+  $$
+
+---
+
+### Root-Inverse-Gamma Distribution {-}
+
+If $X \sim \text{Gamma}(a, b)$, then $Y = \frac{1}{\sqrt{X}} \sim \text{RIG}(a, b)$.
+Then:
+
+* Probability density function:
+
+  $$
+  f(y) = \frac{2b^a}{\Gamma(a)} \cdot \frac{1}{y^{2a + 1}} \exp\left( -\frac{b}{y^2} \right), \quad y > 0
+  $$
+* Mean (if $a > \tfrac{1}{2}$):
+
+  $$
+  E(Y) = \sqrt{b} \cdot \frac{\Gamma(a - \tfrac{1}{2})}{\Gamma(a)}
+  $$
+* Variance (if $a > 1$):
+
+  $$
+  \text{Var}(Y) = \frac{b}{a - 1} - \left( E(Y) \right)^2
+  $$
+
+---
+
+### Half-Normal Distribution {-}
+
+If $X \sim \mathcal{N}(0, \sigma^2)$, then $Y = |X| \sim \text{HalfNormal}(\sigma^2)$.
+Then:
+
+* Probability density function:
+
+  $$
+  f(y) = \sqrt{\frac{2}{\pi \sigma^2}} e^{-y^2 / (2\sigma^2)}, \quad y > 0
+  $$
+* Mean:
+
+  $$
+  E(Y) = \sigma \sqrt{\frac{2}{\pi}}
+  $$
+* Variance:
+
+  $$
+  \text{Var}(Y) = \sigma^2 \left(1 - \frac{2}{\pi}\right)
+  $$
+
+---
+
+### Log-Normal Distribution {-}
+
+If $\log(Y) \sim \mathcal{N}(\mu, \sigma^2)$, then $Y \sim \text{LogNormal}(\mu, \sigma^2)$.
+Then:
+
+* Probability density function:
+
+  $$
+  f(y) = \frac{1}{y \sqrt{2\pi \sigma^2}} \exp\left( -\frac{(\log y - \mu)^2}{2\sigma^2} \right), \quad y > 0
+  $$
+* Mean:
+
+  $$
+  E(Y) = e^{\mu + \sigma^2 / 2}
+  $$
+* Variance:
+
+  $$
+  \text{Var}(Y) = e^{2\mu + \sigma^2} (e^{\sigma^2} - 1)
+  $$
+
+---
+
+### Student’s t-Distribution {-}
+
+Defined by location $\mu$, scale $\sigma^2$, and degrees of freedom $\nu$.
+If $Y \sim t(\mu, \sigma^2, \nu)$, then:
+
+* Probability density function:
+
+  $$
+  f(y) = \frac{\Gamma\left( \frac{\nu + 1}{2} \right)}{\Gamma\left( \frac{\nu}{2} \right) \sqrt{\nu \pi \sigma^2}} \left[ 1 + \frac{(y - \mu)^2}{\nu \sigma^2} \right]^{-\frac{\nu + 1}{2}}
+  $$
+* Mean (if $\nu > 1$):
+
+  $$
+  E(Y) = \mu
+  $$
+* Variance (if $\nu > 2$):
+
+  $$
+  \text{Var}(Y) = \frac{\nu \sigma^2}{\nu - 2}
+  $$
+
+---
+
+### Bivariate Normal Distribution {-}
+
+Models two jointly normal variables $X$ and $Y$ with correlation $\rho$.
+If $(X, Y) \sim \text{BN}(\mu_X, \mu_Y, \sigma_X, \sigma_Y, \rho)$, then the joint density is:
+
+* Joint probability density function:
+
+  $$
+  f(x, y) = \frac{1}{2\pi \sigma_X \sigma_Y \sqrt{1 - \rho^2}} \exp\left( -\frac{1}{2(1 - \rho^2)} Q \right)
+  $$
+
+  where
+
+  $$
+  Q = \left( \frac{x - \mu_X}{\sigma_X} \right)^2 - 2\rho \left( \frac{x - \mu_X}{\sigma_X} \right) \left( \frac{y - \mu_Y}{\sigma_Y} \right) + \left( \frac{y - \mu_Y}{\sigma_Y} \right)^2
+  $$
+* Conditional expectation:
+
+  $$
+  E(Y \mid X = x) = \mu_Y + \rho \frac{\sigma_Y}{\sigma_X}(x - \mu_X)
+  $$
+* Conditional variance:
+
+  $$
+  \text{Var}(Y \mid X) = \sigma_Y^2 (1 - \rho^2)
+  $$
+
+This distribution is used for modeling two correlated outcomes or as a prior for two dependent parameters.
+
+ 
+
+### Normal Distribution {-}
+
+This provided delve into Bayesian inference for normally distributed data, employing conjugate priors. 
+
+1. **Background and Setup:**
+   - The data is assumed to follow a Normal distribution, \( N(\mu, \sigma^2) \), where both the mean (\( \mu \)) and variance (\( \sigma^2 \)) are unknown.
+   - A common approach in Bayesian analysis is to assume conjugate priors for these parameters because conjugate priors simplify the computation of the posterior distributions.
+
+2. **Conjugate Priors Used:**
+   - For the mean \( \mu \), when \( \sigma^2 \) is known, the conjugate prior is a Normal distribution, \( N(\mu_0, \tau_0) \).
+   - For the variance \( \sigma^2 \), the conjugate prior is an inverse-Gamma distribution, which ensures that the posterior distributions for \( \mu \) and \( \sigma^2 \) are tractable and remain within the family of Normal and inverse-Gamma distributions respectively.
+
+3. **Mathematical Formulation:**
+   - **Likelihood Function:** Given the data \( x = (x_1, x_2, ..., x_n) \), the likelihood for a normal model is:
+     \[
+     p(x | \mu, \sigma^2) \propto \sigma^{-n} \exp\left(-\frac{1}{2\sigma^2} \sum_{i=1}^n (x_i - \mu)^2\right)
+     \]
+   - **Posterior for Mean \( \mu \):** When \( \sigma^2 \) is known, the posterior distribution of \( \mu \) after observing data is also a Normal distribution:
+     \[
+     \mu | x, \sigma^2 \sim N\left(\frac{\tau_0 \mu_0 + n\bar{x}}{\tau_0 + n}, \frac{\sigma^2}{\tau_0 + n}\right)
+     \]
+     where \( \bar{x} \) is the sample mean.
+   - **Posterior for Variance \( \sigma^2 \):** The posterior for \( \sigma^2 \) is an inverse-Gamma distribution, parameterized by updated shape and scale parameters derived from the data.
+
+4. **Updating Process:**
+   - Given the priors and the observed data, the parameters of the priors (\(\mu_0, \tau_0\) for the mean and shape and rate for the variance) are updated to reflect the new evidence provided by the data.
+   - This Bayesian updating allows continuous learning as new data becomes available, adjusting the beliefs about the parameters based on cumulative evidence.
+
+![](./02_Plots/Bayesian/Bayer_Distribution_Normal.png)
+
+
+
+## Appropriate Prior Distribution 
+
+  
 1. **Selection of Priors**:
    - In Bayesian statistics, the choice of prior \( p(\theta) \) is crucial because it fundamentally influences the resulting posterior distribution \( p(\theta | \text{data}) \). Selecting a prior that reflects genuine knowledge or reasonable assumptions about \( \theta \) is important for ensuring that the posterior distribution is meaningful and accurate.
    - If the prior is too restrictive or if it does not align with the actual data characteristics, it can lead to misleading inferences, where the data cannot correct a poorly chosen prior.
@@ -581,11 +1283,11 @@ Priors derived from expert elicitation involve consulting subject-matter experts
 - **Implementation**: Structured elicitation processes are used to translate expert knowledge into a quantifiable prior distribution. This might involve using tools like probability distribution fitting, where experts specify quantiles, means, variances, or other moments based on their understanding.
 - **Challenges**: Requires careful consideration to avoid biases inherent in expert opinions and to accurately represent uncertainty in expert estimates.
 
-## 1. Non-informative Priors
+### 1. Non-informative Priors {-}
 
 When engaging in Bayesian analysis without specific prior knowledge about the parameters in question, employing non-informative priors can be an effective strategy. These types of priors are designed to minimally influence the posterior outcomes, allowing the data itself to primarily drive the inferences. Here is a detailed description of two significant types of non-informative priors: **Jeffreys Prior** and **Reference Prior**.
 
-### Jeffreys Prior {-}
+#### Jeffreys Prior {-}
 
 **Background:**
 Jeffreys Prior is named after Sir Harold Jeffreys, who introduced it in his work on Bayesian statistics. This prior is particularly noted for its property of invariance, meaning that it remains unchanged under transformation of parameters.
@@ -604,7 +1306,7 @@ where \( I(\theta) \) is the Fisher information matrix for parameter \( \theta \
 - Jeffreys Prior is particularly useful for parameters that are naturally scale-invariant, such as variance and standard deviation.
 - While it addresses the issue of uniform priors not translating uniformly over transformations of the parameters, Jeffreys Prior can sometimes lead to priors that are improper or do not integrate to one, particularly in complex models or multi-parameter settings.
 
-### Reference Prior {-}
+#### Reference Prior {-}
 
 **Background:**
 
@@ -624,7 +1326,7 @@ While the specific form of a reference prior can depend on the model and the par
 - Reference Priors are particularly useful in settings involving multiple parameters where interactions can complicate the analysis.
 - They are also used in problems where the sample size is large, and the aim is to make inferences that are as objective as possible.
 
-## 2. Conjugate Priors 
+### 2. Conjugate Priors  {-}
  
 Conjugate priors are a type of prior that, when used with a particular likelihood function, results in a posterior distribution that is of the same family as the prior distribution. This property of conjugacy is particularly valuable because it simplifies the mathematical operations involved in Bayesian updates.
 
@@ -662,7 +1364,7 @@ knitr::include_graphics("./02_Plots/Bayesian/Bayer_Conjugate.png")
 3. **Hyperparameter Sensitivity**: The process requires the selection of hyperparameters, which can significantly influence the posterior. Incorrect or suboptimal choices of these parameters can lead to biased or misleading results, especially if the prior information is insufficient or vague.
 
 
-## 3. Empirical Bayes Priors
+### 3. Empirical Bayes Priors {-}
 
 **Concept and Foundation of Empirical Bayes**
 
@@ -683,7 +1385,7 @@ Empirical Bayes methods are based on the idea of using observed data to estimate
 - **Computational Efficiency**: Empirical Bayes can be more computationally efficient than fully Bayesian methods since it avoids the need for complex prior specification and the intensive computations that can entail, especially with large datasets.
 
 
-## 4. Expert Elicitation Priors
+### 4. Expert Elicitation Priors {-}
 
 Expert elicitation priors are a method in Bayesian statistics where subjective judgments from experts are formally incorporated into the Bayesian framework as prior distributions. This approach is particularly useful in scenarios where empirical data is sparse, but expert knowledge is abundant and reliable.  
 
@@ -719,6 +1421,28 @@ Sensitivity analysis in Bayesian statistics is a crucial step to evaluate how th
   - Examining how conclusions change with different prior beliefs about the null hypothesis.
 - **Complexity:** Conducting sensitivity analysis across a wide range of priors can be computationally intensive. A narrow or overly restricted sensitivity analysis may miss critical variations in prior assumptions.
 
+---
+
+
+**A Framework for Bayesian Sensitivity Analysis**
+
+
+This process, also called the **"robust Bayesian" approach**, includes these steps:
+
+1. **Choose a flexible set of priors** that span the spectrum of plausible beliefs.
+2. **Evaluate posterior results** (e.g., probability treatment is superior) for each prior.
+3. **Identify prior beliefs** that would change key conclusions (e.g., make an effect clinically significant or not).
+4. **Report** the results so readers can see where their own beliefs might fall—and what that would imply.
+
+This is sometimes referred to as **prior partitioning**.
+
+A **Bayesian sensitivity analysis** aims to answer:
+
+> *How robust are our conclusions to different reasonable beliefs about the unknown parameters?*
+
+This allows more **transparent**, **context-aware**, and **decision-relevant** interpretation of results. For instance, even if the posterior probability of treatment superiority is high, we may still find that under many reasonable priors, the probability of a *clinically significant* effect is modest—shifting the interpretation.
+
+---
 
 **1. Purpose of Sensitivity Analysis in Bayesian Approaches**
 
@@ -745,7 +1469,7 @@ Sensitivity analysis in Bayesian statistics is a crucial step to evaluate how th
    - Provide tools or visualizations (e.g., graphs of posterior probabilities vs. prior parameters) to facilitate interpretation.
    
    
-**3. Types of Communities of Priors**
+**3. Types of Prior Communities (Increasing in Complexity)**
 
 There are three main approaches to defining a community of priors:
 
@@ -773,120 +1497,35 @@ There are three main approaches to defining a community of priors:
   - Gustafson (1989): Introduced a "neighborhood" of priors around a non-informative prior, with some contamination from alternative priors.
 - Tools like maximum and minimum posterior probabilities within the class can highlight the range of plausible conclusions.
 
-# Distribution 
-
-## Bernoulli Distribution 
-
-This delve into the application of Bayesian statistics for Poisson-distributed data using a Gamma distribution as a conjugate prior. This scenario is commonly encountered in settings where the data consists of counts or events that follow a Poisson process, and the prior information about the event rate (λ, lambda) is modeled using a Gamma distribution. 
  
-**Context and Setup**
+## Hierarchical Priors 
 
-- **Bernoulli Distribution**: This is used to model binary data, where each trial has two possible outcomes, typically represented as 0 or 1. In the context given, each trial (or observation) can result in success (1) or failure (0).
-- **Beta Distribution for Prior**: The Beta distribution is commonly used as a prior in Bayesian analysis for binomial and Bernoulli distributions due to its conjugate properties. The Beta distribution is parameterized by two positive shape parameters, α (alpha) and β (beta), which represent prior knowledge about the probability of success in Bernoulli trials.
+**Overview of Hierarchical Models and τ**
 
-**Mathematical Formulation**
+In a Bayesian **hierarchical model**, you assume that unit-level parameters (e.g., treatment effects in different studies), denoted as $\theta_k$, are drawn from a **shared population distribution**:
 
-- The likelihood of observing a particular set of Bernoulli data given a probability of success θ is:
-  \[
-  p(X|\theta) = \theta^{\sum x_i} (1-\theta)^{n - \sum x_i}
-  \]
-  where \( \sum x_i \) is the total number of successes, and \( n \) is the total number of trials.
-- The conjugate prior for θ in this scenario is a Beta distribution:
-  \[
-  p(\theta) \propto \theta^{\alpha - 1} (1-\theta)^{\beta - 1}
-  \]
-- The posterior distribution, after observing the data, remains a Beta distribution:
-  \[
-  p(\theta|X) = \text{Beta}(\alpha + \sum x_i, \beta + n - \sum x_i)
-  \]
-  This formula shows that the parameters of the Beta distribution are updated by adding the number of successes to α and the number of failures to β.
+$$
+\theta_k \sim \mathcal{N}(\mu, \tau^2)
+$$
 
+This assumes the $\theta_k$ are **exchangeable**, meaning you believe there's no systematic reason to expect one unit’s effect to be predictably different from another, unless explained by covariates.
 
-![](./02_Plots/Bayesian/Bayer_Distribution_Bernoulli.png)
+The key **hyperparameter** in this setup is the **between-unit standard deviation $\tau$**, which governs the **degree of heterogeneity**:
+
+* $\tau = 0$: all units are assumed identical (fixed effects).
+* Larger $\tau$: more heterogeneity allowed across units (random effects).
+
+Bayesian inference requires a **prior distribution** for $\tau$. Choosing this prior carefully is essential because:
+
+* It affects how much **shrinkage** is applied to unit-level estimates.
+* In sparse data situations, it can strongly influence the **posterior**.
+
+**Three Critical Assumptions in Hierarchical Priors**
+
+1. **Exchangeability**: Are the $\theta_k$s similar enough to be drawn from a common distribution?
+2. **Form of random-effects distribution**: Is a Normal distribution appropriate for the $\theta_k$? Often used, but alternatives like Student’s t may be more robust.
+3. **Prior for $\tau$**: The most delicate part—how much heterogeneity do we *a priori* expect?
  
-
-**Statistical Inference**
-
-- **Posterior Mean**: The expectation of the posterior distribution \( \theta|X \) can be estimated as:
-  \[
-  E[\theta|X] = \frac{\alpha + \sum x_i}{\alpha + \beta + n}
-  \]
-  This represents a weighted average between the prior belief and the observed data, where the influence of the prior diminishes as more data is collected.
-- **Practical Example**: Suppose a prior belief models the probability of success as somewhat uncertain but leaning towards being less likely (e.g., \( \alpha = 2, \beta = 18 \)). After observing 15 successes out of 20 trials, the posterior parameters would be updated to \( \alpha' = 2+15 = 17 \) and \( \beta' = 18+5 = 23 \). The posterior distribution would then be Beta(17, 23).
-
- 
-## Poisson Distribution
-
-This delve into the application of Bayesian statistics for Poisson-distributed data using a Gamma distribution as a conjugate prior. This scenario is commonly encountered in settings where the data consists of counts or events that follow a Poisson process, and the prior information about the event rate (λ, lambda) is modeled using a Gamma distribution.  
-
-1. **Poisson Distribution**:
-   - The Poisson distribution is used to model the probability of a given number of events happening in a fixed interval of time or space, given the average number of events (rate λ).
-   - The likelihood function for observing data \( y = (y_1, y_2, \dots, y_n) \) under a Poisson model is:
-     \[
-     p(y|\lambda) = \prod_{i=1}^n \frac{\lambda^{y_i} e^{-\lambda}}{y_i!}
-     \]
-
-2. **Gamma Distribution as a Conjugate Prior**:
-   - The Gamma distribution is a suitable choice as a conjugate prior for λ in Poisson models because it results in a posterior distribution that is also a Gamma, facilitating computational ease and analytical tractability.
-   - The Gamma distribution is parameterized by a shape parameter (α, alpha) and a rate parameter (β, beta), with the probability density function given by:
-     \[
-     p(\lambda) = \frac{\beta^\alpha}{\Gamma(\alpha)} \lambda^{\alpha-1} e^{-\beta \lambda}
-     \]
-
-3. **Posterior Distribution**:
-   - By Bayes’ theorem, the posterior distribution of λ after observing data \( y \) combines the prior and the likelihood, yielding another Gamma distribution:
-     \[
-     p(\lambda|y) \propto p(y|\lambda) p(\lambda) = \text{Gamma}(\alpha + \sum y_i, \beta + n)
-     \]
-   - Here, \( \sum y_i \) is the sum of the observed counts, and \( n \) is the number of observations or trials.
-
-
-![](./02_Plots/Bayesian/Bayer_Distribution_Poisson.png)
-
-**Example Illustration**
-
-- Suppose we have a set of counts over ten time periods, and we assume that these counts are Poisson-distributed with an unknown rate λ. Using a Gamma prior for λ with parameters α = 1 and β = 1, we incorporate the observed data to update these parameters.
-
-- After observing the data, the posterior parameters become:
-  - New alpha (α'): α + sum of observed counts
-  - New beta (β'): β + number of observations
-
-- If the observed counts sum to 77 over 10 periods, the posterior distribution for λ becomes:
-  - Alpha: 1 + 77 = 78
-  - Beta: 1 + 10 = 11
-  - Resulting in a posterior distribution Gamma(78, 11).
-  
-## Normal Distribution
-
-This provided delve into Bayesian inference for normally distributed data, employing conjugate priors. 
-
-1. **Background and Setup:**
-   - The data is assumed to follow a Normal distribution, \( N(\mu, \sigma^2) \), where both the mean (\( \mu \)) and variance (\( \sigma^2 \)) are unknown.
-   - A common approach in Bayesian analysis is to assume conjugate priors for these parameters because conjugate priors simplify the computation of the posterior distributions.
-
-2. **Conjugate Priors Used:**
-   - For the mean \( \mu \), when \( \sigma^2 \) is known, the conjugate prior is a Normal distribution, \( N(\mu_0, \tau_0) \).
-   - For the variance \( \sigma^2 \), the conjugate prior is an inverse-Gamma distribution, which ensures that the posterior distributions for \( \mu \) and \( \sigma^2 \) are tractable and remain within the family of Normal and inverse-Gamma distributions respectively.
-
-3. **Mathematical Formulation:**
-   - **Likelihood Function:** Given the data \( x = (x_1, x_2, ..., x_n) \), the likelihood for a normal model is:
-     \[
-     p(x | \mu, \sigma^2) \propto \sigma^{-n} \exp\left(-\frac{1}{2\sigma^2} \sum_{i=1}^n (x_i - \mu)^2\right)
-     \]
-   - **Posterior for Mean \( \mu \):** When \( \sigma^2 \) is known, the posterior distribution of \( \mu \) after observing data is also a Normal distribution:
-     \[
-     \mu | x, \sigma^2 \sim N\left(\frac{\tau_0 \mu_0 + n\bar{x}}{\tau_0 + n}, \frac{\sigma^2}{\tau_0 + n}\right)
-     \]
-     where \( \bar{x} \) is the sample mean.
-   - **Posterior for Variance \( \sigma^2 \):** The posterior for \( \sigma^2 \) is an inverse-Gamma distribution, parameterized by updated shape and scale parameters derived from the data.
-
-4. **Updating Process:**
-   - Given the priors and the observed data, the parameters of the priors (\(\mu_0, \tau_0\) for the mean and shape and rate for the variance) are updated to reflect the new evidence provided by the data.
-   - This Bayesian updating allows continuous learning as new data becomes available, adjusting the beliefs about the parameters based on cumulative evidence.
-
-![](./02_Plots/Bayesian/Bayer_Distribution_Normal.png)
-
-
 # Bayesian Inference Algorithm
 
 ## Maximum A Posteriori (MAP) Estimation
@@ -1027,3 +1666,490 @@ Variational inference (VI) is a method used in Bayesian statistics that approxim
 - **Bias**: VI introduces bias because the variational family may not encompass the true posterior.
 - **Dependency on Form**: The effectiveness of VI depends greatly on the chosen variational family. If too restrictive, it may not adequately capture the posterior distribution.
  
+ 
+# Historical Data in Bayesian Analysis
+
+## Introduction
+
+**Historical data** has always played a role in experimental planning and meta-analysis. However, **Bayesian methods** provide a **principled and flexible framework** to incorporate historical information not just in design, but also in **estimation, inference, prediction, and decision-making**.
+
+In Bayesian reasoning, historical data can help shape the **prior distribution**, inform assumptions, or contribute directly to **combined evidence**. But not all historical data are equally relevant or reliable — so it's crucial to judge **how** and **to what extent** past data should influence current analysis.
+
+The framework described here outlines **six levels of relevance**, ranging from completely discarding historical data to treating it as fully equivalent to current data.
+
+
+
+
+## Incorporate into Bayesian Analysis
+ 
+![](./02_Plots/Bayesian/Bayer_Historical.png)
+
+*Different assumptions relating parameters underlying historical data to the parameter of current interest: single arrows represent a distribution, double arrows represent logical functions, and wavy arrows represent discounting.*
+
+### (a) **Irrelevance**
+
+* Historical data are judged to have no bearing on the current study.
+* This might be because of:
+
+  * Vast differences in population, methods, or outcomes
+  * Poor data quality
+  * Known biases
+* In Bayesian terms, this means the **prior** is formed **without using** the historical data.
+
+This assumes that **past studies provide no useful information** about the current study's parameter (θ). Therefore, the prior is constructed **without reference** to historical data—possibly using a vague, flat, or reference prior.
+
+* Example: A new trial uses a completely different treatment strategy or patient population compared to earlier trials.
+* Implication: Past data is **fully ignored**.
+
+---
+
+### (b) **Exchangeable**
+
+* The past and current studies are assumed to be **similar in structure and quality**, though not identical.
+* This allows for **exchangeability of parameters**, meaning:
+
+  * The data are not pooled directly
+  * Instead, they are modelled **hierarchically**, with partial pooling
+* This is a **standard approach in meta-analysis**, and Bayesian **hierarchical models** (or multilevel models) are well-suited to this setup.
+
+Here, we assume the current parameter (θ) and historical parameters (θ₁, ..., θ\_H) are **exchangeable**, meaning they are thought to come from the **same population distribution**:
+
+$$
+θ₁, θ₂, ..., θ_H, θ \sim \mathcal{N}(\mu, \tau^2)
+$$
+
+* Exchangeability means we think past and current studies are measuring similar (but not identical) effects.
+* The prior for θ becomes the **posterior predictive distribution** of a new value in this exchangeable sequence.
+
+If the variances (σ²\_h) and τ² are known, the **posterior for θ** is:
+
+$$
+θ \mid y₁, ..., y_H \sim \mathcal{N} \left( \frac{\sum y_h w_h}{\sum w_h}, \frac{1}{\sum w_h} + \tau^2 \right)
+$$
+
+where:
+
+$$
+w_h = \frac{1}{σ_h^2 + \tau^2}
+$$
+
+* **Note**: If τ² is small, this implies strong similarity (tight clustering); if τ² is large, the model treats the studies as more different.
+* **Example**: Meta-analyses or hierarchical models that use multiple past studies.
+
+---
+
+### (c) **Potential Biases**
+
+* Historical data may contain **internal** (methodological flaws) or **external** (population/context mismatch) biases.
+* Rather than discarding them, Bayesian models can:
+
+  * **Quantify potential biases**
+  * Adjust the historical estimates accordingly
+* This is especially useful in **observational studies** or when reusing **non-randomised data**.
+* The adjustments can be formalised using **bias distributions** or **discount functions**.
+
+Historical parameters are modeled as **biased versions** of the current parameter. For each h:
+
+$$
+θ_h = θ + δ_h
+$$
+
+* δ\_h is a bias term that can be:
+
+  1. **Known** (fixed value).
+  2. **Random**, with known distribution (e.g., δ\_h ∼ N(0, τ\_h²)).
+  3. **Random with non-zero mean** (e.g., δ\_h ∼ N(μ\_δ, τ\_h²)) to account for systematic directional bias.
+
+This results in a prior:
+
+$$
+θ \mid y_h \sim \mathcal{N}(y_h, σ_h^2 + τ_h^2)
+$$
+
+* This approach acknowledges uncertainty or possible systematic errors in the past study design or population.
+
+
+---
+
+### (d) **Equal but Discounted**
+
+* The past data are considered **unbiased**, but **less reliable** than current data.
+* So they are included **with reduced precision** — in effect, you "shrink" their influence.
+* This approach acknowledges that historical data may be:
+
+  * Based on older methods
+  * Less complete
+  * Less relevant to the current setting
+* In practice, this can be implemented by:
+
+  * Inflating the variance of historical data
+  * Down-weighting the historical sample size (e.g., using **power priors**)
+
+Here we assume:
+
+$$
+θ_h = θ
+$$
+
+so the parameters are identical across studies, **but** we **discount** the strength of the past evidence by a factor α (0 < α ≤ 1), known as the **power prior**.
+
+The effect is to reduce the effective sample size (or weight) of historical data:
+
+$$
+θ \mid y_h \sim \mathcal{N}(y_h, \frac{σ_h^2}{α})
+$$
+
+* α = 0 means full discount (historical data is irrelevant).
+* α = 1 means no discount (full pooling).
+* Intermediate α values allow **partial borrowing** of strength.
+* **Criticism**: The α value is arbitrary and lacks a natural operational meaning.
+
+---
+
+### (e) **Functional Dependence**
+
+* The current parameter of interest is a **deterministic or functional function** of parameters estimated in past studies.
+* For example:
+
+  * A cost-effectiveness model may use historical data to inform baseline costs or risks, while current data inform treatment effect.
+  * Or a risk model may use parameters from external registries.
+* This kind of structure can be expressed using **Bayesian networks** or **modular models**, linking different sources via functional relationships.
+
+The current parameter is a **known function** of parameters from historical studies.
+
+Example:
+
+* θ₁ = treatment effect in males
+
+* θ₂ = treatment effect in females
+
+* If a future study involves 60% males, then:
+
+  $$
+  θ = 0.6 θ₁ + 0.4 θ₂
+  $$
+
+* Prior for θ is derived from known or estimated priors for θ₁ and θ₂.
+
+* This method is particularly useful when populations differ but in predictable ways.
+
+---
+
+### (f) **Equal (Full Pooling)**
+
+* Historical and current data are considered **completely equivalent**.
+* Parameters are assumed to be drawn from the **same distribution**, and data can be **pooled directly**.
+* This is the most optimistic assumption and works best when:
+
+  * The populations, protocols, and measurements are nearly identical
+  * There is strong confidence in the **quality and comparability** of historical data
+* In effect, you assume **exchangeability of individuals** (not just studies), so the prior and current data are merged seamlessly.
+
+This assumes all studies are measuring **exactly the same parameter**:
+
+$$
+θ_h = θ \quad \text{for all } h
+$$
+
+* This is the **strongest assumption** and leads to **complete pooling**:
+
+$$
+θ \mid y₁, ..., y_H \sim \mathcal{N} \left( \frac{\sum y_h / σ_h^2}{\sum 1 / σ_h^2}, \frac{1}{\sum 1 / σ_h^2} \right)
+$$
+
+* Appropriate if the studies are very similar in design, population, and implementation.
+* More acceptable in **design** phase (e.g., for sample size calculation) than in analysis.
+
+
+
+
+# Hierarchical Models
+
+In real-world health care evaluation, statistical inference often faces **multiplicity**—the need to analyze multiple parameters:
+
+* Multiple subgroups in a trial (e.g. age, gender)
+* Multiple endpoints (e.g. death, complications)
+* Multiple institutions (e.g. hospitals, regions)
+* Multiple treatment comparisons or repeated trials
+
+To handle this, **Bayesian hierarchical models** offer a structured approach that accounts for:
+
+* Similarities (exchangeability) across units
+* Variability between units
+* The influence of prior beliefs
+
+
+Three conceptual assumptions help guide the modeling:
+
+
+1. **Identical parameters (complete pooling)**
+   All units are assumed to estimate the same underlying effect $\theta$, and their data are fully pooled.
+   For example:
+
+   $$
+   Y_k \sim N(\theta, \sigma_k^2)
+   $$
+
+   Bayesian updating leads to a pooled posterior for $\theta$, resembling a weighted average of individual estimates.
+
+2. **Independent parameters (no pooling)**
+   Each $\theta_k$ is estimated independently.
+
+   $$
+   \theta_k \sim \text{Uniform}, \quad Y_k \sim N(\theta_k, \sigma_k^2)
+   $$
+
+   This gives posterior:
+
+   $$
+   \theta_k \mid y_k \sim N(y_k, \sigma_k^2)
+   $$
+
+   No information is shared between units.
+
+3. **Exchangeable parameters (partial pooling via hierarchical models)**
+   Each $\theta_k$ is viewed as drawn from a population distribution:
+
+   $$
+   \theta_k \sim N(\mu, \tau^2), \quad Y_k \sim N(\theta_k, \sigma_k^2)
+   $$
+
+   Here, $\mu$ and $\tau^2$ are hyperparameters—estimated from the data (empirical Bayes) or given priors (full Bayes).
+   The posterior shrinks each unit’s estimate toward $\mu$, with the **shrinkage factor**:
+
+   $$
+   B_k = \frac{\sigma_k^2}{\sigma_k^2 + \tau^2}
+   $$
+
+   Larger $\tau^2$: less pooling. Smaller $\tau^2$: more shrinkage.
+   
+   
+First, assuming all parameters are identical implies complete pooling. Under this model, each unit (e.g., trial or subgroup) is estimating the same underlying effect. All data are combined into one analysis, and individual differences are ignored. Statistically, this is equivalent to estimating a single parameter using weighted averages. The result is a high degree of certainty, but potentially oversimplified if real variation exists.
+
+Second, assuming all parameters are independent implies no pooling. Each unit is analyzed separately, with no borrowing of information. This is the most conservative approach and gives wide uncertainty intervals. Statistically, this treats each observed effect as arising from its own prior, typically uniform, resulting in posterior distributions that are just normal likelihoods centered on the data.
+
+Third, the most nuanced assumption is that of exchangeability. Here, the individual parameters (such as treatment effects) are assumed to be drawn from a common population distribution. This does not imply they are the same, but rather that we have no reason to believe any one is systematically different from the others. Exchangeability leads naturally to hierarchical or multi-level models, where the unit-specific effects are modeled as random effects with a common mean and variance.
+
+Under the exchangeability assumption, each observed effect is shrunk toward the group mean, and the degree of shrinkage depends on the relative variances of the data and the prior. Smaller, more uncertain studies shrink more; large, precise studies shrink less. This is known as partial pooling and helps stabilize estimates, particularly when individual studies are small or noisy.
+
+A practical example is the magnesium meta-analysis. Early small trials showed a large mortality benefit for magnesium in acute myocardial infarction. A fixed-effects meta-analysis found a significant odds ratio of 0.67. A hierarchical Bayesian model, assuming exchangeability of trial effects, moderated this to an odds ratio of 0.58, as extreme results from small trials were shrunk toward the overall mean. This demonstrates how Bayesian models can temper overoptimistic findings from underpowered studies.
+
+To assess the credibility of such findings, sceptical priors centered on no effect (odds ratio = 1) are introduced. In the pooled analysis, a highly sceptical prior equivalent to 421 events is needed to make the posterior just include 1—an unrealistically extreme prior. In the random-effects model, a sceptical prior equivalent to only 58 events is sufficient to neutralize the evidence. This suggests the evidence is more fragile and less convincing under the hierarchical model.
+
+
+
+# Nuisance Parameters
+
+**Nuisance parameters** are common in most real-world models. For example, if the main goal is to estimate a treatment effect (denoted by θ), the data may also depend on background factors, variances, or baseline event rates, which are not of direct interest. These are nuisance parameters.
+
+**Classical Methods for Eliminating Nuisance Parameters**
+
+Several techniques in traditional statistics aim to remove or reduce the influence of nuisance parameters from the likelihood function for θ:
+
+1. **Likelihood approximation**
+   Use a summary statistic or transformation whose likelihood does not depend on nuisance parameters. For example, normal approximations for odds ratios or hazard ratios eliminate dependence on unknown variances.
+
+2. **Plug-in estimates**
+   Estimate the nuisance parameters (usually by maximum likelihood) and substitute them into the likelihood for θ. This is computationally simple but can underestimate uncertainty, especially if the number of nuisance parameters is large. In Bayesian terms, this is known as the **empirical Bayes** approach.
+
+3. **Conditional likelihood**
+   Form a conditional likelihood that depends only on θ, by conditioning on aspects of the data that are uninformative about the nuisance parameters. This is a popular method in likelihood-based inference.
+
+4. **Profile likelihood**
+   Maximize the likelihood over nuisance parameters for each value of θ, producing a "profile" likelihood function. This function depends only on θ and can be used for inference. This method is illustrated in the hierarchical modeling.
+
+Each of these methods ultimately reduces the problem to one involving only θ, which can then be combined with a prior to conduct a Bayesian analysis.
+
+**The Fully Bayesian Approach**
+
+The full Bayesian treatment of nuisance parameters avoids removing them from the likelihood altogether. Instead:
+
+1. **Assign priors** to all parameters, including nuisance ones.
+2. **Construct the joint posterior distribution** for all parameters.
+3. **Integrate out the nuisance parameters** to obtain the marginal posterior for θ.
+
+This method fully accounts for uncertainty in the nuisance parameters and is consistent with Bayesian principles. However, it can be computationally intensive, especially in high-dimensional models.
+
+This approach is used in various situations, such as:
+
+* Binomial data with uncertain control risks
+* Poisson models with unknown baseline rates
+* Normal models with unknown variances
+
+When hierarchical models are used, often the full Bayesian model is used only at the higher levels (e.g., for between-group variance τ), while using approximations at the lower (sampling) level.
+
+**Sensitivity analysis** is emphasized as essential when placing priors on nuisance parameters. Even seemingly non-informative priors can exert significant influence on the posterior if not carefully chosen. In such cases, combining traditional techniques for handling nuisance parameters with Bayesian analysis of the primary parameter may offer a good compromise.
+
+
+
+# How to Use Bayesian
+
+## Bayesian Checklist
+
+Here is a detailed explanation of the **Bayesian Checklist** for reporting and evaluating Bayesian analyses, especially in the context of health-care intervention studies. The checklist serves as a framework to ensure transparency, reproducibility, and credibility of Bayesian modeling and decision-making.
+
+---
+
+**1. Background**
+
+**The Intervention**
+Clearly describe the intervention being evaluated, the context (clinical or policy), and the target population. This should make clear the relevance and scope of the analysis.
+
+**Aim of Study**
+Specify what you are trying to infer (the parameters of interest, such as treatment effect) and what decisions or actions (if any) may follow from the analysis. The former requires a prior distribution; the latter should be supported by a loss or utility function.
+
+---
+
+**2. Methods**
+
+**Study Design**
+Describe the design of the study or studies being analyzed. If data are pooled from multiple sources, comment on their similarity to justify any assumptions of *exchangeability* (i.e. whether they can be treated as if drawn from the same distribution).
+
+**Outcome Measure**
+State the quantity of primary interest (e.g. odds ratio, risk difference, mean effect) that you are estimating or predicting.
+
+**Statistical Model**
+Lay out the relationship between the observed data and the underlying parameters. This could be a full probabilistic model (likelihood plus prior), or a description detailed enough for a competent analyst to reconstruct it mathematically.
+
+**Prospective Bayesian Analysis**
+Indicate whether the Bayesian components (e.g., priors, utility functions) were defined before data collection (prospective), or adapted after seeing the data (retrospective). Mention whether interim analyses were planned.
+
+**Prior Distribution**
+Clearly specify priors for all parameters of interest.
+
+* If **informative**, explain how it was elicited (e.g., expert opinion, historical data).
+* If **non-informative**, justify why it is reasonable in the context.
+* If multiple priors are compared (for sensitivity analysis), describe them all explicitly.
+
+**Loss Function or Decision Framework**
+If the study involves decisions (e.g., whether to proceed with treatment approval), specify the loss or utility function. This might involve:
+
+* A threshold for clinical equivalence
+* A cost-benefit tradeoff
+* An expert-elicited function
+  Explain how it was derived and how it connects to the posterior distribution.
+
+**Computation and Software**
+Describe what computational methods were used—especially if Markov Chain Monte Carlo (MCMC) or similar techniques were involved.
+
+* Mention the software used
+* Justify that the MCMC chains converged
+* Provide enough detail for results to be reproducible
+
+---
+
+**3. Results**
+
+**Evidence from the Study**
+Report the raw data as clearly as confidentiality permits:
+
+* Sample sizes
+* Measurements
+* Event counts
+* Observed means or proportions
+  This ensures that others can reconstruct the likelihood and use the results in subsequent meta-analyses.
+
+---
+
+**4. Interpretation**
+
+**Bayesian Interpretation**
+Summarize the posterior distribution:
+
+* Give credible intervals (e.g., 95%)
+* Include plots where helpful
+* Report posterior probabilities of clinically relevant thresholds being exceeded
+* If decision rules were used, interpret results in terms of the associated losses or utilities
+
+Make a clear distinction between:
+
+* A **stand-alone analysis** intended to guide an immediate decision
+* A **contributory analysis** that will be part of a larger evidence synthesis later
+
+**Sensitivity Analysis**
+Report how different prior distributions or loss functions affected the results. If the conclusions change substantially, this needs to be acknowledged and discussed.
+
+**Comments**
+Provide a candid evaluation of:
+
+* The strengths of the model (e.g., ability to handle uncertainty, use of external data)
+* Potential weaknesses (e.g., dependence on prior assumptions, model misspecification)
+  This promotes scientific transparency and helps users judge the robustness of the conclusions.
+
+---
+
+This checklist functions as a **template for best practices** in Bayesian analysis, ensuring clarity and reproducibility. It complements more general reporting standards like CONSORT but is focused on Bayesian-specific elements like priors, posterior distributions, and decision-making under uncertainty.
+
+
+## Structure of the Alternative
+
+It would be misleading to dichotomise statistical methods as either ‘classical’ or ‘Bayesian’, since both terms cover a bewildering range of techniques. A rough
+taxonomy can be developed by distinguishing two characteristics: whether or not
+prior distributions are used for inferences, and whether the objective is estimation, hypothesis testing or a decision requiring a loss function of some form. A
+
+
+* **Whether prior knowledge is used**:
+
+  * *Informal*: no formal incorporation of prior beliefs (typical in classical statistics).
+  * *Formal*: prior information is incorporated through a specified prior distribution (Bayesian approach).
+
+* **What the analysis aims to achieve**:
+
+  * *Inference (estimation)*: estimating unknown parameters.
+  * *Hypothesis testing*: comparing competing models or claims.
+  * *Decision-making*: making choices under uncertainty, typically using a loss or utility function.
+
+Here is the summarized structure:
+
+| Objective       | Informal (No Prior)           | Formal (Uses Prior)                  |
+| --------------- | ----------------------------- | ------------------------------------ |
+| Inference       | **Fisherian**                 | **Proper Bayesian**                  |
+| Hypothesis Test | **Neyman–Pearson**            | **Bayes Factors**                    |
+| Decision        | **Classical Decision Theory** | **Full Decision-Theoretic Bayesian** |
+
+
+
+1. **Fisherian (Inference + No Prior)**
+
+   Focuses on likelihood-based estimation, using maximum likelihood or likelihood intervals without formal priors.
+   
+   The Fisherian method focuses on the **likelihood function**, which measures how well different parameter values are supported by the observed data. Key elements include:
+
+   * **Maximum Likelihood Estimation (MLE)**: Selects the parameter value that maximizes the likelihood.
+   * **Likelihood-based intervals**: Constructed from regions with high likelihood support.
+   * **P-values**: Proposed by Fisher as a guide to measure evidence against the null hypothesis. However, Fisher intended P-values to be **informal**, not as rigid decision thresholds.
+  
+   **Criticism**: Fisher’s use of P-values has been misapplied over time—used as formal proof rather than as measures of evidence.
+
+2. **Proper Bayesian (Inference + Prior)**
+
+   Estimates parameters by combining prior distributions with likelihoods to form posterior distributions.
+
+3. **Neyman–Pearson (Testing + No Prior)**
+
+   Classical hypothesis testing framework: use of null/alternative hypotheses, p-values, Type I and II errors.
+   
+   Neyman–Pearson theory is based on **decision-making under repeated sampling** and is more procedural:
+   
+   * **Type I error (α)**: Probability of incorrectly rejecting the null hypothesis.
+   * **Type II error (β)**: Probability of failing to detect a real effect.
+   * **Power**: 1 − β, the probability of correctly detecting a true effect.
+   * **Confidence intervals**: Constructed so that, in the long run, 95% of them will contain the true value.
+  
+   **Criticism**: The approach doesn’t allow direct probability statements about the hypothesis or observed result in a specific trial. Its concepts apply to **repeated experiments**, not necessarily to the one at hand.
+
+4. **Bayes Factors (Testing + Prior)**
+
+   Bayesian hypothesis testing using the ratio of marginal likelihoods under two models (see Bayes Factor).
+   
+   * P-values do **not** obey the likelihood principle (they can depend on the study design or stopping rules).
+   * Bayes factors **do** obey the likelihood principle: they assess evidence **purely from the observed data**.
+   * P-values are often **misinterpreted** as the probability that H₀ is true. Bayes factors more naturally address that question.
+
+5. **Classical Decision Theory (Decision + No Prior)**
+
+   Uses frequentist ideas to minimize expected loss, assuming no prior distribution on parameters.
+
+6. **Full Decision-Theoretic Bayesian (Decision + Prior)**
+
+   Makes decisions by minimizing expected loss with respect to a posterior distribution. Explicitly combines beliefs and consequences.
