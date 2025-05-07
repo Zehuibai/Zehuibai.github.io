@@ -13,7 +13,7 @@
 
 <title> Analysis of Variance</title>
 
-<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
@@ -37,8 +37,8 @@
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
-<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -373,6 +373,9 @@ div.tocify {
       <a href="03-SSC-Case-Categorical-Endpoint.html">Sample Size Determination for Categorical Endpoint</a>
     </li>
     <li>
+      <a href="03-SSC-Sample-Size-Determination-for-Counts-and-Rates.html">Sample Size Determination for Counts and Rates</a>
+    </li>
+    <li>
       <a href="03-SSC-Case-Survival-Endpoint.html">Sample Size Determination for Survival Endpoint</a>
     </li>
     <li>
@@ -383,6 +386,9 @@ div.tocify {
     </li>
     <li>
       <a href="03-SSC-IA-Adaptive-Design.html">Statistical Considerations for Adaptive Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-Multiple-Test.html">Sample Size for Multiple Test</a>
     </li>
   </ul>
 </li>
@@ -414,10 +420,13 @@ div.tocify {
       <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
     </li>
     <li>
-      <a href="04-Design-Design-and-Evaluation-of-Complex-Sequential-Trials.html">Complex Sequential Analysis Trials</a>
+      <a href="04-Design-Complex-Sequential-Trials.html">Complex Sequential Analysis Trials</a>
     </li>
     <li>
       <a href="04-Design-Adaptive-Clinical-Trials.html">Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bayesian-Clinical-Trials.html">Bayesian Clinical Trials</a>
     </li>
     <li>
       <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
@@ -426,7 +435,10 @@ div.tocify {
       <a href="04-Design-Single-Arm-Clinical-Trials.html">Single Arm Clinical Trials</a>
     </li>
     <li>
-      <a href="04-Design-Design-and-Evaluation-of-Diagnostic-Study.html">Design and Evaluation of Diagnostic Study</a>
+      <a href="04-Design-Diagnostic-Study-Design-and-Evaluation.html">Diagnostic Study-Design and Evaluation</a>
+    </li>
+    <li>
+      <a href="04-Design-Diagnostic-Study-MRMC.html">Diagnostic Study-Multireader Multicase (MRMC)</a>
     </li>
     <li>
       <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
@@ -545,6 +557,9 @@ div.tocify {
     </li>
     <li>
       <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-SSD.html">Safety Signal Detection and Evaluation</a>
     </li>
     <li>
       <a href="06-Analysis-Meta-Analysis.html">Meta Analysis</a>
@@ -1143,7 +1158,6 @@ Intelligenz &lt;- data.frame(IQ.Werte=c(99, 131, 118, 112, 128, 136, 120, 107,
 Intelligenz$Fach &lt;- factor(Intelligenz$Fach,labels=c(&quot;I&quot;, &quot;II&quot;, &quot;III&quot;,&quot;IV&quot;))
 
 ## Compute summary statistics
-library(dplyr)
 group_by(Intelligenz, Fach) %&gt;%
   dplyr::summarise(
     count = n(),
@@ -1156,7 +1170,7 @@ group_by(Intelligenz, Fach) %&gt;%
   </script>
 </div>
 <pre class="r"><code>## Visualize your data with ggpubr
-library(&quot;ggpubr&quot;)
+# library(&quot;ggpubr&quot;)
 ggboxplot(Intelligenz, x = &quot;Fach&quot;, y = &quot;IQ.Werte&quot;, 
           color = &quot;Fach&quot;, 
           palette = c(&quot;#00AFBB&quot;, &quot;#E7B800&quot;, &quot;#FC4E07&quot;,&quot;#E7298A&quot;),
@@ -1221,7 +1235,7 @@ variances (relaxes the homogeneity of variance assumptions)</li>
 plot(Intelligenz.aov, 1)</code></pre>
 <p><img src="06-Analysis-ANOVA_files/figure-html/Homogeneity%20Test-1.png" width="672" /></p>
 <pre class="r"><code>## Levene’s test,  Homogeneity of variance assumption
-library(car)
+# library(car)
 leveneTest(IQ.Werte ~ Fach, data = Intelligenz)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
@@ -1637,12 +1651,12 @@ group_by(my_data, supp, dose) %&gt;%
   </script>
 </div>
 <pre class="r"><code># Visualize data
-library(&quot;ggpubr&quot;)
+# library(&quot;ggpubr&quot;)
 ggboxplot(my_data, x = &quot;dose&quot;, y = &quot;len&quot;, color = &quot;supp&quot;,
           palette = c(&quot;#00AFBB&quot;, &quot;#E7B800&quot;))</code></pre>
 <p><img src="06-Analysis-ANOVA_files/figure-html/Two-Ways%20ANOVA%20Test-1.png" width="672" /></p>
 <pre class="r"><code>## Two-way interaction plot
-library(&quot;ggpubr&quot;)
+# library(&quot;ggpubr&quot;)
 ggline(my_data, x = &quot;dose&quot;, y = &quot;len&quot;, color = &quot;supp&quot;,
        add = c(&quot;mean_se&quot;, &quot;dotplot&quot;),
        palette = c(&quot;#00AFBB&quot;, &quot;#E7B800&quot;))</code></pre>
@@ -1737,7 +1751,7 @@ TukeyHSD(res.aov3, which = &quot;dose&quot;)</code></pre>
 ## D1-D0.5  9.130  6.362488 11.897512 0.0e+00
 ## D2-D0.5 15.495 12.727488 18.262512 0.0e+00
 ## D2-D1    6.365  3.597488  9.132512 2.7e-06</code></pre>
-<pre class="r"><code>library(multcomp)
+<pre class="r"><code># library(multcomp)
 summary(glht(res.aov2, linfct = mcp(dose = &quot;Tukey&quot;)))</code></pre>
 <pre><code>## 
 ##   Simultaneous Tests for General Linear Hypotheses
@@ -1760,7 +1774,7 @@ summary(glht(res.aov2, linfct = mcp(dose = &quot;Tukey&quot;)))</code></pre>
 plot(res.aov3, 1)</code></pre>
 <p><img src="06-Analysis-ANOVA_files/figure-html/Two-Ways%20ANOVA%20Test-3.png" width="672" /></p>
 <pre class="r"><code>## Levene’s test to check the homogeneity of variances.
-library(car)
+# library(car)
 leveneTest(len ~ supp*dose, data = my_data)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
@@ -2626,7 +2640,7 @@ proc multtest inpvalues(pval)=pvals1 plots= RawUniformPlot;
 run;
 ods graphics off;</code></pre>
 <div class="figure" style="text-align: center">
-<img src="./02_Plots/ANOVA/Schweder-Spjøtvoll 1.png" alt="Figure: Schweder-Spjøtvoll (Uniform Probability) Plot" width="100%" />
+<img src="02_Plots/ANOVA/Schweder-Spj%C3%B8tvoll%201.PNG" alt="Figure: Schweder-Spjøtvoll (Uniform Probability) Plot" width="100%" />
 <p class="caption">
 Figure: Schweder-Spjøtvoll (Uniform Probability) Plot
 </p>
@@ -2637,7 +2651,7 @@ proc multtest inpvalues(probt)=ttests plots= RawUniformPlot;
 run;
 ods graphics off;</code></pre>
 <div class="figure" style="text-align: center">
-<img src="./02_Plots/ANOVA/Schweder-Spjøtvoll 2.png" alt="Figure: Plot of p-Values for the Cold Study" width="100%" />
+<img src="02_Plots/ANOVA/Schweder-Spj%C3%B8tvoll%202.PNG" alt="Figure: Plot of p-Values for the Cold Study" width="100%" />
 <p class="caption">
 Figure: Plot of p-Values for the Cold Study
 </p>
@@ -2665,7 +2679,7 @@ proc multtest inpvalues(pval)=pvals1
 run;
 ods graphics off;</code></pre>
 <div class="figure" style="text-align: center">
-<img src="./02_Plots/ANOVA/Schweder-Spjøtvoll 3.png" alt="Figure: Estimating the Number of True Nulls Using Hochberg and Benjamini’s Method" width="100%" />
+<img src="02_Plots/ANOVA/Schweder-Spj%C3%B8tvoll%203.PNG" alt="Figure: Estimating the Number of True Nulls Using Hochberg and Benjamini’s Method" width="100%" />
 <p class="caption">
 Figure: Estimating the Number of True Nulls Using Hochberg and
 Benjamini’s Method
@@ -2731,7 +2745,7 @@ squares mean is a simple forecast based on the table, or the marginal
 means of a list of forecast values.</li>
 </ul></li>
 </ul>
-<pre class="r"><code>library(lsmeans)
+<pre class="r"><code># library(lsmeans)
 head(oranges)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
@@ -3251,7 +3265,7 @@ run;
 quit;
 ods graphics off; </code></pre>
 <div class="figure" style="text-align: center">
-<img src="02_Plots/ANOVA/Turkey_Diffgram.png" alt="Figure: Diffogram indicating Comparisons of Diets" width="100%" />
+<img src="02_Plots/ANOVA/Turkey_Diffgram.PNG" alt="Figure: Diffogram indicating Comparisons of Diets" width="100%" />
 <p class="caption">
 Figure: Diffogram indicating Comparisons of Diets
 </p>
@@ -3458,7 +3472,7 @@ ods graphics off; </code></pre>
 <p><strong>Graphing the One-Sided Dunnett Comparisons</strong></p>
 <pre><code>lsmeans Trt/pdiff=controll;</code></pre>
 <div class="figure" style="text-align: center">
-<img src="02_Plots/ANOVA/Dunnett_OneSide.png" alt="Figure: Displaying One-Sided Dunnett Comparisons Graphically" width="100%" />
+<img src="02_Plots/ANOVA/Dunnett_OneSide.PNG" alt="Figure: Displaying One-Sided Dunnett Comparisons Graphically" width="100%" />
 <p class="caption">
 Figure: Displaying One-Sided Dunnett Comparisons Graphically
 </p>
@@ -4095,7 +4109,7 @@ run;
 quit;
 ods graphics off;</code></pre>
 <div class="figure" style="text-align: center">
-<img src="02_Plots/ANOVA/ACNOVA_Effect.png" alt="Figure: Fitted ANCOVA Model with Interaction" width="100%" />
+<img src="02_Plots/ANOVA/ACNOVA_Effect.PNG" alt="Figure: Fitted ANCOVA Model with Interaction" width="100%" />
 <p class="caption">
 Figure: Fitted ANCOVA Model with Interaction
 </p>
@@ -5455,7 +5469,7 @@ proc orthoreg data=Tox;
  lsmeans Trt / adjust=dunnett pdiff=controll stepdown;
 run;</code></pre>
 <p><strong>R Implementation</strong></p>
-<pre class="r"><code>library(&quot;multcomp&quot;)
+<pre class="r"><code># library(&quot;multcomp&quot;)
 data(&quot;recovery&quot;, package = &quot;multcomp&quot;)
 recovery.aov &lt;- aov(minutes ~ blanket, data = recovery)
 recovery.mc &lt;- glht(recovery.aov,

@@ -26,7 +26,8 @@ knitr::opts_chunk$set(echo = TRUE)
 # if(!require(psych)){install.packages("psych")}
 
 packages<-c("tidyverse", "kableExtra", "gtsummary",
-            "Hmisc","htmltools","clinUtils","sjPlot")
+            "Hmisc","htmltools","clinUtils","sjPlot",
+            "ggpubr","car","multcomp","lsmeans")
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(new.pkg)) 
@@ -435,7 +436,6 @@ Intelligenz <- data.frame(IQ.Werte=c(99, 131, 118, 112, 128, 136, 120, 107,
 Intelligenz$Fach <- factor(Intelligenz$Fach,labels=c("I", "II", "III","IV"))
 
 ## Compute summary statistics
-library(dplyr)
 group_by(Intelligenz, Fach) %>%
   dplyr::summarise(
     count = n(),
@@ -444,7 +444,7 @@ group_by(Intelligenz, Fach) %>%
   )
 
 ## Visualize your data with ggpubr
-library("ggpubr")
+# library("ggpubr")
 ggboxplot(Intelligenz, x = "Fach", y = "IQ.Werte", 
           color = "Fach", 
           palette = c("#00AFBB", "#E7B800", "#FC4E07","#E7298A"),
@@ -500,7 +500,7 @@ run;
 plot(Intelligenz.aov, 1)
 
 ## Levene’s test,  Homogeneity of variance assumption
-library(car)
+# library(car)
 leveneTest(IQ.Werte ~ Fach, data = Intelligenz)
 
 ## With no assumption of equal variances
@@ -731,12 +731,12 @@ group_by(my_data, supp, dose) %>%
   
                   
 # Visualize data
-library("ggpubr")
+# library("ggpubr")
 ggboxplot(my_data, x = "dose", y = "len", color = "supp",
           palette = c("#00AFBB", "#E7B800"))
 
 ## Two-way interaction plot
-library("ggpubr")
+# library("ggpubr")
 ggline(my_data, x = "dose", y = "len", color = "supp",
        add = c("mean_se", "dotplot"),
        palette = c("#00AFBB", "#E7B800"))
@@ -773,7 +773,7 @@ pairwise.t.test(my_data$len, my_data$dose,
 ## Multiple pairwise-comparison between the means of groups
 TukeyHSD(res.aov3, which = "dose")
 
-library(multcomp)
+# library(multcomp)
 summary(glht(res.aov2, linfct = mcp(dose = "Tukey")))
 
 ## 3. Homogeneity and normality
@@ -781,7 +781,7 @@ summary(glht(res.aov2, linfct = mcp(dose = "Tukey")))
 plot(res.aov3, 1)
 
 ## Levene’s test to check the homogeneity of variances.
-library(car)
+# library(car)
 leveneTest(len ~ supp*dose, data = my_data)
 
 ## Check the normality assumpttion
@@ -1529,7 +1529,7 @@ Remark:
 *Once the reference table is established, the least squares mean is a simple forecast based on the table, or the marginal means of a list of forecast values.
 
 ```{r Calculate the least squares mean in R,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library(lsmeans)
+# library(lsmeans)
 head(oranges)
 str(oranges)
 
@@ -3474,7 +3474,7 @@ run;
 
 
 ```{r step down Dunnett,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library("multcomp")
+# library("multcomp")
 data("recovery", package = "multcomp")
 recovery.aov <- aov(minutes ~ blanket, data = recovery)
 recovery.mc <- glht(recovery.aov,

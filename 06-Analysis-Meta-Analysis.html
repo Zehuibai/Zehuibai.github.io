@@ -1,0 +1,2229 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Meta Analysis</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Biosimilar-Trials.html">Statistical Considerations for the Design and Analysis of Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Alternatives-to-Power.html">Bayesian methods - Alternatives to Power</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Continuous-Endpoint.html">Sample Size Determination for Continuous Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Categorical-Endpoint.html">Sample Size Determination for Categorical Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-Determination-for-Counts-and-Rates.html">Sample Size Determination for Counts and Rates</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Survival-Endpoint.html">Sample Size Determination for Survival Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Repeated-Measures.html">Sample Size Determination for Repeated Measures</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Sequential-Design.html">Statistical Considerations for Group Sequential Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Adaptive-Design.html">Statistical Considerations for Adaptive Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-Multiple-Test.html">Sample Size for Multiple Test</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-Estimands-Framework.html">Estimands Framework</a>
+    </li>
+    <li>
+      <a href="04-Design-Estimands-Practice.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Complex-Sequential-Trials.html">Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Adaptive-Clinical-Trials.html">Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bayesian-Clinical-Trials.html">Bayesian Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Single-Arm-Clinical-Trials.html">Single Arm Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Diagnostic-Study-Design-and-Evaluation.html">Diagnostic Study-Design and Evaluation</a>
+    </li>
+    <li>
+      <a href="04-Design-Diagnostic-Study-MRMC.html">Diagnostic Study-Multireader Multicase (MRMC)</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Projecting-How-Long-Your-Trial-Will-Take.html">Projecting How Long Your Trial Will Take</a>
+    </li>
+    <li>
+      <a href="04-Design-Regulatory-Submission.html">Regulatory Submission from Stats Perspective</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot-Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Time-To-Event.html">Time to Event Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-PRO-Data.html">Patient Reported Outcome Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-SSC-and-Power-Calculation.html">Sample Size and Power Calculations Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Correlation.html">Correlation Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Model-Table.html">Clinical Data and Model visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-ScatterPlot.html">Scatter and Line Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-BarPlot.html">Bar Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-PieChart.html">Pie Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-BoxPlot.html">Box Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Histogram.html">Histogram</a>
+    </li>
+    <li>
+      <a href="05-Plot-Forest-Plot.html">Forest Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Flow-Chart.html">Flow Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-calculator"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Linear-Regression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-SSD.html">Safety Signal Detection and Evaluation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Meta-Analysis.html">Meta Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Time-Series-Analysis.html">Time Series Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-SEM.html">Structural Equation Modeling</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Factor-Analysis.html">Factor Analysis</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-bar-chart"></span>
+     
+    Machine Learning
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="07-ML-Bayesian-Theory.html">Bayesian Theory</a>
+    </li>
+    <li>
+      <a href="07-ML-Bayesian-Analysis.html">Bayesian Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Regularization-Penalized-Regression.html">Regularization Penalized Regression</a>
+    </li>
+    <li>
+      <a href="07-ML-Loss-Regression.html">Loss Functions in Machine Learning</a>
+    </li>
+    <li>
+      <a href="07-ML-PCA.html">Principal Component Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-KNN.html">K-Nearest Neighbors</a>
+    </li>
+    <li>
+      <a href="07-ML-SVM.html">Support Vector Machine</a>
+    </li>
+    <li>
+      <a href="07-ML-Tree-Models.html">Tree Models</a>
+    </li>
+    <li>
+      <a href="07-ML-LDA.html">Linear Discriminant Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Cluster-Analysis.html">Cluster Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Neural-Networks.html">Neural Network</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="08-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+<li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Meta Analysis</p></h1>
+
+</div>
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>In general, two types of evidence can be distinguished when
+performing a meta-analysis: individual participant data (IPD), and
+aggregate data (AD). &gt; 个体参与者数据 (IPD) 和聚合数据 (AD).</p>
+<blockquote>
+<p>AD
+更常见（例如来自文献），通常代表汇总估计，例如优势比或相对风险。这可以使用多种方法在概念上相似的研究中直接综合.
+IPD
+证据代表研究中心收集的原始数据。当需要证据综合时，这种区别提高了对不同元分析方法的需求.</p>
+</blockquote>
+<p>元分析的两种主要方法，即固定效应模型和随机效应模型.
+针对这两种模型，都引入了逆方差法 Inverse variance method 进行估计。</p>
+<ul>
+<li>固定效应模型提供了一系列研究估计的加权平均值。估计方差的倒数通常用作研究权重，因此较大的研究往往比较小的研究对加权平均值的贡献更大。因此，当荟萃分析中的研究以一项非常大的研究为主时，小型研究的结果实际上被忽略了。
+最重要的是，固定效应模型假设所有纳入的研究都调查相同的人群，使用相同的变量和结果定义等。这种假设通常是不现实的，因为研究通常容易出现多种异质性来源；例如治疗效果可能因地区、剂量水平、研究条件</li>
+<li>在随机效应荟萃分析的加权平均过程中应用的权重是通过两个步骤实现的：第
+1 步：逆方差加权, 第 2 步：通过应用随机效应方差分量 (REVC)
+来取消逆方差加权的权重，该分量简单地从基础研究的效应大小的可变性程度得出。这意味着效应大小的这种变异性（也称为异质性）越大，未加权就越大，这可能会达到随机效应荟萃分析结果成为研究中未加权平均效应大小的程度。</li>
+</ul>
+<div id="meta-analysis-for-different-data" class="section level3">
+<h3>meta-analysis for different data</h3>
+<ul>
+<li>Meta-analysis of binary outcome data <code>metabin</code></li>
+<li>Meta-analysis of continuous outcome data <code>metacont</code></li>
+<li>Meta-analysis of correlations <code>metacor</code></li>
+<li>Meta-analysis of incidence rates <code>metainc</code></li>
+<li>Meta-regression <code>metareg</code></li>
+<li>Meta-analysis of single proportions <code>metaprop</code></li>
+<li>Meta-analysis of single means <code>metamean</code></li>
+<li>Merge pooled results of two meta-analyses
+<code>metamerge</code></li>
+<li>Combine and summarize meta-analysis objects
+<code>metabind</code></li>
+</ul>
+<p>Meta-Analysis with Survival Outcomes</p>
+<pre class="r"><code>data4 &lt;- read.csv(&quot;./01_Datasets/dataset04.csv&quot;, as.is=TRUE)
+mg1 &lt;- metagen(logHR, selogHR,
+               studlab=paste(author, year), data=data4,
+               sm=&quot;HR&quot;)
+print(mg1, digits=2)</code></pre>
+<pre><code>## Number of studies: k = 4
+## 
+##                        HR       95%-CI     z p-value
+## Common effect model  0.89 [0.78; 1.01] -1.82  0.0688
+## Random effects model 0.89 [0.78; 1.01] -1.82  0.0688
+## 
+## Quantifying heterogeneity (with 95%-CIs):
+##  tau^2 &lt; 0.0001 [0.0000; 1.2885]; tau = 0.0011 [0.0000; 1.1351]
+##  I^2 = 17.2% [0.0%; 87.3%]; H = 1.10 [1.00; 2.81]
+## 
+## Test of heterogeneity:
+##     Q d.f. p-value
+##  3.62    3  0.3049
+## 
+## Details of meta-analysis methods:
+## - Inverse variance method
+## - Restricted maximum-likelihood estimator for tau^2
+## - Q-Profile method for confidence interval of tau^2 and tau
+## - Calculation of I^2 based on Q</code></pre>
+<p>Meta-Analysis of Cross-Over Trials</p>
+<pre class="r"><code>data5 &lt;- read.csv(&quot;./01_Datasets/dataset05.csv&quot;, as.is=TRUE)
+## meta-analysis of these cross-over trials
+mg2 &lt;- metagen(mean, SE, studlab=paste(author, year),
+               data=data5, sm=&quot;MD&quot;)
+print(summary(mg2), digits=2)</code></pre>
+<pre><code>##                               MD           95%-CI %W(common) %W(random)
+## Skrabal et al. 1981a       -4.50 [ -8.62;  -0.38]        2.2        4.6
+## Skrabal et al. 1981b       -0.50 [ -3.83;   2.83]        3.3        5.0
+## MacGregor et al. 1982      -4.00 [ -7.72;  -0.28]        2.6        4.8
+## Khaw and Thom 1982         -2.40 [ -4.56;  -0.24]        7.9        5.6
+## Richards et al. 1984       -1.00 [ -7.66;   5.66]        0.8        3.3
+## Smith et al. 1985           0.00 [ -3.72;   3.72]        2.6        4.8
+## Kaplan et al. 1985         -5.80 [ -8.94;  -2.66]        3.7        5.1
+## Zoccali et al. 1985        -3.00 [ -8.88;   2.88]        1.1        3.6
+## Matlou et al. 1986         -3.00 [ -5.94;  -0.06]        4.2        5.2
+## Barden et al. 1986         -1.50 [ -4.24;   1.24]        4.9        5.3
+## Poulter and Sever 1986      2.00 [ -2.31;   6.31]        2.0        4.5
+## Grobbee et al. 1987        -0.30 [ -3.24;   2.64]        4.2        5.2
+## Krishna et al. 1989        -8.00 [-12.31;  -3.69]        2.0        4.5
+## Mullen and O&#39;Connor 1990a   3.00 [ -0.92;   6.92]        2.4        4.7
+## Mullen and O&#39;Connor 1990b   1.40 [ -2.52;   5.32]        2.4        4.7
+## Patki et al. 1990         -13.10 [-14.47; -11.73]       19.5        5.9
+## Valdes et al. 1991         -3.00 [ -6.92;   0.92]        2.4        4.7
+## Barden et al. 1991         -0.60 [ -1.78;   0.58]       26.5        5.9
+## Overlack et al. 1991        3.00 [ -0.92;   6.92]        2.4        4.7
+## Smith et al. 1992          -1.70 [ -6.60;   3.20]        1.5        4.1
+## Fotherby and Potter 1992   -6.00 [-10.90;  -1.10]        1.5        4.1
+## 
+## Number of studies: k = 21
+## 
+##                         MD         95%-CI      z  p-value
+## Common effect model  -3.71 [-4.32; -3.11] -12.03 &lt; 0.0001
+## Random effects model -2.43 [-4.19; -0.66]  -2.69   0.0071
+## 
+## Quantifying heterogeneity (with 95%-CIs):
+##  tau^2 = 13.3645 [6.2066; 27.6896]; tau = 3.6558 [2.4913; 5.2621]
+##  I^2 = 92.5% [89.9%; 94.5%]; H = 3.66 [3.14; 4.25]
+## 
+## Test of heterogeneity:
+##       Q d.f.  p-value
+##  267.24   20 &lt; 0.0001
+## 
+## Details of meta-analysis methods:
+## - Inverse variance method
+## - Restricted maximum-likelihood estimator for tau^2
+## - Q-Profile method for confidence interval of tau^2 and tau
+## - Calculation of I^2 based on Q</code></pre>
+</div>
+</div>
+<div id="fixed-effect-model-for-continuous-outcomes"
+class="section level2">
+<h2>Fixed Effect Model for Continuous Outcomes</h2>
+<div id="effect-measures" class="section level3">
+<h3>Effect Measures</h3>
+<p>Meta-analysis typically focuses on comparing two interventions, which
+we refer to as experimental and control. When the response is continuous
+(i.e. quantitative) typically the mean, standard deviation and sample
+size are reported for each group.</p>
+<p><span class="math display">\[
+\begin{array}{|l|l}
+\hline n_{e} &amp; \text { Number of patients in the experimental (i.e.
+active) treatment arm } \\
+\hline \hat{\mu}_{e} &amp; \text { Mean response in the experimental
+treatment arm } \\
+\hline s_{e} &amp; \text { Standard deviation of the response in the
+experimental treatment arm } \\
+n_{c} &amp; \text { Number of patients in the control (often equivalent
+to placebo) arm } \\
+\hline \hat{\mu}_{c} &amp; \text { Mean response in the control arm } \\
+\hline s_{c} &amp; \text { Standard deviation of the response in the
+control arm } \\
+\hline
+\end{array}
+\]</span></p>
+</div>
+<div id="standardized-mean-difference" class="section level3">
+<h3>Standardized Mean Difference</h3>
+<p><strong>Mean difference</strong></p>
+<p>For study <span class="math inline">\(k\)</span>, the estimated mean
+difference is <span class="math display">\[
+\hat{\mu}_{k}=\hat{\mu}_{e k}-\hat{\mu}_{c k},
+\]</span> with variance estimate <span class="math display">\[
+\widehat{\operatorname{Var}}\left(\hat{\mu}_{k}\right)=\frac{s_{e
+k}^{2}}{n_{e k}}+\frac{s_{c k}^{2}}{n_{c k}}
+\]</span> An approximate two-sided <span
+class="math inline">\((1-\alpha)\)</span> confidence interval for the
+mean difference is given by <span class="math display">\[
+\left(\hat{\mu}_{e k}-\hat{\mu}_{c k}\right) \pm z_{1-\frac{\alpha}{2}}
+\sqrt{\frac{s_{e k}^{2}}{n_{e k}}+\frac{s_{c k}^{2}}{n_{c k}}}
+\]</span></p>
+<p><strong>Standardized Mean Difference</strong></p>
+<p>当所有研究均以相同规模测量了相关结果,
+可以通过汇总各个研究中的平均差异来直接估算总体效果。但 是, 在许多情况下,
+不同的研究使用不同的结果量表，例如不同的抑郁量表或生活质量量表。在这种情况
+下，我们无法直接合并效果估计值 (均值差异) 。取而代之的是,
+我们从每项研究中计算出无量纲的效果 度量 dimensionless effect,
+并将其用于合并
+一种非常流行的无量纲效果量度是标准化平均差，即研究的平均差除以基于单个治疗组或两个治疗组的标
+准差。R包meta的metacont函数基于合并样本方差的标准化均值差，称为Hedges。研究k的标准均值差计
+算为: <span class="math display">\[
+\hat{g}_{k}=\left(1-\frac{3}{4 n_{k}-9}\right) \frac{\hat{\mu}_{e
+k}-\hat{\mu}_{c k}}{\sqrt{\left(\left(n_{e k}-1\right) s_{e
+k}^{2}+\left(n_{c k}-1\right) s_{c k}^{2}\right) /\left(n_{k}-2\right)}}
+\]</span> where <span class="math inline">\(n_{k}=n_{e k}+n_{c
+k}\)</span> and the factor <span class="math inline">\(1-3 /\left(4
+n_{k}-9\right)\)</span> corrects for the bias in the estimated standard
+error. To calculate a confidence interval for <span
+class="math inline">\(\hat{g}_{k}\)</span>, we need its variance; again
+following RevMan is calculated as <span class="math display">\[
+\widehat{\operatorname{Var}}\left(\hat{g}_{k}\right)=\frac{n_{k}}{n_{e
+k} \cdot n_{c k}}+\frac{\hat{g}_{k}^{2}}{2\left(n_{k}-3.94\right)}
+\]</span> Once <span class="math inline">\(\hat{g}_{k}\)</span> and
+<span
+class="math inline">\(\widehat{\operatorname{Var}}\left(\hat{g}_{k}\right)\)</span>
+are calculated a two-sided <span
+class="math inline">\((1-\alpha)\)</span> confidence interval can be
+calculated by <span class="math display">\[\hat{g}_{k} \pm
+z_{1-\frac{\alpha}{2}} \text { S.E. }\left(\hat{g}_{k}\right)\]</span>
+Once <span class="math inline">\(\hat{g}_{k}\)</span> and <span
+class="math inline">\(\overline{\operatorname{Var}}\left(\hat{g}_{k}\right)\)</span>
+are calculated a two-sided <span
+class="math inline">\((1-\alpha)\)</span> confidence interval can be
+calculated by with standard error S.E. <span
+class="math inline">\(\left(\hat{g}_{k}\right)=\sqrt{\overline{\operatorname{Var}}\left(\hat{g}_{k}\right)}\)</span>
+and <span class="math inline">\(z_{1-\frac{\alpha}{2}}\)</span> denoting
+the <span class="math inline">\(1-\frac{\alpha}{2}\)</span> quantile of
+the standard normal distribution.</p>
+<ul>
+<li>use the metacont function to calculate mean difference and
+confidence interval</li>
+</ul>
+<pre class="r"><code>## use the metacont function to calculate mean difference and confidence interval
+## sm=&quot;MD&quot; (i.e. summary measure is the Mean Difference) as default setting.
+data(Fleiss1993cont) 
+m1 &lt;- metacont(n.psyc, mean.psyc, sd.psyc, n.cont, mean.cont, sd.cont,
+               data = Fleiss1993cont, sm = &quot;SMD&quot;)
+m1</code></pre>
+<pre><code>## Number of studies: k = 5
+## Number of observations: o = 232 (o.e = 106, o.c = 126)
+## 
+##                          SMD             95%-CI     z p-value
+## Common effect model  -0.3434 [-0.6068; -0.0801] -2.56  0.0106
+## Random effects model -0.3434 [-0.6068; -0.0801] -2.56  0.0106
+## 
+## Quantifying heterogeneity (with 95%-CIs):
+##  tau^2 = 0 [0.0000; 0.7255]; tau = 0 [0.0000; 0.8518]
+##  I^2 = 0.0% [0.0%; 79.2%]; H = 1.00 [1.00; 2.19]
+## 
+## Test of heterogeneity:
+##     Q d.f. p-value
+##  3.68    4  0.4514
+## 
+## Details of meta-analysis methods:
+## - Inverse variance method
+## - Restricted maximum-likelihood estimator for tau^2
+## - Q-Profile method for confidence interval of tau^2 and tau
+## - Calculation of I^2 based on Q
+## - Hedges&#39; g (bias corrected standardised mean difference; using exact formulae)</code></pre>
+</div>
+<div id="inverse-variance-weighted-average-method"
+class="section level3">
+<h3>Inverse variance-weighted average method</h3>
+<p>There are two methods for the fixed effects model meta-analysis: the
+IVW and weighted SZ. The fixed effects model assumes that all studies in
+a meta-analysis share a single true effect size.</p>
+<p>固定效应模型假设荟萃分析中成分研究 component studies
+的估计效应来自单个同质群体 single homogeneous populatio。
+因此，为了计算总体估算值，我们对每项研究的估算值取平均值，从而考虑到某些估算值比其他估算值更为精确的事实（来自较大的研究）</p>
+<p>More formally, let <span class="math inline">\(k=1, \ldots,
+K\)</span> index study, <span
+class="math inline">\(\hat{\theta}_{k}\)</span> denote the intervention
+effect estimate from study <span class="math inline">\(k\)</span>, and
+<span class="math inline">\(\theta\)</span> denote the intervention
+effect in the population, which we wish to estimate. Denote by <span
+class="math inline">\(\hat{\sigma}_{k}^{2}\)</span> the sample estimate
+of <span
+class="math inline">\(\operatorname{Var}\left(\hat{\theta}_{k}\right)\)</span>.
+The fixed effect model is <span class="math display">\[
+\hat{\theta}_{k}=\theta+\sigma_{k} \epsilon_{k}, \quad
+\epsilon_{k}^{\mathrm{i} . \mathrm{i} . \mathrm{d} .} N(0,1)
+\]</span> We now consider the fixed effect estimate of <span
+class="math inline">\(\theta\)</span>, denoted by <span
+class="math inline">\(\hat{\theta}_{F}\)</span>. Given estimates <span
+class="math inline">\(\left(\hat{\theta}_{k}, \hat{\sigma}_{k}\right),
+k=1, \ldots, K\)</span>, the maximum-likelihood estimate under model
+(2.7) is <span class="math display">\[
+\hat{\theta}_{F}=\frac{\sum_{k=1}^{K} \hat{\theta}_{k} /
+\hat{\sigma}_{k}^{2}}{\sum_{k=1}^{K} 1 /
+\hat{\sigma}_{k}^{2}}=\frac{\sum_{k=1}^{K} w_{k}
+\hat{\theta}_{k}}{\sum_{k=1}^{K} w_{k}}
+\]</span> Accordingly, <span
+class="math inline">\(\hat{\theta}_{F}\)</span> is a weighted average of
+the individual effect estimates <span
+class="math inline">\(\hat{\theta}_{k}\)</span> with weights <span
+class="math inline">\(w_{k}=1 / \hat{\sigma}_{k}^{2}\)</span>.
+Therefore, this method is called the <strong>inverse variance
+method</strong>. The variance of <span
+class="math inline">\(\hat{\theta}_{F}\)</span> is estimated by <span
+class="math display">\[
+\widehat{\operatorname{Var}}\left(\hat{\theta}_{F}\right)=\frac{1}{\sum_{k=1}^{K}
+w_{k}}
+\]</span> <span class="math inline">\((1-\alpha)\)</span> confidence
+interval for <span class="math inline">\(\hat{\theta}_{F}\)</span> can
+be calculated by <span class="math display">\[\hat{\theta}_{F} \pm
+z_{1-\frac{\alpha}{2}} \text { SE
+}\left(\hat{\theta}_{F}\right)\]</span></p>
+<pre class="r"><code>data1 &lt;- read.csv(&quot;./01_Datasets/dataset01.csv&quot;, as.is=TRUE)
+data2 &lt;- read.csv(&quot;./01_Datasets/dataset02.csv&quot;, as.is=TRUE)
+## The fixed effect estimate and its variance can be calculated using base R code
+
+## 1. Calculate mean difference, variance and weights
+MD &lt;- with(data1, Me - Mc)
+varMD &lt;- with(data1, Se^2/Ne + Sc^2/Nc)
+weight &lt;- 1/varMD
+
+## 2. Calculate the inverse variance estimator
+## the standard weighted.mean function is used to calculate theta_F.
+round(weighted.mean(MD, weight), 4)</code></pre>
+<pre><code>## [1] -15.514</code></pre>
+<pre class="r"><code>## 3. Calculate the variance
+round(1/sum(weight), 4)</code></pre>
+<pre><code>## [1] 1.4126</code></pre>
+<pre class="r"><code>## Alternative easier using the metacont function which yields identical results
+mc1 &lt;- metacont(Ne, Me, Se, Nc, Mc, Sc,
+                data=data1,
+                studlab=paste(author, year))
+round(c(mc1$TE.fixed, mc1$seTE.fixed^2), 4)</code></pre>
+<pre><code>## [1] -15.5140   1.4126</code></pre>
+<pre class="r"><code>## Forest Plot
+## pdf(file=&quot;Schwarzer-Fig2.3.pdf&quot;, width=9.6) 
+## uncomment line to generate PDF file
+forest(mc1, comb.random=FALSE, xlab=
+         &quot;Difference in mean response (intervention - control)
+units: maximum % fall in FEV1&quot;,
+       xlim=c(-50,10), xlab.pos=-20, smlab.pos=-20)</code></pre>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/IVW-1.png" width="960" /></p>
+<pre class="r"><code>## invisible(dev.off()) 
+## uncomment line to save PDF file</code></pre>
+</div>
+<div id="generic-inverse-variance-meta-analysis-metagen"
+class="section level3">
+<h3>Generic inverse variance meta-analysis <code>metagen</code></h3>
+<p>Fixed effect and random effects meta-analysis based on estimates
+(e.g. log hazard ratios) and their standard errors. The inverse variance
+method is used for pooling.</p>
+<ul>
+<li>sm: A character string indicating underlying summary measure, e.g.,
+“RD”, “RR”, “OR”, “ASD”, “HR”, “MD”, “SMD”, or “ROM”.</li>
+<li>Confidence intervals for individual studies: For the mean difference
+(argument sm = “MD”), the confidence interval for individual studies can
+be based on the
+<ul>
+<li>standard normal distribution (method.ci = “z”), or</li>
+<li>t-distribution (method.ci = “t”).</li>
+</ul></li>
+<li>Estimation of between-study variance:
+<ul>
+<li><code>method.tau = "DL"</code> DerSimonian-Laird estimator
+(DerSimonian and Laird, 1986)</li>
+<li><code>method.tau = "PM"</code> Paule-Mandel estimator (Paule and
+Mandel, 1982)</li>
+<li><code>method.tau = "REML"</code> Restricted maximum-likelihood
+estimator (Viechtbauer, 2005)</li>
+<li><code>method.tau = "ML"</code> Maximum-likelihood estimator
+(Viechtbauer, 2005)</li>
+<li><code>method.tau = "HS"</code> Hunter-Schmidt estimator (Hunter and
+Schmidt, 2015)</li>
+<li><code>method.tau = "SJ"</code> Sidik-Jonkman estimator (Sidik and
+Jonkman, 2005)</li>
+<li><code>method.tau = "HE"</code> Hedges estimator (Hedges and Olkin,
+1985)</li>
+<li><code>method.tau = "EB"</code> Empirical Bayes estimator (Morris,
+1983)</li>
+</ul></li>
+<li>Confidence interval for the between-study variance:
+<ul>
+<li><code>method.tau.ci = "J"</code> Method by Jackson (2013)</li>
+<li><code>method.tau.ci = "BJ"</code> Method by Biggerstaff and Jackson
+(2008)</li>
+<li><code>method.tau.ci = "QP"</code> Q-Profile method (Viechtbauer,
+2007)</li>
+<li><code>method.tau.ci = "PL"</code> Profile-Likelihood method for
+three-level meta-analysis model (Van den Noortgate et al., 2013)</li>
+</ul></li>
+</ul>
+<pre class="r"><code>mc1.gen &lt;- metagen(TE, seTE, data=mc1, sm=&quot;MD&quot;)
+## Print results for fixed effect and random effects method
+c(mc1$TE.fixed, mc1$TE.random)</code></pre>
+<pre><code>## [1] -15.51403 -15.64702</code></pre>
+<pre class="r"><code>c(mc1.gen$TE.fixed, mc1.gen$TE.random)</code></pre>
+<pre><code>## [1] -15.51403 -15.64702</code></pre>
+</div>
+<div id="weighted-sum-of-z-scores" class="section level3">
+<h3>Weighted Sum of Z-Scores</h3>
+<p>Another popular method for the fixed effects model meta-analysis is
+calculating the weighted SZ from the follows studies. Let <span
+class="math inline">\(Z_{i}\)</span> be the z-score from study <span
+class="math inline">\(i\)</span>, which <span
+class="math inline">\(N(0,1)\)</span> under the null hypothesis of no
+effects. Then, the weighted SZ statistic is <span
+class="math display">\[
+Z_{S Z}=\frac{\sum w_{S Z, i} Z_{i}}{\sqrt{\sum w_{S Z, i}{ }^{2}}}
+\]</span> By the characteristic of a normal distribution, <span
+class="math inline">\(\mathrm{Z}_{\mathrm{SZ}}\)</span> also follows
+<span class="math inline">\(N(0,1)\)</span> under the null hypothesis.
+To combine z-scores from multiple studies, a per-study sample size was
+suggested as weights of each study, as follows: <span
+class="math display">\[
+w_{S Z, i}=\sqrt{N_{i}}
+\]</span></p>
+</div>
+</div>
+<div id="random-effects-model-for-continuous-outcomes"
+class="section level2">
+<h2>Random Effects Model for Continuous Outcomes</h2>
+<div id="introduction-1" class="section level3">
+<h3>Introduction</h3>
+<p>The random effects model seeks to account for the fact that the study
+effect estimates <span class="math inline">\(\hat{\theta}_{k}\)</span>
+are often more variable than assumed in the fixed effect model. Under
+the random effects model, <span class="math display">\[
+\hat{\theta}_{k}=\theta+u_{k}+\sigma_{k} \epsilon_{k}, \quad
+\epsilon_{k}^{\text {i.i.d. }} N(0,1) ; u_{k}^{\text {i.i.d. }}
+N\left(0, \tau^{2}\right)
+\]</span> where the <span class="math inline">\(u\)</span> ’s and <span
+class="math inline">\(\epsilon\)</span> ’s are independent. Define <span
+class="math display">\[
+Q=\sum_{k=1}^{K} w_{k}\left(\hat{\theta}_{k}-\hat{\theta}_{F}\right)^{2}
+\]</span> the weighted sum of squares about the fixed effect estimate
+with <span class="math inline">\(w_{k}=1 /
+\hat{\sigma}_{k}^{2}\)</span>. This is usually referred to as either the
+homogeneity test statistic or the heterogeneity statistic. Next define
+<span class="math display">\[
+S=\sum_{k=1}^{K} w_{k}-\frac{\sum_{k=1}^{K} w_{k}^{2}}{\sum_{k=1}^{K}
+w_{k}}
+\]</span> If <span class="math inline">\(Q&lt;(K-1)\)</span>, then <span
+class="math inline">\(\hat{\tau}^{2}\)</span> is set to 0 and the random
+effects estimate <span class="math inline">\(\hat{\theta}_{R}\)</span>
+is set equal to the fixed effect estimate <span
+class="math inline">\(\hat{\theta}_{F}\)</span>. Otherwise, the
+<strong>Dersimonian-Laird estimator of the between-study
+variance</strong> is defined as <span class="math display">\[
+\hat{\tau}^{2}=\frac{Q-(K-1)}{S}
+\]</span> and the random effects estimate and its variance are given by
+<span class="math display">\[
+\begin{array}{c}
+\hat{\theta}_{R}=\frac{\sum_{k=1}^{K} w_{k}^{*}
+\hat{\theta}_{k}}{\sum_{k=1}^{K} w_{k}^{*}} \\
+\operatorname{Var}\left(\hat{\theta}_{R}\right)=\frac{1}{\sum_{k=1}^{K}
+w_{k}^{*}}
+\end{array}
+\]</span> with weights <span class="math inline">\(w_{k}^{*}=1
+/\left(\hat{\sigma}_{k}^{2}+\hat{\tau}^{2}\right)\)</span>. The random
+effects estimator <span class="math inline">\(\hat{\theta}_{R}\)</span>
+is a weighted average of the individual effect estimates <span
+class="math inline">\(\hat{\theta}_{k}\)</span> with weights <span
+class="math inline">\(1
+/\left(\hat{\sigma}_{k}^{2}+\hat{\tau}^{2}\right)\)</span>. Accordingly,
+this method is often called “<strong>Inverse variance method</strong>”,
+too. A <span class="math inline">\((1-\alpha)\)</span> confidence
+interval for <span class="math inline">\(\hat{\theta}_{R}\)</span> can
+be calculated by <span class="math display">\[\hat{\theta}_{R} \pm
+z_{1-\frac{\alpha}{2}} \text { S.E.
+}\left(\hat{\theta}_{R}\right)\]</span></p>
+</div>
+<div id="implementation" class="section level3">
+<h3>Implementation</h3>
+<p><strong>Estimation of Between-Study Variance</strong></p>
+<ul>
+<li>DerSimonian–Laird estimator (method.tau=“DL”) (default)</li>
+<li>Paule–Mandel estimator (method.tau=“PM”)</li>
+<li>Restricted maximum-likelihood estimator (method.tau=“REML”)</li>
+<li>Maximum-likelihood estimator (method.tau=“ML”)</li>
+<li>Hunter–Schmidt estimator (method.tau=“HS”)</li>
+<li>Sidik–Jonkman estimator (method.tau=“SJ”)</li>
+<li>Hedges estimator (method.tau=“HE”)</li>
+<li>Empirical Bayes estimator (method.tau=“EB”).</li>
+</ul>
+<pre class="r"><code># 1. Conduct meta-analyses
+# 1a. DerSimonian-Laird estimator (default)
+mg1.DL &lt;- metagen(TE, seTE, data=mc1)
+# 1b. Paule-Mandel estimator
+mg1.PM &lt;- metagen(TE, seTE, data=mc1, method.tau=&quot;PM&quot;)
+# 1c. Restricted maximum-likelihood estimator
+mg1.RM &lt;- metagen(TE, seTE, data=mc1, method.tau=&quot;REML&quot;)
+# 1d. Maximum-likelihood estimator
+mg1.ML &lt;- metagen(TE, seTE, data=mc1, method.tau=&quot;ML&quot;)
+# 1e. Hunter-Schmidt estimator
+mg1.HS &lt;- metagen(TE, seTE, data=mc1, method.tau=&quot;HS&quot;)
+# 1f. Sidik-Jonkman estimator
+mg1.SJ &lt;- metagen(TE, seTE, data=mc1, method.tau=&quot;SJ&quot;)
+# 1g. Hedges estimator
+mg1.HE &lt;- metagen(TE, seTE, data=mc1, method.tau=&quot;HE&quot;)
+# 1h. Empirical Bayes estimator
+mg1.EB &lt;- metagen(TE, seTE, data=mc1, method.tau=&quot;EB&quot;)
+# 2. Extract between-study variance tau-squared
+tau2 &lt;- data.frame(tau2=round(c(0,
+                                mg1.DL$tau^2, mg1.PM$tau^2,
+                                mg1.RM$tau^2, mg1.ML$tau^2,
+                                mg1.HS$tau^2, mg1.SJ$tau^2,
+                                mg1.HE$tau^2, mg1.EB$tau^2), 2),
+                   row.names=c(&quot;FE&quot;, &quot;DL&quot;, &quot;PM&quot;, &quot;REML&quot;, &quot;ML&quot;,
+                               &quot;HS&quot;, &quot;SJ&quot;, &quot;HE&quot;, &quot;EB&quot;))
+# 3. Print tau-squared values
+t(tau2)</code></pre>
+<pre><code>##      FE   DL   PM REML   ML   HS    SJ HE   EB
+## tau2  0 2.52 2.48 2.52 0.06 0.81 15.75  0 2.48</code></pre>
+<pre class="r"><code># 4. Create dataset with summaries
+res &lt;- data.frame(MD=c(mg1.DL$TE.fixed,
+                       mg1.DL$TE.random, mg1.PM$TE.random,
+                       mg1.RM$TE.random, mg1.ML$TE.random,
+                       mg1.HS$TE.random, mg1.SJ$TE.random,
+                       mg1.HE$TE.random, mg1.EB$TE.random),
+                  seMD=c(mg1.DL$seTE.fixed,
+                         mg1.DL$seTE.random, mg1.PM$seTE.random,
+                         mg1.RM$seTE.random, mg1.ML$seTE.random,
+                         mg1.HS$seTE.random, mg1.SJ$seTE.random,
+                         mg1.HE$seTE.random, mg1.EB$seTE.random),
+                  method=c(&quot;&quot;,
+                           &quot;DerSimonian-Laird&quot;,
+                           &quot;Paule-Mandel&quot;,
+                           &quot;Restricted maximum-likelihood&quot;,
+                           &quot;Maximum-likelihood&quot;,
+                           &quot;Hunter-Schmidt&quot;,
+                           &quot;Sidik-Jonkman&quot;,
+                           &quot;Hedges&quot;,
+                           &quot;Empirical Bayes&quot;),
+                  tau2=tau2,
+                  model=c(&quot;Fixed-effect model&quot;,
+                          rep(&quot;Random-effect model&quot;, 8)))
+knitr::kable(res)</code></pre>
+<table>
+<colgroup>
+<col width="6%" />
+<col width="12%" />
+<col width="11%" />
+<col width="37%" />
+<col width="7%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">MD</th>
+<th align="right">seMD</th>
+<th align="left">method</th>
+<th align="right">tau2</th>
+<th align="left">model</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">FE</td>
+<td align="right">-15.51403</td>
+<td align="right">1.188538</td>
+<td align="left"></td>
+<td align="right">0.00</td>
+<td align="left">Fixed-effect model</td>
+</tr>
+<tr class="even">
+<td align="left">DL</td>
+<td align="right">-15.64702</td>
+<td align="right">1.274628</td>
+<td align="left">DerSimonian-Laird</td>
+<td align="right">2.52</td>
+<td align="left">Random-effect model</td>
+</tr>
+<tr class="odd">
+<td align="left">PM</td>
+<td align="right">-15.64543</td>
+<td align="right">1.273478</td>
+<td align="left">Paule-Mandel</td>
+<td align="right">2.48</td>
+<td align="left">Random-effect model</td>
+</tr>
+<tr class="even">
+<td align="left">REML</td>
+<td align="right">-15.64702</td>
+<td align="right">1.274628</td>
+<td align="left">Restricted maximum-likelihood</td>
+<td align="right">2.52</td>
+<td align="left">Random-effect model</td>
+</tr>
+<tr class="odd">
+<td align="left">ML</td>
+<td align="right">-15.51773</td>
+<td align="right">1.190701</td>
+<td align="left">Maximum-likelihood</td>
+<td align="right">0.06</td>
+<td align="left">Random-effect model</td>
+</tr>
+<tr class="even">
+<td align="left">HS</td>
+<td align="right">-15.56254</td>
+<td align="right">1.217847</td>
+<td align="left">Hunter-Schmidt</td>
+<td align="right">0.81</td>
+<td align="left">Random-effect model</td>
+</tr>
+<tr class="odd">
+<td align="left">SJ</td>
+<td align="right">-15.95615</td>
+<td align="right">1.603754</td>
+<td align="left">Sidik-Jonkman</td>
+<td align="right">15.75</td>
+<td align="left">Random-effect model</td>
+</tr>
+<tr class="even">
+<td align="left">HE</td>
+<td align="right">-15.51403</td>
+<td align="right">1.188538</td>
+<td align="left">Hedges</td>
+<td align="right">0.00</td>
+<td align="left">Random-effect model</td>
+</tr>
+<tr class="odd">
+<td align="left">EB</td>
+<td align="right">-15.64543</td>
+<td align="right">1.273478</td>
+<td align="left">Empirical Bayes</td>
+<td align="right">2.48</td>
+<td align="left">Random-effect model</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># 5. Do meta-analysis
+m &lt;- metagen(MD, seMD, data=res,
+             studlab=method,
+             sm=&quot;MD&quot;,
+             comb.fixed=FALSE, comb.random=FALSE,
+             byvar=model)
+knitr::kable(m)</code></pre>
+<table style="width:100%;">
+<colgroup>
+<col width="17%" />
+<col width="5%" />
+<col width="5%" />
+<col width="6%" />
+<col width="2%" />
+<col width="1%" />
+<col width="5%" />
+<col width="5%" />
+<col width="5%" />
+<col width="5%" />
+<col width="6%" />
+<col width="11%" />
+<col width="5%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">studlab</th>
+<th align="right">TE</th>
+<th align="right">seTE</th>
+<th align="right">statistic</th>
+<th align="right">pval</th>
+<th align="left">df</th>
+<th align="right">lower</th>
+<th align="right">upper</th>
+<th align="right">w.common</th>
+<th align="right">w.random</th>
+<th align="right">zval</th>
+<th align="left">subgroup</th>
+<th align="right">w.fixed</th>
+<th align="left">byvar</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"></td>
+<td align="right">-15.51403</td>
+<td align="right">1.188538</td>
+<td align="right">-13.053036</td>
+<td align="right">0</td>
+<td align="left">NA</td>
+<td align="right">-17.84353</td>
+<td align="right">-13.18454</td>
+<td align="right">0.7079028</td>
+<td align="right">0.7079028</td>
+<td align="right">-13.053036</td>
+<td align="left">Fixed-effect model</td>
+<td align="right">0.7079028</td>
+<td align="left">Fixed-effect model</td>
+</tr>
+<tr class="even">
+<td align="left">DerSimonian-Laird</td>
+<td align="right">-15.64702</td>
+<td align="right">1.274628</td>
+<td align="right">-12.275758</td>
+<td align="right">0</td>
+<td align="left">NA</td>
+<td align="right">-18.14525</td>
+<td align="right">-13.14880</td>
+<td align="right">0.6155073</td>
+<td align="right">0.6155073</td>
+<td align="right">-12.275758</td>
+<td align="left">Random-effect model</td>
+<td align="right">0.6155073</td>
+<td align="left">Random-effect model</td>
+</tr>
+<tr class="odd">
+<td align="left">Paule-Mandel</td>
+<td align="right">-15.64543</td>
+<td align="right">1.273478</td>
+<td align="right">-12.285593</td>
+<td align="right">0</td>
+<td align="left">NA</td>
+<td align="right">-18.14140</td>
+<td align="right">-13.14946</td>
+<td align="right">0.6166196</td>
+<td align="right">0.6166196</td>
+<td align="right">-12.285593</td>
+<td align="left">Random-effect model</td>
+<td align="right">0.6166196</td>
+<td align="left">Random-effect model</td>
+</tr>
+<tr class="even">
+<td align="left">Restricted maximum-likelihood</td>
+<td align="right">-15.64702</td>
+<td align="right">1.274628</td>
+<td align="right">-12.275758</td>
+<td align="right">0</td>
+<td align="left">NA</td>
+<td align="right">-18.14525</td>
+<td align="right">-13.14880</td>
+<td align="right">0.6155073</td>
+<td align="right">0.6155073</td>
+<td align="right">-12.275758</td>
+<td align="left">Random-effect model</td>
+<td align="right">0.6155073</td>
+<td align="left">Random-effect model</td>
+</tr>
+<tr class="odd">
+<td align="left">Maximum-likelihood</td>
+<td align="right">-15.51773</td>
+<td align="right">1.190701</td>
+<td align="right">-13.032432</td>
+<td align="right">0</td>
+<td align="left">NA</td>
+<td align="right">-17.85146</td>
+<td align="right">-13.18400</td>
+<td align="right">0.7053334</td>
+<td align="right">0.7053334</td>
+<td align="right">-13.032432</td>
+<td align="left">Random-effect model</td>
+<td align="right">0.7053334</td>
+<td align="left">Random-effect model</td>
+</tr>
+<tr class="even">
+<td align="left">Hunter-Schmidt</td>
+<td align="right">-15.56254</td>
+<td align="right">1.217847</td>
+<td align="right">-12.778728</td>
+<td align="right">0</td>
+<td align="left">NA</td>
+<td align="right">-17.94947</td>
+<td align="right">-13.17560</td>
+<td align="right">0.6742399</td>
+<td align="right">0.6742399</td>
+<td align="right">-12.778728</td>
+<td align="left">Random-effect model</td>
+<td align="right">0.6742399</td>
+<td align="left">Random-effect model</td>
+</tr>
+<tr class="odd">
+<td align="left">Sidik-Jonkman</td>
+<td align="right">-15.95615</td>
+<td align="right">1.603754</td>
+<td align="right">-9.949252</td>
+<td align="right">0</td>
+<td align="left">NA</td>
+<td align="right">-19.09945</td>
+<td align="right">-12.81285</td>
+<td align="right">0.3887986</td>
+<td align="right">0.3887986</td>
+<td align="right">-9.949252</td>
+<td align="left">Random-effect model</td>
+<td align="right">0.3887986</td>
+<td align="left">Random-effect model</td>
+</tr>
+<tr class="even">
+<td align="left">Hedges</td>
+<td align="right">-15.51403</td>
+<td align="right">1.188538</td>
+<td align="right">-13.053036</td>
+<td align="right">0</td>
+<td align="left">NA</td>
+<td align="right">-17.84353</td>
+<td align="right">-13.18454</td>
+<td align="right">0.7079028</td>
+<td align="right">0.7079028</td>
+<td align="right">-13.053036</td>
+<td align="left">Random-effect model</td>
+<td align="right">0.7079028</td>
+<td align="left">Random-effect model</td>
+</tr>
+<tr class="odd">
+<td align="left">Empirical Bayes</td>
+<td align="right">-15.64543</td>
+<td align="right">1.273478</td>
+<td align="right">-12.285593</td>
+<td align="right">0</td>
+<td align="left">NA</td>
+<td align="right">-18.14140</td>
+<td align="right">-13.14946</td>
+<td align="right">0.6166196</td>
+<td align="right">0.6166196</td>
+<td align="right">-12.285593</td>
+<td align="left">Random-effect model</td>
+<td align="right">0.6166196</td>
+<td align="left">Random-effect model</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># 6. Do forest plot
+# pdf(file=&quot;Schwarzer-Fig2.5.pdf&quot;, width=8.1, height=4.0) 
+# uncomment line to generate PDF file
+forest(m,
+       xlim=c(-20, -12),
+       hetstat=FALSE, smlab=&quot;&quot;,
+       leftcols=c(&quot;studlab&quot;, &quot;tau2&quot;),
+       leftlabs=c(&quot;Method&quot;, &quot;Between-study\nheterogeneity&quot;),
+       print.byvar=FALSE)</code></pre>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/Random-Effects-Model-1.png" width="960" /></p>
+<pre class="r"><code># invisible(dev.off()) # uncomment line to save PDF file   </code></pre>
+</div>
+<div id="hartung-knapp-adjustment" class="section level3">
+<h3>Hartung-Knapp Adjustment</h3>
+<p>Hartung and Knapp (2001a,b) proposed an alternative method for random
+effects meta-analysis based on a refined variance estimator for the
+treatment estimate. Simulation studies (Hartung and Knapp, 2001a,b;
+IntHout et al., 2014; Langan et al., 2019) show <strong>improved
+coverage probabilities</strong> compared to the classic random effects
+method.</p>
+<p>Hartung和Knapp
+在随机效应模型中引入了一种基于改进方差估计器的新的会萃分析方法。与DerSimonianLaird方法相比，首选Hartung-Knapp方法。
+代替使方差估计 <span class="math display">\[
+\widehat{\operatorname{Var}}\left(\hat{\theta}_{R}\right)=\frac{1}{\sum_{k=1}^{K}
+w_{k}^{*}}
+\]</span> Instead of using the variance estimate given in Eq. (2.14),
+Hartung and Knapp propose to use the following variance estimator for
+<span class="math inline">\(\hat{\theta}_{R}\)</span> : <span
+class="math display">\[
+\widehat{\operatorname{Var}}_{\mathrm{HK}}\left(\hat{\theta}_{R}\right)=\frac{1}{K-1}
+\sum_{k=1}^{K}
+\frac{w_{k}^{*}}{w^{*}}\left(\hat{\theta}_{k}-\hat{\theta}_{R}\right)^{2}
+\]</span> with weights <span class="math inline">\(w_{k}^{*}\)</span> as
+given in above and <span class="math inline">\(w=\sum k=1^{K} w
+k\)</span>. Hartung showed that <span class="math display">\[
+\frac{\hat{\theta}_{R}-\theta}{\text { S.E. }
+\mathrm{HK}\left(\hat{\theta}_{R}\right)}
+\]</span> with standard error s.E. <span
+class="math inline">\(\mathrm{HK}\left(\hat{\theta}_{R}\right)=\sqrt{\widehat{\operatorname{Var}}_{\mathrm{HK}}\left(\hat{\theta}_{R}\right)}\)</span>
+follows a <span class="math inline">\(t\)</span> -distribution with
+<span class="math inline">\(K-1\)</span> degrees of freedom.
+Accordingly, a <span class="math inline">\((1-\alpha)\)</span>
+confidence interval for <span
+class="math inline">\(\hat{\theta}_{R}\)</span> based on the
+Hartung-Knapp method can be calculated by <span class="math display">\[
+\hat{\theta}_{R} \pm t_{K-1 ; 1-\frac{\alpha}{2}} \text { S.E. }
+\mathrm{HK}\left(\hat{\theta}_{R}\right)
+\]</span></p>
+<pre class="r"><code> ## use the metacont function to conduct the Hartung–Knapp adjustment
+mc2.hk &lt;- metacont(Ne, Me, Se, Nc, Mc, Sc, sm=&quot;SMD&quot;,
+                   data=data2, comb.fixed=FALSE,
+                   hakn=TRUE)</code></pre>
+<p>However, in rare settings with very homogeneous treatment estimates,
+the Hartung-Knapp (HK) variance estimate can be arbitrarily small
+resulting in a very narrow confidence interval (Knapp and Hartung, 2003;
+Wiksten et al., 2016). In such cases, an ad hoc variance correction has
+been proposed by utilising the variance estimate from the classic random
+effects model with the HK method (Knapp and Hartung, 2003; IQWiQ, 2020).
+An alternative approach is to use the wider confidence interval of
+classic fixed or random effects meta-analysis and the HK method (Wiksten
+et al., 2016; Jackson et al., 2017).</p>
+<ul>
+<li><code>adhoc.hakn = ""</code> Ad hoc method not used</li>
+<li><code>adhoc.hakn = "se"</code> use variance correction if HK
+standard error is smaller than standard error from classic random
+effects meta-analysis (Knapp and Hartung, 2003)</li>
+<li><code>adhoc.hakn = "iqwig6"</code> use variance correction if HK
+confidence interval is narrower than CI from classic random effects
+model with DerSimonian-Laird estimator (IQWiG, 2020)</li>
+<li><code>adhoc.hakn = "ci"</code> use wider confidence interval of
+classic random effects and HK meta-analysis (Hybrid method 2 in Jackson
+et al., 2017)</li>
+</ul>
+</div>
+</div>
+<div id="meta-regression" class="section level2">
+<h2>Meta-Regression</h2>
+<p>元回归是对多个二进制/分类协变量或连续协变量的扩展。Meta-regression
+model <span class="math display">\[
+\hat{\theta}_{k}=\theta+\beta_{1} x_{1 k}+\cdots+\beta_{P} x_{P
+k}+u_{k}+\sigma_{k} \epsilon_{k}, \quad \epsilon_{k}^{\text {i.i.d. }}
+N(0,1) ; u_{k}^{\text {i.i.d. }} N\left(0, \tau^{2}\right)
+\]</span> with <span class="math inline">\(k=1, \ldots, K\)</span> and
+independent error terms <span class="math inline">\(u\)</span> and <span
+class="math inline">\(\epsilon\)</span>. As this model has both fixed
+effect <span class="math inline">\((\beta \mathrm{s})\)</span> and
+random effects terms <span
+class="math inline">\(\left(u_{k}\right.\)</span> with variance <span
+class="math inline">\(\left.\tau^{2}\right)\)</span> this
+meta-regression model is also called a mixed effects model. The fixed
+effect meta-regression is a special case of the mixed effects model when
+the between-study variance <span
+class="math inline">\(\tau^{2}=0\)</span>.</p>
+<p>n order to calculate 95 % confidence intervals for studies with
+longer study duration based on information from the meta-regression
+model, the variance–covariance matrix of the estimated coefficients has
+to be taken into account.</p>
+<pre class="r"><code>data3 &lt;- read.csv(&quot;./01_Datasets/dataset03.csv&quot;, as.is=TRUE)
+## Meta-Regression with a Categorical Covariate
+mc3s.c &lt;- metacont(Ne, Me, Se, Nc, Mc, Sc, data=data3,
+                   studlab=paste(author, year),
+                   byvar=duration, print.byvar=FALSE,
+                   tau.common=TRUE, comb.fixed=FALSE)
+print(summary(mc3s.c), digits=2)</code></pre>
+<pre><code>##                     MD         95%-CI %W(random)    duration
+## Bontognali 1991  -0.57 [-2.69;  1.55]        0.0 &lt;= 3 months
+## Castiglioni 1986 -0.10 [-0.14; -0.06]        5.8 &lt;= 3 months
+## Cremonini 1986   -0.46 [-0.62; -0.30]        2.7 &lt;= 3 months
+## Grassi 1994      -0.29 [-0.45; -0.13]        2.7 &lt;= 3 months
+## Jackson 1984     -0.02                       0.0 &lt;= 3 months
+## Allegra 1996     -0.04 [-0.06; -0.02]        6.1  &gt; 3 months
+## Babolini 1980    -0.20 [-0.24; -0.16]        5.8  &gt; 3 months
+## Boman 1983       -0.12 [-0.20; -0.04]        4.8  &gt; 3 months
+## Borgia 1981      -0.10 [-0.22;  0.02]        3.6  &gt; 3 months
+## Decramer 2005    -0.01 [-0.03;  0.01]        6.1  &gt; 3 months
+## Grassi 1976      -0.13 [-0.22; -0.04]        4.5  &gt; 3 months
+## Grillage 1985    -0.02                       0.0  &gt; 3 months
+## Hansen 1994      -0.05 [-0.11;  0.01]        5.3  &gt; 3 months
+## Malerba 2004     -0.01 [-0.03;  0.01]        6.2  &gt; 3 months
+## McGavin 1985     -0.10 [-0.21;  0.01]        3.8  &gt; 3 months
+## Meister 1986     -0.05 [-0.10; -0.00]        5.6  &gt; 3 months
+## Meister 1999     -0.04 [-0.08; -0.00]        5.9  &gt; 3 months
+## Moretti 2004     -0.05 [-0.10;  0.00]        5.4  &gt; 3 months
+## Nowak 1999       -0.03 [-0.05; -0.01]        6.1  &gt; 3 months
+## Olivieri 1987    -0.15 [-0.25; -0.05]        4.2  &gt; 3 months
+## Parr 1987        -0.03 [-0.07;  0.01]        5.8  &gt; 3 months
+## Pela 1999        -0.12 [-0.20; -0.04]        4.7  &gt; 3 months
+## Rasmussen 1988   -0.01 [-0.09;  0.07]        4.7  &gt; 3 months
+## 
+## Number of studies: k = 21
+## Number of observations: o = 5055 (o.e = 2543, o.c = 2512)
+## 
+##                         MD         95%-CI     z  p-value
+## Random effects model -0.09 [-0.12; -0.05] -4.89 &lt; 0.0001
+## 
+## Quantifying heterogeneity (with 95%-CIs):
+##  tau^2 = 0.0051 [0.0029; 0.0196]; tau = 0.0711 [0.0536; 0.1401]
+##  I^2 = 85.5% [79.1%; 89.9%]; H = 2.63 [2.19; 3.15]
+## 
+## Quantifying residual heterogeneity (with 95%-CIs):
+##  tau^2 = 0.0040; tau = 0.0636; I^2 = 83.8% [76.2%; 89.0%]; H = 2.49 [2.05; 3.01]
+## 
+## Test of heterogeneity:
+##       Q d.f.  p-value
+##  138.08   20 &lt; 0.0001
+## 
+## Results for subgroups (random effects model):
+##               k    MD         95%-CI  tau^2    tau     Q   I^2
+## &lt;= 3 months   4 -0.23 [-0.32; -0.13] 0.0040 0.0636 22.43 86.6%
+## &gt; 3 months   17 -0.07 [-0.10; -0.03] 0.0040 0.0636 94.92 83.1%
+## 
+## Test for subgroup differences (random effects model):
+##                     Q d.f.  p-value
+## Between groups   9.15    1   0.0025
+## Within groups  117.35   19 &lt; 0.0001
+## 
+## Details of meta-analysis methods:
+## - Inverse variance method
+## - Restricted maximum-likelihood estimator for tau^2
+##   (assuming common tau^2 in subgroups)
+## - Q-Profile method for confidence interval of tau^2 and tau
+## - Calculation of I^2 based on Q</code></pre>
+<pre class="r"><code>mc3s.mr &lt;- metareg(mc3s.c)
+print(mc3s.mr, digits=2)</code></pre>
+<pre><code>## 
+## Mixed-Effects Model (k = 21; tau^2 estimator: REML)
+## 
+## tau^2 (estimated amount of residual heterogeneity):     0.00 (SE = 0.00)
+## tau (square root of estimated tau^2 value):             0.06
+## I^2 (residual heterogeneity / unaccounted variability): 89.66%
+## H^2 (unaccounted variability / sampling variability):   9.67
+## R^2 (amount of heterogeneity accounted for):            19.93%
+## 
+## Test for Residual Heterogeneity:
+## QE(df = 19) = 117.35, p-val &lt; .01
+## 
+## Test of Moderators (coefficient 2):
+## QM(df = 1) = 9.15, p-val &lt; .01
+## 
+## Model Results:
+## 
+##                      estimate    se   zval  pval  ci.lb  ci.ub      
+## intrcpt                 -0.23  0.05  -4.58  &lt;.01  -0.32  -0.13  *** 
+## .subgroup&gt; 3 months      0.16  0.05   3.02  &lt;.01   0.06   0.26   ** 
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code># Variance-covariance matrix
+varcov &lt;- vcov(mc3s.mr)
+# Estimated treatment effect in studies with longer duration
+TE.s2 &lt;- sum(coef(mc3s.mr))
+# Standard error of treatment effect
+seTE.s2 &lt;- sqrt(sum(diag(varcov)) + 2*varcov[1,2])
+
+
+## The quantities TE.s2 and seTE.s2 can be used as input to the metagen function to estimate a 95 % confidence interval.
+print(metagen(TE.s2, seTE.s2, sm=&quot;MD&quot;), digits=2)</code></pre>
+<pre><code>## 
+##     MD         95%-CI     z  p-value
+##  -0.07 [-0.10; -0.03] -3.93 &lt; 0.0001</code></pre>
+</div>
+<div id="meta-analysis-with-binary-outcomes" class="section level2">
+<h2>Meta-Analysis with Binary Outcomes</h2>
+<div id="effect-measures-1" class="section level3">
+<h3>Effect Measures</h3>
+<p>The most commonly used effect measures for binary outcomes are the
+<strong>odds ratio, risk ratio and risk difference</strong>. Another
+effect measure, the arcsine difference (反正弦差异), which is used in
+tests for small-study effects 通常使用优势比和风险比。原因，these
+relative effect measures are on average more stable across studies than
+the risk difference (更稳定)</p>
+<p>Summary data of study k in meta-analysis with binary responses .<span
+class="math inline">\(k =1;...; K\)</span></p>
+<p><span class="math display">\[\begin{array}{l|l|l|l}
+\hline &amp; \text { Event } &amp; \text { No event } &amp; \text {
+Group size } \\
+\hline \text { Experimental } &amp; a_{k} &amp; b_{k} &amp; n_{e
+k}=a_{k}+b_{k} \\
+\hline \text { Control } &amp; c_{k} &amp; d_{k} &amp; n_{c
+k}=c_{k}+d_{k} \\
+\hline &amp; a_{k}+c_{k} &amp; b_{k}+d_{k} &amp; n_{k} \\
+\hline
+\end{array}\]</span> These probabilities are estimated from the observed
+cell counts by <span class="math display">\[\hat{p}_{e k}=a_{k}
+/\left(a_{k}+b_{k}\right)=a_{k} / n_{e k} \text { and } \hat{p}_{c
+k}=c_{k} /\left(c_{k}+d_{k}\right)=c_{k} / n_{c k}\]</span></p>
+<div id="odds-ratio" class="section level4">
+<h4>Odds Ratio</h4>
+<p>The odds ratio for study <span class="math inline">\(k,
+\psi_{k}\)</span>, is defined as the ratio of the odds of an event in
+the experimental arm to that in the control arm. That is <span
+class="math display">\[
+\psi_{k}=\frac{\left(\frac{p_{e k}}{1-p_{e k}}\right)}{\left(\frac{p_{c
+k}}{1-p_{c k}}\right)}=\frac{p_{e k}\left(1-p_{c k}\right)}{p_{c
+k}\left(1-p_{e k}\right)}
+\]</span> - If either of the two estimated event probabilities is zero
+the log odds ratio, <span class="math inline">\(\log \psi_{k}\)</span>,
+is either <span class="math inline">\(-\infty\)</span> or <span
+class="math inline">\(+\infty\)</span> - If both are zero, the log odds
+ratio is undefined. The odds ratio from study <span
+class="math inline">\(k\)</span> is estimated by <span
+class="math display">\[
+\hat{\psi}_{k}=\frac{a_{k} d_{k}}{b_{k} c_{k}}
+\]</span> variance of the natural logarithm of the odds ratio is well
+approximated by <span class="math display">\[
+\widehat{\operatorname{Var}}\left(\log
+\hat{\psi}_{k}\right)=\frac{1}{a_{k}}+\frac{1}{b_{k}}+\frac{1}{c_{k}}+\frac{1}{d_{k}}
+\]</span> where the approximation improves as nek and <span
+class="math inline">\(n_{c k}\)</span> increase. Using the estimate of
+the log odds ratio, and its estimated variance, an approximate two-sided
+<span class="math inline">\((1-\alpha)\)</span> confidence interval for
+the odds ratio is given by <span class="math display">\[\exp \left(\log
+\hat{\psi}_{k} \pm z_{1-\frac{\alpha}{2}} \text { S.E. }\left(\log
+\hat{\psi}_{k}\right)\right)\]</span></p>
+<pre><code>metabin(Ee, Ne, Ec, Nc, sm=&quot;OR&quot;, method=&quot;I&quot;,
+        data=data7, subset=study==&quot;Milpied&quot;)</code></pre>
+</div>
+<div id="risk-ratio" class="section level4">
+<h4>Risk Ratio</h4>
+<p>The risk ratio <span class="math inline">\(\phi_{k}\)</span>, often
+called relative risk, is defined as the ratio of the two event
+probabilities, <span class="math display">\[
+\phi_{k}=\frac{p_{e k}}{p_{c k}}
+\]</span> If either of the two event probabilities is zero the log risk
+ratio <span class="math inline">\(\log \phi_{k}\)</span>, is either
+<span class="math inline">\(-\infty\)</span> or <span
+class="math inline">\(+\infty .\)</span> If both probabilities are zero,
+the log risk ratio is undefined. The risk ratio is estimated by <span
+class="math display">\[
+\hat{\phi}_{k}=\frac{\left(\frac{a_{k}}{a_{k}+b_{k}}\right)}{\left(\frac{c_{k}}{c_{k}+d_{k}}\right)}
+\]</span> whose variance is approximated by <span
+class="math display">\[
+\widehat{\operatorname{Var}}\left(\log
+\hat{\phi}_{k}\right)=\frac{1}{a_{k}}+\frac{1}{c_{k}}-\frac{1}{a_{k}+b_{k}}-\frac{1}{c_{k}+d_{k}}
+\]</span></p>
+<pre><code>metabin(Ee, Ne, Ec, Nc, sm=&quot;RR&quot;, method=&quot;I&quot;,
+        data=data7, subset=study==&quot;Milpied&quot;)</code></pre>
+</div>
+<div id="risk-difference" class="section level4">
+<h4>Risk Difference</h4>
+<p>The risk difference <span class="math inline">\(\eta_{k}\)</span> is
+defined as the difference between the two event probabilities <span
+class="math display">\[
+\eta_{k}=p_{e k}-p_{c k}
+\]</span> The risk difference is always defined and has finite range
+from <span class="math inline">\(-1\)</span> to 1 . The natural estimate
+of the risk difference is <span class="math display">\[
+\hat{\eta}_{k}=\frac{a_{k}}{a_{k}+b_{k}}-\frac{c_{k}}{c_{k}+d_{k}}
+\]</span> with corresponding variance estimate <span
+class="math display">\[
+\widehat{\operatorname{Var}}\left(\hat{\eta}_{k}\right)=\frac{a_{k}
+b_{k}}{\left(a_{k}+b_{k}\right)^{3}}+\frac{c_{k}
+d_{k}}{\left(c_{k}+d_{k}\right)^{3}}
+\]</span> An approximate two-sided <span
+class="math inline">\((1-\alpha)\)</span> confidence interval for the
+risk difference is thus <span class="math display">\[
+\hat{\eta}_{k} \pm z_{1-\frac{\alpha}{2}} \text { S.E.
+}\left(\hat{\eta}_{k}\right)
+\]</span></p>
+<pre><code>metabin(Ee, Ne, Ec, Nc, sm=&quot;RD&quot;, method=&quot;I&quot;,
+        data=data7, subset=study==&quot;Milpied&quot;)</code></pre>
+</div>
+<div id="arcsine-difference" class="section level4">
+<h4>Arcsine Difference</h4>
+<p>The arcsine difference has been considered as a measure of
+effectiveness in clinical trials, though it is rarely used in practice.
+However, it has certain advantages when assessing whether a
+meta-analysis may be affected by publication bias or other small-study
+effects. The arcsine difference is defined as the difference of the
+arcsine-transformed event probabilities
+(反正弦差定义为反正弦转换事件概率的差), that is <span
+class="math display">\[\Delta_{k}=\arcsin \sqrt{p_{e k}}-\arcsin
+\sqrt{p_{c k}}\]</span></p>
+<blockquote>
+<p>如果两个事件概率都接近，则反正弦差的值类似于风险差，否则值可能会完全不同</p>
+</blockquote>
+<p>Like the risk difference, the arcsine difference is always defined,
+with a finite range from <span class="math inline">\(-\pi / 2\)</span>
+to <span class="math inline">\(\pi / 2\)</span>. The value of the
+arcsine difference is similar to the risk difference if both event
+probabilities are close to <span class="math inline">\(0.5\)</span>,
+otherwise the values can be quite different.</p>
+<p>The arcsine difference is estimated by <span class="math display">\[
+\hat{\Delta}_{k}=\arcsin \sqrt{\frac{a_{k}}{n_{e k}}}-\arcsin
+\sqrt{\frac{c_{k}}{n_{c k}}}
+\]</span> with approximate variance <span class="math display">\[
+\widehat{\operatorname{Var}}\left(\hat{\Delta}_{k}\right)=\frac{1}{4
+n_{e k}}+\frac{1}{4 n_{c k}} \approx \frac{1}{n_{k}}, \text { if } n_{e
+k} \approx n_{c k}
+\]</span> where the approximation improves as nek and <span
+class="math inline">\(n c k\)</span> increase. Notice that the
+approximate variance of <span class="math inline">\(\hat{\Delta}
+k\)</span> only depends on the sample size in the two groups. A
+confidence interval for <span class="math inline">\(\hat{\Delta}
+k\)</span> <span class="math display">\[
+\hat{\Delta} k \pm z_{1-\frac{\alpha}{2}} \text { S.E. }(\hat{\Delta} k)
+\]</span></p>
+<pre><code>metabin(Ee, Ne, Ec, Nc, sm=&quot;ASD&quot;, method=&quot;I&quot;,
+        data=data7, subset=study==&quot;Milpied&quot;)</code></pre>
+</div>
+</div>
+<div id="implementation-1" class="section level3">
+<h3>Implementation</h3>
+<ul>
+<li>The <code>metabin</code> function can smoothly realize the
+combination of effect sizes</li>
+</ul>
+<pre class="r"><code>data(Fleiss93)
+## 心梗后服用阿司匹林能否降低死亡率
+   ## 7 studies information
+   ## event.e表示治疗组的死亡人数
+   ## n.e表示治疗组的总人数
+   ## event.c表示对照组的总人数
+   ## n.c表示对照组的总人数
+metabin(event.e, n.e, event.c, n.c, data=Fleiss93, sm=&quot;OR&quot;)</code></pre>
+<pre><code>## Number of studies: k = 7
+## Number of observations: o = 28003 (o.e = 14186, o.c = 13817)
+## Number of events: e = 4414
+## 
+##                          OR           95%-CI     z p-value
+## Common effect model  0.8969 [0.8405; 0.9570] -3.29  0.0010
+## Random effects model 0.8683 [0.7559; 0.9973] -2.00  0.0457
+## 
+## Quantifying heterogeneity (with 95%-CIs):
+##  tau^2 = 0.0147 [0.0000; 0.1145]; tau = 0.1214 [0.0000; 0.3384]
+##  I^2 = 39.7% [0.0%; 74.6%]; H = 1.29 [1.00; 1.99]
+## 
+## Test of heterogeneity:
+##     Q d.f. p-value
+##  9.95    6  0.1269
+## 
+## Details of meta-analysis methods:
+## - Mantel-Haenszel method (common effect model)
+## - Inverse variance method (random effects model)
+## - Restricted maximum-likelihood estimator for tau^2
+## - Q-Profile method for confidence interval of tau^2 and tau
+## - Calculation of I^2 based on Q</code></pre>
+<pre class="r"><code>## meta分析森林图将forest plot一般来说不能少
+## 各研究的OR值和95%可信区间、权重、效应量合并值以及异质性检验结果等都在该图中
+## comb.random=FALSE，不用随机效应模型进行效应量合并，而是采用固定效应模型
+metaresult&lt;-metabin(event.e, n.e,event.c,n.c,data=Fleiss93,sm=&quot;OR&quot;,
+                    studlab=paste(study, year),comb.random=FALSE)
+forest(metaresult)</code></pre>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/metabin-1.png" width="960" /></p>
+</div>
+<div id="estimation-in-sparse-data---continuity-correction"
+class="section level3">
+<h3>Estimation in Sparse Data - Continuity correction</h3>
+<p>We consider questions raised when the number of incidents in one or
+two research departments is small. In this case, we have noticed that
+the estimates of the odds ratio and the risk ratio may be uncertain. If
+the total sample size of the study is small, or the sample size is
+large, but the probability of the event is very close to zero or one,
+sparse data may appear.</p>
+<blockquote>
+<p>假设研究k的数据稀疏。
+如前所述，如果ak或ck为零，则估计的比值比和估计的风险比均为0或1。尽管在这种情况下风险比具有有限的估计，但方差公式并不可靠。为了进行荟萃分析，我们要么省略此类研究，要么向零条目的2×2表的每个单元格添加少量增量。
+后者称为添加连续性校正。Gart和Zweifel
+[19]指出，如果任何单元格计数为零（但基本真实概率不为零或1），则将单元格计数增加0.5.</p>
+</blockquote>
+<blockquote>
+<p>如果将0.5加到二乘二表的每个像元，则对数优势比的估计方差会减小，因为所有四个分母都增加了。
+显然，可以使用不同于0.5的增量，例如0.01或0.1，以评估结果对不同增量选择的敏感性。</p>
+</blockquote>
+<p><span
+class="math display">\[\hat{\psi}_{k}^{\mathrm{mod}}=\frac{\left(a_{k}+0.5\right)\left(d_{k}+0.5\right)}{\left(b_{k}+0.5\right)\left(c_{k}+0.5\right)}\]</span>
+<span class="math display">\[\widehat{\operatorname{Var}}\left(\log
+\hat{\psi}_{k}^{\mathrm{mod}}\right)=\frac{1}{a_{k}+0.5}+\frac{1}{b_{k}+0.5}+\frac{1}{c_{k}+0.5}+\frac{1}{d_{k}+0.5}
+.\]</span></p>
+<blockquote>
+<p>Sweeting等基于两组观察数，提出了一种替代性的连续性校正，即所谓的治疗臂连续性校正。
+实验组（增量）和对照组（增量）的连续性校正定义为</p>
+</blockquote>
+<p><span
+class="math display">\[\operatorname{incr}_{e}=\frac{n_{e}}{n_{e}+n_{c}}\]</span>
+<span
+class="math display">\[\operatorname{incr}_{c}=\frac{n_{c}}{n_{e}+n_{c}}\]</span></p>
+<blockquote>
+<p>增量的两个增量和增量的总和为1。如果两组的样本量相等，则两组的增量均为0.5。
+如果组在样本大小方面严重不平衡，则此连续性校正的想法是获得较少的偏差结果。</p>
+</blockquote>
+<pre class="r"><code>## With 0.5 continuity correction for sparse data
+data8 &lt;- read.csv(&quot;./01_Datasets/dataset08.csv&quot;, as.is=TRUE)
+metabin(Ee, Ne, Ec, Nc, sm=&quot;OR&quot;, method=&quot;I&quot;,
+        data=data8, subset=study==&quot;Australian&quot;)</code></pre>
+<pre><code>## Number of observations: o = 595 (o.e = 300, o.c = 295)
+## Number of events: e = 1
+## 
+##       OR           95%-CI     z p-value
+## 1 0.3267 [0.0133; 8.0515] -0.68  0.4938
+## 
+## Details:
+## - Continuity correction of 0.5</code></pre>
+<pre class="r"><code>## With 0.1 continuity correction for sparse data
+metabin(Ee, Ne, Ec, Nc, sm=&quot;OR&quot;, method=&quot;I&quot;,
+        data=data8, subset=study==&quot;Australian&quot;,
+        incr=0.1)</code></pre>
+<pre><code>## Number of observations: o = 595 (o.e = 300, o.c = 295)
+## Number of events: e = 1
+## 
+##       OR            95%-CI     z p-value
+## 1 0.0891 [0.0001; 57.8269] -0.73  0.4642
+## 
+## Details:
+## - Continuity correction of 0.1</code></pre>
+<pre class="r"><code>## conduct an analysis based on the treatment arm continuity correction
+## using argument incr=&quot;TACC&quot;
+metabin(Ee, Ne, Ec, Nc, sm=&quot;OR&quot;, method=&quot;I&quot;,
+        data=data8, subset=study==&quot;Australian&quot;,
+        incr=&quot;TACC&quot;)        </code></pre>
+<pre><code>## Number of observations: o = 595 (o.e = 300, o.c = 295)
+## Number of events: e = 1
+## 
+##       OR           95%-CI     z p-value
+## 1 0.3303 [0.0135; 8.0698] -0.68  0.4969
+## 
+## Details:
+## - Treatment arm continuity correction in study with zero cell frequencies</code></pre>
+<p><strong>Calculating the risk ratio with sparse data, (Pettigrew et
+al)</strong></p>
+<p><span
+class="math display">\[\hat{\phi}_{k}^{\mathrm{mod}}=\frac{a_{k}+0.5}{a_{k}+b_{k}+0.5}
+/ \frac{c_{k}+0.5}{c_{k}+d_{k}+0.5}\]</span> <span
+class="math display">\[\widehat{\operatorname{Var}}\left(\log
+\hat{\phi}_{k}^{\bmod
+}\right)=\frac{1}{a_{k}+0.5}+\frac{1}{c_{k}+0.5}-\frac{1}{a_{k}+b_{k}+0.5}-\frac{1}{c_{k}+d_{k}+0.5}
+\cdot\]</span></p>
+</div>
+<div id="peto-odds-ratio" class="section level3">
+<h3>Peto Odds Ratio</h3>
+<p>An alternative method for the estimation of the odds ratio, which we
+term the Peto Odds Ratio method, was proposed by Yusuf et al. </p>
+<p>该方法的主要优点是无需校正零单元格计数。
+该方法基于观察到的细胞数ak和预期细胞数 <span
+class="math inline">\(E\left(a_{k} \mid \ldots ;
+\psi=1\right)\)</span></p>
+<p>The Peto estimate of the odds ratio is <span class="math display">\[
+\hat{\psi}_{k}^{*}=\exp \left(\frac{a_{k}-\mathrm{E}\left(a_{k} \mid
+\cdots ; \psi_{k}=1\right)}{\operatorname{Var}\left(a_{k} \mid \cdots ;
+\psi_{k}=1\right)}\right)
+\]</span> where <span class="math inline">\(\mathrm{E}(a k \mid \cdots ;
+\psi k=1)\)</span> and <span class="math inline">\(\operatorname{Var}(a
+k \mid \ldots ; \psi k=1)\)</span> are the mean and variance of <span
+class="math inline">\(a_{k}\)</span> under the hypergeometric
+distribution. Under this distribution, we have <span
+class="math display">\[
+\begin{array}{c}
+\mathrm{E}\left(a_{k} \mid \cdots ;
+\psi_{k}=1\right)=\frac{\left(a_{k}+b_{k}\right)\left(a_{k}+c_{k}\right)}{n_{k}}
+\\
+\operatorname{Var}\left(a_{k} \mid \cdots ;
+\psi_{k}=1\right)=\frac{\left(a_{k}+b_{k}\right)\left(c_{k}+d_{k}\right)\left(a_{k}+c_{k}\right)\left(b_{k}+d_{k}\right)}{n_{k}^{2}\left(n_{k}-1\right)}
+\end{array}
+\]</span> An estimator of the variance of <span
+class="math inline">\(\log \hat{\psi}_{k}^{*}\)</span> is <span
+class="math display">\[
+\widehat{\operatorname{Var}}\left(\log
+\hat{\psi}_{k}^{*}\right)=\frac{1}{\operatorname{Var}\left(a_{k} \mid
+\ldots ; \psi_{k}=1\right)}
+\]</span></p>
+<blockquote>
+<p>Peto估计器在不平衡设计中表现不佳（即，当nek与nck有很大不同时），如果设计不平衡，则Peto估计量将不一致（即，对于大样本量，它不会收敛到真实的优势比）。
+在随机对照试验的背景下，在大多数情况下，即如果治疗组的大小相当（在1：1随机化的情况下）并且治疗效果中等，则使用Peto方法是合理的。</p>
+</blockquote>
+<pre class="r"><code>metabin(Ee, Ne, Ec, Nc, sm=&quot;OR&quot;, method=&quot;P&quot;,
+        data=data8, subset=study==&quot;Australian&quot;)</code></pre>
+<pre><code>## Number of observations: o = 595 (o.e = 300, o.c = 295)
+## Number of events: e = 1
+## 
+##       OR           95%-CI     z p-value
+## 1 0.1331 [0.0026; 6.7068] -1.01  0.3132</code></pre>
+</div>
+<div id="fixed-effect-model-inverse-variance-method"
+class="section level3">
+<h3>Fixed Effect Model: Inverse Variance Method</h3>
+<p>逆方差方法是通用的。要使用它，我们只需要估计每项研究的治疗效果及其变化。
+我们在尺度上应
+用逆方差方法，在该尺度上，估计值的分布最接近于正态分布，然后在必要时对结果进行反变换。
+因此，汇总的固定效应估计为 <span class="math display">\[
+\hat{\theta}_{F}=\frac{\sum_{k=1}^{K} w_{k}
+\hat{\theta}_{k}}{\sum_{k=1}^{K} w_{k}}, \text { with }
+\operatorname{Var}\left(\hat{\theta}_{F}\right)=\left(\sum_{k=1}^{K}
+w_{k}\right)^{-1}
+\]</span> and weights <span class="math inline">\(w
+k=\widehat{\operatorname{Var}}(\hat{\theta} k)^{-1}\)</span>. As usual,
+an approximate two-sided <span class="math inline">\((1-\alpha)\)</span>
+confidence interval is given by <span class="math display">\[
+\hat{\theta}_{F} \pm z_{1-\frac{\alpha}{2}}
+\mathrm{S.E.}\left(\hat{\theta}_{F}\right)
+\]</span> 不幸的是，对于稀疏数据，基于逆方差方法的合并估计存在偏差</p>
+</div>
+<div id="fixed-effect-model-mantelhaenszel-method"
+class="section level3">
+<h3>Fixed Effect Model: Mantel–Haenszel Method</h3>
+<p>Mantel和Haenszel在分层的病例对照研究中提出了一个共同优势比的估计量，该方法也可以用于随机对照试验的荟萃分析中.
+通过指定参数<code>MH.exact = TRUE</code>，可以使用确切的Mantel–Haenszel方法.</p>
+<p><strong>Odds Ratio</strong></p>
+<p>The pooled odds ratio is estimated by combining the individual odds
+ratios <span class="math inline">\(\hat{\psi}_{k}\)</span> on the
+natural scale <span class="math display">\[
+\begin{array}{l}
+\hat{\psi}_{\mathrm{MH}}=\frac{\sum_{k=1}^{K} w_{k}
+\hat{\psi}_{k}}{\sum_{k=1}^{K} w_{k}} \\
+\text { with weights } w_{k}=\frac{b_{k} c_{k}}{n_{k}}
+\end{array}
+\]</span> An estimator of the variance of the logarithm of <span
+class="math inline">\(\hat{\psi}_{M H}\)</span> that is robust both in
+sparse data and large strata models <span class="math display">\[
+\begin{aligned}
+\overrightarrow{\operatorname{Var}\left(\log
+\hat{\psi}_{\mathrm{MH}}\right)}=&amp; \frac{\sum_{k=1}^{K} P_{k}
+R_{k}}{2\left(\sum_{k=1}^{K}
+R_{k}\right)^{2}}+\frac{\sum_{k=1}^{K}\left(P_{k} S_{k}+Q_{k}
+R_{k}\right)}{2 \sum_{k=1}^{K} R_{k} \sum_{k=1}^{K}
+S_{k}}+\frac{\sum_{k=1}^{K} Q_{k} S_{k}}{2\left(\sum_{k=1}^{K}
+S_{k}\right)^{2}} \\
+&amp; \text { with } P_{k}=\frac{a_{k}+d_{k}}{n_{k}},
+Q_{k}=\frac{b_{k}+c_{k}}{n_{k}}, R_{k}=\frac{a_{k} d_{k}}{n_{k}}, \text
+{ and } S_{k}=\frac{b_{k} c_{k}}{n_{k}} .
+\end{aligned}
+\]</span></p>
+<p><strong>Risk Ratio</strong></p>
+<p>The pooled risk ratio <span class="math inline">\(\hat{\phi}
+\mathrm{MH}\)</span> is calculated by combining individual risk ratios
+<span class="math inline">\(\hat{\phi} k\)</span> on the natural scale
+<span class="math display">\[
+\begin{array}{c}
+\hat{\phi}_{\mathrm{MH}}=\frac{\sum_{k=1}^{K} w_{k}
+\hat{\phi}_{k}}{\sum_{k=1}^{K} w_{k}} \\
+\text { using weights } w_{k}=\frac{\left(a_{k}+b_{k}\right)
+c_{k}}{n_{k}}
+\end{array}
+\]</span> A robust estimator of the variance of the logarithm of <span
+class="math inline">\(\hat{\phi}_{\mathrm{MH}}\)</span> is given by
+Greenland and Robins <span class="math display">\[
+\overline{\operatorname{Var}\left(\log
+\hat{\phi}_{\mathrm{MH}}\right)}=\frac{\sum_{k=1}^{K}
+\frac{\left(a_{k}+b_{k}\right)\left(c_{k}+d_{k}\right)\left(a_{k}+c_{k}\right)-a_{k}
+c_{k} n_{k}}{n_{k}^{2}}}{\sum_{k=1}^{K}
+\frac{a_{k}\left(c_{k}+d_{k}\right)}{n_{k}} \sum_{k=1}^{K}
+\frac{c_{k}\left(a_{k}+b_{k}\right)}{n_{k}}}
+\]</span></p>
+<p><strong>Risk Difference</strong></p>
+<p>The pooled risk difference <span class="math inline">\(\hat{\eta}
+\mathrm{MH}\)</span> is calculated by combining risk differences <span
+class="math inline">\(\hat{\eta} k\)</span> <span
+class="math display">\[
+\hat{\eta}_{\mathrm{MH}}=\frac{\sum_{k=1}^{K} w_{k}
+\hat{\eta}_{k}}{\sum_{k=1}^{K} w_{k}}
+\]</span> with weights <span class="math inline">\(w k=\frac{(a k+b k)(c
+k+d k)}{n k}\)</span> A robust estimator of the variance of <span
+class="math inline">\(\hat{\eta}_{\mathrm{MH}}\)</span> is given by
+<span class="math display">\[
+\widehat{\operatorname{Var}\left(\hat{\eta}_{\mathrm{MH}}\right)}=\frac{\sum_{k=1}^{K}
+\frac{\left(a_{k} b_{k} n_{c}\right)^{3}+\left(c_{k} d_{k}
+n_{e}\right)^{3}}{\left(n_{e}
+n_{c}\left(n_{e}+n_{c}\right)\right)^{2}}}{\left(\sum_{k=1}^{K}
+\frac{\left(a_{k}+b_{k}\right)\left(c_{k}+d_{k}\right)}{n_{k}}\right)^{2}}
+\]</span></p>
+<pre class="r"><code>data7 &lt;- read.csv(&quot;./01_Datasets/dataset07.csv&quot;, as.is=TRUE)
+mb1.mh &lt;- metabin(Ee, Ne, Ec, Nc, sm=&quot;OR&quot;,
+                  data=data7, studlab=study)
+print(summary(mb1.mh), digits=2)</code></pre>
+<pre><code>##                    OR        95%-CI %W(common) %W(random)
+## De Souza         1.60 [0.54;  4.73]        2.6        4.1
+## Gianni           9.86 [2.11; 45.96]        0.7        2.2
+## Gisselbrecht     0.95 [0.62;  1.45]       21.8       13.4
+## Intragumtornchai 1.37 [0.43;  4.36]        2.4        3.6
+## Kaiser           1.35 [0.84;  2.16]       14.8       12.2
+## Kluin-Nelemans   1.54 [0.86;  2.78]        8.9        9.7
+## Martelli 1996    0.91 [0.18;  4.57]        1.5        2.0
+## Martelli 2003    1.49 [0.73;  3.06]        6.1        7.6
+## Milpied          2.37 [1.29;  4.35]        6.8        9.3
+## Rodriguez 2003   1.87 [0.84;  4.14]        4.4        6.6
+## Santini 1998     2.15 [1.01;  4.56]        4.6        7.1
+## Santini-2        1.07 [0.61;  1.87]       11.7       10.2
+## Verdonck         0.67 [0.24;  1.83]        4.6        4.6
+## Vitolo           0.61 [0.29;  1.27]        9.1        7.3
+## 
+## Number of studies: k = 14
+## Number of observations: o = 2126 (o.e = 1072, o.c = 1054)
+## Number of events: e = 1366
+## 
+##                        OR       95%-CI    z p-value
+## Common effect model  1.35 [1.12; 1.61] 3.21  0.0013
+## Random effects model 1.36 [1.07; 1.73] 2.50  0.0122
+## 
+## Quantifying heterogeneity (with 95%-CIs):
+##  tau^2 = 0.0669 [0.0000; 0.7852]; tau = 0.2586 [0.0000; 0.8861]
+##  I^2 = 41.0% [0.0%; 68.6%]; H = 1.30 [1.00; 1.78]
+## 
+## Test of heterogeneity:
+##      Q d.f. p-value
+##  22.03   13  0.0549
+## 
+## Details of meta-analysis methods:
+## - Mantel-Haenszel method (common effect model)
+## - Inverse variance method (random effects model)
+## - Restricted maximum-likelihood estimator for tau^2
+## - Q-Profile method for confidence interval of tau^2 and tau
+## - Calculation of I^2 based on Q</code></pre>
+<pre class="r"><code>forest(mb1.mh, comb.random=FALSE, hetstat=FALSE,
+       text.fixed=&quot;MH estimate&quot;)</code></pre>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/Mantel%E2%80%93Haenszel-1.png" width="960" /></p>
+<pre class="r"><code>mb2.mh &lt;- metabin(Ee, Ne, Ec, Nc, sm=&quot;OR&quot;, method=&quot;MH&quot;,
+                  data=data8, studlab=study)
+print(summary(mb2.mh), digits=2)</code></pre>
+<pre><code>##               OR       95%-CI %W(common) %W(random)
+## Australian  0.33 [0.01; 8.05]        1.4        0.8
+## CASTEL      0.72 [0.25; 2.01]        7.8        8.1
+## Coope       0.52 [0.13; 2.11]        5.3        4.4
+## EWPHE       0.83 [0.43; 1.61]       17.8       19.7
+## HDFP        0.55 [0.26; 1.16]       17.7       15.4
+## MRC         1.20 [0.36; 3.93]        4.6        6.1
+## MRC elderly 1.07 [0.55; 2.09]       15.3       19.3
+## STOP        0.10 [0.01; 0.77]        9.2        2.0
+## Shep        0.91 [0.35; 2.36]        8.1        9.4
+## Shep Pilot  0.50 [0.04; 5.57]        1.5        1.5
+## Syst-eur    0.94 [0.42; 2.10]       11.3       13.3
+## 
+## Number of studies: k = 11
+## Number of observations: o = 17604 (o.e = 8969, o.c = 8635)
+## Number of events: e = 194
+## 
+##                        OR       95%-CI     z p-value
+## Common effect model  0.75 [0.56; 1.00] -1.98  0.0479
+## Random effects model 0.78 [0.58; 1.05] -1.63  0.1026
+## 
+## Quantifying heterogeneity (with 95%-CIs):
+##  tau^2 = 0 [0.0000; 0.6820]; tau = 0 [0.0000; 0.8258]
+##  I^2 = 0.0% [0.0%; 60.2%]; H = 1.00 [1.00; 1.59]
+## 
+## Test of heterogeneity:
+##     Q d.f. p-value
+##  7.22   10  0.7041
+## 
+## Details of meta-analysis methods:
+## - Mantel-Haenszel method (common effect model)
+## - Inverse variance method (random effects model)
+## - Restricted maximum-likelihood estimator for tau^2
+## - Q-Profile method for confidence interval of tau^2 and tau
+## - Calculation of I^2 based on Q
+## - Continuity correction of 0.5 in studies with zero cell frequencies</code></pre>
+</div>
+<div id="random-effects-model" class="section level3">
+<h3>Random Effects Model</h3>
+<p>In a random effects model, the assumption of a constant treatment
+effect across studies is relaxed by allowing the treatment effect from
+each study to have a probability distribution about the pooled treatment
+effect. Usually a normal distribution is used, so that <span
+class="math display">\[\hat{\theta}_{k}=\theta+u_{k}+\sigma_{k}
+\epsilon_{k}, \quad \epsilon_{k}^{\text {i.i.d. }} N(0,1) ; u_{k}^{\text
+{i.i.d. }} N\left(0, \tau^{2}\right)\]</span> where the <span
+class="math inline">\(u\)</span> ’s and <span
+class="math inline">\(\epsilon\)</span> ’s are independent. The
+between-study variance <span class="math inline">\(\tau^{2}\)</span>
+describes the extent of heterogeneity between individual study
+results.</p>
+<p><strong>DerSimonian–Laird Method</strong></p>
+<p><span class="math display">\[
+\hat{\tau}^{2}=\frac{Q-(K-1)}{\sum_{k=1}^{K} w_{k}-\frac{\sum_{k=1}^{K}
+w_{k}^{2}}{\sum_{k=1}^{k} w_{k}}}
+\]</span> where <span class="math inline">\(Q\)</span>, the
+heterogeneity statistic, is given by <span class="math inline">\(Q=\sum
+k=1^{K} w k(\hat{\theta} k-\hat{\theta} F)^{2}\)</span> and <span
+class="math inline">\(w k=\)</span> <span
+class="math inline">\(\widehat{\operatorname{Var}}(\hat{\theta}
+k)^{-1}\)</span>. The estimator <span
+class="math inline">\(\hat{\tau}^{2}\)</span> is set to zero if <span
+class="math inline">\(Q&lt;K-1\)</span></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
