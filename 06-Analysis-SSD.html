@@ -37,6 +37,15 @@
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="site_libs/datatables-binding-0.33/datatables.js"></script>
+<link href="site_libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="site_libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="site_libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="site_libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
 <link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
 
@@ -439,6 +448,9 @@ div.tocify {
     </li>
     <li>
       <a href="04-Design-Diagnostic-Study-MRMC.html">Diagnostic Study-Multireader Multicase (MRMC)</a>
+    </li>
+    <li>
+      <a href="04-Design-Vaccine-Design.html">Vaccine Trials</a>
     </li>
     <li>
       <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
@@ -4588,7 +4600,6 @@ exposed to the drug). This allows for fairer comparisons across
 treatment groups, especially when follow-up times vary. However, their
 interpretability has limits and depends on several underlying
 assumptions.</p>
-<hr />
 <p><strong>Interpretation of exposure-adjusted incidence rates is only
 straightforward under assumption of constant event rate over
 time</strong></p>
@@ -4600,7 +4611,6 @@ resistance, seasonality, etc.</p>
 <p>If the risk is <strong>not constant</strong>, then EAIRs become
 harder to interpret, as they could under- or over-estimate the true risk
 at different time points.</p>
-<hr />
 <p><strong>Interpretation of EAIRs depends on several
 factors:</strong></p>
 <ul>
@@ -4626,7 +4636,6 @@ apply.</li>
 </ul></li>
 </ul></li>
 </ul>
-<hr />
 <p><strong>Confidence intervals can aid in the interpretation of
 EAIRs</strong></p>
 <p>Confidence intervals (CIs) reflect the <strong>uncertainty or
@@ -4640,7 +4649,6 @@ hypothesis-testing tools.</li>
 especially in safety analyses, where the focus is on understanding risk,
 not testing for differences.</li>
 </ul>
-<hr />
 <p><strong>Notes to consider when reviewing competitor
 publications:</strong></p>
 <ul>
@@ -4672,7 +4680,6 @@ to consider:</p>
 <li>Event-based rates for multiple AEs</li>
 <li>Competing risk or recurrent event models for complex cases</li>
 </ul>
-<hr />
 <p><strong>Exposure-adjusted incidence rates for discrete
 periods</strong></p>
 <p>This method involves dividing the study period into separate
@@ -4683,7 +4690,6 @@ defined timeframes than over the entire study period. - It allows for
 description of how AE risk <strong>changes over time</strong>, helping
 identify periods of higher or lower risk (e.g., early onset
 toxicity).</p>
-<hr />
 <p><strong>Time-to-event analyses</strong></p>
 <p>This refers to survival-type methods, primarily: -
 <strong>Kaplan-Meier analysis</strong>, which estimates the probability
@@ -4694,7 +4700,6 @@ an adverse event, rather than repeated or cumulative counts.</p>
 <p>This approach provides a detailed look at the <strong>temporal aspect
 of safety</strong>, helping answer: “When are events most likely to
 occur?”</p>
-<hr />
 <p><strong>Exposure-adjusted event rates</strong></p>
 <p>These are used to: - Account for <strong>recurrent events</strong>,
 where the same AE can happen more than once in a participant. - It uses
@@ -4705,7 +4710,6 @@ including the need for constant rate assumptions and appropriate
 handling of exposure time.</p>
 <p>This method is valuable for chronic or cycling conditions where
 multiple AEs per participant are expected.</p>
-<hr />
 <p><strong>Other multiple event-based analyses</strong></p>
 <p>This category includes more advanced statistical methods designed to
 address complex event patterns:</p>
@@ -4721,6 +4725,36 @@ precludes the occurrence of a non-fatal AE.</li>
 <p>These methods are more complex but better reflect <strong>real-world
 clinical scenarios</strong>, especially when multiple outcomes are
 interrelated.</p>
+</div>
+<div id="implementation-in-r" class="section level3 unnumbered">
+<h3 class="unnumbered">Implementation in R</h3>
+<p>The analyze function tern::estimate_incidence_rate() creates a layout
+element to estimate an event rate adjusted for person-years at risk,
+otherwise known as incidence rate. The primary analysis variable
+specified via vars is the person-years at risk. In addition to this
+variable, the n_events variable for number of events observed (where a
+value of 1 means an event was observed and 0 means that no event was
+observed) must also be specified.</p>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-712c6397b7b0614b8187" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-712c6397b7b0614b8187">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: top; text-align: left; font-weight: bold;\">Exposure-Adjusted Incidence Rate (EAIR) Data Example 2a: Event Occurs Late<\/caption>","data":[["1","2","3","4","5"],[1,2,3,4,5],[0,1,1,0,0],["Experienced event","End of follow up","End of follow up","Experienced event","Experienced event"],[101,112,112,89,92],["Trt X - Late","Trt X - Late","Trt X - Late","Trt X - Late","Trt X - Late"],[1,0,0,1,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>USUBJID<\/th>\n      <th>USUBJIDN<\/th>\n      <th>CNSR<\/th>\n      <th>EVENTC<\/th>\n      <th>AVAL<\/th>\n      <th>ARM<\/th>\n      <th>n_events<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"dom":"t","columnDefs":[{"className":"dt-left","targets":"_all"},{"name":"USUBJID","targets":0},{"name":"USUBJIDN","targets":1},{"name":"CNSR","targets":2},{"name":"EVENTC","targets":3},{"name":"AVAL","targets":4},{"name":"ARM","targets":5},{"name":"n_events","targets":6}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-f969b07e6642bb1c29c7" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-f969b07e6642bb1c29c7">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: top; text-align: left; font-weight: bold;\">Exposure-Adjusted Incidence Rate (EAIR) Data Example 2b: Event Occurs Early<\/caption>","data":[["1","2","3","4","5"],[1,2,3,4,5],[0,0,1,0,1],["Yes","Yes","No","Yes","No"],[14,20,112,28,112],["Trt X - Early","Trt X - Early","Trt X - Early","Trt X - Early","Trt X - Early"],[1,1,0,1,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>USUBJID<\/th>\n      <th>USUBJIDN<\/th>\n      <th>CNSR<\/th>\n      <th>EVENTC<\/th>\n      <th>AVAL<\/th>\n      <th>ARM<\/th>\n      <th>n_events<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"dom":"t","columnDefs":[{"className":"dt-left","targets":"_all"},{"name":"USUBJID","targets":0},{"name":"USUBJIDN","targets":1},{"name":"CNSR","targets":2},{"name":"EVENTC","targets":3},{"name":"AVAL","targets":4},{"name":"ARM","targets":5},{"name":"n_events","targets":6}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<p><img src="06-Analysis-SSD_files/figure-html/unnamed-chunk-1-3.png" width="960" /></p>
+<p><strong>Incidence Estimate and Confidence intervals</strong></p>
+<pre><code>##                                     Trt X - Late    Trt X - Early
+##                                         (N=5)           (N=5)    
+## —————————————————————————————————————————————————————————————————
+## Total patient-years at risk             506.0           286.0    
+## Number of adverse events observed         3               3      
+## AE rate per 100 patient-years           0.59            1.05     
+## 95% CI                              (-0.08, 1.26)   (-0.14, 2.24)</code></pre>
+<pre><code>##                                     Trt X - Late   Trt X - Early
+##                                        (N=5)           (N=5)    
+## ————————————————————————————————————————————————————————————————
+## Total patient-years at risk            506.0           286.0    
+## Number of adverse events observed        3               3      
+## AE rate per 100 patient-years           0.59           1.05     
+## 95% CI                              (0.12, 1.73)   (0.22, 3.07)</code></pre>
 </div>
 </div>
 </div>

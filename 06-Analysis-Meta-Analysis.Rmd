@@ -5,7 +5,7 @@ title: |
 output:
   html_document:
     df_print: paged
-    number_sections: No
+    number_sections: Yes
     toc: yes
     toc_float: yes
   word_document:
@@ -23,8 +23,9 @@ knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
 # <!--                    1. load the required packages                       -->
 # <!-- ---------------------------------------------------------------------- --> 
 
-## if(!require(psych)){install.packages("psych")}
-packages<-c("tidyverse", "meta",
+# if(!require(psych)){install.packages("psych")}
+packages<-c("tidyverse","gdata",
+            "meta","rmeta","metafor","gmeta",
             "kableExtra")
 
 ipak <- function(pkg){
@@ -35,27 +36,381 @@ ipak <- function(pkg){
 }
 ipak(packages)
 
-## get the wd path
+# get the wd path
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 getwd()
+
+
+# source("./03_Functions/gmeta.r")
+# source("./03_Functions/np.gmeta.r")
+ 
+
+
+data1 <- read.csv("./01_Datasets/dataset01.csv", as.is=TRUE)
+data2 <- read.csv("./01_Datasets/dataset02.csv", as.is=TRUE)
+data3 <- read.csv("./01_Datasets/dataset03.csv", as.is=TRUE)
+data4 <- read.csv("./01_Datasets/dataset04.csv", as.is=TRUE)
+data5 <- read.csv("./01_Datasets/dataset05.csv", as.is=TRUE)
+data6 <- read.csv("./01_Datasets/dataset06.csv", as.is=TRUE)
+data7 <- read.csv("./01_Datasets/dataset07.csv", as.is=TRUE)
+data8 <- read.csv("./01_Datasets/dataset08.csv", as.is=TRUE)
 ```
 
 
-## Introduction
+# Introduction
+ 
+Meta-analysis is a statistical method used to systematically combine and synthesize results from multiple independent studies that address the same or closely related research question. Its primary purpose is to increase the overall power and precision of the findings, resolve uncertainty when individual studies disagree, and provide a more comprehensive understanding of the evidence base.
+
+Unlike traditional narrative reviews, which rely on qualitative summaries and are often subject to author bias, meta-analysis follows a structured and quantitative approach. It typically involves extracting effect sizes or summary statistics from each study, assessing consistency among studies, and calculating an overall pooled estimate using appropriate statistical models.
+
+Meta-analysis is especially valuable in fields such as medicine, psychology, education, and public health, where multiple studies may exist on a single intervention, treatment, or phenomenon. It allows researchers to answer questions with greater statistical confidence than any single study can provide, and it plays a critical role in evidence-based decision-making, such as developing clinical guidelines or informing public policy.
+
+A well-conducted meta-analysis begins with a clearly defined research question and a written protocol. It includes systematic literature searches, predefined inclusion and exclusion criteria, careful data extraction, assessment of study quality, evaluation of heterogeneity among results, and application of suitable analytical techniques. When properly designed, a meta-analysis offers a rigorous and transparent synthesis of scientific evidence.
+
+## Meta-Analysis Protocol
+
+Writing a protocol is the **first and most critical step** in conducting a meta-analysis. It is comparable to designing a clinical trial: the protocol defines the research question, outlines inclusion and exclusion criteria, and specifies how data will be identified, abstracted, and synthesized.
+
+Key benefits:
+
+* **Minimizes bias** in study selection and analysis.
+* **Enhances scientific rigor** and reproducibility.
+* **Clarifies scope and eligibility** of studies for inclusion.
+
+---
+
+**[1] Defining the Research Objective**
+
+A clearly defined objective is crucial for guiding all subsequent steps. For example:
+
+> *"To assess the overall evidence of the effectiveness of calcium-channel blockers in treating mild-to-moderate hypertension."*
+
+However, to operationalize this question, further specifications are required, such as:
+
+* Definition of “mild-to-moderate” hypertension (blood pressure thresholds have evolved over time).
+* Outcome measures (e.g., change in diastolic BP).
+* Control group type (placebo or active comparator).
+* Study design (e.g., parallel, crossover), randomization methods, and blinding.
+* Patient characteristics (e.g., age, gender, comorbidities).
+* Study duration.
+
+These specifications form the foundation for establishing **eligibility criteria** for selecting studies.
+
+---
+
+**[2] Criteria for Identifying Eligible Studies**
+
+ 
+To ensure consistency, validity, and scientific rigor in a meta-analysis, the following six criteria should be clearly defined in the research protocol:
+
+**1. Clarifying the Disease or Condition Under Study**
+
+* Definitions of disease or outcome must be consistent with contemporary clinical standards.
+* Historical definitions may differ (e.g., older studies may define hypertension differently).
+
+The specific medical condition or area of application must be precisely defined. For instance, if the focus is on "mild-to-moderate hypertension," the protocol must clarify what blood pressure ranges constitute this category. Clinical definitions may have changed over time—what was once considered mild may now be classified as moderate or even normal. Failing to standardize this definition could result in the inclusion of heterogeneous populations that compromise the validity of pooled estimates.
+
+**2. Defining the Effectiveness Measure or Outcome**
+
+* Define primary endpoints (e.g., change in diastolic blood pressure).
+* Include methods of measurement (position, device).
+* Ensure that chosen outcomes are consistently reported across studies.
+
+Meta-analyses require a common outcome measure to aggregate data meaningfully. In hypertension trials, this might be the change in diastolic blood pressure (DBP) from baseline. However, outcomes may be reported differently across studies—mean change, percentage reaching normal levels, or alternative metrics like mean arterial pressure. The protocol must specify which outcomes are acceptable, how they are measured (e.g., sitting vs. standing BP), and whether they can be harmonized across studies.
+
+**3. Specifying the Type of Control Group**
+
+* Control types (placebo or active comparator) influence interpretation of efficacy.
+* Meta-analysis should include studies with **comparable control groups**.
+
+The type of comparator used in each study (e.g., placebo, active control, usual care) has major implications for the interpretation of efficacy. Placebo-controlled trials provide direct evidence, while active-controlled trials offer relative comparisons. The meta-analysis should either restrict inclusion to studies with the same type of control group or account for differences analytically (e.g., through subgroup or sensitivity analyses). The protocol should define acceptable control types and explain how variations will be handled.
+
+**4. Outlining Acceptable Study Designs and Quality Characteristics**
+
+* Design (parallel vs. crossover), randomization, stratification, blinding, and bias control.
+* Design consistency helps maintain internal validity across synthesized studies.
+
+Different experimental designs (parallel vs. crossover, randomized vs. non-randomized) can introduce variability in treatment effects. Additional factors such as blinding, allocation concealment, and stratification should be specified. The protocol must outline which study designs are acceptable and whether criteria like randomization method or blinding status are mandatory for inclusion. High-quality design features reduce bias and increase the reliability of synthesized results.
+
+**5. Characterizing the Patient Population**
+
+* Include demographic variables, inpatient vs. outpatient status, concurrent diseases, and concomitant medications.
+* Abstracting subgroup-level summary statistics helps evaluate heterogeneity.
+
+Eligible studies must include similar populations in terms of demographics and clinical characteristics. Age range, sex distribution, race or ethnicity, inpatient vs. outpatient setting, presence of comorbidities, and use of concomitant medications should be considered. If these factors vary widely, stratified analyses or subgroup extraction may be necessary. The protocol should state clearly which patient characteristics are required and how heterogeneity will be managed.
+
+**6. Determining the Acceptable Length of Follow-Up or Treatment Duration**
+
+* Treatment duration significantly affects clinical outcomes.
+* Must be accounted for in both selection and interpretation.
+
+The duration of each study must be taken into account, as it affects the stability and magnitude of treatment effects. A 4-week intervention may yield different results compared to a 6-month study. The protocol should define acceptable minimum and/or maximum follow-up durations, or describe how differences in length will be addressed in the analysis (e.g., through meta-regression).
+
+---
+
+**[3] Searching and Collecting Studies**
+
+Numerous databases should be consulted based on the research field:
+
+For Major Medical Databases:
+
+* **PubMed/MEDLINE**
+* **Embase**
+* **Web of Science**
+* **ClinicalTrials.gov**
+* **Cochrane Central (CENTRAL)**
+
+Inclusion/exclusion criteria are applied at the **study level** (unlike patient-level in clinical trials).
+
+---
+
+**[4] Data Abstraction and Extraction**
+
+A **Data Extraction Form (DAF)** is essential for:
+
+* Standardizing data capture from multiple studies.
+* Ensuring clarity and reproducibility.
+* Supporting quality assurance and future meta-analysis updates.
+ 
+
+Data abstraction should be guided by:
+
+* Disease definition
+* Outcomes
+* Control group type
+* Study design
+* Patient population
+* Duration of follow-up
+
+
+---
+
+**[5] Meta-Analysis Methods**
+
+The statistical methods must be pre-specified in the protocol:
+
+* Determined by study design and type of outcome data.
+* Must account for **heterogeneity** across studies.
+* May need adjustment based on study characteristics identified during data abstraction.
+
+---
+
+**[6] Reporting the Meta-Analysis Results**
+
+A comprehensive meta-analysis report should mirror the structure of the protocol and include:
+
+* **Executive Summary / Abstract**
+* **Objective**
+* **Study Search and Inclusion Criteria**
+* **Data Extraction and Methods**
+* **Results (with figures, forest plots, heterogeneity analysis)**
+* **Discussion and Conclusion**
+* **Appendices**
+
+This final report serves as:
+
+* Documentation of the research process.
+* A source for publications.
+* A benchmark for transparency and methodological rigor.
 
 
 
-In general, two types of evidence can be distinguished when performing a meta-analysis: individual participant data (IPD), and aggregate data (AD).
-> 个体参与者数据 (IPD) 和聚合数据 (AD).
 
-> AD 更常见（例如来自文献），通常代表汇总估计，例如优势比或相对风险。这可以使用多种方法在概念上相似的研究中直接综合. IPD 证据代表研究中心收集的原始数据。当需要证据综合时，这种区别提高了对不同元分析方法的需求.
+## Fixed-Effects and Random-Effects
 
-元分析的两种主要方法，即固定效应模型和随机效应模型. 针对这两种模型，都引入了逆方差法 Inverse variance method 进行估计。
+In meta-analysis, we aim to combine results from multiple independent studies to arrive at an overall conclusion about a treatment or effect. Two fundamental statistical models used in meta-analysis are the **fixed-effects model** and the **random-effects model**. 
 
-* 固定效应模型提供了一系列研究估计的加权平均值。估计方差的倒数通常用作研究权重，因此较大的研究往往比较小的研究对加权平均值的贡献更大。因此，当荟萃分析中的研究以一项非常大的研究为主时，小型研究的结果实际上被忽略了。 最重要的是，固定效应模型假设所有纳入的研究都调查相同的人群，使用相同的变量和结果定义等。这种假设通常是不现实的，因为研究通常容易出现多种异质性来源；例如治疗效果可能因地区、剂量水平、研究条件
-* 在随机效应荟萃分析的加权平均过程中应用的权重是通过两个步骤实现的：第 1 步：逆方差加权, 第 2 步：通过应用随机效应方差分量 (REVC) 来取消逆方差加权的权重，该分量简单地从基础研究的效应大小的可变性程度得出。这意味着效应大小的这种变异性（也称为异质性）越大，未加权就越大，这可能会达到随机效应荟萃分析结果成为研究中未加权平均效应大小的程度。
+The typical aim of a clinical trial is to compare the efficacy of a treatment (such as a new drug D) against a control (e.g., placebo P). This comparison is made using a treatment effect size, denoted by δ, which is a numerical summary of the difference in outcomes between the treatment and control groups.
 
-### meta-analysis for different data
+* For **binary data** (e.g., death vs. survival), effect sizes may include:
+
+  * Difference in proportions
+  * Log odds ratio
+  * Relative risk
+
+* For **continuous data** (e.g., blood pressure, exercise capacity), effect sizes may include:
+
+  * Difference in means
+  * Standardized mean difference
+
+The hypotheses are:
+
+* Null hypothesis (H₀): δ = 0 (no difference between treatment and control)
+* Alternative hypothesis (Hₐ): δ ≠ 0 or δ > 0 (depending on the test direction)
+
+Each study provides an estimate of the treatment effect (denoted $\hat{\delta}_i$) and its variance $\hat{\sigma}_i^2$. Meta-analysis combines these estimates across studies to evaluate the overall effect.
+
+
+### Fixed-Effects Model
+ 
+
+**Assumption**: All studies estimate the **same true effect** δ. Any variation among study results is due to **random error** or **sampling variability**, not due to differences in the underlying populations or study conditions.
+
+This model assumes that:
+
+$$
+\hat{\delta}_i = \delta + \varepsilon_i
+$$
+
+where $\varepsilon_i \sim N(0, \hat{\sigma}_i^2)$ represents the random error in study $i$.
+
+Thus,
+
+$$
+\hat{\delta}_i \sim N(\delta, \hat{\sigma}_i^2)
+$$
+
+The objective is to compute a **weighted average** of the individual study estimates to derive an overall estimate $\hat{\delta}$ of δ:
+
+$$
+\hat{\delta} = \sum_{i=1}^K w_i \hat{\delta}_i
+$$
+
+where the weights $w_i$ are typically chosen to give more weight to more precise studies. A common choice is:
+
+$$
+w_i = \frac{1}{\hat{\sigma}_i^2}
+$$
+
+The variance of the pooled estimate is:
+
+$$
+\text{Var}(\hat{\delta}) = \sum_{i=1}^K w_i^2 \hat{\sigma}_i^2
+$$
+
+A 95% confidence interval for the overall effect size is:
+
+$$
+\hat{\delta} \pm 1.96 \times \sqrt{\text{Var}(\hat{\delta})}
+$$
+
+A test statistic to assess statistical significance of the combined estimate is:
+
+$$
+T = \frac{\hat{\delta} - 0}{\sqrt{\text{Var}(\hat{\delta})}}
+$$
+
+**Weighting Schemes** in fixed-effects meta-analysis:
+
+1. Equal weights: $w_i = \frac{1}{K}$, where K is the number of studies.
+2. By sample size: $w_i = \frac{N_i}{N}$, where $N_i$ is the sample size in study $i$ and $N$ is the total across studies.
+3. By treatment group sizes: $w_i = \frac{N_{iD} \cdot N_{iP}}{N_{iD} + N_{iP}} \times \frac{1}{w}$
+4. **Inverse-variance weighting** (most common): $w_i = \frac{1}{\hat{\sigma}_i^2}$
+
+In fixed-effects meta-analysis for binary data, a special case is the **Mantel-Haenszel method**, which is used to combine odds ratios or risk ratios across 2x2 tables using the hypergeometric distribution.
+
+
+### Random-Effects Model
+ 
+**Assumption**: Each study estimates its **own true effect** $\delta_i$, which itself is a random draw from a distribution of true effects centered at the global mean effect δ. This accounts for **between-study variability**, such as differences in study design, populations, or measurement protocols.
+
+The model assumes:
+
+$$
+\hat{\delta}_i = \delta_i + \varepsilon_i \quad \text{with} \quad \delta_i \sim N(\delta, \tau^2)
+$$
+
+and
+
+$$
+\varepsilon_i \sim N(0, \hat{\sigma}_i^2)
+$$
+
+So, the total variance in observed effects is:
+
+$$
+\text{Var}(\hat{\delta}_i) = \tau^2 + \hat{\sigma}_i^2
+$$
+
+Here, $\tau^2$ is the **between-study variance**, and it must be estimated (e.g., using the DerSimonian-Laird method).
+
+The pooled estimate under the random-effects model is:
+
+$$
+\hat{\delta}_{RE} = \sum_{i=1}^K w_i^* \hat{\delta}_i \quad \text{with} \quad w_i^* = \frac{1}{\hat{\sigma}_i^2 + \tau^2}
+$$
+
+The confidence interval and hypothesis testing proceed in a similar way as with fixed-effects, but with the adjusted weights accounting for both within- and between-study variability.
+
+
+### Compare
+
+
+The decision between using a fixed-effects model or a random-effects model in meta-analysis is **not solely determined by statistical tests for heterogeneity**, such as the Cochran’s Q test or the I² statistic. Rather, the choice should depend on both **the scientific context** and **the objectives** of the meta-analysis. Analysts must make a judgment based on the **design of the studies**, **clinical and methodological similarities**, and **the rationale behind combining the studies in the first place**.
+
+
+A **fixed-effects model** is appropriate when the **true treatment effect is assumed to be the same across all included studies**. The variation in observed results from one study to another is believed to be entirely due to **sampling error** or **random within-study variation**, not due to differences in populations, interventions, or study procedures.
+
+To justify this model, the analyst should evaluate whether there is an **a priori reason** to believe all studies are estimating the **same underlying treatment effect**. For example, this is plausible when the studies:
+
+* Use **identical protocols** or designs,
+* Involve **similar patient populations**,
+* Use **uniform interventions** and **outcomes**,
+* Are conducted in **similar settings**.
+
+* Use **fixed-effects** model when:
+
+  * Studies are **homogeneous** (similar population, methods, settings)
+  * There is **no evidence** of between-study heterogeneity (e.g., I² close to 0%)
+  * You believe that all studies estimate the same true effect
+ 
+
+A **random-effects model** is used when there is **no strong reason to assume that the treatment effect is identical across all studies**. This model assumes that each study estimates its **own effect size**, which itself is drawn from a **distribution of effect sizes** centered around a population mean. Thus, the model incorporates **both within-study variation** and **between-study heterogeneity**.
+
+A random-effects model is more appropriate when:
+
+* Studies differ in **designs, populations, treatment settings**, or **outcome definitions**,
+* There is **clinical or methodological diversity** among the studies,
+* The treatment might **interact with population characteristics**, such as age, gender, disease severity, geography, etc.
+
+* Use **random-effects** model when:
+
+  * Studies are **heterogeneous** in population, protocol, or design
+  * You wish to generalize the results beyond the observed studies
+  * The test for heterogeneity is significant (e.g., high I² or significant Q test)
+  
+  
+| Feature                | Fixed-Effects Model              | Random-Effects Model                         |
+| ---------------------- | -------------------------------- | -------------------------------------------- |
+| True Effect Assumption | One common true effect           | Distribution of true effects                 |
+| Heterogeneity Allowed  | No                               | Yes                                          |
+| Weighting              | Inverse of within-study variance | Inverse of (within + between-study variance) |
+| Suitable When          | Studies are very similar         | Studies differ (clinical/methodological)     |
+| Confidence Intervals   | Narrower                         | Wider                                        |
+| Example Use            | Repeated trials in same setting  | Multi-center studies across regions          |
+
+
+In practice, many analysts compute **both fixed-effects and random-effects models**, even if they believe one is theoretically more appropriate. This dual approach provides:
+
+* A **comparison** of effect sizes and confidence intervals,
+* Insight into the **influence of between-study variability**,
+* A **sensitivity analysis** for model assumptions.
+
+The confidence intervals from the random-effects model are usually **wider** than those from the fixed-effects model because they account for **both within-study and between-study variance**. If there is **no heterogeneity** (i.e., τ² = 0), both models will produce **identical results**.
+
+However, even when the heterogeneity tests (e.g., Q or I²) are not significant, if there is **clinical or contextual reason to expect variation**, the random-effects model is typically preferred for **generalizability** and **conservative inference**.
+
+## Implementation in R
+
+The **rmeta** package (by Thomas Lumley) and **meta** package (by Guido Schwarzer) provide functions for both models:
+
+* For binary data:
+
+  * Fixed-effects (Mantel-Haenszel): `meta.MH` in `rmeta`
+  * Random-effects: `meta.DSL` (DerSimonian-Laird method)
+
+* For continuous data:
+
+  * `metacont` function in `meta` package allows analysis under both fixed and random models.
+
+These tools help analysts perform meta-analyses and produce key outputs such as:
+
+* Forest plots
+* Funnel plots
+* Estimates of heterogeneity (I², τ²)
+* Confidence intervals for pooled effect size
+
+### meta Package: Analysis for Different Data
 
 * Meta-analysis of binary outcome data `metabin`
 * Meta-analysis of continuous outcome data `metacont`
@@ -66,100 +421,412 @@ In general, two types of evidence can be distinguished when performing a meta-an
 * Meta-analysis of single means `metamean`
 * Merge pooled results of two meta-analyses `metamerge`
 * Combine and summarize meta-analysis objects `metabind`
- 
+
 
 Meta-Analysis with Survival Outcomes
 
-```{r Survival,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-data4 <- read.csv("./01_Datasets/dataset04.csv", as.is=TRUE)
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
 mg1 <- metagen(logHR, selogHR,
                studlab=paste(author, year), data=data4,
                sm="HR")
 print(mg1, digits=2)
+
+## Forest plot
+plot(mg1)
+
+## To assess potential publication bias informally, we generate the funnel plot and visually assess whether it is symmetric. 
+funnel(mg1)
 ```
 
-
+ 
 Meta-Analysis of Cross-Over Trials
 
-```{r Cross-Over,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-data5 <- read.csv("./01_Datasets/dataset05.csv", as.is=TRUE)
-## meta-analysis of these cross-over trials
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# meta-analysis of these cross-over trials
 mg2 <- metagen(mean, SE, studlab=paste(author, year),
                data=data5, sm="MD")
 print(summary(mg2), digits=2)
+
+plot(mg2)
+funnel(mg2)
 ```
 
 
-## Fixed Effect Model for Continuous Outcomes
+## Combining p-Values in Meta-Analysis
 
-### Effect Measures  
+**Combining p-values in meta-analysis** is a statistical approach used when studies report only p-values rather than full effect sizes or variance estimates. This situation often arises in systematic reviews where only minimal information is available from each individual study. The goal is to aggregate the evidence from several such studies to determine whether, collectively, they support or refute a common hypothesis.
+
+One of the most widely used methods for this purpose is **Fisher's combined probability test**, proposed by Ronald Fisher. It allows researchers to combine the results of multiple independent hypothesis tests into a single test statistic.
+
+---
+
+**Theoretical Basis of Fisher’s Method**
+
+Suppose you have **K independent studies**, each testing the same null hypothesis (**H₀**) and each reporting a p-value:
+**p₁, p₂, ..., pₖ**
+
+Under the null hypothesis, each individual p-value follows a **uniform distribution** on the interval \[0, 1]. Mathematically:
+**pᵢ \~ U\[0, 1]**
+
+If you take the **negative natural logarithm** of a uniform random variable, the result follows an **exponential distribution** with mean 1. Specifically:
+**−ln(pᵢ) \~ Exp(1)**
+
+Multiplying this value by 2 gives a value that follows a **chi-square distribution** with 2 degrees of freedom:
+**−2ln(pᵢ) \~ χ²(2)**
+
+If the p-values are independent, the sum of K such terms will follow a **chi-square distribution** with **2K degrees of freedom**:
+
+**X² = −2 ∑ ln(pᵢ)**
+This statistic follows a **χ² distribution with 2K degrees of freedom** under the null hypothesis.
+
+A large value of X² suggests that at least some of the studies are showing significant results, and that the overall null hypothesis may be false.
+
+---
+
+
+
+**Step-by-Step R Implementation**
+
+You can easily implement Fisher’s method in R without using any external packages. Here's how:
+
+1. **Define a function** that takes a vector of p-values and calculates the combined p-value.
+2. **Apply the chi-square distribution function** (`pchisq`) to obtain the p-value from the combined statistic.
+
+Here is the full function:
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# Function to compute Fisher's combined p-value
+fishers.pvalue <- function(x) {
+  # x: a numeric vector of p-values
+  test_stat <- -2 * sum(log(x))
+  pchisq(test_stat, df = 2 * length(x), lower.tail = FALSE)
+}
+```
+ 
+
+**Worked Example**
+
+Assume we have 4 independent studies on the effectiveness of statins. The reported p-values from these studies are:
+
+* 0.106
+* 0.0957
+* 0.00166
+* 0.0694
+
+Let’s use the function above to combine them:
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# Vector of p-values
+x <- c(0.106, 0.0957, 0.00166, 0.0694)
+
+# Apply Fisher's method
+combined.pval <- fishers.pvalue(x)
+
+# Print the result
+print(combined.pval)
+```
+
+
+However, a few important points should be noted:
+
+* This method **does not account for effect size heterogeneity**.
+* It is **sensitive to very small p-values**, which can dominate the result.
+* All included studies must test the **same hypothesis**, and the tests must be **independent**.
+
+---
+
+**Conclusion**
+
+Fisher’s method is a powerful and simple tool to combine p-values when full meta-analytic data (like effect sizes and variances) are not available. It is particularly useful in early-phase systematic reviews, meta-analyses of hypothesis tests, or when only limited summary data are accessible.
+
+
+# Continuous Outcomes using Fixed Effect Model
+
+## Effect Measures  
 
 Meta-analysis typically focuses on comparing two interventions, which we refer to as experimental and control. When the response is continuous (i.e. quantitative) typically the mean, standard deviation and sample size are reported for each group.
+ 
+Suppose the goal is to evaluate whether the two groups differ in terms of their population means. Let:
 
-$$
-\begin{array}{|l|l}
-\hline n_{e} & \text { Number of patients in the experimental (i.e. active) treatment arm } \\
-\hline \hat{\mu}_{e} & \text { Mean response in the experimental treatment arm } \\
-\hline s_{e} & \text { Standard deviation of the response in the experimental treatment arm } \\
-n_{c} & \text { Number of patients in the control (often equivalent to placebo) arm } \\
-\hline \hat{\mu}_{c} & \text { Mean response in the control arm } \\
-\hline s_{c} & \text { Standard deviation of the response in the control arm } \\
-\hline
-\end{array}
-$$
+* **µ₁** = true mean of the Treated group
+* **µ₂** = true mean of the Control group
+* **Δ = µ₁ − µ₂** = difference in population means (also called the **mean difference**)
+* **δ = (µ₁ − µ₂)/σ** = standardized mean difference (or **effect size**), where **σ** is a standard deviation (either pooled or from the control group)
 
+**Summary**
 
-
-### Standardized Mean Difference
-
-**Mean difference**
-
-For study $k$, the estimated mean difference is
-$$
-\hat{\mu}_{k}=\hat{\mu}_{e k}-\hat{\mu}_{c k},
-$$
-with variance estimate
-$$
-\widehat{\operatorname{Var}}\left(\hat{\mu}_{k}\right)=\frac{s_{e k}^{2}}{n_{e k}}+\frac{s_{c k}^{2}}{n_{c k}}
-$$
-An approximate two-sided $(1-\alpha)$ confidence interval for the mean difference is given by
-$$
-\left(\hat{\mu}_{e k}-\hat{\mu}_{c k}\right) \pm z_{1-\frac{\alpha}{2}} \sqrt{\frac{s_{e k}^{2}}{n_{e k}}+\frac{s_{c k}^{2}}{n_{c k}}}
-$$
+* Use raw **mean differences** (D) when outcome scales are consistent across studies
+* Use **standardized mean differences** (δ, Cohen’s d, Hedges’ g) when outcome scales differ
+* Hedges’ g is preferred in meta-analysis due to its bias correction
+* Statistical inference (Z-tests, confidence intervals) depends on the variance of the effect size estimate
+* Correction factors and variance formulas vary slightly in the literature but typically lead to very similar results for reasonably sized samples
 
 
+### Estimating the Mean Difference (Δ)
 
-**Standardized Mean Difference**
+When all studies in the meta-analysis report outcomes using the same scale or unit, we can directly compute and combine the raw **mean differences**.
 
-当所有研究均以相同规模测量了相关结果, 可以通过汇总各个研究中的平均差异来直接估算总体效果。但
-是, 在许多情况下, 不同的研究使用不同的结果量表，例如不同的抑郁量表或生活质量量表。在这种情况 下，我们无法直接合并效果估计值 (均值差异) 。取而代之的是, 我们从每项研究中计算出无量纲的效果 度量 dimensionless effect, 并将其用于合并
-一种非常流行的无量纲效果量度是标准化平均差，即研究的平均差除以基于单个治疗组或两个治疗组的标 准差。R包meta的metacont函数基于合并样本方差的标准化均值差，称为Hedges。研究k的标准均值差计 算为:
-$$
-\hat{g}_{k}=\left(1-\frac{3}{4 n_{k}-9}\right) \frac{\hat{\mu}_{e k}-\hat{\mu}_{c k}}{\sqrt{\left(\left(n_{e k}-1\right) s_{e k}^{2}+\left(n_{c k}-1\right) s_{c k}^{2}\right) /\left(n_{k}-2\right)}}
-$$
-where $n_{k}=n_{e k}+n_{c k}$ and the factor $1-3 /\left(4 n_{k}-9\right)$ corrects for the bias in the estimated standard error. To calculate a confidence interval for $\hat{g}_{k}$, we need its variance; again following RevMan is
-calculated as
-$$
-\widehat{\operatorname{Var}}\left(\hat{g}_{k}\right)=\frac{n_{k}}{n_{e k} \cdot n_{c k}}+\frac{\hat{g}_{k}^{2}}{2\left(n_{k}-3.94\right)}
-$$
-Once $\hat{g}_{k}$ and $\widehat{\operatorname{Var}}\left(\hat{g}_{k}\right)$ are calculated a two-sided $(1-\alpha)$ confidence interval can be calculated by
-$$\hat{g}_{k} \pm z_{1-\frac{\alpha}{2}} \text { S.E. }\left(\hat{g}_{k}\right)$$
-Once $\hat{g}_{k}$ and $\overline{\operatorname{Var}}\left(\hat{g}_{k}\right)$ are calculated a two-sided $(1-\alpha)$ confidence interval can be calculated by
-with standard error S.E. $\left(\hat{g}_{k}\right)=\sqrt{\overline{\operatorname{Var}}\left(\hat{g}_{k}\right)}$ and $z_{1-\frac{\alpha}{2}}$ denoting the $1-\frac{\alpha}{2}$ quantile of the standard normal distribution.
+For a single study:
 
+* Let **X̄₁** and **X̄₂** be the sample means of the Treated and Control groups, respectively
+* Let **S₁** and **S₂** be the corresponding sample standard deviations
+* Let **n₁** and **n₂** be the sample sizes of the two groups
+
+Then, the sample mean difference **D** is estimated by:
+
+**D = X̄₁ − X̄₂**
+
+To compute confidence intervals or perform hypothesis testing, we need the **variance** of D.
+
+There are two cases:
+
+**Case 1: Unequal Variances (Heteroscedasticity)**
+
+Assume the two groups have different variances (σ₁² ≠ σ₂²). Then the variance of D is:
+
+**Var(D) = (S₁² / n₁) + (S₂² / n₂)**
+
+**Case 2: Equal Variances (Homoscedasticity)**
+
+If variances are assumed equal (σ₁ = σ₂ = σ), a **pooled variance** is used:
+
+**S²\_pooled = \[ (n₁ − 1)S₁² + (n₂ − 1)S₂² ] / (n₁ + n₂ − 2)**
+
+Then, the variance of D is:
+
+**Var(D) = (n₁ + n₂) / (n₁n₂) × S²\_pooled**
+
+The **standard error** of D (SED) is simply the square root of its variance:
+
+**SED = √Var(D)**
+
+In meta-analysis, we combine the D estimates from multiple studies, weighting them by the inverse of their variances.
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# use the metacont function to calculate mean difference and confidence interval
+# sm="MD" (i.e. summary measure is the Mean Difference) as default setting.
+data(Fleiss1993cont) 
+m1_MD <- metacont(n.psyc, mean.psyc, sd.psyc, n.cont, mean.cont, sd.cont,
+                  data = Fleiss1993cont, 
+                  studlab=rownames(Fleiss1993cont),
+                  sm = "MD")
+m1_MD
+plot(m1_MD)
+```
+
+ 
+### Estimating the Standardized Mean Difference (δ)
+
+When different studies use **different measurement scales**, it's not meaningful to compare or pool raw mean differences directly. Instead, we use the **standardized mean difference (SMD)**, which removes scale effects.
+
+SMD is defined as:
+
+**δ = (µ₁ − µ₂) / σ**
+
+where **σ** is a standard deviation, either from the control group or pooled from both.
+
+---
+
+**Two Common Estimators of δ:**
+
+1. **Cohen's d** (proposed by Cohen, 1988)
+
+This is calculated as:
+
+**d = (X̄₁ − X̄₂) / S**
+
+Where **S** is the pooled standard deviation:
+
+**S² = \[ (n₁ − 1)S₁² + (n₂ − 1)S₂² ] / (n₁ + n₂)**
+
+Then, **S = √S²**
+
+Note: Cohen’s d slightly **overestimates** the true δ when sample sizes are small.
+
+---
+
+2. **Hedges’ g** (proposed by Hedges, 1982)
+
+This is a corrected version of Cohen’s d for small sample bias:
+
+**g = (X̄₁ − X̄₂) / S∗**
+
+Where:
+
+**S∗² = \[ (n₁ − 1)S₁² + (n₂ − 1)S₂² ] / (n₁ + n₂ − 2)**
+This is the traditional **pooled sample variance**. Taking the square root gives **S∗**.
+
+However, **g is biased**, and this bias can be corrected using a **correction factor J**:
+
+**g∗ = J × g**, where **J = 1 − (3 / (4N − 9))** and **N = n₁ + n₂**
+
+Then **g∗** is an approximately **unbiased estimate** of δ.
+
+An approximate formula for the variance of g∗ is:
+
+**Var(g∗) ≈ (1 / ñ) + (g∗² / (2(N − 3.94)))**
+
+Where:
+
+**ñ = (n₁ × n₂) / (n₁ + n₂)** is the **harmonic mean** of sample sizes
+
+This variance formula is compatible with the **R `meta` package**, although other literature might use alternatives such as 2N, 2(N − 2), etc. These make very little difference unless **n₁ and n₂ are very small**.
+
+**Hypothesis Testing for Effect Size δ**
+
+To test **H₀: δ = 0** (no effect) versus **H₁: δ ≠ 0**, we use a **Z-statistic**:
+
+**Z = g∗ / √Var(g∗)**
+
+We reject the null hypothesis if |Z| exceeds the critical value from the standard normal distribution (typically zₐ/2 = 1.96 for a 95% confidence level).
+
+A **confidence interval** for δ can be constructed as:
+
+**CI = g∗ ± zₐ/2 × √Var(g∗)**
+
+> There is a proportional relationship:
+
+**d = (n₁ + n₂) / (n₁ + n₂ − 2) × g = (n₁ + n₂) / (n₁ + n₂ − 2) × g∗ / J**
+ 
+
+ 
 * use the metacont function to calculate mean difference and confidence interval
 
-```{r Standardized-Mean-Difference,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-## use the metacont function to calculate mean difference and confidence interval
-## sm="MD" (i.e. summary measure is the Mean Difference) as default setting.
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# use the metacont function to calculate mean difference and confidence interval
+# sm="MD" (i.e. summary measure is the Mean Difference) as default setting.
 data(Fleiss1993cont) 
-m1 <- metacont(n.psyc, mean.psyc, sd.psyc, n.cont, mean.cont, sd.cont,
-               data = Fleiss1993cont, sm = "SMD")
-m1
+m1_SMD <- metacont(n.psyc, mean.psyc, sd.psyc, n.cont, mean.cont, sd.cont,
+                   data = Fleiss1993cont, 
+                   studlab=rownames(Fleiss1993cont),
+                   sm = "SMD")
+data.frame(
+  Study      = m1_SMD$studlab,
+  SMD        = round(m1_SMD$TE, 3),
+  SE         = round(m1_SMD$seTE, 3),
+  CI_lower   = round(m1_SMD$lower, 3),
+  CI_upper   = round(m1_SMD$upper, 3)
+)
+
+m1_SMD
+
+plot(m1_SMD)
+
+# Use Cohen's d instead of Hedges' g as effect measure
+update(m1_SMD, method.smd = "Cohen")
 ```
 
 
-### Inverse variance-weighted average method
+## Heterogeneity in Meta-Analysis
+
+
+In meta-analysis, **heterogeneity** refers to the variation in study outcomes beyond what would be expected by random sampling alone. In other words, it captures how different the effect sizes are across studies. Understanding and quantifying heterogeneity is essential because it influences the choice of meta-analytic model (fixed-effect vs random-effects) and the interpretation of results.
+
+When using the `meta` package in R (e.g., through functions like `metacont()` or `metabin()`), the output includes a section called **“Quantifying heterogeneity”** and **“Test of heterogeneity”**, which provides several statistics to assess this variability. 
+
+**Summary of Interpretation**
+
+* **Q statistic** tells you whether heterogeneity is present (yes/no)
+* **τ²** tells you how much true heterogeneity exists (in raw variance units)
+* **H** tells you how much more variability is observed than expected
+* **I²** tells you the proportion of observed variance that is true heterogeneity
+
+---
+
+**Test of Heterogeneity: Cochran’s Q**
+
+Cochran’s Q statistic is a classical test that evaluates whether the variability in observed effects across studies is greater than expected by chance.
+
+It is defined as:
+
+**Q = Σ wi × (δ̂i − δ̂)²**
+
+Where:
+
+* **δ̂i** is the effect estimate from the *i*th study
+* **δ̂** is the overall pooled effect estimate
+* **wi** is the weight assigned to the *i*th study, typically inverse variance
+
+This formula calculates a **weighted sum of squared deviations** of the individual effect sizes from the overall effect.
+
+Under the null hypothesis that all studies share the same true effect size (i.e., no heterogeneity), **Q follows a chi-squared distribution with (K − 1) degrees of freedom**, where K is the number of studies.
+
+If the **p-value associated with Q** is less than a chosen significance level (e.g., 0.05), the null hypothesis is rejected, indicating **significant heterogeneity** across studies.
+
+However, the Q test has limitations:
+
+* It has **low power** when the number of studies is small, meaning it may **fail to detect real heterogeneity**.
+* It has **excessive power** when the number of studies is large, meaning it may flag **trivial heterogeneity as significant**.
+
+Because of these issues, researchers often use additional statistics to **quantify** the amount of heterogeneity, not just test for its presence.
+
+Beyond the Q test, the `meta` package provides three additional indices to **describe the magnitude of heterogeneity**: τ² (tau-squared), H, and I².
+
+---
+
+**Tau-squared (τ²)**
+
+Tau-squared estimates the **between-study variance**, i.e., the variance of the true effect sizes across studies. This value is crucial in **random-effects models**, where it directly influences the weights assigned to each study.
+
+Tau-squared is estimated using the **DerSimonian and Laird method**:
+
+**τ² = (Q − (K − 1)) / U**
+
+Where:
+
+* Q is Cochran’s Q statistic
+* K is the number of studies
+* U is a function of the study weights
+
+If Q < K − 1 due to sampling error, τ² is set to zero. A larger τ² indicates more dispersion in the true effects.
+
+---
+
+**H Index**
+
+The H index expresses heterogeneity as a **ratio** comparing the observed variability to what would be expected if all studies had the same true effect size.
+
+It is defined as:
+
+**H = √(Q / (K − 1))**
+
+If **H = 1**, it implies perfect homogeneity (no excess variability). Values of H > 1 indicate increasing levels of heterogeneity.
+
+A confidence interval for H can be constructed by assuming that **ln(H)** is approximately normally distributed. If the lower bound of this interval is above 1, it suggests statistically significant heterogeneity.
+
+The formula for the standard error of ln(H) depends on the value of Q:
+
+* If Q > K: SE is estimated using log transformations
+* If Q ≤ K: SE uses a different approximation due to boundary issues
+
+---
+
+**I-squared (I²)**
+
+I² quantifies the **percentage of total variation** in observed effects that is due to **real heterogeneity** rather than chance. It is arguably the most commonly reported measure of heterogeneity.
+
+The formula is:
+
+**I² = \[(Q − (K − 1)) / Q] × 100%**
+
+This value ranges from 0% to 100%:
+
+* **0–25%**: low heterogeneity
+* **25–50%**: moderate heterogeneity
+* **50–75%**: substantial heterogeneity
+* **75–100%**: considerable heterogeneity
+
+Negative values of I² are set to 0 by convention. If the **lower bound of the confidence interval for I² is greater than zero**, heterogeneity is considered statistically significant.
+
+Alternatively, I² can be computed from H:
+
+**I² = (H² − 1) / H² × 100%**
+
+This formulation is used to derive confidence intervals for I² from those for H.
+ 
+
+## Inverse Variance-Weighted Average Method
 
 There are two methods for the fixed effects model meta-analysis: the IVW and weighted SZ. The fixed effects model assumes that all studies in a meta-analysis share a single true effect size. 
 
@@ -184,45 +851,43 @@ $$\hat{\theta}_{F} \pm z_{1-\frac{\alpha}{2}} \text { SE }\left(\hat{\theta}_{F}
 
 
 
-```{r IVW,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-data1 <- read.csv("./01_Datasets/dataset01.csv", as.is=TRUE)
-data2 <- read.csv("./01_Datasets/dataset02.csv", as.is=TRUE)
-## The fixed effect estimate and its variance can be calculated using base R code
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# The fixed effect estimate and its variance can be calculated using base R code
 
-## 1. Calculate mean difference, variance and weights
+# 1. Calculate mean difference, variance and weights
 MD <- with(data1, Me - Mc)
 varMD <- with(data1, Se^2/Ne + Sc^2/Nc)
 weight <- 1/varMD
 
-## 2. Calculate the inverse variance estimator
-## the standard weighted.mean function is used to calculate theta_F.
+# 2. Calculate the inverse variance estimator
+# the standard weighted.mean function is used to calculate theta_F.
 round(weighted.mean(MD, weight), 4)
 
-## 3. Calculate the variance
+# 3. Calculate the variance
 round(1/sum(weight), 4)
 
 
-## Alternative easier using the metacont function which yields identical results
+# Alternative easier using the metacont function which yields identical results
 mc1 <- metacont(Ne, Me, Se, Nc, Mc, Sc,
                 data=data1,
                 studlab=paste(author, year))
 round(c(mc1$TE.fixed, mc1$seTE.fixed^2), 4)
 
 
-## Forest Plot
-## pdf(file="Schwarzer-Fig2.3.pdf", width=9.6) 
-## uncomment line to generate PDF file
+# Forest Plot
+# pdf(file="Schwarzer-Fig2.3.pdf", width=9.6) 
+# uncomment line to generate PDF file
 forest(mc1, comb.random=FALSE, xlab=
          "Difference in mean response (intervention - control)
 units: maximum % fall in FEV1",
        xlim=c(-50,10), xlab.pos=-20, smlab.pos=-20)
-## invisible(dev.off()) 
-## uncomment line to save PDF file
+# invisible(dev.off()) 
+# uncomment line to save PDF file
 
 
 ```
 
-### Generic inverse variance meta-analysis `metagen`
+## Generic inverse variance meta-analysis `metagen`
 
 Fixed effect and random effects meta-analysis based on estimates (e.g. log hazard ratios) and their
 standard errors. The inverse variance method is used for pooling.
@@ -247,15 +912,15 @@ standard errors. The inverse variance method is used for pooling.
     + `method.tau.ci = "PL"` Profile-Likelihood method for three-level meta-analysis model (Van den Noortgate et al., 2013)
 
 
-```{r metagen,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
 mc1.gen <- metagen(TE, seTE, data=mc1, sm="MD")
-## Print results for fixed effect and random effects method
+# Print results for fixed effect and random effects method
 c(mc1$TE.fixed, mc1$TE.random)
 c(mc1.gen$TE.fixed, mc1.gen$TE.random)
 ```
 
 
-### Weighted Sum of Z-Scores
+## Weighted Sum of Z-Scores
 
 Another popular method for the fixed effects model meta-analysis is calculating the weighted SZ from the follows studies. Let $Z_{i}$ be the z-score from study $i$, which $N(0,1)$ under the null hypothesis of no effects. Then, the weighted SZ statistic is
 $$
@@ -267,9 +932,9 @@ w_{S Z, i}=\sqrt{N_{i}}
 $$
 
 
-## Random Effects Model for Continuous Outcomes
+# Continuous Outcomes using Random Effects Model 
 
-### Introduction
+## Introduction
 
 The random effects model seeks to account for the fact that the study effect estimates $\hat{\theta}_{k}$ are often
 more variable than assumed in the fixed effect model. Under the random effects model,
@@ -299,7 +964,7 @@ $$
 with weights $w_{k}^{*}=1 /\left(\hat{\sigma}_{k}^{2}+\hat{\tau}^{2}\right)$. The random effects estimator $\hat{\theta}_{R}$ is a weighted average of the individual effect estimates $\hat{\theta}_{k}$ with weights $1 /\left(\hat{\sigma}_{k}^{2}+\hat{\tau}^{2}\right)$. Accordingly, this method is often called "**Inverse variance method**", too. A $(1-\alpha)$ confidence interval for $\hat{\theta}_{R}$ can be calculated by
 $$\hat{\theta}_{R} \pm z_{1-\frac{\alpha}{2}} \text { S.E. }\left(\hat{\theta}_{R}\right)$$
 
-### Implementation
+## Implementation
 
 **Estimation of Between-Study Variance**
 
@@ -312,7 +977,7 @@ $$\hat{\theta}_{R} \pm z_{1-\frac{\alpha}{2}} \text { S.E. }\left(\hat{\theta}_{
 * Hedges estimator (method.tau="HE")
 * Empirical Bayes estimator (method.tau="EB").
 
-```{r Random-Effects-Model,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
 # 1. Conduct meta-analyses
 # 1a. DerSimonian-Laird estimator (default)
 mg1.DL <- metagen(TE, seTE, data=mc1)
@@ -385,7 +1050,7 @@ forest(m,
 # invisible(dev.off()) # uncomment line to save PDF file   
 ```
 
-### Hartung-Knapp Adjustment
+## Hartung-Knapp Adjustment
 
 Hartung and Knapp (2001a,b) proposed an alternative method for random effects meta-analysis
 based on a refined variance estimator for the treatment estimate. Simulation studies (Hartung and
@@ -412,8 +1077,8 @@ $$
 $$
 
 
-```{r Hartung-Knapp,echo = T,message = FALSE, error = FALSE, warning = FALSE}
- ## use the metacont function to conduct the Hartung–Knapp adjustment
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+ # use the metacont function to conduct the Hartung–Knapp adjustment
 mc2.hk <- metacont(Ne, Me, Se, Nc, Mc, Sc, sm="SMD",
                    data=data2, comb.fixed=FALSE,
                    hakn=TRUE)
@@ -439,70 +1104,591 @@ meta-analysis and the HK method (Wiksten et al., 2016; Jackson et al., 2017).
 
 
 
+# Meta-Regression
 
-## Meta-Regression
+**Meta-regression** is an extension of meta-analysis designed to explain **residual heterogeneity** among study results by incorporating **study-level moderators** (also called covariates or independent variables). These moderators might include characteristics such as study year, mean age of participants, treatment dosage, study quality score, or geographic region.
 
-元回归是对多个二进制/分类协变量或连续协变量的扩展。Meta-regression model
+In essence, meta-regression allows us to model how the **effect size** changes across studies depending on these moderators. This helps uncover patterns and improve understanding of why studies differ in their results.
+
+## Basic Concept 
+
+
+Just as a standard regression model evaluates how a dependent variable is influenced by one or more predictors, a meta-regression regresses the **effect sizes** reported in individual studies on one or more **study-level characteristics**. The key difference is that each effect size is estimated with a known variance (from the original studies), and that this variance should be incorporated into the estimation procedure.
+
+The effect size from study *i* is denoted as **δ̂ᵢ**. These observed effect sizes vary due to both:
+
+1. **Within-study sampling variance** (denoted σ̂²ᵢ), and
+2. **Between-study variance** (denoted τ²), which is estimated if a **random-effects model** is used.
+
+The general **meta-regression model** can be written as:
+
+**δᵢ = β₀ + β₁xᵢ₁ + β₂xᵢ₂ + … + βₚxᵢₚ + νᵢ + εᵢ**
+
+* δᵢ: true effect size for study *i*
+* xᵢ₁, xᵢ₂, ..., xᵢₚ: study-level moderators
+* β₀: intercept (mean effect when all covariates are 0)
+* βⱼ: regression coefficient for moderator *j*
+* νᵢ \~ N(0, τ²): between-study random effect (residual heterogeneity)
+* εᵢ \~ N(0, σ̂²ᵢ): within-study error (sampling variance from each study)
+
+---
+
+**Fixed-Effects vs Random-Effects Meta-Regression**
+
+In **fixed-effects meta-regression**, it is assumed that all residual variation in effect size across studies is due to within-study sampling error (τ² = 0). This is appropriate only if there is no heterogeneity beyond sampling error.
+
+In contrast, **random-effects meta-regression** allows for additional variability in true effect sizes not explained by sampling error, acknowledging that effect sizes may truly differ across studies.
+
+* Use fixed-effects meta-regression when you believe studies share a common true effect.
+* Use random-effects meta-regression when studies likely differ in their true effects, even after accounting for moderators.
+
+---
+
+**Interpreting Meta-Regression**
+
+The main goals are:
+
+* To identify which moderators significantly **explain** heterogeneity.
+* To understand the **direction** and **magnitude** of association between moderators and effect sizes.
+* To quantify how much **residual heterogeneity** (unexplained variance) remains after including moderators.
+
+Statistical output includes:
+
+* Estimates of **β coefficients** (effect of each moderator on the outcome)
+* Their **standard errors**, **z-values**, and **p-values**
+* The estimate of **τ²**, which is the residual heterogeneity **after** accounting for moderators
+* Measures like **QM** (analogous to the regression F-test), testing whether all β’s are jointly zero
+
+
+## Implementing Meta-Regression in R with metafor
+
+The `meta` and `rmeta` packages do not support meta-regression. Instead, the **`metafor`** package is used, which is designed for flexible meta-analysis and includes advanced features like meta-regression.
+
+To perform **meta-analysis** using the `rma()` function in the **`metafor`** R package, you must specify the **method** used to estimate the **between-study variance τ²**, which is critical for random-effects models. The choice of method can impact the estimated τ² and, consequently, the weighting of studies and the overall meta-analytic result.
+
+
+**When to Choose Which Method?**
+
+* Use `"REML"` when you want **accurate τ² estimation** and plan to use meta-regression.
+* Use `"DL"` when replicating older studies or when simplicity and speed are needed.
+* Use `"SJ"` or `"EB"` if you're concerned about **underestimating** between-study heterogeneity.
+* Use `"ML"` if you want to compare models using likelihood criteria (e.g., AIC).
+
+
+**Fixed-Effects Model**
+
+If you assume **no between-study heterogeneity** (i.e., τ² = 0), you are using a **fixed-effects model**. You can specify it explicitly with:
+
+```r
+method = "FE"
+```
+
+This method assumes that all studies estimate the same true effect size, and any observed differences are due to sampling error alone.
+
+---
+
+**Random-Effects Models and τ² Estimation Methods**
+
+For **random-effects meta-analysis**, τ² must be estimated. The `rma()` function provides multiple estimators for τ², each with different theoretical backgrounds and properties.
+
+Here are the main methods you can choose from:
+
+1. **DerSimonian-Laird ("DL")**
+
+   * Classic method used in most meta-analyses historically.
+   * Based on method of moments.
+   * **Quick and easy**, but known to **underestimate τ²**, especially with few studies or when heterogeneity is large.
+   * Use:
+
+     ```r
+     rma(yi, vi, data = dat, method = "DL")
+     ```
+
+2. **Hunter-Schmidt ("HS")**
+
+   * Used mostly in psychological and behavioral science meta-analyses.
+   * Assumes **true score variance model**, often used with correlation coefficients.
+   * Less common in medical or epidemiological contexts.
+   * Use:
+
+     ```r
+     method = "HS"
+     ```
+
+3. **Hedges ("HE")**
+
+   * Based on Hedges and Olkin’s method.
+   * Also a **method-of-moments** estimator, more robust than DL under certain conditions.
+   * Known to produce **less biased τ² estimates** when variances are unequal.
+   * Use:
+
+     ```r
+     method = "HE"
+     ```
+
+4. **Sidik-Jonkman ("SJ")**
+
+   * A newer estimator.
+   * Tends to **overestimate τ²** in small samples but is **very conservative**.
+   * Good when aiming for **wider confidence intervals** to avoid overconfidence.
+   * Use:
+
+     ```r
+     method = "SJ"
+     ```
+
+5. **Empirical Bayes ("EB")**
+
+   * Uses Bayesian principles to shrink individual study estimates toward the overall mean.
+   * Especially useful when the number of studies is **very small**.
+   * Use:
+
+     ```r
+     method = "EB"
+     ```
+
+6. **Maximum Likelihood ("ML")**
+
+   * Optimizes the likelihood of observing the data given a model.
+   * Biased in small samples (underestimates τ²), but still widely used.
+   * Allows model comparisons (e.g., AIC).
+   * Use:
+
+     ```r
+     method = "ML"
+     ```
+
+7. **Restricted Maximum Likelihood ("REML")**
+
+   * Default method in `rma()`.
+   * Adjusts for degrees of freedom used in estimating fixed effects.
+   * **Asymptotically unbiased and efficient**.
+   * Recommended for most applications.
+   * Use:
+
+     ```r
+     method = "REML"
+     ```
+     
+     
+     
+**To Do with Doing Meta-Analysis in R: A Hands-on Guide**
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+ 
+```
+
+**Practical Notes**
+
+* Use only study-level covariates (not individual participant-level variables).
+* Be cautious when including many moderators in a model with a small number of studies.
+* Avoid overfitting; meta-regression should be guided by theory or prior knowledge.
+* Meta-regression is observational—**associations do not imply causation**.
+
+
+## Meta-regression vs. Weighted Regression
+
+**Meta-regression vs. Weighted Regression** is a subtle but important distinction in statistical modeling, especially in the context of meta-analysis.
+
+At first glance, meta-regression appears very similar to ordinary **weighted linear regression**, where the **effect size estimates** (e.g., log odds ratios, SMDs, or risk differences from individual studies) are regressed on **study-level covariates** using a set of **weights**. However, while the **parameter estimates** (the regression coefficients) from both approaches will typically match, the **standard errors**, **confidence intervals**, and **p-values** can differ significantly. The key lies in the **assumed error structure** of the models.
+
+In **meta-regression**, the goal is to estimate how **study-level moderators** (like geographic region, year, or sample size) explain variations in the effect sizes across studies. The correct meta-regression model assumes:
+
+* Known and fixed variances for each study's effect size (provided as input)
+* Residuals that have a **known variance structure**, namely:
+
+  **Var(εᵢ) = σ̂ᵢ² + τ²**
+
+This combined variance includes:
+
+* **σ̂ᵢ²**, the within-study variance (from each study)
+* **τ²**, the between-study variance (heterogeneity), estimated by `rma()` from the data
+
+These two components make up the weights:
+
+**wᵢ = 1 / (σ̂ᵢ² + τ²)**
+
+---
+
+**The Mistake with `lm()` and Weighted Regression**
+
+The R function `lm()` can perform weighted linear regression via the `weights` argument, and it will indeed **give the correct point estimates** for the regression coefficients if you use **wᵢ** as the weights. However, it does **not make the correct distributional assumption** for the residuals.
+
+Specifically:
+
+* `lm()` assumes residuals εᵢ are from **N(0, σ² × wᵢ)**, where σ² is an **unknown common error variance** that is **estimated from the data**
+* Meta-regression assumes εᵢ ∼ **N(0, 1 / wᵢ)** — i.e., the weights are already the known inverse variances, and no additional σ² scaling is needed
+
+Because of this mismatch, `lm()` will inflate the standard errors by a factor of √(σ̂²), which results in **incorrect inference** (i.e., p-values and confidence intervals will be wrong).
+
+---
+
+**Conclusion**
+
+* **Meta-regression** and **weighted regression** use the same formula for calculating coefficient estimates, but they differ in the assumed variance model of the residuals.
+* **lm() incorrectly estimates an extra residual variance term (σ²)**, leading to inflated standard errors and incorrect inference.
+* Always use `rma()` or manual calculations with fixed weights and no additional residual variance term when performing meta-regression.
+
+
+
+ 
+# Binary Outcomes
+
+## Effect Measures
+
+In meta-analysis, especially when dealing with binary outcomes (such as "event occurred" vs. "event did not occur"), choosing an appropriate **effect measure** is crucial for meaningful interpretation and synthesis across studies. The most commonly used effect measures include:
+
+
+**Study Summary Data (2×2 Table)**
+
+In each study $k$ included in the meta-analysis (where $k = 1, ..., K$), the outcome data can be summarized in a 2×2 contingency table:
+
 $$
-\hat{\theta}_{k}=\theta+\beta_{1} x_{1 k}+\cdots+\beta_{P} x_{P k}+u_{k}+\sigma_{k} \epsilon_{k}, \quad \epsilon_{k}^{\text {i.i.d. }} N(0,1) ; u_{k}^{\text {i.i.d. }} N\left(0, \tau^{2}\right)
+\begin{array}{l|c|c|c}
+\hline
+ & \text{Event} & \text{No Event} & \text{Group Size} \\
+\hline
+\text{Experimental Group} & a_k & b_k & n_{ek} = a_k + b_k \\
+\text{Control Group} & c_k & d_k & n_{ck} = c_k + d_k \\
+\hline
+\text{Totals} & a_k + c_k & b_k + d_k & n_k = n_{ek} + n_{ck} \\
+\hline
+\end{array}
 $$
-with $k=1, \ldots, K$ and independent error terms $u$ and $\epsilon$. As this model has both fixed effect $(\beta \mathrm{s})$
-and random effects terms $\left(u_{k}\right.$ with variance $\left.\tau^{2}\right)$ this meta-regression model is also called a mixed effects model. The fixed effect meta-regression is a special case of the mixed effects model when the
-between-study variance $\tau^{2}=0$.
 
-n order to calculate 95 % confidence intervals for studies with longer study duration based on information from the meta-regression model, the variance–covariance matrix of the estimated coefficients has to be taken into account.
+From this, the **estimated probabilities** of event occurrence in each group are calculated as:
 
-```{r Meta-Regression,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-data3 <- read.csv("./01_Datasets/dataset03.csv", as.is=TRUE)
-## Meta-Regression with a Categorical Covariate
-mc3s.c <- metacont(Ne, Me, Se, Nc, Mc, Sc, data=data3,
-                   studlab=paste(author, year),
-                   byvar=duration, print.byvar=FALSE,
-                   tau.common=TRUE, comb.fixed=FALSE)
-print(summary(mc3s.c), digits=2)
+$$
+\hat{p}_{e k} = \frac{a_k}{n_{e k}} \quad \text{and} \quad \hat{p}_{c k} = \frac{c_k}{n_{c k}}
+$$
 
-mc3s.mr <- metareg(mc3s.c)
-print(mc3s.mr, digits=2)
+These probabilities are then used to compute the chosen effect measure (OR, RR, RD, ASD) for each study $k$, which are subsequently pooled using either a **fixed-effects** or **random-effects** model, depending on heterogeneity and modeling assumptions.
+ 
+ 
+---
+
+**1. Odds Ratio (OR)**
+
+The **odds ratio** compares the odds of the event occurring in the treatment group to the odds in the control group.
+
+$$
+\text{OR}_k = \frac{a_k / b_k}{c_k / d_k} = \frac{a_k d_k}{b_k c_k}
+$$
+
+* **Odds**: the ratio of the probability that the event occurs to the probability that it does not occur.
+* Often used in **case-control studies** or where outcomes are **rare**.
+* **Log(OR)** is approximately normally distributed, making it suitable for statistical modeling and meta-analysis.
+
+---
+
+**2. Risk Ratio (RR)**
+
+Also called the **relative risk**, this measure compares the **probability** of the event between the two groups.
+
+$$
+\text{RR}_k = \frac{\hat{p}_{e k}}{\hat{p}_{c k}} = \frac{a_k / (a_k + b_k)}{c_k / (c_k + d_k)} = \frac{a_k / n_{e k}}{c_k / n_{c k}}
+$$
+
+* Indicates how many times more (or less) likely an event is in the treatment group compared to the control.
+* Intuitive and widely used in **randomized controlled trials**.
+* Less statistically stable than OR when event probabilities approach 0 or 1.
+
+---
+
+**3. Risk Difference (RD)**
+
+The **risk difference** measures the absolute difference in event probabilities between groups.
+
+$$
+\text{RD}_k = \hat{p}_{e k} - \hat{p}_{c k}
+$$
+
+* Directly interpretable as the percentage point difference in risk.
+* More sensitive to **baseline risk**; can vary substantially across populations.
+* **Less stable** across studies than OR or RR, which are **relative** measures.
+
+---
+
+**4. Arcsine Difference (ASD)**
+
+The **arcsine difference** is used less frequently but is especially useful for detecting **small-study effects** (e.g., publication bias) in meta-analysis.
+
+$$
+\text{ASD}_k = \arcsin\left(\sqrt{\hat{p}_{e k}}\right) - \arcsin\left(\sqrt{\hat{p}_{c k}}\right)
+$$
+
+* Stabilizes variance, especially in studies with small sample sizes or rare events.
+* Used in certain **regression-based tests** for funnel plot asymmetry or bias detection.
+
+---
+
+**Why Are OR and RR Usually Preferred?**
+
+The **odds ratio** and **risk ratio** are preferred in most meta-analyses for several reasons:
+
+* They are **relative measures**, which tend to remain more **consistent** across studies with different baseline risks (a concept known as **effect measure homogeneity**).
+* **Log(OR)** and **log(RR)** are approximately normally distributed, enabling the use of standard meta-analytic methods (e.g., inverse-variance weighting).
+* They are less affected by the absolute event rate compared to risk difference, making them more **robust** in diverse clinical settings.
+
+ 
+
+## Analysis with Risk-Ratio [Fixed Effect - Inverse Variance Method]
+
+The risk ratio (RR), also known as relative risk, is a widely used measure of treatment effect in clinical trials with binary outcomes (e.g., event/no event). In a meta-analysis, RR quantifies how the probability of an event (e.g., death, MI) differs between a treatment group and a control group across multiple studies.
+  
+ 
+
+The risk ratio is defined as the ratio of the event probability (risk) in the experimental group to the event probability in the control group:
+
+$$
+\text{RR} = \frac{p_E}{p_C} = \frac{x_E / n_E}{x_C / n_C}
+$$
+
+* $p_E$: Risk (probability of event) in the **experimental** group
+* $p_C$: Risk (probability of event) in the **control** group
+* $x_E$: Number of events in the experimental group
+* $n_E$: Total number of patients in the experimental group
+* $x_C$: Number of events in the control group
+* $n_C$: Total number of patients in the control group
+
+Interpretation:
+
+* RR = 1: No difference between the groups
+* RR < 1: Lower risk in the experimental group (treatment is beneficial)
+* RR > 1: Higher risk in the experimental group
+
+For example, in a statin study, RR < 1 would indicate that high-dose statins reduce risk of death or MI compared to standard-dose statins.
+
+---
+
+**Confidence Interval for RR using Log Transformation**
+
+Since the distribution of the RR is skewed, it's common to perform inference on its **logarithmic scale** using:
+
+$$
+\ln(\text{RR}) = \ln(p_E) - \ln(p_C)
+$$
+
+The variance of $\ln(\text{RR})$ is approximated by the delta method as:
+
+$$
+\text{Var}(\ln(\text{RR})) = \frac{1}{x_E} - \frac{1}{n_E} + \frac{1}{x_C} - \frac{1}{n_C}
+$$
+
+The **standard error** (SE) is the square root of the variance. A **95% confidence interval** on the log scale is:
+
+$$
+\ln(\text{RR}) \pm 1.96 \times SE
+$$
+
+Exponentiating the lower and upper limits gives the 95% CI for RR:
+
+$$
+RR = \exp(\ln(\text{RR})) \\
+LRR = \exp(\ln(\text{RR}) - 1.96 \times SE) \\
+URR = \exp(\ln(\text{RR}) + 1.96 \times SE)
+$$
+
+This CI helps determine statistical significance: if the interval **does not include 1**, the RR is statistically significant.
+
+ 
+**Assessing Statistical Significance**
+
+1. **Confidence Interval Method**
+   Calculate the 95% CI using the log RR and its variance. Example results:
+
+* Study 3 (TNT) 95% CI: \[0.697, 0.922] → significant
+* Other studies’ CIs include 1 → not significant
+
+2. **P-Value Method**
+   Compute the Z-statistic:
+
+$$
+z = \frac{\ln(\text{RR})}{SE}
+$$
+
+Then compute p-value:
+
+$$
+p = 2(1 - \Phi(|z|))
+$$
+
+Example:
+
+* TNT study p-value = 0.00166 → significant
+* Others > 0.05 → not significant
+
+3. **Post-Hoc Power Analysis**
+   Using the `pwr` package in R, power calculations showed:
+
+* TNT study: power ≈ 88.5% (high)
+* Others: power ≈ 36–44% (low)
+
+Low power explains why some studies didn’t show significance despite lower RR values.
+
+---
+
+**Risk Ratio Meta-Analysis Step-by-Step (Fixed-Effects Model)** Before considering a random-effects model, check for **between-study heterogeneity**.
+
+1. Compute the Q statistic:
+
+$$
+Q = \sum w_i (\ln(\text{RR}_i))^2 - \frac{(\sum w_i \ln(\text{RR}_i))^2}{\sum w_i}
+$$
+
+2. Compare Q to a chi-square distribution with $K - 1$ degrees of freedom.
+
+**Automated Meta-Analysis in R using `meta` package**
+
+```
+metabin(Ee, Ne, Ec, Nc, sm="RR", method="I",
+        data=data7, subset=study=="Milpied")
+```
+
+## Analysis with Risk Difference [Fixed Effect - Inverse Variance Method]
+
+While the **risk ratio (RR)** is widely used for summarizing binary outcome data in meta-analysis, the **risk difference (RD)** is also an important effect measure due to its **simplicity and intuitive interpretation**. It tells us the **absolute difference in event rates** between the treatment and control groups.
+
+**Definition of Risk Difference (RD)**
+
+The **risk difference** is calculated as the difference between the observed risks in the experimental and control groups:
+
+$$
+\text{RD} = \hat{p}_E - \hat{p}_C = \frac{x_E}{n_E} - \frac{x_C}{n_C}
+$$
+
+Where:
+
+* $\hat{p}_E$: estimated risk (probability of event) in the **experimental** group
+* $\hat{p}_C$: estimated risk in the **control** group
+* $x_E$, $x_C$: number of events in the experimental and control groups
+* $n_E$, $n_C$: total number of patients in each group
+
+**Interpretation**:
+
+* RD = 0: No difference between groups
+* RD < 0: Lower risk in the experimental group → treatment **beneficial**
+* RD > 0: Lower risk in the control group → treatment **harmful**
+
+This measure is especially appealing to clinicians and policy-makers because it reflects the **actual difference in event rates**, which can be used to estimate metrics such as **number needed to treat (NNT = 1 / |RD|)**.
+
+---
+
+**Variance and Standard Error of RD**
+
+To construct confidence intervals and conduct hypothesis tests, we need to estimate the **variance** of the risk difference. This is derived from the binomial distribution under the assumption that each group’s outcomes are independent:
+
+$$
+\text{Var(RD)} = \frac{\hat{p}_E(1 - \hat{p}_E)}{n_E} + \frac{\hat{p}_C(1 - \hat{p}_C)}{n_C}
+$$
+
+Then the **standard error** is:
+
+$$
+\text{SE(RD)} = \sqrt{\text{Var(RD)}}
+$$
+
+---
+
+**Example: RD Calculation in Statin Trials**
+
+Using the statin trial data, suppose we have:
 
 
-# Variance-covariance matrix
-varcov <- vcov(mc3s.mr)
-# Estimated treatment effect in studies with longer duration
-TE.s2 <- sum(coef(mc3s.mr))
-# Standard error of treatment effect
-seTE.s2 <- sqrt(sum(diag(varcov)) + 2*varcov[1,2])
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# Estimated risks
+pE = c(0.0700, 0.0905, 0.0669, 0.0926)
+pC = c(0.0834, 0.1053, 0.0835, 0.1041)
+
+# Risk differences
+RD = pE - pC
+# Result:
+# [1] -0.0133 -0.0148 -0.0166 -0.0115
+```
+
+Now calculate the **variance and standard error** for each RD:
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# Sample sizes (example values)
+nE = c(2099, 2265, 4995, 4439)
+nC = c(2063, 2232, 5006, 4449)
+
+# Variance of RD
+VarRD = pE*(1 - pE)/nE + pC*(1 - pC)/nC
+# Standard Error
+SERD = sqrt(VarRD)
+SERD
+```
 
 
-## The quantities TE.s2 and seTE.s2 can be used as input to the metagen function to estimate a 95 % confidence interval.
-print(metagen(TE.s2, seTE.s2, sm="MD"), digits=2)
+This allows us to construct **95% confidence intervals** for each RD:
+
+$$
+\text{RD} \pm 1.96 \times \text{SE}
+$$
+
+
+
+---
+
+**Meta-Analysis of Risk Differences (Fixed-Effects Model)**
+
+To combine the RD values from all studies and improve precision, a meta-analysis is performed using a **fixed-effects model**. In this model, each study is **weighted by the inverse of the variance** of its RD:
+
+$$
+w_i = \frac{1}{\text{Var(RD)}_i}
+$$
+
+The combined (pooled) RD is then calculated as a **weighted average**:
+
+$$
+\text{RD}_{\text{pooled}} = \frac{\sum w_i \cdot \text{RD}_i}{\sum w_i}
+$$
+
+And the variance of the pooled RD:
+
+$$
+\text{Var}(\text{RD}_{\text{pooled}}) = \frac{1}{\sum w_i}
+$$
+
+The standard error and 95% confidence interval follow directly from this.
+
+---
+
+**Performing Meta-Analysis Using the R Package `meta`**
+
+The `meta` package allows for straightforward implementation of RD meta-analysis with the function `metabin()`:
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# Create the statin study data
+dat <- data.frame(
+  Study = c("Prove-It", "A-to-Z", "TNT", "IDEAL"),
+  evhigh = c(147, 205, 334, 411),   # number of events in high-dose group
+  nhigh  = c(2099, 2265, 4995, 4439),  # total in high-dose group
+  evstd  = c(172, 235, 418, 463),   # number of events in standard-dose group
+  nstd   = c(2063, 2232, 5006, 4449)   # total in standard-dose group
+)
+RD.Statin = metabin(evhigh, nhigh, evstd, nstd,
+                    studlab = Study,
+                    data = dat,
+                    method = "Inverse",
+                    sm = "RD")
+summary(RD.Statin)
+plot(RD.Statin)
+```
+
+
+```
+metabin(Ee, Ne, Ec, Nc, sm="RD", method="I",
+        data=data7, subset=study=="Milpied")
 ```
 
 
 
+## Meta-Analysis with Odds Ratio 
 
-
-## Meta-Analysis with Binary Outcomes
-
-### Effect Measures
-
-The most commonly used effect measures for binary outcomes are the **odds ratio, risk ratio and risk difference**.
-Another effect measure, the arcsine difference (反正弦差异), which is used in tests for small-study effects
-通常使用优势比和风险比。原因，these relative effect measures are on average more stable across studies than the risk difference (更稳定)
-
-Summary data of study k in meta-analysis with binary responses .$k =1;...; K$
-
-$$\begin{array}{l|l|l|l}
-\hline & \text { Event } & \text { No event } & \text { Group size } \\
-\hline \text { Experimental } & a_{k} & b_{k} & n_{e k}=a_{k}+b_{k} \\
-\hline \text { Control } & c_{k} & d_{k} & n_{c k}=c_{k}+d_{k} \\
-\hline & a_{k}+c_{k} & b_{k}+d_{k} & n_{k} \\
-\hline
-\end{array}$$
-These probabilities are estimated from the observed cell counts by
-$$\hat{p}_{e k}=a_{k} /\left(a_{k}+b_{k}\right)=a_{k} / n_{e k} \text { and } \hat{p}_{c k}=c_{k} /\left(c_{k}+d_{k}\right)=c_{k} / n_{c k}$$
-
-
-#### Odds Ratio
+### Fixed Effect - Inverse Variance Method
 
 The odds ratio for study $k, \psi_{k}$, is defined as the ratio of the odds of an event in the experimental arm
 to that in the control arm. That is
@@ -523,155 +1709,366 @@ $$
 where the approximation improves as nek and $n_{c k}$ increase. Using the estimate of the log odds
 ratio, and its estimated variance, an approximate two-sided $(1-\alpha)$ confidence interval for the
 odds ratio is given by
+
 $$\exp \left(\log \hat{\psi}_{k} \pm z_{1-\frac{\alpha}{2}} \text { S.E. }\left(\log \hat{\psi}_{k}\right)\right)$$
-
-```
-metabin(Ee, Ne, Ec, Nc, sm="OR", method="I",
-        data=data7, subset=study=="Milpied")
-```
-
-
-
-#### Risk Ratio
-
-The risk ratio $\phi_{k}$, often called relative risk, is defined as the ratio of the two event probabilities,
-$$
-\phi_{k}=\frac{p_{e k}}{p_{c k}}
-$$
-If either of the two event probabilities is zero the log risk ratio $\log \phi_{k}$, is either $-\infty$ or $+\infty .$ If
-both probabilities are zero, the log risk ratio is undefined. The risk ratio is estimated by
-$$
-\hat{\phi}_{k}=\frac{\left(\frac{a_{k}}{a_{k}+b_{k}}\right)}{\left(\frac{c_{k}}{c_{k}+d_{k}}\right)}
-$$
-whose variance is approximated by
-$$
-\widehat{\operatorname{Var}}\left(\log \hat{\phi}_{k}\right)=\frac{1}{a_{k}}+\frac{1}{c_{k}}-\frac{1}{a_{k}+b_{k}}-\frac{1}{c_{k}+d_{k}}
-$$
-
-```
-metabin(Ee, Ne, Ec, Nc, sm="RR", method="I",
-        data=data7, subset=study=="Milpied")
-```
-
-#### Risk Difference
-
-The risk difference $\eta_{k}$ is defined as the difference between the two event probabilities
-$$
-\eta_{k}=p_{e k}-p_{c k}
-$$
-The risk difference is always defined and has finite range from $-1$ to 1 . The natural estimate of the risk difference is
-$$
-\hat{\eta}_{k}=\frac{a_{k}}{a_{k}+b_{k}}-\frac{c_{k}}{c_{k}+d_{k}}
-$$
-with corresponding variance estimate
-$$
-\widehat{\operatorname{Var}}\left(\hat{\eta}_{k}\right)=\frac{a_{k} b_{k}}{\left(a_{k}+b_{k}\right)^{3}}+\frac{c_{k} d_{k}}{\left(c_{k}+d_{k}\right)^{3}}
-$$
-An approximate two-sided $(1-\alpha)$ confidence interval for the risk difference is thus
-$$
-\hat{\eta}_{k} \pm z_{1-\frac{\alpha}{2}} \text { S.E. }\left(\hat{\eta}_{k}\right)
-$$
-
-```
-metabin(Ee, Ne, Ec, Nc, sm="RD", method="I",
-        data=data7, subset=study=="Milpied")
-```
-
-#### Arcsine Difference
-
-The arcsine difference has been considered as a measure of effectiveness in clinical trials, though it is rarely used in practice. However, it has certain advantages when assessing whether a meta-analysis may be affected by publication bias or other small-study effects. 
-The arcsine difference is defined as the difference of the arcsine-transformed event probabilities (反正弦差定义为反正弦转换事件概率的差), that is
-$$\Delta_{k}=\arcsin \sqrt{p_{e k}}-\arcsin \sqrt{p_{c k}}$$
-
-> 如果两个事件概率都接近，则反正弦差的值类似于风险差，否则值可能会完全不同
-
-Like the risk difference, the arcsine difference is always defined, with a finite range from $-\pi / 2$ to
-$\pi / 2$. The value of the arcsine difference is similar to the risk difference if both event probabilities
-are close to $0.5$, otherwise the values can be quite different.
-
-The arcsine difference is estimated by
-$$
-\hat{\Delta}_{k}=\arcsin \sqrt{\frac{a_{k}}{n_{e k}}}-\arcsin \sqrt{\frac{c_{k}}{n_{c k}}}
-$$
-with approximate variance
-$$
-\widehat{\operatorname{Var}}\left(\hat{\Delta}_{k}\right)=\frac{1}{4 n_{e k}}+\frac{1}{4 n_{c k}} \approx \frac{1}{n_{k}}, \text { if } n_{e k} \approx n_{c k}
-$$
-where the approximation improves as nek and $n c k$ increase. Notice that the approximate
-variance of $\hat{\Delta} k$ only depends on the sample size in the two groups.
-A confidence interval for $\hat{\Delta} k$
-$$
-\hat{\Delta} k \pm z_{1-\frac{\alpha}{2}} \text { S.E. }(\hat{\Delta} k)
-$$
-
-
-```
-metabin(Ee, Ne, Ec, Nc, sm="ASD", method="I",
-        data=data7, subset=study=="Milpied")
-```
-
-
-### Implementation
 
 * The `metabin` function can smoothly realize the combination of effect sizes
 
-```{r metabin,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
 data(Fleiss93)
-## 心梗后服用阿司匹林能否降低死亡率
-   ## 7 studies information
-   ## event.e表示治疗组的死亡人数
-   ## n.e表示治疗组的总人数
-   ## event.c表示对照组的总人数
-   ## n.c表示对照组的总人数
+# Can taking aspirin after a heart attack reduce mortality?
+# 7 studies information
+# event.e indicates the number of deaths in the treatment group
+# n.e indicates the total number of people in the treatment group
+# event.c indicates the total number of people in the control group
+# n.c indicates the total number of people in the control group
+
 metabin(event.e, n.e, event.c, n.c, data=Fleiss93, sm="OR")
 
-## meta分析森林图将forest plot一般来说不能少
-## 各研究的OR值和95%可信区间、权重、效应量合并值以及异质性检验结果等都在该图中
-## comb.random=FALSE，不用随机效应模型进行效应量合并，而是采用固定效应模型
+# Meta-analysis forest plot is generally indispensable
+# The OR value and 95% confidence interval, weight, combined effect size value and heterogeneity test results of each study are all in this figure
+# comb.random=FALSE, the random effect model is not used for effect size combination, but the fixed effect model is used
 metaresult<-metabin(event.e, n.e,event.c,n.c,data=Fleiss93,sm="OR",
-                    studlab=paste(study, year),comb.random=FALSE)
-forest(metaresult)
+                    studlab=paste(study, year),random=FALSE)
+plot(metaresult)
 ```
 
 
+**Unfortunately, for sparse data, the pooled estimates based on the inverse variance method are biased**
+
+
+### Meta-Analysis using Mantel-Haenszel Method (Fixed Effect)
+
+**Detailed Explanation of the Mantel-Haenszel (MH) Method in Meta-Analysis**
+
+The **Mantel-Haenszel method** is a classical and widely used approach in meta-analysis for combining binary outcome data (e.g., event vs. non-event) across multiple studies. It estimates a **pooled odds ratio** under the assumption of a **fixed effect**, meaning that the true treatment effect (odds ratio) is assumed to be the same in all studies, and differences arise purely from sampling variability.
+
+---
+
+**Data Structure and Odds Ratio Definition**
+
+For each study, data are typically organized in a 2-by-2 contingency table:
+
+| Group        | Events $(A, C)$ | Non-Events $(B, D)$ | Total $(n_1, n_2)$ |
+| ------------ | --------------- | ------------------- | ------------------ |
+| Experimental | $A$             | $B$                 | $A + B$            |
+| Control      | $C$             | $D$                 | $C + D$            |
+
+The **odds** of the event in each group is calculated as:
+
+* Experimental: $\text{Odds}_E = A / B$
+* Control: $\text{Odds}_C = C / D$
+
+The **odds ratio (OR)** for each study is:
+
+$$
+\text{OR}_i = \frac{A_i \cdot D_i}{B_i \cdot C_i}
+$$
+
+---
+
+**Mantel-Haenszel Pooled Odds Ratio**
+
+The **Mantel-Haenszel pooled OR** is calculated as:
+
+$$
+\text{OR}_{MH} = \frac{\sum_{i=1}^K \frac{A_i D_i}{N_i}}{\sum_{i=1}^K \frac{B_i C_i}{N_i}}
+$$
+
+where:
+
+* $N_i = A_i + B_i + C_i + D_i$, the total sample size in the ith study.
+* This estimator is **more robust** than inverse variance methods when individual studies have **small cell counts**.
+
+It can be viewed as a **weighted average** of individual study odds ratios, where each weight is:
+
+$$
+w_i = \frac{B_i C_i}{N_i}
+$$
+
+This leads to a relative weight for each study:
+
+$$
+\text{relWeight}_i = \frac{w_i}{\sum w_i}
+$$
+
+and the pooled estimate becomes:
+
+$$
+\text{OR}_{MH} = \sum \text{relWeight}_i \cdot \text{OR}_i
+$$
+
+---
+
+**Naïve Variance and Confidence Interval (Not Recommended)**
+
+A simple variance estimate for $\text{OR}_{MH}$ is the inverse of the total weight:
+
+$$
+\text{Var}(\text{OR}_{MH}) = \frac{1}{\sum w_i}
+$$
+
+This is used to construct an approximate 95% confidence interval:
+
+$$
+\text{CI} = \text{OR}_{MH} \pm 1.96 \times \sqrt{\text{Var}}
+$$
+
+However, this method is not ideal because the **distribution of the odds ratio is skewed**, especially for small probabilities, and the variance of the OR itself does not follow a normal distribution.
+
+---
+
+**Improved Confidence Interval Using Emerson’s Approximation**
+
+To improve accuracy, it is common to perform inference on the **log scale** and construct a confidence interval for the **log odds ratio**, then exponentiate the limits. Emerson’s method uses an advanced formula proposed by Robins et al. (1986) to estimate the **variance of the log odds ratio** more precisely.
+
+The steps are:
+
+1. For each study, define:
+
+   * $T1_i = \frac{A_i + D_i}{N_i}$
+   * $T2_i = \frac{B_i + C_i}{N_i}$
+   * $T3_i = \frac{A_i D_i}{N_i}$
+   * $T4_i = \frac{B_i C_i}{N_i}$
+
+2. Sum across all studies:
+
+   * $ST3 = \sum T3_i$
+   * $ST4 = \sum T4_i$
+
+3. Compute the **variance of the log odds ratio**:
+
+$$
+\text{Var}(\log(\text{OR}_{MH})) = \frac{1}{2} \sum \left[
+\frac{T1_i T3_i}{ST3^2} +
+\frac{T1_i T4_i + T2_i T3_i}{ST3 \cdot ST4} +
+\frac{T2_i T4_i}{ST4^2}
+\right]
+$$
+
+4. The confidence interval is then:
+
+* Lower bound on log scale:
+
+  $$
+  \log(\text{OR}_{MH}) - 1.96 \cdot \sqrt{\text{Var}}
+  $$
+
+* Upper bound on log scale:
+
+  $$
+  \log(\text{OR}_{MH}) + 1.96 \cdot \sqrt{\text{Var}}
+  $$
+
+* Exponentiate both bounds to return to the original scale.
+
+---
  
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# Create the statin study dataset
+dat <- data.frame(
+  Study  = c("Prove-It", "A-to-Z", "TNT", "IDEAL"),
+  evhigh = c(147, 205, 334, 411),    # events in high-dose group
+  nhigh  = c(2099, 2265, 4995, 4439),# total in high-dose group
+  evstd  = c(172, 235, 418, 463),    # events in standard-dose group
+  nstd   = c(2063, 2232, 5006, 4449) # total in standard-dose group
+)
+
+# Odds ratios from individual studies
+OR <- c(0.828, 0.846, 0.787, 0.878)
+
+# Step 1: compute raw Mantel-Haenszel weights
+w0 <- (dat$nhigh - dat$evhigh) * dat$evstd / (dat$nhigh + dat$nstd)
+
+# Step 2: total weight and relative weights
+TotWeight <- sum(w0)
+relWt <- w0 / TotWeight
+
+# Step 3: compute pooled MH OR
+OR.MH <- sum(relWt * OR)
+
+# Step 4: naive variance
+Var.ORMH1 <- 1 / TotWeight
+lowCI_naive <- OR.MH - 1.96 * sqrt(Var.ORMH1)
+upCI_naive <- OR.MH + 1.96 * sqrt(Var.ORMH1)
+
+print(paste0("MH estimate = ",round(OR.MH,3), 
+             ", 95% CI (naive) = [",
+             round(lowCI_naive,3),",",
+             round(upCI_naive,3),"]"))
+```
+
+**R Implementation: Emerson's Improved Method**
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+A <- dat$evhigh
+B <- dat$nhigh - dat$evhigh
+C <- dat$evstd
+D <- dat$nstd - dat$evstd
+N <- A + B + C + D
+
+T1 <- (A + D) / N
+T2 <- (B + C) / N
+T3 <- A * D / N
+T4 <- B * C / N
+
+ST3 <- sum(T3)
+ST4 <- sum(T4)
+
+Var.lnOR <- 0.5 * (
+  (T1 * T3) / ST3^2 +
+  (T1 * T4 + T2 * T3) / (ST3 * ST4) +
+  (T2 * T4) / ST4^2
+)
+
+Var.lnMH <- sum(Var.lnOR)
+
+# 95% CI on log scale
+lowCI_lnMH <- log(OR.MH) - 1.96 * sqrt(Var.lnMH)
+upCI_lnMH <- log(OR.MH) + 1.96 * sqrt(Var.lnMH)
+
+# Convert to OR scale
+lowCI_MH <- exp(lowCI_lnMH)
+upCI_MH <- exp(upCI_lnMH)
+
+print(paste0("MH estimate = ",round(OR.MH,3), 
+             ", 95% CI (Emerson) = [",
+             round(lowCI_MH,3),",",
+             round(upCI_MH,3),"]"))
+```
+
+This confidence interval matches the output from the `meta` package.
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+ORMH.Statin <- metabin(
+  event.e = evhigh, n.e = nhigh,
+  event.c = evstd,  n.c = nstd,
+  studlab = Study,
+  data = dat,
+  method = "MH",   # Mantel-Haenszel
+  sm = "OR"
+)
+
+summary(ORMH.Statin)
+plot(ORMH.Statin)
+```
+
+The **Mantel-Haenszel method** is a reliable and efficient approach to pooling odds ratios across studies, especially when:
+
+* The event is rare
+* Some cell counts are small
+* The number of studies is moderate to large
 
 
 ### Estimation in Sparse Data - Continuity correction
 
+ 
+**Sparse data** refers to cases where the number of events is very low—sometimes **zero**—in one or more groups of a 2×2 contingency table:
 
-We consider questions raised when the number of incidents in one or two research departments is small. In this case, we have noticed that the estimates of the odds ratio and the risk ratio may be uncertain. If the total sample size of the study is small, or the sample size is large, but the probability of the event is very close to zero or one, sparse data may appear.
+|              | Event (Yes) | Event (No) | Total                |
+| ------------ | ----------- | ---------- | -------------------- |
+| Experimental | $a_k$       | $b_k$      | $n_{ek} = a_k + b_k$ |
+| Control      | $c_k$       | $d_k$      | $n_{ck} = c_k + d_k$ |
+
+If **either $a_k = 0$ or $c_k = 0$** (i.e. no events in the treatment or control group), then:
+
+* The **odds ratio (OR)** becomes either 0 or ∞ (undefined on the log scale).
+* The **risk ratio (RR)** becomes either 0 or 1, but the **variance estimate becomes unstable or unreliable**.
+
+This results in high **statistical uncertainty** and **biased estimates**, especially when you try to combine such studies in a meta-analysis.
+
+---
+
+To address this problem, researchers typically consider two approaches:
+
+**1. Exclude the study**:
+Omitting studies with zero events may avoid the distortion of summary statistics, but it **discards potentially valuable data** and can introduce **selection bias**.
+
+**2. Apply continuity correction**:
+This involves **adding a small constant** to each cell of the 2×2 table to avoid zeros and make OR and RR computable. This is the more commonly used method.
+
+The **standard correction** is to add **0.5** to every cell of the table:
+
+$$
+\hat{\psi}_{k}^{\text{mod}} = \frac{(a_k + 0.5)(d_k + 0.5)}{(b_k + 0.5)(c_k + 0.5)}
+$$
+
+This adjusted odds ratio becomes computable even if some original counts were zero.
+
+The variance of the **log-transformed adjusted odds ratio** is:
+
+$$
+\widehat{\operatorname{Var}}(\log \hat{\psi}_{k}^{\text{mod}}) = \frac{1}{a_k + 0.5} + \frac{1}{b_k + 0.5} + \frac{1}{c_k + 0.5} + \frac{1}{d_k + 0.5}
+$$
+
+This method is easy to implement and prevents division by zero. However, it is **sensitive to the choice of increment**, especially in small studies.
+
+* Using 0.5 may **artificially shrink** or **inflate** estimates.
+* To assess this, one can try other small constants like 0.01 or 0.1 to check **sensitivity**.
+
+---
+
+Sweeting et al. (2004) proposed a **more refined continuity correction** that adjusts for **imbalance in sample sizes** between treatment groups.
+
+Define:
+
+* $n_e$: sample size in the **experimental** group
+* $n_c$: sample size in the **control** group
+
+Then the continuity corrections for each arm are:
+
+$$
+\text{incr}_e = \frac{n_e}{n_e + n_c}, \quad \text{incr}_c = \frac{n_c}{n_e + n_c}
+$$
+
+**Key points:**
+
+* The sum of $\text{incr}_e + \text{incr}_c = 1$
+* If sample sizes are equal, both are 0.5 (same as the standard method)
+* If **sample sizes are unbalanced**, the group with the smaller size gets a **smaller correction**, leading to **less bias**
+
+This approach helps produce more accurate estimates of ORs in **asymmetric studies** where one group is much larger than the other.
+
+---
+
+**Summary of Continuity Correction Techniques**
+
+| Method                       | Increment Type       | When Used                        | Advantage                            |
+| ---------------------------- | -------------------- | -------------------------------- | ------------------------------------ |
+| **Standard (0.5 rule)**      | 0.5 to each cell     | Common, default in many packages | Simple, avoids zero counts           |
+| **Smaller fixed increments** | e.g. 0.01, 0.1       | Sensitivity analysis             | Tests robustness of results          |
+| **Sweeting’s method**        | Based on group sizes | Unbalanced study arms            | Reduces bias in odds ratio estimates |
+
+---
+
+**Practical Recommendation**
+
+When working with sparse data in meta-analysis:
+
+1. **Do not blindly discard studies** with zero events.
+2. Use a **continuity correction**, especially if using OR or RR.
+3. Prefer **Sweeting’s method** when arms are highly unbalanced.
+4. Always perform a **sensitivity analysis** using different corrections to ensure robustness of conclusions.
+
+These approaches are implemented in most statistical software packages (e.g., R `meta`, `metafor`) via options for continuity correction (e.g., `add=0.5` or `add="tacc"` for treatment-arm continuity correction).
 
 
-> 假设研究k的数据稀疏。 如前所述，如果ak或ck为零，则估计的比值比和估计的风险比均为0或1。尽管在这种情况下风险比具有有限的估计，但方差公式并不可靠。为了进行荟萃分析，我们要么省略此类研究，要么向零条目的2×2表的每个单元格添加少量增量。 后者称为添加连续性校正。Gart和Zweifel [19]指出，如果任何单元格计数为零（但基本真实概率不为零或1），则将单元格计数增加0.5.
-
-> 如果将0.5加到二乘二表的每个像元，则对数优势比的估计方差会减小，因为所有四个分母都增加了。 显然，可以使用不同于0.5的增量，例如0.01或0.1，以评估结果对不同增量选择的敏感性。
-
-
-$$\hat{\psi}_{k}^{\mathrm{mod}}=\frac{\left(a_{k}+0.5\right)\left(d_{k}+0.5\right)}{\left(b_{k}+0.5\right)\left(c_{k}+0.5\right)}$$
-$$\widehat{\operatorname{Var}}\left(\log \hat{\psi}_{k}^{\mathrm{mod}}\right)=\frac{1}{a_{k}+0.5}+\frac{1}{b_{k}+0.5}+\frac{1}{c_{k}+0.5}+\frac{1}{d_{k}+0.5} .$$
-
-
-> Sweeting等基于两组观察数，提出了一种替代性的连续性校正，即所谓的治疗臂连续性校正。 实验组（增量）和对照组（增量）的连续性校正定义为
-
-$$\operatorname{incr}_{e}=\frac{n_{e}}{n_{e}+n_{c}}$$
-$$\operatorname{incr}_{c}=\frac{n_{c}}{n_{e}+n_{c}}$$
-
-> 增量的两个增量和增量的总和为1。如果两组的样本量相等，则两组的增量均为0.5。 如果组在样本大小方面严重不平衡，则此连续性校正的想法是获得较少的偏差结果。
-
-```{r Continuity-correction,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-## With 0.5 continuity correction for sparse data
-data8 <- read.csv("./01_Datasets/dataset08.csv", as.is=TRUE)
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# With 0.5 continuity correction for sparse data
 metabin(Ee, Ne, Ec, Nc, sm="OR", method="I",
         data=data8, subset=study=="Australian")
 
-## With 0.1 continuity correction for sparse data
+# With 0.1 continuity correction for sparse data
 metabin(Ee, Ne, Ec, Nc, sm="OR", method="I",
         data=data8, subset=study=="Australian",
         incr=0.1)
 
-## conduct an analysis based on the treatment arm continuity correction
-## using argument incr="TACC"
+# conduct an analysis based on the treatment arm continuity correction
+# using argument incr="TACC"
 metabin(Ee, Ne, Ec, Nc, sm="OR", method="I",
         data=data8, subset=study=="Australian",
         incr="TACC")        
@@ -682,132 +2079,341 @@ metabin(Ee, Ne, Ec, Nc, sm="OR", method="I",
 $$\hat{\phi}_{k}^{\mathrm{mod}}=\frac{a_{k}+0.5}{a_{k}+b_{k}+0.5} / \frac{c_{k}+0.5}{c_{k}+d_{k}+0.5}$$
 $$\widehat{\operatorname{Var}}\left(\log \hat{\phi}_{k}^{\bmod }\right)=\frac{1}{a_{k}+0.5}+\frac{1}{c_{k}+0.5}-\frac{1}{a_{k}+b_{k}+0.5}-\frac{1}{c_{k}+d_{k}+0.5} \cdot$$
 
-### Peto Odds Ratio
+### Peto Odds Ratio (Fixed Effect)
 
-An alternative method for the estimation of the odds ratio, which we term the Peto Odds Ratio method, was proposed by Yusuf et al. 
+The **Peto method** is another fixed-effect approach to meta-analyzing binary outcomes, particularly when effect sizes are small and events are relatively rare. This method provides an approximation of the **pooled odds ratio (OR)** without requiring the individual odds ratios from each study to be calculated directly. It's especially suited for **unbalanced designs** (i.e., differing group sizes) or **sparse data**, although it can become biased if the treatment and control group sizes are very unequal or if the treatment effect is large.
 
-该方法的主要优点是无需校正零单元格计数。 该方法基于观察到的细胞数ak和预期细胞数 $E\left(a_{k} \mid \ldots ; \psi=1\right)$
 
-The Peto estimate of the odds ratio is
+---
+
+**1. Peto's Odds Ratio: Concept**
+
+The **Peto odds ratio** for each study is based on the **difference between observed and expected event counts** under the null hypothesis (no effect), and uses this difference to construct the log odds ratio.
+
+For study $i$, define:
+
+* $O_i$: Observed number of events in the **experimental** group (i.e., $A_i$)
+* $E_i$: Expected number of events in the experimental group under the null:
+
+  $$
+  E_i = \frac{(A_i + B_i)(A_i + C_i)}{N_i}
+  $$
+* $V_i$: Variance of $O_i - E_i$:
+
+  $$
+  V_i = \frac{(A_i + B_i)(C_i + D_i)(A_i + C_i)(B_i + D_i)}{N_i^2(N_i - 1)}
+  $$
+
+Using these, the **Peto odds ratio** for each study is:
+
 $$
-\hat{\psi}_{k}^{*}=\exp \left(\frac{a_{k}-\mathrm{E}\left(a_{k} \mid \cdots ; \psi_{k}=1\right)}{\operatorname{Var}\left(a_{k} \mid \cdots ; \psi_{k}=1\right)}\right)
-$$
-where $\mathrm{E}(a k \mid \cdots ; \psi k=1)$ and $\operatorname{Var}(a k \mid \ldots ; \psi k=1)$ are the mean and variance of $a_{k}$
-under the hypergeometric distribution. Under this distribution, we have
-$$
-\begin{array}{c}
-\mathrm{E}\left(a_{k} \mid \cdots ; \psi_{k}=1\right)=\frac{\left(a_{k}+b_{k}\right)\left(a_{k}+c_{k}\right)}{n_{k}} \\
-\operatorname{Var}\left(a_{k} \mid \cdots ; \psi_{k}=1\right)=\frac{\left(a_{k}+b_{k}\right)\left(c_{k}+d_{k}\right)\left(a_{k}+c_{k}\right)\left(b_{k}+d_{k}\right)}{n_{k}^{2}\left(n_{k}-1\right)}
-\end{array}
-$$
-An estimator of the variance of $\log \hat{\psi}_{k}^{*}$ is
-$$
-\widehat{\operatorname{Var}}\left(\log \hat{\psi}_{k}^{*}\right)=\frac{1}{\operatorname{Var}\left(a_{k} \mid \ldots ; \psi_{k}=1\right)}
-$$
-
-> Peto估计器在不平衡设计中表现不佳（即，当nek与nck有很大不同时），如果设计不平衡，则Peto估计量将不一致（即，对于大样本量，它不会收敛到真实的优势比）。 在随机对照试验的背景下，在大多数情况下，即如果治疗组的大小相当（在1：1随机化的情况下）并且治疗效果中等，则使用Peto方法是合理的。
-
-
-```{r Peto-odds,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-metabin(Ee, Ne, Ec, Nc, sm="OR", method="P",
-        data=data8, subset=study=="Australian")
-```
-
-
-### Fixed Effect Model: Inverse Variance Method
-
-逆方差方法是通用的。要使用它，我们只需要估计每项研究的治疗效果及其变化。 我们在尺度上应 用逆方差方法，在该尺度上，估计值的分布最接近于正态分布，然后在必要时对结果进行反变换。
-因此，汇总的固定效应估计为
-$$
-\hat{\theta}_{F}=\frac{\sum_{k=1}^{K} w_{k} \hat{\theta}_{k}}{\sum_{k=1}^{K} w_{k}}, \text { with } \operatorname{Var}\left(\hat{\theta}_{F}\right)=\left(\sum_{k=1}^{K} w_{k}\right)^{-1}
-$$
-and weights $w k=\widehat{\operatorname{Var}}(\hat{\theta} k)^{-1}$. As usual, an approximate two-sided $(1-\alpha)$ confidence interval is given by
-$$
-\hat{\theta}_{F} \pm z_{1-\frac{\alpha}{2}} \mathrm{S.E.}\left(\hat{\theta}_{F}\right)
-$$
-不幸的是，对于稀疏数据，基于逆方差方法的合并估计存在偏差
-
-
-### Fixed Effect Model: Mantel–Haenszel Method
-
-Mantel和Haenszel在分层的病例对照研究中提出了一个共同优势比的估计量，该方法也可以用于随机对照试验的荟萃分析中. 通过指定参数`MH.exact = TRUE`，可以使用确切的Mantel–Haenszel方法. 
-
-**Odds Ratio**
-
-The pooled odds ratio is estimated by combining the individual odds ratios $\hat{\psi}_{k}$ on the natural scale
-$$
-\begin{array}{l}
-\hat{\psi}_{\mathrm{MH}}=\frac{\sum_{k=1}^{K} w_{k} \hat{\psi}_{k}}{\sum_{k=1}^{K} w_{k}} \\
-\text { with weights } w_{k}=\frac{b_{k} c_{k}}{n_{k}}
-\end{array}
-$$
-An estimator of the variance of the logarithm of $\hat{\psi}_{M H}$ that is robust both in sparse data and large
-strata models
-$$
-\begin{aligned}
-\overrightarrow{\operatorname{Var}\left(\log \hat{\psi}_{\mathrm{MH}}\right)}=& \frac{\sum_{k=1}^{K} P_{k} R_{k}}{2\left(\sum_{k=1}^{K} R_{k}\right)^{2}}+\frac{\sum_{k=1}^{K}\left(P_{k} S_{k}+Q_{k} R_{k}\right)}{2 \sum_{k=1}^{K} R_{k} \sum_{k=1}^{K} S_{k}}+\frac{\sum_{k=1}^{K} Q_{k} S_{k}}{2\left(\sum_{k=1}^{K} S_{k}\right)^{2}} \\
-& \text { with } P_{k}=\frac{a_{k}+d_{k}}{n_{k}}, Q_{k}=\frac{b_{k}+c_{k}}{n_{k}}, R_{k}=\frac{a_{k} d_{k}}{n_{k}}, \text { and } S_{k}=\frac{b_{k} c_{k}}{n_{k}} .
-\end{aligned}
+\hat{\Psi}_i = \exp\left(\frac{O_i - E_i}{V_i}\right)
 $$
 
-**Risk Ratio**
+And the **95% confidence interval** for this estimate is:
 
-The pooled risk ratio $\hat{\phi} \mathrm{MH}$ is calculated by combining individual risk ratios $\hat{\phi} k$ on the natural
-scale
 $$
-\begin{array}{c}
-\hat{\phi}_{\mathrm{MH}}=\frac{\sum_{k=1}^{K} w_{k} \hat{\phi}_{k}}{\sum_{k=1}^{K} w_{k}} \\
-\text { using weights } w_{k}=\frac{\left(a_{k}+b_{k}\right) c_{k}}{n_{k}}
-\end{array}
-$$
-A robust estimator of the variance of the logarithm of $\hat{\phi}_{\mathrm{MH}}$ is given by Greenland and Robins
-$$
-\overline{\operatorname{Var}\left(\log \hat{\phi}_{\mathrm{MH}}\right)}=\frac{\sum_{k=1}^{K} \frac{\left(a_{k}+b_{k}\right)\left(c_{k}+d_{k}\right)\left(a_{k}+c_{k}\right)-a_{k} c_{k} n_{k}}{n_{k}^{2}}}{\sum_{k=1}^{K} \frac{a_{k}\left(c_{k}+d_{k}\right)}{n_{k}} \sum_{k=1}^{K} \frac{c_{k}\left(a_{k}+b_{k}\right)}{n_{k}}}
+\text{CI}_i = \exp\left(\frac{O_i - E_i \pm 1.96 \cdot \sqrt{V_i}}{V_i}\right)
 $$
 
-**Risk Difference**
+---
 
-The pooled risk difference $\hat{\eta} \mathrm{MH}$ is calculated by combining risk differences $\hat{\eta} k$
+**2. Pooled Peto’s Odds Ratio Across Studies**
+
+The **pooled odds ratio** is calculated as:
+
 $$
-\hat{\eta}_{\mathrm{MH}}=\frac{\sum_{k=1}^{K} w_{k} \hat{\eta}_{k}}{\sum_{k=1}^{K} w_{k}}
-$$
-with weights $w k=\frac{(a k+b k)(c k+d k)}{n k}$ A robust estimator of the variance of $\hat{\eta}_{\mathrm{MH}}$ is given by
-$$
-\widehat{\operatorname{Var}\left(\hat{\eta}_{\mathrm{MH}}\right)}=\frac{\sum_{k=1}^{K} \frac{\left(a_{k} b_{k} n_{c}\right)^{3}+\left(c_{k} d_{k} n_{e}\right)^{3}}{\left(n_{e} n_{c}\left(n_{e}+n_{c}\right)\right)^{2}}}{\left(\sum_{k=1}^{K} \frac{\left(a_{k}+b_{k}\right)\left(c_{k}+d_{k}\right)}{n_{k}}\right)^{2}}
+\hat{\Psi}_{\text{pooled}} = \exp\left(\frac{\sum_{i=1}^K (O_i - E_i)}{\sum_{i=1}^K V_i}\right)
 $$
 
+And its **95% confidence interval** is:
 
-```{r Mantel–Haenszel,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-data7 <- read.csv("./01_Datasets/dataset07.csv", as.is=TRUE)
-mb1.mh <- metabin(Ee, Ne, Ec, Nc, sm="OR",
-                  data=data7, studlab=study)
-print(summary(mb1.mh), digits=2)
-forest(mb1.mh, comb.random=FALSE, hetstat=FALSE,
-       text.fixed="MH estimate")
-       
+$$
+\exp\left( \frac{\sum (O_i - E_i) \pm 1.96 \cdot \sqrt{\sum V_i}}{\sum V_i} \right)
+$$
 
-mb2.mh <- metabin(Ee, Ne, Ec, Nc, sm="OR", method="MH",
-                  data=data8, studlab=study)
-print(summary(mb2.mh), digits=2)
-```
+This method avoids direct computation of individual study ORs and variances, focusing instead on the **expected vs. observed** framework.
+
+---
 
 
-### Random Effects Model
+**3. Manual Calculation in R (Step-by-Step)**
 
-In a random effects model, the assumption of a constant treatment effect across studies is relaxed by allowing the treatment effect from each study to have a probability distribution about the pooled treatment effect. Usually a normal distribution is used, so that
-$$\hat{\theta}_{k}=\theta+u_{k}+\sigma_{k} \epsilon_{k}, \quad \epsilon_{k}^{\text {i.i.d. }} N(0,1) ; u_{k}^{\text {i.i.d. }} N\left(0, \tau^{2}\right)$$
-where the $u$ 's and $\epsilon$ 's are independent. The between-study variance $\tau^{2}$ describes the extent of
-heterogeneity between individual study results.
-
-**DerSimonian–Laird Method**
  
+
+```{r ,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+dat <- data.frame(
+  Study  = c("Prove-It", "A-to-Z", "TNT", "IDEAL"),
+  evhigh = c(147, 205, 334, 411),
+  nhigh  = c(2099, 2265, 4995, 4439),
+  evstd  = c(172, 235, 418, 463),
+  nstd   = c(2063, 2232, 5006, 4449)
+)
+
+## First, define the 2×2 table components:
+
+A <- dat$evhigh
+B <- dat$nhigh - A
+C <- dat$evstd
+D <- dat$nstd - C
+N <- A + B + C + D
+ 
+# Now compute the Peto components for each study:
+# Observed
+Oi <- A
+
+# Expected under null
+Ei <- (A + B) * (A + C) / N
+
+# Variance
+Vi <- (A + B) * (C + D) * (A + C) * (B + D) / (N^2 * (N - 1))
+
+# Peto’s OR
+psii <- exp((Oi - Ei) / Vi)
+print(psii)
+
+
+## Compute confidence intervals for each study:
+lowCIi <- exp((Oi - Ei - 1.96 * sqrt(Vi)) / Vi)
+upCIi  <- exp((Oi - Ei + 1.96 * sqrt(Vi)) / Vi)
+
+print(lowCIi)
+print(upCIi)
+
+print("Interpretation: Only the third study may have a CI that excludes 1 → statistically significant")
+
+
+## Now compute the **pooled Peto’s OR**:
+psi <- exp(sum(Oi - Ei) / sum(Vi))
+lowCI <- exp((sum(Oi - Ei) - 1.96 * sqrt(sum(Vi))) / sum(Vi))
+upCI  <- exp((sum(Oi - Ei) + 1.96 * sqrt(sum(Vi))) / sum(Vi))
+
+cat("Pooled Peto OR =", round(psi, 3), "\n")
+cat("95% CI = [", round(lowCI, 3), ",", round(upCI, 3), "]\n")
+```
+
+ 
+---
+
+**4. Using the `meta` R Package for Peto’s Method**
+
+The `meta` package automates this calculation. Here’s how to perform Peto’s OR meta-analysis using `metabin()`:
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+
+ORPeto.Statin <- metabin(
+  event.e = evhigh, n.e = nhigh,
+  event.c = evstd,  n.c = nstd,
+  studlab = Study,
+  data = dat,
+  method = "Peto",  # use Peto's method
+  sm = "OR"
+)
+
+summary(ORPeto.Statin)
+plot(ORPeto.Statin)
+```
+ 
+
+**When to Use Peto’s Method**
+
+Peto’s method is most appropriate when:
+
+* Treatment effects are small (i.e., odds ratios close to 1)
+* Event rates are low (rare outcomes)
+* Treatment and control group sizes are approximately balanced
+
+However, **Peto’s method can be biased** if:
+
+* There are large treatment effects
+* Treatment and control groups are imbalanced
+* There are studies with zero events in one arm
+
+For general applications with more robust statistical properties, the **Mantel-Haenszel method** or **inverse-variance method** is typically preferred.
+
+
+ 
+ 
+## Random Effect Model
+
+In real-world meta-analysis of binary outcomes (e.g., treatment success/failure, survival/death), the differences between study results often cannot be explained by random sampling error alone. These differences may come from:
+
+* Varying populations across studies
+* Differences in study design or quality
+* Variations in intervention delivery or control conditions
+
+The **random effects model** explicitly models this extra variability between studies.
+
+---
+
+**Model Specification**
+
+
+
+Suppose each study $k$ provides an estimate $\hat{\theta}_k$, such as the **log odds ratio** or **log risk ratio**. The random effects model assumes:
+
 $$
-\hat{\tau}^{2}=\frac{Q-(K-1)}{\sum_{k=1}^{K} w_{k}-\frac{\sum_{k=1}^{K} w_{k}^{2}}{\sum_{k=1}^{k} w_{k}}}
+\hat{\theta}_{k} = \theta + u_k + \sigma_k \epsilon_k
 $$
-where $Q$, the heterogeneity statistic, is given by $Q=\sum k=1^{K} w k(\hat{\theta} k-\hat{\theta} F)^{2}$ and $w k=$ $\widehat{\operatorname{Var}}(\hat{\theta} k)^{-1}$. The estimator $\hat{\tau}^{2}$ is set to zero if $Q<K-1$
+
+Where:
+
+* $\hat{\theta}_k$: Observed treatment effect (e.g., log OR) in study $k$
+* $\theta$: The **overall average effect size** across all studies (the pooled estimate)
+* $u_k \sim N(0, \tau^2)$: Random **between-study deviation**, capturing heterogeneity
+* $\sigma_k \epsilon_k \sim N(0, \sigma_k^2)$: Within-study error due to sampling variability
+* $\tau^2$: The **between-study variance**, a key quantity that reflects the extent of heterogeneity
+* $\epsilon_k$: Standard normal error, i.i.d. $N(0,1)$
+
+In words, this model says that each study’s effect estimate deviates from the overall effect due to:
+
+* **Between-study variability** ($u_k$) → heterogeneity
+* **Within-study sampling error** ($\sigma_k \epsilon_k$)
+
+Both sources of error are assumed to be independent.
+
+---
+
+**Key Assumption: Distribution of Effects**
+
+Instead of assuming all studies estimate the **same true effect** ($\theta$), we assume that the **true effect for each study** is **drawn from a distribution** centered at $\theta$, with variability $\tau^2$:
+
+$$
+\theta_k^{\text{true}} = \theta + u_k, \quad \text{with } u_k \sim N(0, \tau^2)
+$$
+
+So, the treatment effect itself is **random across studies**, and the observed effect $\hat{\theta}_k$ is a noisy version of that random effect.
+
+Given the above, the **total variance** of the observed effect in each study is:
+
+$$
+\operatorname{Var}(\hat{\theta}_k) = \sigma_k^2 + \tau^2
+$$
+
+Where:
+
+* $\sigma_k^2$: **Within-study variance**, often derived from 2×2 tables (as in log OR variance)
+* $\tau^2$: **Between-study variance**, to be estimated
+
+---
+
+
+
+**Estimating Between-Study Variance: DerSimonian–Laird Method**
+
+The **DerSimonian–Laird (DL) method** is a widely used approach for estimating $\tau^2$.
+
+**Step 1: Compute Q Statistic (Cochran’s Q)**
+
+$$
+Q = \sum_{k=1}^{K} w_k (\hat{\theta}_k - \hat{\theta}_F)^2
+$$
+
+* $\hat{\theta}_F$: Fixed-effect estimate (weighted average of study estimates)
+* $w_k = \frac{1}{\widehat{\operatorname{Var}}(\hat{\theta}_k)}$: Inverse variance weights
+
+**Step 2: Compute the DL estimator of $\tau^2$:**
+
+$$
+\hat{\tau}^2 = \frac{Q - (K - 1)}{\sum_{k=1}^{K} w_k - \frac{\sum_{k=1}^{K} w_k^2}{\sum_{k=1}^{K} w_k}}
+$$
+
+* If $Q < K - 1$, then $\hat{\tau}^2$ is **set to 0** (i.e., no detected heterogeneity)
+
+**Interpretation:**
+
+* $Q > K - 1$ → significant heterogeneity → $\tau^2 > 0$
+* $Q \approx K - 1$ → little/no heterogeneity → $\tau^2 \approx 0$
+
+---
+
+**Pooled Effect and Weighting**
+
+Once $\tau^2$ is estimated, the weights used for the random effects pooled estimate become:
+
+$$
+w_k^{\text{RE}} = \frac{1}{\sigma_k^2 + \hat{\tau}^2}
+$$
+
+Then the random effects pooled estimate is:
+
+$$
+\hat{\theta}_{\text{RE}} = \frac{\sum w_k^{\text{RE}} \hat{\theta}_k}{\sum w_k^{\text{RE}}}
+$$
+
+With variance:
+
+$$
+\widehat{\operatorname{Var}}(\hat{\theta}_{\text{RE}}) = \frac{1}{\sum w_k^{\text{RE}}}
+$$
+
+---
+
+| Concept                | Random Effects Model                                        |
+| ---------------------- | ----------------------------------------------------------- |
+| Treatment Effect       | Varies across studies: $\theta_k = \theta + u_k$            |
+| Between-Study Variance | $\tau^2$ (heterogeneity across true effects)                |
+| Within-Study Variance  | $\sigma_k^2$ (sampling error)                               |
+| Pooled Estimate        | Weighted average using total variance $\sigma_k^2 + \tau^2$ |
+| Weight Formula         | $w_k^{RE} = \frac{1}{\sigma_k^2 + \tau^2}$                  |
+| Estimator of $\tau^2$  | DerSimonian–Laird (DL)                                      |
+| Best for               | Heterogeneous studies, moderate to large number of studies  |
+
+# Meta-Analysis for Rare Events
 
 
 
 
+
+# Reference (APA Style)
+
+## Book
+
+Harrer, M., Cuijpers, P., Furukawa, T.A., & Ebert, D.D. (2021). _Doing Meta-Analysis with R: A Hands-On Guide_. Boca Raton, FL and London: Chapmann & Hall/CRC Press. ISBN 978-0-367-61007-4.
+https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/
+
+Chen, D.-G. (Din), & Peace, K. E. (2021). Applied Meta-Analysis with R and Stata (2nd ed.). Chapman & Hall/CRC Press. https://doi.org/10.1201/9780429061240
+
+Schwarzer, G., Carpenter, J. R., & Rücker, G. (2015). Meta-Analysis with R. Springer. https://doi.org/10.1007/978-3-319-21416-0
+
+## Meta Analysis
+
+Berkey, C. S., D. C. Hoaglin, A. Antezak-Bouckoms, F. Mosteller, and G. A.
+Colditz (1998). Meta-analysis of multiple outcomes by regression with random effects. Statistics in Medicine 17, 2537–2550.
+
+Berkey, C. S., D. C. Hoaglin, F. Mosteller, and G. A. Colditz (1995).
+A random-effects regression model for meta-analysis. Statistics in
+Medicine 14(4), 395–411.
+
+Berman, N. G. and R. A. Parker (2002). Meta-analysis: Neither quick nor
+easy. BMC Medical Research Methodology 2(10), 1–9.
+
+Bhaumik, D. K., A. Amatya, S. T. Normand, J. Greenhouse, E. Kaizar,
+B. Neelon, and R. D. Gibbons (2012). Meta-analysis of rare binary adverse event data. Journal of the American Statistical Association 107(498),
+555–567.
+
+Bohning, D., E. Dietz, P. Schlattmann, C. Viwatwonkasem, A. Biggeri, and
+J. Bock (2002). Some general points in estimating heterogeneity variance
+with the dersimonianUlaird estimator. ˝ Biostatistics 3, 445–457.
+
+Borenstein, M., L. V. Hedges, J. P. T. Higgins, and H. R. Rothstein (2009).
+Introduction to Meta-Analysis. West Sussex, United Kingdom: Wiley.
+
+Cai, T., L. Parast, and L. Ryan (2010). Meta-analysis for rare events. Statistics
+in Medicine 29(20), 2078–2089.
+
+Chen, H., A. K. Manning, and J. Dupuis (2012). A method of moments
+estimator for random effect multivariate meta-analysis. Biometrics, (Epub
+May 2, 2012).
+
+Cooper, H., L. V. Hedges, and J. C. Valentine (2009). The Handbook of
+Research Synthesis and Meta-Analysis (2nd edition). New York: Russell
+Sage Foundation.
+
+DerSimonian, R. and N. Laird (1986). Meta-analysis in clinical trials. Controlled Clinical Trials 7, 177–188.
+
+Hartung, J., G. Knapp, and B. K. Sinha (2008). Statistical Meta-Analysis
+with Applications. Hoboken, New Jersey: John Wiley & Sons, Inc.
 
 

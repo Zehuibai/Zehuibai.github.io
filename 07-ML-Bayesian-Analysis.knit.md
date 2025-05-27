@@ -1,0 +1,1931 @@
+---
+title: |
+  ![](logo.png){width=3in}  
+  Bayesian Analysis
+output:
+  html_document:
+    df_print: paged
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+fontsize: 10pt
+editor_options:
+  chunk_output_type: console
+colorlinks: yes
+---
+ 
+
+
+ 
+# Regression and Variable Selection
+
+## Classical Least Squares Estimator
+
+毛毛虫数据集是从 1973
+年对松林毛虫的研究中提取的：它评估了一些森林聚落特征对毛毛虫群落发展的影响。响应变量是在
+500
+平方米（对应于毛虫的最后一列）面积内每棵树的平均毛虫巢数的对数变换。在 n
+= 33 个区域上定义了 p = 8 个潜在的解释变量， x1 是海拔（米），x2
+是坡度（度），x3 是该地区的松树数量，x4
+是在中心采样的树的高度（米）区域，x5 是该区域的方向（从 1 如果向南则为
+2，否则为 2），x6 是优势树的高度（以米为单位），x7 是植被层数，x8
+是混合沉降指数（如果是从 1如果混合，则不混合为
+2）。回归分析的目标是确定哪些解释变量对巢的数量有很大影响，以及这些影响如何相互重叠。
+
+For caterpillar, where $n=33$ and $p=8$, we thus assume that the
+expected lognumber $y_{i}$ of caterpillar nests per tree over an area is
+modeled as a linear combination of an intercept and eight predictor
+variables $(i=1, \ldots, n)$, 
+
+$$
+\mathbb{E}\left[y_{i} \mid \alpha, \boldsymbol{\beta}, \sigma^{2}\right]=\alpha+\sum_{j=1}^{8} \beta_{j} x_{i j}
+$$
+
+
+``` r
+# library(bayess)
+# Demo code https://rdrr.io/cran/bayess/f/
+
+data(caterpillar)
+y=log(caterpillar$y)
+X=as.matrix(caterpillar[,1:8])
+vnames=names(caterpillar)
+
+par(mfrow=c(2,4),mar=c(4.2,2,2,1.2))
+for (i in 1:8) plot(X[,i],y,xlab=vnames[i],pch=19, col="sienna4",xaxt="n",yaxt="n")
+```
+
+<img src="07-ML-Bayesian-Analysis_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+
+``` r
+S=readline(prompt="Type  <Return>   to continue : ")
+```
+
+```
+## Type  <Return>   to continue :
+```
+
+The parameter $\boldsymbol{\beta}$ can obviously be estimated via
+maximum likelihood estimation. In order to avoid non-identifiability and
+uniqueness problems, we assume that
+$\left[\mathbf{1}_{n} \quad \mathbf{X}\right]$ is of full
+$\operatorname{rank}$, that is,
+$\operatorname{rank}\left[\mathbf{1}_{n} \quad \mathbf{X}\right]=p+1$.
+This also means that there is no redundant structure among the
+explanatory variables. We suppose in addition that $p+$ $1<n$ in order
+to obtain well-defined estimates for all parameters.
+
+<!-- 通过最大似然估计来估计参数 β。 为了避免不可识别性和唯一性问题，我们假设[1n X]是满秩的，即秩[1n X] = p+1。 这也意味着解释变量之间没有冗余结构。我们另外假设 p + 1 < n 以获得所有参数的明确估计。 -->
+
+The likelihood
+$\ell\left(\alpha, \boldsymbol{\beta}, \sigma^{2} \mid \mathbf{y}\right)$
+of the standard normal linear model is provided by the following matrix
+representation: $$
+\frac{1}{\left(2 \pi \sigma^{2}\right)^{n / 2}} \exp \left\{-\frac{1}{2 \sigma^{2}}\left(\mathbf{y}-\alpha \mathbf{1}_{n}-\mathbf{X} \boldsymbol{\beta}\right)^{\mathrm{T}}\left(\mathbf{y}-\alpha \mathbf{1}_{n}-\mathbf{X} \boldsymbol{\beta}\right)\right\}
+$$ The maximum likelihood estimators of $\alpha$ and
+$\boldsymbol{\beta}$ are then the solution of the (least squares)
+minimization problem $$
+\begin{array}{l}
+\min _{\alpha, \boldsymbol{\beta}}\left(\mathbf{y}-\alpha \mathbf{1}_{n}-\mathbf{X} \boldsymbol{\beta}\right)^{\mathrm{T}}\left(\mathbf{y}-\alpha \mathbf{1}_{n}-\mathbf{X} \boldsymbol{\beta}\right) \\
+\quad=\min _{\alpha, \boldsymbol{\beta}} \sum_{i=1}^{n}\left(y_{i}-\alpha-\beta_{1} x_{i 1}-\ldots-\beta_{p} x_{i p}\right)^{2}
+\end{array}
+$$ We get solutions $$
+\hat{\alpha}=\overline{\mathbf{y}}, \quad \hat{\boldsymbol{\beta}}=\left(\mathbf{X}^{\top} \mathbf{X}\right)^{-1} \mathbf{X}^{\top}(\mathbf{y}-\bar{y})
+$$
+
+**best linear unbiased estimator**
+
+(see, e.g., Christensen, 2002) states that $(\hat{\alpha}, \hat{\beta})$
+is the best linear unbiased estimator of $(\alpha, \beta)$. This means
+that, for all $a \in \mathbb{R}^{p+1}$, and with the abuse of notation
+that, here, $(\hat{\alpha}, \hat{\beta})$ represents a column vector, $$
+\mathbb{V}\left(a^{\top}(\hat{\alpha}, \hat{\beta}) \mid \alpha, \boldsymbol{\beta}, \sigma^{2}\right) \leq \mathbb{V}\left(a^{\top}(\tilde{\alpha}, \tilde{\beta}) \mid \alpha, \boldsymbol{\beta}, \sigma^{2}\right)
+$$ for any unbiased linear estimator $(\tilde{\alpha}, \tilde{\beta})$
+of $(\alpha, \beta)$.
+
+An unbiased estimator of $\sigma^{2}$ is $$
+\hat{\sigma}^{2}=\frac{1}{n-p-1}\left(\mathbf{y}-\hat{\alpha} \mathbf{1}_{n}-\mathbf{X} \hat{\boldsymbol{\beta}}\right)^{\top}\left(\mathbf{y}-\hat{\alpha} \mathbf{1}_{n}-\mathbf{X} \hat{\boldsymbol{\beta}}\right)=\frac{s^{2}}{n-p-1}
+$$ and $\hat{\sigma}^{2}\left(\mathbf{X}^{\top} \mathbf{X}\right)^{-1}$
+approximates the covariance matrix of $\hat{\boldsymbol{\beta}}$. Note
+that the MLE of $\sigma^{2}$ is $\operatorname{not} \hat{\sigma}^{2}$
+but $\tilde{\sigma}^{2}=s^{2} / n$
+
+    X=scale(X)
+    summary(lm(y~X))
+    # S=readline(prompt="Type  <Return>   to continue : ")
+
+## The Jeffreys Prior Analysis
+
+<!-- 仅考虑线性模型参数完全缺乏先验信息的情况，我们首先描述基于 Jeffreys 先验的非信息性解决方案   -->
+
+Considering only the case of a complete lack of prior information on the
+parameters of the linear model, we first describe a noninformative
+solution based on the Jeffreys prior. It is rather easy to show that the
+Jeffreys prior in this case is $$
+\pi^{J}\left(\alpha, \boldsymbol{\beta}, \sigma^{2}\right) \propto \sigma^{-2}
+$$ which is equivalent to a flat prior on
+$\left(\alpha, \boldsymbol{\beta}, \log \sigma^{2}\right)$.
+
+We could deduce the following (conditional and marginal) posterior distributions
+
+$$
+\begin{aligned}
+\alpha \mid \sigma^{2}, \mathbf{y} \sim \mathscr{N} &\left(\hat{\alpha}, \sigma^{2} / n\right) \\
+\boldsymbol{\beta} \mid \sigma^{2}, \mathbf{y} & \sim \mathscr{N}_{p}\left(\hat{\boldsymbol{\beta}}, \sigma^{2}\left(\mathbf{X}^{\top} \mathbf{X}\right)^{-1}\right) \\
+\sigma^{2} \mid \mathbf{y} & \sim \mathscr{I} \mathscr{G}\left((n-p-1) / 2, s^{2} / 2\right)
+\end{aligned}
+$$
+
+The corresponding Bayesian estimates of $\alpha, \boldsymbol{\beta}$ and $\sigma^{2}$ are thus given by
+$$
+\mathbb{E}^{\pi}[\alpha \mid \mathbf{y}]=\hat{\alpha}, \quad \mathbb{E}^{\pi}[\boldsymbol{\beta} \mid \mathbf{y}]=\hat{\boldsymbol{\beta}} \quad \text { and } \quad \mathbb{E}^{\pi}\left[\sigma^{2} \mid \mathbf{y}\right]=\frac{s^{2}}{n-p-3}
+$$
+respectively. Unsurprisingly, the Jeffreys prior estimate of $\alpha$ is the empirical mean. Further, the posterior expectation of $\boldsymbol{\beta}$ is the maximum likelihood estimate. Note also that the Jeffreys prior estimate of $\sigma^{2}$ is larger (and thus more pessimistic) than both the maximum likelihood estimate $s^{2} / n$ and the classical unbiased estimate $s^{2} /(n-p-1)$.
+
+不出所料，Jeffreys 对 $\alpha$ 的先验估计是经验平均值。 此外，$\boldsymbol{\beta}$ 的后验期望是最大似然估计。 另请注意，Jeffreys 对 $\sigma^{2}$ 的先验估计比最大似然估计 $s^{2}/n$ 和经典无偏估计 $s^{2}$ 更大（因此更悲观） $/(np-1)$。
+
+
+## Zellner’s G-prior analysis 
+
+Zellner提出的一种不同的非信息性方法，用于从贝叶斯角度处理线性回归。 这种方法是一种中间观点，其中一些关于 β 的先验信息可能可用，它被称为 Zellner 的 G-prior，“G”是 Zellner 在先验方差中使用的符号。
+
+**Semi-noninformative Solution**
+
+虑到线性回归模型的自然共轭先验具有严重的局限性，需要更精细的策略。 Zellner 的 G-prior 建模的核心思想是允许实验者引入（可能很弱）关于回归位置参数的信息，但绕过先验规范中最困难的方面，即先验相关结构的推导.这个结构在 Zellner 的提议中是固定的. Zellner 的 G-prior 因此被分解为 β 的（条件）高斯先验和 (α, σ2) 的inproper (Jeffreys) 先验。
+
+We could deduce that, conditionally on $\mathbf{y}, \mathbf{X}$ and $\sigma^{2}$, the parameters $\alpha$ and $\boldsymbol{\beta}$ are independent and such that
+$$
+\begin{array}{c}
+\alpha \mid \sigma^{2}, \mathbf{y} \sim \mathscr{N}_{1}\left(\overline{\mathbf{y}}, \sigma^{2} / n\right) \\
+\boldsymbol{\beta} \mid \mathbf{y}, \sigma^{2} \sim \mathscr{N}_{p}\left(\frac{g}{g+1}(\hat{\boldsymbol{\beta}}+\mathbf{X} \tilde{\boldsymbol{\beta}} / g), \frac{\sigma^{2} g}{g+1}\left\{\mathbf{X}^{\mathrm{T}} \mathbf{X}\right\}^{-1}\right)
+\end{array}
+$$
+where $\hat{\boldsymbol{\beta}}=\left\{\mathbf{X}^{\mathrm{T}} \mathbf{X}\right\}^{-1} \mathbf{X}^{\mathrm{T}} \mathbf{y}$ is the maximum likelihood (and least squares) estimator of $\boldsymbol{\beta}$. The posterior independence between $\alpha$ and $\boldsymbol{\beta}$ is due to the fact that $\mathbf{X}$ is centered and that $\alpha$ and $\boldsymbol{\beta}$ are a priori independent.
+Moreover, the posterior distribution of $\sigma^{2}$ is given by
+$$
+\sigma^{2} \mid \mathbf{y} \sim I \mathscr{G}\left[(n-1) / 2, s^{2}+(\tilde{\boldsymbol{\beta}}-\hat{\boldsymbol{\beta}})^{\mathrm{T}} \mathbf{X}^{\mathrm{T}} \mathbf{X}(\tilde{\boldsymbol{\beta}}-\hat{\boldsymbol{\beta}}) /(g+1)\right]
+$$
+where $I \mathscr{G}(a, b)$ is an inverse Gamma distribution with mean $b /(a-1)$ and where $s^{2}=\left(\mathbf{y}-\overline{\mathbf{y}} \mathbf{1}_{n}-\mathbf{X} \hat{\boldsymbol{\beta}}\right)^{\mathrm{T}}\left(\mathbf{y}-\overline{\mathbf{y}} \mathbf{1}_{n}-\mathbf{X} \hat{\boldsymbol{\beta}}\right)$ corresponds to the (classical) residual sum of squares.
+
+
+``` r
+# library(bayess)
+# Demo code https://rdrr.io/cran/bayess/f/
+
+# postmeancoeff posterior mean of the regression coefficients
+# postsqrtcoeff posterior standard deviation of the regression coefficients
+# log10bf log-Bayes factors against the full model
+# postmeansigma2 posterior mean of the variance of the model
+# postvarsigma2 posterior variance of the variance of the model
+data(faithful)
+BayesReg(faithful[,1],faithful[,2])
+```
+
+```
+## 
+##           PostMean PostStError Log10bf EvidAgaH0
+## Intercept   3.4878      0.0304                  
+## x1          1.0225      0.0303     Inf    (****)
+## 
+## 
+## Posterior Mean of Sigma2: 0.2513
+## Posterior StError of Sigma2: 0.3561
+```
+
+```
+## $postmeancoeff
+## [1] 3.487783 1.022509
+## 
+## $postsqrtcoeff
+## [1] 0.03039825 0.03034252
+## 
+## $log10bf
+##      [,1]
+## [1,]  Inf
+## 
+## $postmeansigma2
+## [1] 0.2513425
+## 
+## $postvarsigma2
+## [1] 0.1268176
+```
+ 
+
+ 
+
+# Bayesian Linear Regression Models
+
+## Classical Linear Regression Model
+
+Classical linear regression, often referred to as ordinary least squares (OLS) regression, estimates the parameters of the model by minimizing the sum of the squared differences between observed values and those predicted by the linear model.  
+
+- **Parameter Estimation:** It provides point estimates for the parameters (intercepts and slopes) that define a line of best fit through the data.
+- **Assumptions:** Assumes residuals are normally distributed, independent, and have constant variance.
+- **Inference:** Statistical inference, such as hypothesis testing and confidence intervals, relies on frequency-based methods. These methods often involve assumptions about the distributions of parameters or error terms (e.g., normally distributed errors).
+- **Uncertainty:** Uncertainty in parameter estimates is typically represented through confidence intervals and p-values, which depend on assumptions of normality and sample size.
+
+
+The **Classical Least Squares Estimator (CLSE)** is a method used in statistics to estimate the parameters of a linear regression model. It is based on the principle of minimizing the sum of squared differences between the observed values (dependent variable) and the values predicted by the linear model.
+
+**Assumptions of Classical Least Squares**
+
+* Linearity: The relationship between $y$ and $X$ is linear.
+* Independence: The errors $\epsilon$ are independent of each other.
+* Homoscedasticity: The variance of the errors is constant ($\sigma^2$).
+* Normality: The errors $\epsilon$ are normally distributed.
+* Full Rank: The matrix $[1_n, X]$ must be of full rank, which means that the columns of $X$ are linearly independent.
+
+* The CLSE is derived by minimizing the sum of squared errors (SSE):
+
+  $$
+  SSE = (y - \alpha 1_n - X\beta)^T (y - \alpha 1_n - X\beta)
+  $$
+* This can be expanded as:
+
+  $$
+  \sum_{i=1}^{n} (y_i - \alpha - \beta_1 x_{i1} - \beta_2 x_{i2} - \cdots - \beta_p x_{ip})^2
+  $$
+* The problem is therefore a **least squares minimization problem**, which is solved by finding the values of $\alpha$ and $\beta$ that minimize this sum.
+ 
+
+* The solution for the estimators $\hat{\alpha}$ and $\hat{\beta}$ is found using matrix calculus:
+
+  * The estimated intercept is:
+
+    $$
+    \hat{\alpha} = \bar{y}
+    $$
+
+    where $\bar{y}$ is the mean of the observed $y$-values.
+  * The estimated regression coefficients are:
+
+    $$
+    \hat{\beta} = (X^T X)^{-1} X^T (y - \bar{y})
+    $$
+* Geometrically, this means that $(\hat{\alpha}, \hat{\beta})$ is the **orthogonal projection** of $y$ onto the subspace spanned by the columns of $[1_n, X]$.
+
+
+``` r
+# suppressPackageStartupMessages(library(rstanarm))
+# suppressPackageStartupMessages(library(bayestestR))
+# suppressPackageStartupMessages(library(bayesplot))
+# suppressPackageStartupMessages(library(insight))
+ 
+# use the BostonHousing data from mlbench package
+# library(mlbench)
+data("BostonHousing")
+str(BostonHousing)
+```
+
+```
+## 'data.frame':	506 obs. of  14 variables:
+##  $ crim   : num  0.00632 0.02731 0.02729 0.03237 0.06905 ...
+##  $ zn     : num  18 0 0 0 0 0 12.5 12.5 12.5 12.5 ...
+##  $ indus  : num  2.31 7.07 7.07 2.18 2.18 2.18 7.87 7.87 7.87 7.87 ...
+##  $ chas   : Factor w/ 2 levels "0","1": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ nox    : num  0.538 0.469 0.469 0.458 0.458 0.458 0.524 0.524 0.524 0.524 ...
+##  $ rm     : num  6.58 6.42 7.18 7 7.15 ...
+##  $ age    : num  65.2 78.9 61.1 45.8 54.2 58.7 66.6 96.1 100 85.9 ...
+##  $ dis    : num  4.09 4.97 4.97 6.06 6.06 ...
+##  $ rad    : num  1 2 2 3 3 3 5 5 5 5 ...
+##  $ tax    : num  296 242 242 222 222 222 311 311 311 311 ...
+##  $ ptratio: num  15.3 17.8 17.8 18.7 18.7 18.7 15.2 15.2 15.2 15.2 ...
+##  $ b      : num  397 397 393 395 397 ...
+##  $ lstat  : num  4.98 9.14 4.03 2.94 5.33 ...
+##  $ medv   : num  24 21.6 34.7 33.4 36.2 28.7 22.9 27.1 16.5 18.9 ...
+```
+
+``` r
+bost <- BostonHousing[,c("medv","age","dis","chas")]
+summary(bost)
+```
+
+```
+##       medv            age              dis         chas   
+##  Min.   : 5.00   Min.   :  2.90   Min.   : 1.130   0:471  
+##  1st Qu.:17.02   1st Qu.: 45.02   1st Qu.: 2.100   1: 35  
+##  Median :21.20   Median : 77.50   Median : 3.207          
+##  Mean   :22.53   Mean   : 68.57   Mean   : 3.795          
+##  3rd Qu.:25.00   3rd Qu.: 94.08   3rd Qu.: 5.188          
+##  Max.   :50.00   Max.   :100.00   Max.   :12.127
+```
+
+``` r
+# Classical linear regression model
+model_freq<-lm(medv~., data=bost)
+# library("broom")
+tidy(model_freq) %>%
+  kable("html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+<table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> term </th>
+   <th style="text-align:right;"> estimate </th>
+   <th style="text-align:right;"> std.error </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> p.value </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> (Intercept) </td>
+   <td style="text-align:right;"> 32.7397914 </td>
+   <td style="text-align:right;"> 2.2470461 </td>
+   <td style="text-align:right;"> 14.5701467 </td>
+   <td style="text-align:right;"> 0.0000000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> age </td>
+   <td style="text-align:right;"> -0.1427996 </td>
+   <td style="text-align:right;"> 0.0198104 </td>
+   <td style="text-align:right;"> -7.2083181 </td>
+   <td style="text-align:right;"> 0.0000000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dis </td>
+   <td style="text-align:right;"> -0.2461603 </td>
+   <td style="text-align:right;"> 0.2651369 </td>
+   <td style="text-align:right;"> -0.9284273 </td>
+   <td style="text-align:right;"> 0.3536322 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> chas1 </td>
+   <td style="text-align:right;"> 7.5129712 </td>
+   <td style="text-align:right;"> 1.4646565 </td>
+   <td style="text-align:right;"> 5.1295106 </td>
+   <td style="text-align:right;"> 0.0000004 </td>
+  </tr>
+</tbody>
+</table>
+
+``` r
+# # Bayesian regression
+# library(rstanarm)
+# https://www.r-bloggers.com/2020/04/bayesian-linear-regression/
+```
+
+ 
+ 
+
+<img src="07-ML-Bayesian-Analysis_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+
+## Jeffreys Prior Analysis
+
+**Defining Jeffreys Prior**
+
+* In Bayesian statistics, we use prior information to reflect our beliefs about the parameters of a model before seeing the data.
+* A **"non-informative" prior** is used when we have no strong prior knowledge about the parameters. This type of prior is designed to have minimal impact on the results.
+* **Jeffreys Prior** is a special type of non-informative prior. It is an **"objective" prior** because it is derived purely from the model structure without any subjective inputs.
+
+* The **Jeffreys Prior** is designed to be invariant under transformations of the parameters. It is calculated using the **Fisher Information Matrix** of the model.
+* For the parameters of a standard linear regression model $(α, β, σ^2)$, the Jeffreys Prior is defined as:
+
+  $$
+  \pi_J(α, β, σ^2) \propto σ^{-2}
+  $$
+* This means:
+
+  * The prior is proportional to the inverse square of the variance $σ^2$.
+  * The choice $σ^{-2}$ makes the prior invariant to changes in scale for $σ^2$.
+* In simpler terms, this prior reflects a complete lack of prior information about $α$ and $β$, but it is more cautious (less confident) about the variance $σ^2$ due to the $σ^{-2}$ term.
+
+---
+
+**Calculating the Likelihood of the Linear Model**
+
+* The likelihood of the linear regression model under normal distribution is:
+
+  $$
+  L(α, β, σ^2 | y) = \frac{1}{(2\pi σ^2)^{n/2}} \exp \left(- \frac{1}{2σ^2} (y - α1_n - Xβ)^T (y - α1_n - Xβ)\right)
+  $$
+
+  * $y$ is the vector of observed values (response).
+  * $X$ is the design matrix of explanatory variables.
+  * $α$ is the intercept.
+  * $β$ is the vector of regression coefficients.
+  * $σ^2$ is the variance of the errors.
+* This is a standard form of the **normal likelihood function** for the regression model.
+
+By combining the Jeffreys Prior with the likelihood (using Bayes’ theorem), the posterior distribution is derived:
+
+  $$
+  \pi_J(α, β, σ^2 | y) \propto σ^{-2} L(α, β, σ^2 | y)
+  $$
+
+Substituting the likelihood:
+
+  $$
+  \pi_J(α, β, σ^2 | y) \propto σ^{-2 - n/2} \exp \left(- \frac{1}{2σ^2} (y - α1_n - Xβ)^T (y - α1_n - Xβ)\right)
+  $$
+
+After mathematical derivations (details omitted for simplicity), the final form of the posterior distribution is:
+
+  * For $α$:
+
+    $$
+    α | σ^2, y \sim N \left(\hat{α}, \frac{σ^2}{n} \right)
+    $$
+  * For $β$:
+
+    $$
+    β | σ^2, y \sim N_p \left(\hat{β}, σ^2 (X^T X)^{-1} \right)
+    $$
+  * For $σ^2$:
+
+    $$
+    σ^2 | y \sim IG \left(\frac{n - p - 1}{2}, \frac{s^2}{2}\right)
+    $$
+  * $N$ is the normal distribution, $N_p$ is the multivariate normal distribution, and $IG$ is the inverse-gamma distribution.
+  * $\hat{α}$ is the estimated mean of $y$, and $\hat{β}$ is the maximum likelihood estimate of $β$.
+  * $s^2$ is the residual sum of squares divided by the degrees of freedom.
+  
+
+**Proper Posterior Distribution and Conditions**
+
+* For the posterior distribution using Jeffreys Prior to be **proper (valid)**:
+
+  * The number of observations $n$ must be greater than the number of parameters $p + 1$.
+  * The design matrix $[1_n, X]$ must be of **full rank** (i.e., $rank([1_n, X]) = p + 1$).
+* These conditions ensure that the posterior distribution is a proper probability distribution (integrates to 1).
+
+---
+
+**Bayesian Estimates with Jeffreys Prior**
+
+* The Bayesian estimates of the parameters are derived from the posterior means:
+
+  * For $α$:
+
+    $$
+    E[α | y] = \hat{α}
+    $$
+  * For $β$:
+
+    $$
+    E[β | y] = \hat{β}
+    $$
+  * For $σ^2$:
+
+    $$
+    E[σ^2 | y] = \frac{s^2}{n - p - 3}
+    $$
+
+* These estimates are similar to the **Maximum Likelihood Estimates (MLE)** but with some differences:
+
+  * The estimate of $σ^2$ is slightly larger than the MLE $s^2 / n$ or the unbiased estimate $s^2 / (n - p - 1)$.
+  * This larger $σ^2$ estimate is a cautious approach because it accounts for the uncertainty in parameter estimation.
+
+The Jeffreys Prior approach has a strong similarity to the classical least squares method because:
+
+  * The Bayesian posterior mean for $β$ is identical to the classical least squares estimate $\hat{β}$.
+  * The posterior distribution of $β$ leads to **credible intervals** that are numerically identical to the classical confidence intervals.
+* However, these intervals have different interpretations:
+
+  * In the classical approach, confidence intervals are interpreted in terms of repeated sampling.
+  * In the Bayesian approach, credible intervals directly represent the degree of belief about the parameter value, given the data.
+
+
+
+
+
+## Zellner’s G-Prior Analysis 
+
+### Introduction {-}
+
+* **Zellner’s G-Prior** is a Bayesian approach to linear regression introduced by Arnold Zellner.
+* It provides a **semi-noninformative** method, balancing between having prior information (informative) and not having any (noninformative).
+* The main idea is to specify a prior distribution for the regression coefficients $β$ that is directly tied to the design matrix $X$ of the model.
+* The "G" in G-Prior refers to a scaling factor $g$ that determines the relative weight of prior information compared to the observed data.
+
+---
+
+ **Prior Specification in Zellner’s G-Prior**
+
+* The linear regression model is defined as:
+
+  $$
+  y = \alpha + X\beta + \epsilon
+  $$
+
+  * $y$ is the $n \times 1$ vector of observed values.
+  * $X$ is the $n \times p$ matrix of explanatory variables (design matrix).
+  * $\beta$ is the $p \times 1$ vector of regression coefficients.
+  * $\alpha$ is the intercept (a constant term).
+  * $\epsilon$ is the vector of random errors, assumed to be normally distributed:
+
+    $$
+    \epsilon \sim N(0, \sigma^2 I)
+    $$
+ 
+* The prior distribution for $\beta$ is defined as a **multivariate normal distribution**, which is:
+
+  $$
+  \beta | \alpha, \sigma^2 \sim N_p \left(\tilde{\beta}, g \sigma^2 (X^T X)^{-1}\right)
+  $$
+
+  * $\tilde{\beta}$ is the prior mean of $\beta$. It can be set to zero (non-informative) or any specified value.
+  * $g$ is the scaling factor that determines the strength of the prior:
+
+    * $g = n$ means the prior has the same weight as one observation.
+    * $g = 0$ means the prior has no influence.
+    * Larger $g$ means weaker prior information, converging to a classical (frequentist) approach.
+  * The prior covariance is scaled by $g \sigma^2 (X^T X)^{-1}$, making it dependent on the data structure.
+* The prior for $\alpha$ and $\sigma^2$ is defined as a **non-informative Jeffreys Prior**:
+
+  $$
+  \pi(\alpha, \sigma^2) \propto \sigma^{-2}
+  $$
+
+
+Note:
+
+* The use of $g$ allows the user to control the influence of prior knowledge on the posterior distribution.
+* By setting $g$, we can decide the relative importance of the prior information in comparison to the data.
+* When $g$ is large, the model becomes similar to a classical (frequentist) approach, but with Bayesian interpretation.
+  
+---
+
+**Constructing the Posterior Distribution**
+
+* We combine the prior with the likelihood using Bayes’ theorem:
+
+  $$
+  \pi(\alpha, \beta, \sigma^2 | y) \propto L(\alpha, \beta, \sigma^2 | y) \times \pi(\alpha, \beta, \sigma^2)
+  $$
+* The likelihood of the linear model is:
+
+  $$
+  L(\alpha, \beta, \sigma^2 | y) = \frac{1}{(2\pi \sigma^2)^{n/2}} \exp \left(- \frac{1}{2\sigma^2} (y - \alpha 1_n - X\beta)^T (y - \alpha 1_n - X\beta)\right)
+  $$
+* Substituting this into Bayes’ theorem with Zellner’s G-Prior gives the posterior:
+
+  $$
+  \pi(\alpha, \beta, \sigma^2 | y) \propto \sigma^{-n/2 - p/2 - 1} \exp \left(- \frac{1}{2\sigma^2} S(\alpha, \beta, y)\right)
+  $$
+
+  where $S(\alpha, \beta, y)$ is a quadratic form involving $(y - \alpha 1_n - X\beta)$ and $g$.
+
+
+**Posterior Distribution for Each Parameter**
+
+* **Posterior for $\alpha$:**
+
+  $$
+  \alpha | \sigma^2, y \sim N \left(\bar{y}, \frac{\sigma^2}{n}\right)
+  $$
+* **Posterior for $\beta$:**
+
+  $$
+  \beta | \sigma^2, y \sim N_p \left(\frac{g}{g + 1} (\hat{\beta} + \frac{\tilde{\beta}}{g}), \frac{\sigma^2 g}{g + 1} (X^T X)^{-1}\right)
+  $$
+
+  * $\hat{\beta} = (X^T X)^{-1} X^T y$ is the Maximum Likelihood Estimate (MLE) of $\beta$.
+* **Posterior for $\sigma^2$:**
+
+  $$
+  \sigma^2 | y \sim IG \left(\frac{n - 1}{2}, \frac{s^2 + (\tilde{\beta} - \hat{\beta})^T X^T X (\tilde{\beta} - \hat{\beta}) / (g + 1)}{2}\right)
+  $$
+
+  * $s^2$ is the residual sum of squares from the classical model.
+
+---
+
+**Interpreting the G Factor**
+
+* The parameter $g$ has a critical influence:
+
+  * $g = 0$ means the prior has zero influence (similar to a non-Bayesian approach).
+  * $g = 1$ means the prior has the same weight as one observation.
+  * $g = n$ means the prior is weighted the same as the entire dataset.
+  * $g \rightarrow \infty$ means the prior has negligible impact, making it essentially a classical approach.
+
+**Comparison with Classical Approach**
+
+* Zellner’s G-Prior is similar to the classical approach in form, but with Bayesian interpretation:
+
+  * The estimates of $\beta$ are a weighted combination of the classical MLE and the prior mean $\tilde{\beta}$.
+  * The variance of $\beta$ is adjusted for the strength of the prior (controlled by $g$).
+* As $g$ increases, the posterior becomes closer to the classical model.
+
+
+### Implementation in R using bayess {-}
+
+* Zellner’s G-Prior can be implemented in R using the `BayesReg` function.
+* This function calculates:
+
+  * Posterior means and variances of $\alpha, \beta, \sigma^2$.
+  * Bayes Factors for model comparison.
+* The choice of $g$ is crucial, with $g = n$ often being a default choice.
+
+
+``` r
+# Load necessary libraries
+# For Zellner’s G-Prior Analysis
+# library(bayess) 
+
+# Step 1: Data Preparation
+set.seed(123)
+n <- 100  # Number of observations
+p <- 3    # Number of predictors
+X <- matrix(rnorm(n * p), nrow = n, ncol = p)  # Simulated design matrix
+colnames(X) <- paste0("X", 1:p)
+
+# Generating true coefficients and response variable
+beta_true <- c(2, -1, 0.5)
+alpha_true <- 3
+sigma_true <- 1
+
+# Generating the response variable
+y <- alpha_true + X %*% beta_true + rnorm(n, mean = 0, sd = sigma_true)
+
+# Step 2: Standardizing X
+X <- scale(X)  # Standardizing the explanatory variables
+
+# Step 3: Zellner’s G-Prior using BayesReg (corrected syntax)
+g <- n  # Setting G to n
+betatilde <- rep(0, dim(X)[2])  # Prior mean set to zero (non-informative)
+
+# Fitting the Bayesian Regression Model using G-Prior
+fit <- bayess::BayesReg(y, X, g = g, betatilde = betatilde, prt = TRUE)
+```
+
+```
+## 
+##           PostMean PostStError Log10bf EvidAgaH0
+## Intercept   3.3124      0.1066                  
+## x1          1.7486      0.1071 27.4134    (****)
+## x2         -0.9086      0.1062 11.0821    (****)
+## x3          0.4142      0.1070  2.0868    (****)
+## 
+## 
+## Posterior Mean of Sigma2: 1.136
+## Posterior StError of Sigma2: 1.6148
+```
+
+``` r
+# Step 4: Outputting Results
+cat("\n--- Zellner's G-Prior Analysis (BayesReg Package) ---\n")
+```
+
+```
+## 
+## --- Zellner's G-Prior Analysis (BayesReg Package) ---
+```
+
+``` r
+print(fit)
+```
+
+```
+## $postmeancoeff
+## [1]  3.3123683  1.7486319 -0.9085853  0.4141796
+## 
+## $postsqrtcoeff
+##                  X1        X2        X3 
+## 0.1065810 0.1070614 0.1062141 0.1069800 
+## 
+## $log10bf
+## [1] 27.413357 11.082080  2.086816
+## 
+## $postmeansigma2
+## [1] 1.135951
+## 
+## $postvarsigma2
+## [1] 2.607652
+```
+
+``` r
+# Step 5: Prediction
+m <- 10  # Number of predictions
+X_new <- matrix(rnorm(m * p), nrow = m, ncol = p)  # New data for prediction
+X_new <- scale(X_new)
+
+# Adjusting X_new dimensions to match coefficient vector
+X_new <- cbind(1, X_new)  # Adding a column for intercept
+
+# Predictive means for new observations
+y_pred_mean <- X_new %*% c(fit$postmeancoeff)
+
+cat("\n--- Predictive Distribution ---\n")
+```
+
+```
+## 
+## --- Predictive Distribution ---
+```
+
+``` r
+cat("Predictive Means for New Observations:\n")
+```
+
+```
+## Predictive Means for New Observations:
+```
+
+``` r
+print(y_pred_mean)
+```
+
+```
+##            [,1]
+##  [1,] 3.6219754
+##  [2,] 0.8128157
+##  [3,] 1.6259643
+##  [4,] 4.1296072
+##  [5,] 5.3414010
+##  [6,] 2.1803344
+##  [7,] 3.7418862
+##  [8,] 4.9940720
+##  [9,] 2.4629773
+## [10,] 4.2126491
+```
+
+## Markov Chain Monte Carlo (MCMC) Methods
+
+Markov Chain Monte Carlo (MCMC) methods are a class of algorithms used to perform numerical integration, particularly in Bayesian statistics. These methods are crucial because many Bayesian models have complex, high-dimensional posterior distributions that cannot be directly sampled using standard simulation techniques. MCMC overcomes this challenge by constructing a Markov chain—a sequence of dependent random variables—that eventually converges to the target distribution.
+ 
+* A **Markov Chain** is a sequence of random variables $(X_t)_{t \in \mathbb{N}}$ where the probability of moving to the next state $X_{t+1}$ depends only on the current state $X_t$, not on any past states:
+
+  $$
+  P(X_{t+1} = x | X_1, X_2, \ldots, X_t) = P(X_{t+1} = x | X_t)
+  $$
+* The Markov chain is fully characterized by its **transition kernel**, which is the conditional distribution of $X_{t+1}$ given $X_t$.
+* The chain has a **stationary distribution** $\pi$ if, after many steps, the distribution of $X_t$ approaches $\pi$ regardless of the starting point. This stationary distribution is the target distribution we wish to sample from.
+ 
+The core idea of MCMC is to design a Markov chain whose stationary distribution is the target distribution $\pi$ (e.g., the posterior distribution in Bayesian inference). Once the chain has "converged" to this stationary distribution, samples from the chain can be treated as samples from $\pi$. This is ensured by the **ergodic theorem**, which states that:
+
+$$
+\frac{1}{T} \sum_{t=1}^{T} g(X_t) \approx E[g(X)]
+$$
+
+for any function $g$, where $E[g(X)]$ is the expectation under $\pi$.
+
+---
+
+**Gibbs Sampling: A Simple MCMC Algorithm**
+
+Gibbs sampling is one of the simplest and most popular MCMC algorithms. It is particularly useful when:
+
+* The target distribution $\pi$ is complex and high-dimensional.
+* The **full conditionals** (conditional distributions of each variable given the rest) can be easily sampled.
+ 
+
+**Two-Stage Gibbs Sampler** is the simplest form of Gibbs sampling with two variables $X_1$ and $X_2$.
+
+* Given the target joint distribution $\pi(x_1, x_2)$, the two full conditionals are:
+
+  * $\pi_1(x_1 | x_2)$ (distribution of $X_1$ given $X_2$)
+  * $\pi_2(x_2 | x_1)$ (distribution of $X_2$ given $X_1$)
+
+* The algorithm works as follows:
+
+  1. Start with an initial value $x_2^{(0)}$.
+  2. At each iteration $t$:
+
+     * Sample $x_1^{(t)}$ from $\pi_1(x_1 | x_2^{(t-1)})$.
+     * Sample $x_2^{(t)}$ from $\pi_2(x_2 | x_1^{(t)})$.
+  3. Repeat for many iterations.
+
+* The key property is that the distribution of the pairs $(x_1, x_2)$ eventually converges to the target distribution $\pi(x_1, x_2)$.
+
+
+**Example: Beta-Binomial Model**
+
+Consider a Bayesian model with a binomial outcome $X_1 \sim B(n, X_2)$ and a beta prior on $X_2 \sim \text{Be}(\alpha, \beta)$. This model has the joint distribution:
+
+$$
+\pi(x_1, x_2) \propto \binom{n}{x_1} x_2^{x_1 + \alpha - 1} (1 - x_2)^{n - x_1 + \beta - 1}
+$$
+
+* The Gibbs sampler works because the two full conditionals are:
+
+  * $X_1 | X_2 \sim B(n, X_2)$
+  * $X_2 | X_1 \sim \text{Be}(\alpha + X_1, \beta + n - X_1)$
+* This allows for direct simulation without needing to manipulate the joint distribution.
+
+
+**General Gibbs Sampler (Multi-Dimensional)**
+
+For a more general case with $p$ variables $X = (X_1, X_2, \ldots, X_p)$, the Gibbs sampler works as follows:
+
+1. Initialize $X^{(0)} = (X_1^{(0)}, X_2^{(0)}, \ldots, X_p^{(0)})$.
+2. At each iteration $t$, update each variable one by one:
+
+   * $X_1^{(t)} \sim \pi_1(X_1 | X_2^{(t-1)}, \ldots, X_p^{(t-1)})$
+   * $X_2^{(t)} \sim \pi_2(X_2 | X_1^{(t)}, X_3^{(t-1)}, \ldots, X_p^{(t-1)})$
+   * Continue until $X_p$ is updated.
+3. Repeat this process for many iterations.
+
+---
+
+**Practical Considerations: Convergence and Mixing**
+
+* **Burn-in Period:** The initial samples (burn-in) are discarded because they may not represent the stationary distribution.
+* **Convergence Diagnosis:** Various techniques (trace plots, autocorrelation, Gelman-Rubin statistic) help determine if the chain has converged.
+* **Mixing:** The chain must explore the entire support of the target distribution. Poor mixing leads to highly correlated samples, reducing the efficiency of MCMC.
+
+
+## Comprehensive Bayesian Linear Regression
+
+Bayesian linear regression, on the other hand, incorporates prior beliefs about parameters and updates these beliefs after observing the data. This approach is fundamentally probabilistic:
+
+- **Parameter Estimation:** Instead of offering single point estimates, Bayesian regression produces a probability distribution (posterior distribution) for each parameter. This reflects all possible values of the parameters weighted by their likelihood given the prior belief and the observed data.
+- **Prior Knowledge:** It starts with a prior distribution on the parameters, which can encode existing knowledge or assumptions about the values they might take.
+- **Inference:** Bayesian inference doesn’t depend on large-sample theory. Instead, it calculates the probability of a parameter value given the data. This is often done via Markov Chain Monte Carlo (MCMC) methods or other numerical techniques for more complex models.
+- **Uncertainty and Prediction:** Provides a richer understanding of uncertainty by using the full posterior distribution of the parameters. Predictive distributions for new data can be directly derived from the posterior.
+
+**Practical Differences:**
+
+- **Flexibility:** Bayesian methods are typically more flexible in incorporating prior information and dealing with complex models where traditional methods may not provide feasible solutions or require cumbersome calculations.
+- **Computation:** Classical methods are generally less computationally intensive compared to Bayesian methods, which may require complex computational techniques (like MCMC) to approximate the posterior distributions, especially in models with a large number of parameters or complex prior distributions.
+- **Interpretation:** Bayesian inference provides a more intuitive probabilistic interpretation of model results, which can be particularly useful in decision-making contexts where probabilities of different outcomes need to be evaluated.
+
+
+### rstanarm::stan_glm - fit the model {-}
+
+To fit a Bayesian regression, we use the function stan_glm from the rstanarm package. This function as the above lm function requires providing the formula and the data that will be used, and leave all the following arguments with their default values:
+
+* family : by default this function uses the gaussian distribution as we do with the classical glm function to perform lm model.
+* prior : The prior distribution for the regression coefficients, By default the normal prior is used. There are subset of functions used for the prior provided by rstanarm like , student t family, laplace family…ect. To get the full list with all the details run this command ?priors. If we want a flat uniform prior we set this to NULL.
+* prior_intercept: prior for the intercept, can be normal, student_t , or cauchy. If we want a flat uniform prior we set this to NULL.
+* prior_aux: prior fo auxiliary parameters such as the error standard deviation for the gaussion family.
+* algorithm: The estimating approach to use. The default is “sampling MCMC1.
+* QR: FALSE by default, if true QR decomposition applied on the design matrix if we have large number of predictors.
+* iter : is the number of iterations if the MCMC method is used, the default is 2000.
+* chains : the number of Markov chains, the default is 4.
+* warmup : also known as burnin, the number of iterations used for adaptation, and should not be used for inference. By default it is half of the iterations.
+
+
+``` r
+# library("rstanarm")
+model_bayes <- rstanarm::stan_glm(medv~., data=bost, seed=111)
+```
+
+```
+## 
+## SAMPLING FOR MODEL 'continuous' NOW (CHAIN 1).
+## Chain 1: 
+## Chain 1: Gradient evaluation took 0.001125 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 11.25 seconds.
+## Chain 1: Adjust your expectations accordingly!
+## Chain 1: 
+## Chain 1: 
+## Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 1: 
+## Chain 1:  Elapsed Time: 0.047 seconds (Warm-up)
+## Chain 1:                0.082 seconds (Sampling)
+## Chain 1:                0.129 seconds (Total)
+## Chain 1: 
+## 
+## SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
+## Chain 2: 
+## Chain 2: Gradient evaluation took 1.1e-05 seconds
+## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
+## Chain 2: Adjust your expectations accordingly!
+## Chain 2: 
+## Chain 2: 
+## Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 2: 
+## Chain 2:  Elapsed Time: 0.042 seconds (Warm-up)
+## Chain 2:                0.071 seconds (Sampling)
+## Chain 2:                0.113 seconds (Total)
+## Chain 2: 
+## 
+## SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
+## Chain 3: 
+## Chain 3: Gradient evaluation took 1.2e-05 seconds
+## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
+## Chain 3: Adjust your expectations accordingly!
+## Chain 3: 
+## Chain 3: 
+## Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 3: 
+## Chain 3:  Elapsed Time: 0.044 seconds (Warm-up)
+## Chain 3:                0.076 seconds (Sampling)
+## Chain 3:                0.12 seconds (Total)
+## Chain 3: 
+## 
+## SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
+## Chain 4: 
+## Chain 4: Gradient evaluation took 1.2e-05 seconds
+## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
+## Chain 4: Adjust your expectations accordingly!
+## Chain 4: 
+## Chain 4: 
+## Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 4: 
+## Chain 4:  Elapsed Time: 0.076 seconds (Warm-up)
+## Chain 4:                0.081 seconds (Sampling)
+## Chain 4:                0.157 seconds (Total)
+## Chain 4:
+```
+
+``` r
+print(model_bayes, digits = 3)
+```
+
+```
+## stan_glm
+##  family:       gaussian [identity]
+##  formula:      medv ~ .
+##  observations: 506
+##  predictors:   4
+## ------
+##             Median MAD_SD
+## (Intercept) 32.834  2.285
+## age         -0.143  0.020
+## dis         -0.258  0.257
+## chas1        7.543  1.432
+## 
+## Auxiliary parameter(s):
+##       Median MAD_SD
+## sigma 8.324  0.260 
+## 
+## ------
+## * For help interpreting the printed output see ?print.stanreg
+## * For info on the priors used see ?prior_summary.stanreg
+```
+
+
+### bayesplot::mcmc_dens - plot the MCMC simulation {-}
+
+The Median estimate is the median computed from the MCMC simulation, and MAD_SD is the median absolute deviation computed from the same simulation. To well understand how getting these outputs, we plot the MCMC simulation of each predictor using bayesplot
+
+
+``` r
+# library("bayesplot")
+# Generate the first plot for the 'age' parameter
+plot1 <- mcmc_dens(model_bayes, pars = "age") +
+  vline_at(-0.143, color = "red") +
+  ggtitle("Density of Age") +
+  theme_minimal()
+
+# Generate the second plot for the 'dis' parameter
+plot2 <- mcmc_dens(model_bayes, pars = "dis") +
+  vline_at(-0.244, color = "red") +
+  ggtitle("Density of Dis") +
+  theme_minimal()
+
+# Arrange both plots side by side
+grid.arrange(plot1, plot2, ncol = 2)
+```
+
+<img src="07-ML-Bayesian-Analysis_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+
+### bayestestR::describe_posterior - model parameters {-}
+
+
+``` r
+# library("bayestestR")
+describe_posterior(model_bayes)
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Parameter"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Median"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["CI"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["CI_low"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["CI_high"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["pd"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["ROPE_CI"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["ROPE_low"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["ROPE_high"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["ROPE_Percentage"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["Rhat"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["ESS"],"name":[12],"type":["dbl"],"align":["right"]}],"data":[{"1":"(Intercept)","2":"32.8341912","3":"0.95","4":"28.2854215","5":"37.1297419","6":"1.00000","7":"0.95","8":"-0.9197104","9":"0.9197104","10":"0","11":"1.001522","12":"2029.279","_rn_":"1"},{"1":"age","2":"-0.1433484","3":"0.95","4":"-0.1812149","5":"-0.1038925","6":"1.00000","7":"0.95","8":"-0.9197104","9":"0.9197104","10":"1","11":"1.001331","12":"2052.155","_rn_":"2"},{"1":"dis","2":"-0.2581988","3":"0.95","4":"-0.7644922","5":"0.2574534","6":"0.81925","7":"0.95","8":"-0.9197104","9":"0.9197104","10":"1","11":"1.001581","12":"2115.192","_rn_":"4"},{"1":"chas1","2":"7.5425493","3":"0.95","4":"4.6695071","5":"10.3937077","6":"1.00000","7":"0.95","8":"-0.9197104","9":"0.9197104","10":"0","11":"1.000453","12":"3744.403","_rn_":"3"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+
+- **CI** : Credible Interval, it is used to quantify the uncertainty about the regression coefficients. There are two methods to compute CI, the highest density interval HDI which is the default, and the Equal-tailed Interval ETI. with 89% probability (given the data) that a coefficient lies above the CI_low value and under CI_high value. This strightforward probabilistic interpretation is completely diffrent from the confidence interval used in classical linear regression where the coefficient fall inside this confidence interval (if we choose 95% of confidence) 95 times if we repeat the study 100 times.
+
+- **pd (Probability of Direction):** Measures the probability that a parameter has a consistent positive or negative effect. It's akin to checking whether the parameter's effect is consistently in one direction or another, not merely the magnitude. And it is considered as the best equivalent for the p-value.
+
+- **ROPE_CI**: Region of Practical Equivalence, since bayes method deals with true probabilities, it does not make sense to compute the probability of getting the effect equals zero (the null hypothesis) as a point (probability of a point in continuous intervals equal zero ). Thus, we define instead a small range around zero which can be considered practically the same as no effect (zero), this range therefore is called ROPE. By default (according to Cohen, 1988) The Rope is [-0.1,0.1] from the standardized coefficients.
+- **% in ROPE:** Shows the percentage of the posterior distribution that falls within the ROPE, helping to evaluate the practical significance of the effect.
+
+- **Rhat:** The potential scale reduction factor on split chains (Gelman-Rubin statistic). it is computed for each scalar quantity of interest, as the standard deviation of that quantity from all the chains included together, divided by the root mean square of the separate within-chain standard deviations. When this value is close to 1 we do not have any convergence problem with MCMC.
+
+- **ESS (Effective Sample Size):** it captures how many independent draws contain the same amount of information as the dependent sample obtained by the MCMC algorithm, the higher the ESS the better. The threshold used in practice is 400.
+
+Aternatively, we can get the coefficeient estimates (which are the medians by default) separatly by using the package insight.
+
+
+``` r
+# library("insight")
+post <- get_parameters(model_bayes)
+print(purrr::map_dbl(post,median),digits = 3)
+```
+
+```
+## (Intercept)         age         dis       chas1 
+##      32.834      -0.143      -0.258       7.543
+```
+
+
+The mean of the posterior distribution is the expected value of the parameter over its entire plausible range as informed by the data and the prior. It provides a balance point of the distribution. as follows:
+
+
+``` r
+print(purrr::map_dbl(post, mean),digits = 3)
+```
+
+```
+## (Intercept)         age         dis       chas1 
+##      32.761      -0.143      -0.248       7.523
+```
+
+The values are closer to each other due to the like normality of the distribution of the posteriors where all the central statistics (mean, median, mode) are closer to each other. Using the following plot to visualize the age coefficient using different statistics as follows:
+
+
+``` r
+mcmc_dens(model_bayes, pars=c("age"))+
+  vline_at(median(post$age), col="red")+
+  vline_at(mean(post$age), col="yellow")+
+  vline_at(map_estimate(post$age)[1,2], col="green")
+```
+
+<img src="07-ML-Bayesian-Analysis_files/figure-html/unnamed-chunk-10-1.png" width="672" />
+
+
+## Inferences - Interval 
+
+In Bayesian statistics, credible intervals (CIs) are used to represent the probability of a parameter lying within a certain range, given the observed data and prior beliefs. These intervals are critical in understanding the distribution of parameters estimated by Bayesian models. Two common types of credible intervals are the Highest Density Interval (HDI) and the Equal-Tailed Interval (ETI).
+
+As we do with classical regression (frequentist), we can test the significance of the bayesian regression coefficients by checking whether the corresponding credible interval contains zero or not
+
+  - If the credible interval (be it HDI or ETI) for a regression coefficient does not include zero, we can say there is substantial evidence that the effect (or association) of that predictor on the response variable is non-zero, and thus "significant" in a practical sense.
+  - Conversely, if the interval includes zero, the data do not provide strong evidence against the null hypothesis of no association.
+
+### 1. Highest Density Interval (HDI) {-}
+
+The Highest Density Interval, or HDI, is a range within which a specified proportion of the distribution's probability mass lies, and where all points within the interval have higher probability density than points outside the interval. For instance, a 95% HDI contains the most credible values of the parameter that account for 95% of the probability mass, and every point inside the interval has a higher probability density than any point outside the interval.
+
+- **Key Feature:** The HDI is the shortest possible interval for a given coverage probability. This makes it particularly useful for skewed distributions, as it naturally adapts to the shape of the distribution and focuses on the most probable values.
+
+
+``` r
+hdi(model_bayes)
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Parameter"],"name":[1],"type":["chr"],"align":["left"]},{"label":["CI"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["CI_low"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["CI_high"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Effects"],"name":[5],"type":["chr"],"align":["left"]},{"label":["Component"],"name":[6],"type":["chr"],"align":["left"]}],"data":[{"1":"(Intercept)","2":"0.95","3":"28.4343424","4":"37.2354889","5":"fixed","6":"conditional","_rn_":"1"},{"1":"age","2":"0.95","3":"-0.1813622","4":"-0.1040772","5":"fixed","6":"conditional","_rn_":"2"},{"1":"dis","2":"0.95","3":"-0.7644668","4":"0.2574968","5":"fixed","6":"conditional","_rn_":"4"},{"1":"chas1","2":"0.95","3":"4.7407028","4":"10.4381668","5":"fixed","6":"conditional","_rn_":"3"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+
+
+### 2. Equal-Tailed Interval (ETI)
+
+The Equal-Tailed Interval is another type of credible interval where each tail of the distribution contains an equal amount of probability mass outside the interval. For a 95% ETI, 2.5% of the distribution's probability mass lies below the lower bound and 2.5% lies above the upper bound.
+
+- **Key Feature:** The ETI is straightforward and intuitive, mirroring the concept of frequentist confidence intervals. It does not necessarily contain the most probable values (like the HDI does) but is easier to compute and interpret for symmetric distributions.
+
+
+``` r
+eti(model_bayes)
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Parameter"],"name":[1],"type":["chr"],"align":["left"]},{"label":["CI"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["CI_low"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["CI_high"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Effects"],"name":[5],"type":["chr"],"align":["left"]},{"label":["Component"],"name":[6],"type":["chr"],"align":["left"]}],"data":[{"1":"(Intercept)","2":"0.95","3":"28.2854215","4":"37.1297419","5":"fixed","6":"conditional","_rn_":"1"},{"1":"age","2":"0.95","3":"-0.1812149","4":"-0.1038925","5":"fixed","6":"conditional","_rn_":"2"},{"1":"dis","2":"0.95","3":"-0.7644922","4":"0.2574534","5":"fixed","6":"conditional","_rn_":"4"},{"1":"chas1","2":"0.95","3":"4.6695071","4":"10.3937077","5":"fixed","6":"conditional","_rn_":"3"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+
+*Note: this similar result between frequentist and bayesian regression may due to the normality assumption for the former that is well satisfied which gives satisfied results and due to the normal prior used in the latter. However, in real world it is less often to be sure about the normality assumption which may give contradict conclusions between the two approaches.*
+
+
+## Inferences - Check part of the credible interval that falls inside the ROPE 
+
+Indeed, the Region of Practical Equivalence (ROPE) offers another way to assess the significance of regression coefficients in a Bayesian framework. This method is complementary to examining whether the credible intervals contain zero. The ROPE technique allows for a more nuanced interpretation of results, particularly when you need to decide if an effect is not only different from zero but also small enough to be considered practically insignificant.
+ 
+The ROPE is a predefined range around zero (e.g., \([-0.1, 0.1]\)) within which effects are considered negligible or practically equivalent to zero. This concept is based on the idea that not all statistically significant findings are practically significant. By defining a small interval around zero, researchers can identify parameters whose effects, while possibly statistically distinct from zero, are so small that they do not matter in practical terms.
+
+- **High Percentage in ROPE:** If a large portion of the posterior distribution of a parameter is within the ROPE, this suggests that the parameter's effect is practically negligible.
+- **Low Percentage in ROPE:** Conversely, if only a small portion of the posterior distribution falls within the ROPE, this suggests that the parameter's effect is practically significant.
+
+
+``` r
+rope(post$age)
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":["CI"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["ROPE_low"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["ROPE_high"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["ROPE_Percentage"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.95","2":"-0.1","3":"0.1","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+
+``` r
+rope(post$chas1)
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":["CI"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["ROPE_low"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["ROPE_high"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["ROPE_Percentage"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.95","2":"-0.1","3":"0.1","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+
+``` r
+rope(post$`(Intercept)`)
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":["CI"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["ROPE_low"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["ROPE_high"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["ROPE_Percentage"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.95","2":"-0.1","3":"0.1","4":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+
+``` r
+rope(post$dis)
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":["CI"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["ROPE_low"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["ROPE_high"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["ROPE_Percentage"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.95","2":"-0.1","3":"0.1","4":"0.1876316"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+
+
+## Inferences - PD and P-value
+
+The concept of **Probability of Direction (pd)** in Bayesian analysis is critical for understanding the directionality of effects in a model. It provides a straightforward interpretation of how likely it is that a parameter has a consistent positive or negative effect, based on the posterior distribution. This is particularly useful when the primary interest is in the direction rather than the magnitude or statistical significance of an effect.
+ 
+- **Probability of Direction (pd):** This metric measures the proportion of the posterior distribution that is either above or below zero (depending on the sign of the median). A pd close to 1 indicates that nearly all of the posterior distribution is on one side of zero, suggesting a consistent effect direction. Conversely, a pd close to 0.5 suggests that the posterior is spread around zero, indicating less certainty about the direction of the effect.
+
+- **Connection to P-values:** In frequentist statistics, the p-value measures the probability of observing data at least as extreme as the data actually observed, under the assumption that the null hypothesis (typically, that there is no effect) is true. In a Bayesian context, while p-values are not directly used, there is an analogous concept where the p-value can be approximated from the pd as \( p\text{-value} = 1 - pd \) for one-sided tests. This approximation gives a sense of how often the observed effect would occur by chance if the null hypothesis were true.
+
+
+# Bayesian Generalized Linear Models
+
+
+## Generalized Linear Models (GLM)
+
+**Limitations of Traditional Linear Models**
+
+* The **linearity assumption** (i.e., $E[y|x] = x^T \beta$) is restrictive, especially for data where the response $y$ is not continuous.
+* The **normality assumption** may be inappropriate for response types such as:
+
+  * **Binary outcomes:** $y \in \{0, 1\}$ (e.g., success/failure, yes/no).
+  * **Counts:** $y \in \{0, 1, 2, \ldots \}$ (e.g., number of events).
+  * **Positive values:** $y \in \mathbb{R}^+$ (e.g., survival times).
+  
+Generalized Linear Models (GLMs) extend linear models to accommodate a broader range of response types by addressing the two major limitations:
+
+* The response $y$ can follow various distributions beyond the normal.
+* The relationship between $y$ and $x$ is defined through a **link function**, which transforms the linear predictor to match the response distribution.
+
+A GLM is defined by three main components:
+
+1. **Random Component: Distribution of $y$**
+
+   * The response variable $y$ is assumed to belong to an **exponential family distribution**. This family includes:
+
+     * Normal distribution for continuous responses.
+     * Bernoulli distribution for binary outcomes.
+     * Poisson distribution for count data.
+
+2. **Systematic Component: Linear Predictor**
+
+   * The linear predictor is a weighted sum of the explanatory variables:
+
+     $$
+     \eta = x^T \beta
+     $$
+
+   * This part retains the linearity of traditional regression models.
+
+3. **Link Function $g(\cdot)$: Connecting $\eta$ to the Mean**
+
+   * The link function transforms the expected value $\mu = E[y]$ to align with the linear predictor:
+
+     $$
+     g(\mu) = x^T \beta
+     $$
+
+   * This allows the model to accommodate a wide range of response types.
+
+The link function is a critical component of GLMs, determining how the linear predictor $x^T \beta$ is transformed to model the response $y$. Some common link functions include:
+
+| Response Type | Distribution | Link Function $g(\mu)$                     | Canonical Link |
+| ------------- | ------------ | ------------------------------------------ | -------------- |
+| Continuous    | Normal       | Identity: $g(\mu) = \mu$                   | Identity       |
+| Binary (0, 1) | Bernoulli    | Logit: $g(\mu) = \log \frac{\mu}{1 - \mu}$ | Logit          |
+| Binary (0, 1) | Bernoulli    | Probit: $g(\mu) = \Phi^{-1}(\mu)$          | Probit         |
+| Counts        | Poisson      | Log: $g(\mu) = \log(\mu)$                  | Log            |
+| Continuous +  | Gamma        | Inverse: $g(\mu) = \frac{1}{\mu}$          | Inverse        |
+ 
+
+Likelihood Function and MLE
+
+
+1. **Likelihood Function**: The likelihood function \( L(\theta|y) \) is central to the process of estimation. It quantifies how probable a set of observed data \( y \) is, given a set of parameters \( \theta \). The likelihood for a dataset \( y \) under a model parameterized by \( \theta \) is given by the product of the probability densities for each individual data point:
+
+   \[
+   L(\theta|y) = \prod_{i=1}^n p(y_i|\theta)
+   \]
+
+   where \( p(y_i|\theta) \) is the probability of observing \( y_i \) given the parameters \( \theta \).
+
+2. **Maximum Likelihood Estimation (MLE)**: This method seeks the parameter set \( \theta \) that maximizes the likelihood function. The estimate \( \hat{\theta} \) is defined as:
+
+   \[
+   \hat{\theta} = \arg \max_{\theta} L(\theta|y)
+   \]
+
+   This is equivalent to maximizing the log-likelihood because the logarithm is a monotonic transformation, simplifying the multiplication of probabilities into a sum:
+
+   \[
+   \ell(\theta|y) = \log L(\theta|y) = \sum_{i=1}^n \log p(y_i|\theta)
+   \]
+
+3. **Score Function**: This is the derivative of the log-likelihood function with respect to the parameter \( \theta \), and it provides a measure of how sensitive the likelihood is to changes in the parameter. It is a crucial component in finding the maximum likelihood estimate through gradient-based optimization methods. The score function is given by:
+
+   \[
+   \frac{\partial \ell(\theta|y)}{\partial \theta}
+   \]
+
+   It helps identify the parameter values where the score is zero, which are potential candidates for maximum likelihood estimates if they correspond to a maximum on the likelihood surface.
+   
+## Advanced MCMC: Metropolis-Hastings Algorithm
+
+**Limitations of Gibbs Sampling**
+
+* Requires the full conditionals to be known and easily sampled.
+* Poor performance when the conditionals are highly correlated.
+* Can struggle in multi-modal distributions (where the chain might get stuck in one mode).
+
+The **Metropolis–Hastings (MH) algorithm** is a powerful and versatile method for generating samples from complex probability distributions. It is a type of **Markov Chain Monte Carlo (MCMC)** algorithm, making it a critical tool in Bayesian statistics, statistical inference, and machine learning.
+
+* In many practical scenarios, the target distribution $\pi(x)$ is complex, making direct sampling impossible.
+* This complexity is especially true in **Generalized Linear Models (GLMs)**, where the likelihood does not factorize easily.
+* The Metropolis–Hastings algorithm provides a general method for sampling from $\pi(x)$ using a simpler, **proposal distribution $q(x, y)$**.
+
+**Why Metropolis–Hastings is Universal**
+
+* The Metropolis–Hastings algorithm can be used with **any target distribution $\pi(x)$**, making it highly versatile.
+* It does not require $\pi(x)$ to be normalized (i.e., the normalizing constant can be unknown).
+* The only requirement is that the target distribution is known up to a proportional constant:
+
+  $$
+  \pi(x) = c f(x)
+  $$
+
+  where $c$ is an unknown constant.
+  
+---
+
+**How the Metropolis–Hastings Algorithm Works**
+
+The Core Idea is
+
+* The algorithm generates a sequence of samples $x^{(1)}, x^{(2)}, \ldots, x^{(T)}$ that approximate the target distribution $\pi(x)$.
+* These samples are generated by proposing new values using a **proposal distribution $q(x, y)$**, and then accepting or rejecting them based on a calculated acceptance probability.
+
+1. **Initialization:**
+
+   * Start with an arbitrary initial value $x^{(0)}$.
+
+2. **Iteration (for each $t = 1, 2, \ldots, T$):**
+
+   * **Step 1: Proposal Generation:**
+
+     * Propose a new value $x^*$ from the **proposal distribution** $q(x^{(t-1)}, x^*)$.
+   * **Step 2: Acceptance Probability Calculation:**
+
+     * Calculate the **acceptance probability**:
+
+       $$
+       \rho(x^{(t-1)}, x^*) = \min \left(1, \frac{\pi(x^*) q(x^*, x^{(t-1)})}{\pi(x^{(t-1)}) q(x^{(t-1)}, x^*)} \right)
+       $$
+   * **Step 3: Acceptance or Rejection:**
+
+     * Generate a uniform random number $u \sim U(0, 1)$.
+     * If $u \leq \rho$, **accept** the proposed value: $x^{(t)} = x^*$.
+     * If $u > \rho$, **reject** the proposed value: $x^{(t)} = x^{(t-1)}$.
+
+3. **Repeat the iteration until the desired number of samples is obtained.**
+
+
+
+
+## Key Components of Bayesian GLMs:
+
+1. **Link Function and Linear Predictor**:  
+   The relationship between the mean of the dependent variable and the linear combination of predictors is specified through a link function. This function ensures that the model predictions stay within bounds suitable for the distribution of the dependent variable. For instance, a logit link function is used in logistic regression to keep the predictions between 0 and 1.
+
+2. **Prior Distributions**:  
+   Priors are set on the parameters (e.g., regression coefficients and scale parameters) to incorporate prior beliefs or external information about the values these parameters might take. These priors can influence the posterior distributions, especially when the data is sparse.
+
+3. **Likelihood**:  
+   The likelihood function is based on the assumed distribution of the response variable given the predictors (e.g., normal for linear regression, binomial for logistic regression). The likelihood integrates the observed data with the linear predictor through the link function.
+
+4. **Posterior Distributions**:  
+   The posterior distributions of the parameters are derived using Bayes' theorem, combining the prior distributions and the likelihood of the observed data. These posteriors provide a complete probabilistic description of the parameters after observing the data.
+
+5. **Predictive Distributions**:  
+   Bayesian GLMs also facilitate the generation of predictive distributions for new observations, which are derived from the posterior predictive distribution. This distribution takes into account both the uncertainty in the parameter estimates and the inherent variability in the response variable.
+   
+
+
+## Probit Model
+
+The **Probit Model** is a type of **Generalized Linear Model (GLM)** used for binary response data (outcomes coded as 0 or 1). It is particularly useful when modeling the probability of a binary outcome $y$ given a set of explanatory variables $X$.
+
+* **Binary Outcome:** $y_i \in \{0, 1\}$.
+* **Explanatory Variables:** $X = (x_1, x_2, \ldots, x_p)$.
+* **Probability of Success:** $P(y = 1 \mid X) = \Phi(X^T \beta)$.
+* **Link Function:** The Probit model uses the **Probit Link Function**:
+
+$$
+g(\mu) = \Phi^{-1}(\mu)
+$$
+
+* Here, $\Phi$ is the **Cumulative Distribution Function (CDF)** of the standard normal distribution.
+* The model is written as:
+
+$$
+P(y_i = 1 \mid X_i) = \Phi(X_i^T \beta)
+$$
+
+---
+
+**Bayesian Analysis of the Probit Model**
+
+* Given $n$ observations, the likelihood function for the Probit model is:
+
+$$
+L(\beta \mid y, X) = \prod_{i=1}^{n} \Phi(X_i^T \beta)^{y_i} [1 - \Phi(X_i^T \beta)]^{1 - y_i}
+$$
+
+* The log-likelihood is:
+
+$$
+\ell(\beta \mid y, X) = \sum_{i=1}^{n} \left[ y_i \log \Phi(X_i^T \beta) + (1 - y_i) \log (1 - \Phi(X_i^T \beta)) \right]
+$$
+
+**Why Bayesian Inference is Necessary**
+
+* The likelihood of the Probit model does not have a closed-form solution for $\beta$.
+* Bayesian methods are used to provide a flexible way of estimating $\beta$, using **Markov Chain Monte Carlo (MCMC)** techniques.
+
+
+### Flat Prior {-}
+
+* The simplest prior is a **flat prior** (non-informative prior), which is uniform over the parameter space:
+
+$$
+\pi(\beta) \propto 1
+$$
+
+* The posterior distribution is:
+
+$$
+\pi(\beta \mid y, X) \propto L(\beta \mid y, X) \pi(\beta)
+$$
+
+* Since the flat prior is constant, the posterior is directly proportional to the likelihood:
+
+$$
+\pi(\beta \mid y, X) \propto \prod_{i=1}^{n} \Phi(X_i^T \beta)^{y_i} [1 - \Phi(X_i^T \beta)]^{1 - y_i}
+$$
+
+This posterior is **non-standard**, meaning it cannot be solved analytically and must be simulated using MCMC.
+
+The **Metropolis-Hastings (MH) algorithm** is a flexible MCMC method suitable for this scenario.
+
+1. **Initialization:**
+
+   * Use the **Maximum Likelihood Estimate (MLE)** $\hat{\beta}$ as the starting point.
+   * Compute the asymptotic covariance matrix $\hat{\Sigma}$ of $\hat{\beta}$.
+   * Set the starting value $\beta^{(0)} = \hat{\beta}$.
+
+2. **Iteration $t \geq 1$:**
+
+   * Generate a candidate value $\beta^*$ from a multivariate normal proposal:
+
+$$
+\beta^* \sim N(\beta^{(t-1)}, \tau^2 \hat{\Sigma})
+$$
+
+* Compute the **acceptance probability**:
+
+$$
+\rho = \min \left(1, \frac{L(\beta^* \mid y, X)}{L(\beta^{(t-1)} \mid y, X)} \right)
+$$
+
+* With probability $\rho$, **accept** the proposal $\beta^{(t)} = \beta^*$.
+* Otherwise, **reject** the proposal $\beta^{(t)} = \beta^{(t-1)}$.
+
+3. **Repeat** until convergence.
+
+---
+
+**Example: Implementing Probit Model with Flat Prior in R**
+
+
+``` r
+# Log-Likelihood Function for Probit Model
+probit_ll <- function(beta, y, X) {
+  lF1 <- pnorm(X %*% beta, log = TRUE)
+  lF2 <- pnorm(-X %*% beta, log = TRUE)
+  sum(y * lF1 + (1 - y) * lF2)
+}
+
+# Metropolis-Hastings Sampler for Probit Model
+hm_flat_probit <- function(niter, y, X, scale) {
+  p <- ncol(X)
+  mod <- summary(glm(y ~ -1 + X, family = binomial(link = "probit")))
+  beta <- matrix(0, niter, p)
+  beta[1, ] <- as.vector(mod$coeff[, 1])
+  Sigma2 <- as.matrix(mod$cov.unscaled)
+  
+  for (i in 2:niter) {
+    beta_prop <- MASS::mvrnorm(1, beta[i - 1, ], scale * Sigma2)
+    llr <- probit_ll(beta_prop, y, X) - probit_ll(beta[i - 1, ], y, X)
+    if (log(runif(1)) < llr) {
+      beta[i, ] <- beta_prop
+    } else {
+      beta[i, ] <- beta[i - 1, ]
+    }
+  }
+  
+  return(beta)
+}
+
+# Example with simulated data
+set.seed(42)
+n <- 1000
+X <- cbind(1, rnorm(n))
+beta_true <- c(-1.5, 2.0)
+y <- rbinom(n, 1, pnorm(X %*% beta_true))
+
+# Running Metropolis-Hastings
+samples <- hm_flat_probit(niter = 10000, y = y, X = X, scale = 1)
+plot(samples[, 1], type = 'l', main = "Probit Model - Trace Plot of Beta1")
+```
+
+<img src="07-ML-Bayesian-Analysis_files/figure-html/unnamed-chunk-14-1.png" width="672" />
+
+``` r
+plot(samples[, 2], type = 'l', main = "Probit Model - Trace Plot of Beta2")
+```
+
+<img src="07-ML-Bayesian-Analysis_files/figure-html/unnamed-chunk-14-2.png" width="672" />
+
+* The trace plots should show good mixing (rapid movement across the parameter space).
+* The posterior mean and variance of the coefficients can be calculated from the MCMC samples.
+* The Probit model can provide a predictive probability for new data points:
+
+$$
+\hat{p_i} = \Phi(X_i^T \hat{\beta})
+$$
+
+
+### Informative Priors for Probit Model (G-Prior) {-}
+
+ 
+* A flat prior may not be suitable for all applications.
+* We can use a **G-Prior** (a type of informative prior) for the coefficients:
+
+$$
+\beta \sim N(0, \sigma^2 (X^T X)^{-1})
+$$
+
+* This results in a different posterior distribution:
+
+$$
+\pi(\beta \mid y) \propto |X^T X|^{1/2} \exp \left(- \frac{1}{2} \beta^T (X^T X) \beta \right) \prod_{i=1}^{n} \Phi(X_i^T \beta)^{y_i} [1 - \Phi(X_i^T \beta)]^{1 - y_i}
+$$
+
+* The Metropolis-Hastings sampler can still be used with this prior.
+
+## Logit Model
+
+
+The **Logit Model** is another type of **Generalized Linear Model (GLM)** used for binary response data (outcomes coded as 0 or 1). It is similar to the Probit model, but instead of using the **Normal Cumulative Distribution Function (CDF)**, it uses the **Logistic Function** as the link function.
+
+* **Binary Outcome:** $y_i \in \{0, 1\}$.
+* **Explanatory Variables:** $X = (x_1, x_2, \ldots, x_p)$.
+* **Probability of Success:** $P(y = 1 \mid X) = \frac{\exp(X^T \beta)}{1 + \exp(X^T \beta)}$.
+* **Link Function:** The Logit model uses the **Logit Link Function**:
+
+$$
+g(\mu) = \log \frac{\mu}{1 - \mu}
+$$
+
+* The model is written as:
+
+$$
+\log \frac{P(y = 1 \mid X)}{P(y = 0 \mid X)} = X^T \beta
+$$
+
+* This can be rearranged to express the probability directly:
+
+$$
+P(y = 1 \mid X) = \frac{\exp(X^T \beta)}{1 + \exp(X^T \beta)}
+$$
+
+---
+
+**Likelihood Function for Logit Model**
+ 
+
+* Given $n$ observations, the likelihood function for the Logit model is:
+
+$$
+L(\beta \mid y, X) = \prod_{i=1}^{n} \frac{\exp(y_i X_i^T \beta)}{1 + \exp(X_i^T \beta)}
+$$
+
+* The log-likelihood is:
+
+$$
+\ell(\beta \mid y, X) = \sum_{i=1}^{n} \left[ y_i (X_i^T \beta) - \log (1 + \exp(X_i^T \beta)) \right]
+$$
+
+
+
+### Flat Prior {-}
+
+* Similar to the Probit model, we can start with a **flat prior** on $\beta$:
+
+$$
+\pi(\beta) \propto 1
+$$
+
+* The posterior distribution is directly proportional to the likelihood:
+
+$$
+\pi(\beta \mid y, X) \propto L(\beta \mid y, X) \pi(\beta)
+$$
+
+* Given the flat prior, the posterior simplifies to:
+
+$$
+\pi(\beta \mid y, X) \propto \prod_{i=1}^{n} \frac{\exp(y_i X_i^T \beta)}{1 + \exp(X_i^T \beta)}
+$$
+
+**Metropolis-Hastings Algorithm for Logit Model**
+
+The posterior distribution of the Logit model is **non-standard**, making direct sampling impossible.
+
+We use the **Metropolis-Hastings (MH) algorithm**, a type of **Markov Chain Monte Carlo (MCMC)** method, to sample from the posterior distribution.
+
+
+1. **Initialization:**
+
+   * Use the **Maximum Likelihood Estimate (MLE)** $\hat{\beta}$ as the starting point.
+   * Compute the asymptotic covariance matrix $\hat{\Sigma}$ of $\hat{\beta}$.
+   * Set the starting value $\beta^{(0)} = \hat{\beta}$.
+
+2. **Iteration $t \geq 1$:**
+
+   * Generate a candidate value $\beta^*$ from a multivariate normal proposal:
+
+$$
+\beta^* \sim N(\beta^{(t-1)}, \tau^2 \hat{\Sigma})
+$$
+
+* Compute the **acceptance probability**:
+
+$$
+\rho = \min \left(1, \frac{L(\beta^* \mid y, X)}{L(\beta^{(t-1)} \mid y, X)} \right)
+$$
+
+* With probability $\rho$, **accept** the proposal $\beta^{(t)} = \beta^*$.
+* Otherwise, **reject** the proposal $\beta^{(t)} = \beta^{(t-1)}$.
+
+3. **Repeat** until convergence.
+
+
+**Example: Implementing Logit Model with Flat Prior in R**
+
+
+``` r
+# Log-Likelihood Function for Logit Model
+logitll <- function(beta, y, X) {
+  if (!is.matrix(beta)) beta <- as.matrix(t(beta))
+  n <- nrow(beta)
+  pll <- rep(0, n)
+  for (i in 1:n) {
+    lF1 <- plogis(X %*% beta[i, ], log = TRUE)
+    lF2 <- plogis(-X %*% beta[i, ], log = TRUE)
+    pll[i] <- sum(y * lF1 + (1 - y) * lF2)
+  }
+  pll
+}
+
+# Metropolis-Hastings Sampler for Logit Model
+hm_flat_logit <- function(niter, y, X, scale) {
+  p <- ncol(X)
+  mod <- summary(glm(y ~ -1 + X, family = binomial(link = "logit")))
+  beta <- matrix(0, niter, p)
+  beta[1, ] <- as.vector(mod$coeff[, 1])
+  Sigma2 <- as.matrix(mod$cov.unscaled)
+  
+  for (i in 2:niter) {
+    tildebeta <- MASS::mvrnorm(1, beta[i - 1, ], scale * Sigma2)
+    llr <- logitll(tildebeta, y, X) - logitll(beta[i - 1, ], y, X)
+    if (log(runif(1)) < llr) {
+      beta[i, ] <- tildebeta
+    } else {
+      beta[i, ] <- beta[i - 1, ]
+    }
+  }
+  
+  return(beta)
+}
+
+# Example with simulated data
+set.seed(42)
+n <- 1000
+X <- cbind(1, rnorm(n))
+beta_true <- c(-2.5, 2.0)
+logit_probs <- plogis(X %*% beta_true)
+y <- rbinom(n, 1, logit_probs)
+
+# Running Metropolis-Hastings
+samples <- hm_flat_logit(niter = 10000, y = y, X = X, scale = 1)
+plot(samples[, 1], type = 'l', main = "Logit Model - Trace Plot of Beta1")
+```
+
+<img src="07-ML-Bayesian-Analysis_files/figure-html/unnamed-chunk-15-1.png" width="672" />
+
+``` r
+plot(samples[, 2], type = 'l', main = "Logit Model - Trace Plot of Beta2")
+```
+
+<img src="07-ML-Bayesian-Analysis_files/figure-html/unnamed-chunk-15-2.png" width="672" />
+
+
+* The trace plots should show good mixing (rapid movement across the parameter space).
+* The posterior means of the coefficients can be calculated using:
+
+
+
+``` r
+# Posterior Means
+posterior_means <- colMeans(samples)
+print(posterior_means)
+```
+
+```
+## [1] -2.580160  2.104661
+```
+
+
+
+## Log-Linear Model
+
+**Log-Linear Models** are a type of **Generalized Linear Model (GLM)** specifically designed for analyzing **contingency tables**. These models are particularly useful for studying the associations (or dependencies) between **categorical variables** by modeling the **logarithm of expected cell counts** as a linear combination of predictor variables.
+ 
+* They are designed for **count data** or **categorical data**.
+* The **link function** is logarithmic: $\log(\mu) = X \beta$.
+* The **response variable $y$** is typically a **Poisson-distributed count**. 
+
+**Poisson Regression for Contingency Tables**
+
+* Each cell count $y_i$ in the contingency table is modeled as a **Poisson random variable**:
+
+$$
+y_i \sim \text{Poisson}(\mu_i)
+$$
+
+* The **logarithm of the expected count $\mu_i$** is modeled as a **linear combination of indicator variables** (categorical factors):
+
+$$
+\log(\mu_i) = X_i^T \beta
+$$
+
+* The **design matrix $X$** is constructed from the indicator variables (dummy variables) representing the categories in the table.
+
+**Saturated vs. Non-Saturated Models**
+
+* A **saturated model** has one parameter for each cell, making it too flexible and difficult to interpret.
+* A **non-saturated model** imposes structure by limiting the parameters:
+
+  * Main effects: Effect of each categorical variable alone.
+  * Interaction effects: Combined effects of two or more variables.
+  
+**Types of Log-Linear Models**
+
+* **Independence Model:** All variables are independent.
+
+$$
+\log(\mu_{ijk}) = \lambda + \lambda_u + \lambda_v + \lambda_w
+$$
+
+* **Pairwise Independence:** Some pairs are dependent, others are independent.
+
+$$
+\log(\mu_{ijk}) = \lambda + \lambda_u + \lambda_v + \lambda_w + \lambda_{uv}
+$$
+
+* **Full Model (Saturated):** All interactions are included.
+
+$$
+\log(\mu_{ijk}) = \lambda + \lambda_u + \lambda_v + \lambda_w + \lambda_{uv} + \lambda_{uw} + \lambda_{vw} + \lambda_{uvw}
+$$
+
+
+### Flat Prior {-}
+ 
+
+* Start with a **flat prior** $\pi(\beta) \propto 1$.
+* The **posterior distribution** is:
+
+$$
+\pi(\beta | y) \propto \exp \left[ \sum_{i=1}^{n} y_i X_i^T \beta - \sum_{i=1}^{n} \exp(X_i^T \beta) \right]
+$$
+
+* This is a **non-standard distribution** and cannot be directly sampled.
+* We use **Metropolis-Hastings (MH)** for posterior sampling.
+
+---
+
+**Log-Likelihood Function**
+
+
+``` r
+loglinll <- function(beta, y, X) {
+  if (!is.matrix(beta)) beta <- as.matrix(t(beta))
+  n <- nrow(beta)
+  pll <- rep(0, n)
+  for (i in 1:n) {
+    lF <- exp(X %*% beta[i, ])
+    pll[i] <- sum(dpois(y, lF, log = TRUE))
+  }
+  pll
+}
+```
+
+
+**Metropolis-Hastings Sampler for Log-Linear Model**
+
+
+``` r
+hm_flat_loglin <- function(niter, y, X, scale) {
+  p <- ncol(X)
+  mod <- summary(glm(y ~ -1 + X, family = poisson()))
+  beta <- matrix(0, niter, p)
+  beta[1, ] <- as.vector(mod$coeff[, 1])
+  Sigma2 <- as.matrix(mod$cov.unscaled)
+  
+  for (i in 2:niter) {
+    tildebeta <- MASS::mvrnorm(1, beta[i - 1, ], scale * Sigma2)
+    llr <- loglinll(tildebeta, y, X) - loglinll(beta[i - 1, ], y, X)
+    if (log(runif(1)) < llr) {
+      beta[i, ] <- tildebeta
+    } else {
+      beta[i, ] <- beta[i - 1, ]
+    }
+  }
+  
+  return(beta)
+}
+```
+ 
+**Example with Air Quality Data**
+
+
+``` r
+# Load airquality data and preprocess
+data("airquality")
+air <- na.omit(airquality)
+air$OzoneBinary <- ifelse(air$Ozone > median(air$Ozone, na.rm = TRUE), 1, 0)
+air$TempBinary <- ifelse(air$Temp > median(air$Temp, na.rm = TRUE), 1, 0)
+air$Month <- factor(air$Month)
+
+# Create contingency table
+counts <- as.vector(table(air$OzoneBinary, air$TempBinary, air$Month))
+
+# Generate the design matrix X manually
+design <- expand.grid(
+  OzoneBinary = c(0, 1),
+  TempBinary = c(0, 1),
+  Month = factor(5:9)
+)
+
+# Create the model matrix for the design
+X <- model.matrix(~ OzoneBinary * TempBinary * Month, data = design)
+
+# Check if the lengths match
+length(counts)  # Should be 20
+```
+
+```
+## [1] 20
+```
+
+``` r
+nrow(X)         # Should also be 20
+```
+
+```
+## [1] 20
+```
+
+``` r
+# Run Metropolis-Hastings
+samples <- hm_flat_loglin(niter = 10000, y = counts, X = X, scale = 0.5)
+
+# Posterior summary
+posterior_means <- colMeans(samples)
+posterior_means
+```
+
+```
+##  [1]  2.828462e+00 -1.086847e+00 -1.318713e+06 -1.585348e+00 -2.307879e+00
+##  [6] -1.299925e+00  2.723378e-02  1.318710e+06 -5.279193e-01 -1.162564e+06
+## [11]  2.830845e-01 -2.114455e+00  1.318712e+06  1.318713e+06  1.318712e+06
+## [16]  1.318710e+06 -1.318709e+06 -1.561428e+05 -1.318708e+06 -1.318706e+06
+```
+
+   
+# Bayesian Survival Analysis
+
+## Cox PH Model
+
+1. **Cox PH Model Basics**:
+   The Cox Proportional Hazards model is a widely used statistical method for survival analysis, focusing on the time until an event occurs. It is characterized by the hazard function, which models the instantaneous risk of the event. The baseline hazard function, \( h_0(t) \), is not specified, which allows flexibility in modeling different types of hazard shapes.
+
+2. **Model Formulation**:
+   The model incorporates a linear predictor involving covariates, represented typically as:
+   \[
+   h(t | \beta) = h_0(t) \exp(\beta^T X)
+   \]
+   Here, \( \beta \) represents the regression coefficients corresponding to the covariates \( X \), and \( h_0(t) \) is the baseline hazard function. This formulation assumes that the covariates have a multiplicative effect on the hazard rate, which remains proportional over time.
+
+3. **Piecewise Constant Baseline Hazard**:
+   According to the content in the image, the baseline hazard, \( h_0(t) \), can be modeled as a piecewise constant function. This means that \( h_0(t) \) is assumed constant within specified intervals. This is a common approach when the baseline hazard is not known a priori and needs to be estimated from the data. It simplifies calculations and allows for flexibility in the model. The hazard rate in each interval \( [s_j, s_{j+1}) \) is denoted as \( \lambda_j \).
+
+4. **Bayesian Framework**:
+   In a Bayesian setting, priors are assigned to the parameters of the model, including the regression coefficients \( \beta \) and the parameters defining the piecewise constant baseline hazard \( \lambda_j \). The priors could be guided by previous studies or expert knowledge. Common choices for priors on \( \beta \) might include normal distributions, while \( \lambda_j \) might have gamma priors due to their positive support.
+
+5. **Posterior Distributions**:
+   The Bayesian approach focuses on estimating the posterior distributions of the model parameters, which combine prior beliefs and the likelihood derived from the observed data. These posterior distributions provide a complete probabilistic description of the model parameters, offering insights into their uncertainty and variability.
+
+6. **Computational Methods**:
+   The analysis often involves using Markov Chain Monte Carlo (MCMC) methods to sample from the posterior distributions. This is particularly necessary in complex models where analytical solutions are infeasible.
+
+
+
+# Reference
+
+* [R Bloggers - Bayesian linear regression](https://www.r-bloggers.com/2020/04/bayesian-linear-regression/)
+* [Bayesian Regression Analysis in R using brms](https://tem11010.github.io/regression_brms/)
+
+## Package
+
+**For the bayess package:**
+Marin J, Robert CP (2024). _bayess: Bayesian Essentials with R_. R package version 1.6,
+  https://github.com/jmm34/bayess, <https://www.r-project.org>.
+  
+**For the brms package:**
+Bürkner, P.-C. (2017). brms: An R package for Bayesian multilevel models using Stan. Journal of Statistical Software, 80(1), 1–28. https://doi.org/10.18637/jss.v080.i01
+
+**For the rstan package (Stan):**
+Stan Development Team. (2022). RStan: the R interface to Stan. R package version 2.21.5. https://mc-stan.org
+
+**For the BayesFactor package:**
+Morey, R. D., & Rouder, J. N. (2018). BayesFactor: Computation of Bayes Factors for Common Designs. R package version 0.9.12-4.2. https://CRAN.R-project.org/package=BayesFactor
+
+**For the bayesplot package:**
+Gabry, J., & Mahr, T. (2022). bayesplot: Plotting for Bayesian Models. R package version 1.9.0. https://CRAN.R-project.org/package=bayesplot

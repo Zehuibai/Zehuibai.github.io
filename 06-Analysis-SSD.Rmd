@@ -24,7 +24,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
 # <!-- ---------------------------------------------------------------------- --> 
 
 ## if(!require(psych)){install.packages("psych")}
-packages<-c("tidyverse",  
+packages<-c("tidyverse","tern","rtables","DT","patchwork","ggpubr",
             "kableExtra")
 
 ipak <- function(pkg){
@@ -1333,6 +1333,8 @@ Safety topics may emerge throughout the drug lifecycle from various sources:
 *   When sponsors create **Custom MedDRA Queries (CMQs)**, the list of PTs used should be provided in a dataset.
 *   Regulatory agencies should review PT lists to ensure appropriateness and facilitate analysis integration.
 
+
+
 **Examples of PT Assignments with Primary and Secondary SOCs**
 
 |                                  |                                            |                                        |                                                                              |
@@ -1462,6 +1464,7 @@ Confidence intervals help express the **uncertainty** around the point estimate 
 
 ---
 
+
 **Worked Example:**
 
 - **Participants**: 5  
@@ -1489,21 +1492,21 @@ Confidence intervals help express the **uncertainty** around the point estimate 
 - **Consider specifying EAIR denominators in the table shells**: This makes statistical QC easier and reduces the risk of mismatches during table generation.
 
 
+
+
 ### Interpretation of EAIRs {-}
 
 **EAIRs are descriptive statistics that can help with medical interpretation of safety data**
 
 EAIRs help normalize the occurrence of adverse events (AEs) by accounting for the amount of time each participant is at risk (i.e., exposed to the drug). This allows for fairer comparisons across treatment groups, especially when follow-up times vary. However, their interpretability has limits and depends on several underlying assumptions.
 
----
-
+ 
 **Interpretation of exposure-adjusted incidence rates is only straightforward under assumption of constant event rate over time**
 
 This is a key statistical assumption behind EAIRs. It assumes the hazard (risk) of an event remains **constant over time**, which simplifies the interpretation. However, in real-world scenarios, risk may vary over time due to accumulation of exposure, adaptive resistance, seasonality, etc.
 
 If the risk is **not constant**, then EAIRs become harder to interpret, as they could under- or over-estimate the true risk at different time points.
-
----
+ 
 
 **Interpretation of EAIRs depends on several factors:**
 
@@ -1515,9 +1518,8 @@ If the risk is **not constant**, then EAIRs become harder to interpret, as they 
   - **Time dependency**:
     - **Time to onset**: If AEs tend to occur early or late after exposure, this affects whether EAIRs capture the true risk.
     - **Seasonality**: For diseases or AEs affected by time of year (e.g., flu, allergy), constant hazard assumptions may not apply.
-
----
-
+ 
+ 
 **Confidence intervals can aid in the interpretation of EAIRs**
 
 Confidence intervals (CIs) reflect the **uncertainty or variability** of the EAIR estimate.
@@ -1525,8 +1527,7 @@ Confidence intervals (CIs) reflect the **uncertainty or variability** of the EAI
 - CIs provide a **crude but informative range** of where the true value may lie.
 - They should be treated as descriptive statistics—not hypothesis-testing tools.
 - CIs are generally **preferred over p-values**, especially in safety analyses, where the focus is on understanding risk, not testing for differences.
-
----
+ 
 
 **Notes to consider when reviewing competitor publications:**
 
@@ -1545,16 +1546,14 @@ When analyzing safety data, EAIRs are just one tool. Depending on your objective
 - Time-to-event methods for first occurrences
 - Event-based rates for multiple AEs
 - Competing risk or recurrent event models for complex cases
-
----
+ 
 
 **Exposure-adjusted incidence rates for discrete periods**
 
 This method involves dividing the study period into separate intervals (e.g., weeks or months) and calculating EAIRs for each interval. This has two key advantages:
 - The **constant hazard assumption** is more likely to be reasonable over shorter, defined timeframes than over the entire study period.
 - It allows for description of how AE risk **changes over time**, helping identify periods of higher or lower risk (e.g., early onset toxicity).
-
----
+ 
 
 **Time-to-event analyses**
 
@@ -1564,8 +1563,7 @@ This refers to survival-type methods, primarily:
 - They are particularly useful when focusing on **time to the first occurrence** of an adverse event, rather than repeated or cumulative counts.
 
 This approach provides a detailed look at the **temporal aspect of safety**, helping answer: “When are events most likely to occur?”
-
----
+ 
 
 **Exposure-adjusted event rates**
 
@@ -1575,8 +1573,7 @@ These are used to:
 - Assumptions are generally **similar to EAIRs**, including the need for constant rate assumptions and appropriate handling of exposure time.
 
 This method is valuable for chronic or cycling conditions where multiple AEs per participant are expected.
-
----
+ 
 
 **Other multiple event-based analyses**
 
@@ -1587,6 +1584,192 @@ This category includes more advanced statistical methods designed to address com
 - **Competing risks models**: Adjust for scenarios where **different types of events compete**, such as when death precludes the occurrence of a non-fatal AE.
 
 These methods are more complex but better reflect **real-world clinical scenarios**, especially when multiple outcomes are interrelated.
+
+
+### Implementation in R {-}
+
+The analyze function tern::estimate_incidence_rate() creates a layout element to estimate an event rate adjusted for person-years at risk, otherwise known as incidence rate. The primary analysis variable specified via vars is the person-years at risk. In addition to this variable, the n_events variable for number of events observed (where a value of 1 means an event was observed and 0 means that no event was observed) must also be specified.
+
+
+```{r echo =F, error=FALSE, message=FALSE, warning=FALSE}
+arm_ache <- data.frame(
+  USUBJID = as.character(seq(5)),
+  USUBJIDN = as.numeric(seq(5)),
+  CNSR = c(0, 1, 1, 0, 0),
+  EVENTC = c("Experienced event", "End of follow up", "End of follow up", "Experienced event", "Experienced event"),
+  AVAL = c(101, 112, 112, 89, 92),
+  ARM = factor(c("Trt X - Late", "Trt X - Late", "Trt X - Late", "Trt X - Late", "Trt X - Late"))
+)
+
+leg_ache <- data.frame(
+  USUBJID = as.character(seq(5)),
+  USUBJIDN = as.numeric(seq(5)),
+  CNSR = c(0, 0, 1, 0, 1),
+  EVENTC = c("Yes", "Yes", "No", "Yes", "No"),
+  AVAL = c(14, 20, 112, 28, 112),
+  ARM = factor(c("Trt X - Early", "Trt X - Early", "Trt X - Early", "Trt X - Early", "Trt X - Early"))
+)
+
+arm_ache$n_events <- 1 - arm_ache$CNSR
+leg_ache$n_events <- 1 - leg_ache$CNSR
+
+# Render as interactive HTML table
+datatable(
+  arm_ache,
+  rownames = FALSE,
+  options = list(
+    pageLength = 5,
+    dom = 't',  # hide search bar and pagination
+    columnDefs = list(list(className = 'dt-left', targets = "_all"))
+  ),
+  caption = htmltools::tags$caption(
+    style = 'caption-side: top; text-align: left; font-weight: bold;',
+    'Exposure-Adjusted Incidence Rate (EAIR) Data Example 2a: Event Occurs Late'
+  )
+) 
+
+datatable(
+  leg_ache,
+  rownames = FALSE,
+  options = list(
+    pageLength = 5,
+    dom = 't',  # hide search bar and pagination
+    columnDefs = list(list(className = 'dt-left', targets = "_all"))
+  ),
+  caption = htmltools::tags$caption(
+    style = 'caption-side: top; text-align: left; font-weight: bold;',
+    'Exposure-Adjusted Incidence Rate (EAIR) Data Example 2b: Event Occurs Early'
+  )
+)
+
+# Define helper function for EAIR
+calculate_eair <- function(df, aval_unit = "days") {
+  n_participants <- nrow(df)
+  total_time <- sum(df$AVAL)
+  if (aval_unit == "days") {
+    total_years <- total_time / 365.25  # Convert days to years
+  } else if (aval_unit == "months") {
+    total_years <- total_time / 12
+  } else {
+    stop("Unknown time unit.")
+  }
+  n_events <- sum(df$n_events)
+  eair <- 100 * n_events / total_years
+  return(c(n_participants, round(total_years, 1), n_events, round(eair, 1)))
+}
+
+# Compute summary
+summary_late <- calculate_eair(arm_ache)
+summary_early <- calculate_eair(leg_ache)
+
+# Combine summary into a table
+summary_data <- data.frame(
+  Metric = c(
+    "Number of study participants",
+    "Total participant years at risk",
+    "Number of study participants with events",
+    "Exposure-adjusted incidence rate per 100 participant-years"
+  ),
+  `Event Occurs Late` = summary_late,
+  `Event Occurs Early` = summary_early,
+  check.names = FALSE
+)
+
+# Create the table
+table_plot <- ggtexttable(summary_data, rows = NULL, theme = ttheme("light"))
+
+# Create the first plot
+p_late <- ggplot(arm_ache, aes(x = AVAL, y = reorder(USUBJID, USUBJIDN))) +
+  geom_point(aes(shape = EVENTC, colour = EVENTC, size = EVENTC)) +
+  geom_segment(aes(x = 0, xend = AVAL, y = reorder(USUBJID, USUBJIDN), yend = reorder(USUBJID, USUBJIDN)), size = 1) +
+  xlab("Participant time at risk (days)") +
+  ylab("Participant") +
+  scale_shape_manual(name = "", labels = c("End of follow-up", "Experienced event"), values = c(1, 16)) +
+  scale_colour_manual(name = "", labels = c("End of follow-up", "Experienced event"), values = c("blue", "red")) +
+  scale_size_manual(name = "", labels = c("End of follow-up", "Experienced event"), values = c(3, 3)) +
+  scale_x_continuous(breaks = c(0, 28, 56, 84, 112)) +
+  annotate("text", x = 106, y = 1, label = "101") +
+  annotate("text", x = 118, y = 2, label = "112") +
+  annotate("text", x = 118, y = 3, label = "112") +
+  annotate("text", x = 95, y = 4, label = "89") +
+  annotate("text", x = 97, y = 5, label = "92") +
+  labs(title = "EAIR Example 2a: Event Occurs Late") +
+  theme_minimal(base_size = 18)
+
+# Create the second plot
+p_early <- ggplot(leg_ache, aes(x = AVAL, y = reorder(USUBJID, USUBJIDN))) +
+  geom_point(aes(shape = EVENTC, colour = EVENTC, size = EVENTC)) +
+  geom_segment(aes(x = 0, xend = AVAL, y = reorder(USUBJID, USUBJIDN), yend = reorder(USUBJID, USUBJIDN)), size = 1) +
+  xlab("Participant time at risk (days)") +
+  ylab("Participant") +
+  scale_shape_manual(name = "", labels = c("End of follow-up", "Experienced event"), values = c(1, 16)) +
+  scale_colour_manual(name = "", labels = c("End of follow-up", "Experienced event"), values = c("blue", "red")) +
+  scale_size_manual(name = "", labels = c("End of follow-up", "Experienced event"), values = c(3, 3)) +
+  scale_x_continuous(breaks = c(0, 28, 56, 84, 112)) +
+  annotate("text", x = 20, y = 1, label = "14") +
+  annotate("text", x = 26, y = 2, label = "20") +
+  annotate("text", x = 118, y = 3, label = "112") +
+  annotate("text", x = 34, y = 4, label = "28") +
+  annotate("text", x = 118, y = 5, label = "112") +
+  labs(title = "EAIR Example 2b: Event Occurs Early") +
+  theme_minimal(base_size = 18)
+
+# Combine the two plots and table
+final_plot <- ggarrange(
+  ggarrange(p_late, p_early, nrow = 1, common.legend = TRUE, legend = "bottom"),
+  table_plot,
+  ncol = 1,
+  heights = c(3, 1)
+)
+
+# Print final combined output
+print(final_plot)
+```
+
+
+**Incidence Estimate and Confidence intervals**
+
+
+```{r echo =F, error=FALSE, message=FALSE, warning=FALSE}
+arm_ache_combined <- rbind(arm_ache,leg_ache) 
+
+# Build both tables
+tbl_normal <- basic_table(show_colcounts = TRUE) %>%
+  split_cols_by("ARM") %>%
+  estimate_incidence_rate(
+    vars = "AVAL",
+    n_events = "n_events",
+    control = control_incidence_rate(
+      input_time_unit = "year",
+      num_pt_year = 100,
+      conf_type = "normal"
+    ),
+    .stats = c("person_years", "n_events", "rate", "rate_ci"),
+    .stat_names = NULL,
+    .formats = list(rate = "xx.xx", rate_ci = "(xx.xx, xx.xx)")
+  ) %>%
+  build_table(arm_ache_combined)
+tbl_normal
+
+
+tbl_exact <- basic_table(show_colcounts = TRUE) %>%
+  split_cols_by("ARM") %>%
+  estimate_incidence_rate(
+    vars = "AVAL",
+    n_events = "n_events",
+    control = control_incidence_rate(
+      input_time_unit = "year",
+      num_pt_year = 100,
+      conf_type = "exact"
+    ),
+    .stats = c("person_years", "n_events", "rate", "rate_ci"),
+    .stat_names = NULL,
+    .formats = list(rate = "xx.xx", rate_ci = "(xx.xx, xx.xx)")
+  ) %>%
+  build_table(arm_ache_combined)
+tbl_exact
+```
+
 
 
 # Structure Benefit-Risk Assessment
