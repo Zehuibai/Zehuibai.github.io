@@ -33,6 +33,7 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
@@ -223,6 +224,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -681,6 +685,14 @@ div.tocify {
 
 <div id="header">
 
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 <h1 class="title toc-ignore"><p><img src="logo.png"
@@ -718,8 +730,87 @@ extraction, assessment of study quality, evaluation of heterogeneity
 among results, and application of suitable analytical techniques. When
 properly designed, a meta-analysis offers a rigorous and transparent
 synthesis of scientific evidence.</p>
-<div id="meta-analysis-protocol" class="section level2" number="1.1">
-<h2><span class="header-section-number">1.1</span> Meta-Analysis
+<div id="what-are-meta-analyses" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> What Are
+Meta-Analyses</h2>
+<p><strong>Definition and Purpose</strong> Meta-analysis is a method
+used to statistically combine and interpret the results of multiple
+independent studies addressing the same research question. Coined by
+Gene V. Glass in 1976 as an “analysis of analyses,” it shifts the unit
+of analysis from individual participants or observations to entire
+studies. The aim is to create a comprehensive, quantitative summary of
+the available evidence in a specific research area.</p>
+<p><strong>Types of Evidence Synthesis</strong> There are several
+approaches to synthesizing results from multiple studies. These methods
+vary in terms of structure, objectivity, and the type of conclusions
+they allow.</p>
+<p><strong>1. Narrative Reviews</strong></p>
+<ul>
+<li>Narrative reviews are qualitative summaries of a research
+field.</li>
+<li>They are typically written by experts based on their knowledge and
+experience.</li>
+<li>There are no formal rules for how studies are selected or how
+evidence is interpreted.</li>
+<li>Because of this flexibility, narrative reviews can be biased and
+reflect the personal opinions of the author.</li>
+<li>However, when done carefully, they can provide valuable overviews
+and help identify key themes and questions in a field.</li>
+</ul>
+<p><strong>2. Systematic Reviews</strong></p>
+<ul>
+<li>Systematic reviews use predefined methods to locate, assess, and
+synthesize all relevant studies on a specific topic.</li>
+<li>The review process is transparent, reproducible, and designed to
+minimize bias.</li>
+<li>Inclusion and exclusion criteria are clearly specified
+beforehand.</li>
+<li>Study quality is assessed using objective criteria.</li>
+<li>Results are summarized systematically, though not necessarily in a
+quantitative form.</li>
+</ul>
+<p><strong>3. Meta-Analyses</strong></p>
+<ul>
+<li>Meta-analyses are typically conducted as part of a systematic review
+but go further by statistically combining study results.</li>
+<li>The process starts with a clearly defined research question and
+selection criteria.</li>
+<li>Only studies with quantitative data are included.</li>
+<li>The outcome is a single numerical estimate that reflects the overall
+effect size, prevalence, or correlation derived from the selected
+studies.</li>
+<li>Because of this quantitative focus, meta-analyses often require that
+studies be relatively homogeneous in design, interventions, and
+measurement methods.</li>
+</ul>
+<p><strong>Key Distinction</strong> While both systematic reviews and
+meta-analyses involve structured, transparent methods, the hallmark of
+meta-analysis is the quantitative integration of results. This allows
+for more precise estimates and statistical evaluation of consistency
+across studies.</p>
+<p><strong>4. Individual Participant Data (IPD)
+Meta-Analysis</strong></p>
+<ul>
+<li>IPD meta-analysis involves collecting raw, individual-level data
+from each study, rather than relying on published summary
+statistics.</li>
+<li>The combined dataset allows for more flexible and detailed
+analyses.</li>
+<li>Advantages include the ability to apply consistent statistical
+methods across studies, handle missing data uniformly, and explore
+participant-level moderators (e.g., age, gender) that cannot be examined
+using aggregated data.</li>
+<li>Despite its advantages, IPD meta-analysis is still rare due to the
+difficulty of obtaining individual-level data from all relevant
+studies.</li>
+<li>In practice, many IPD meta-analyses are limited by incomplete data
+availability. For example, a review found that IPD could be obtained
+from only about 64% of eligible studies, with most analyses using fewer
+studies than initially intended.</li>
+</ul>
+</div>
+<div id="meta-analysis-protocol" class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> Meta-Analysis
 Protocol</h2>
 <p>Writing a protocol is the <strong>first and most critical
 step</strong> in conducting a meta-analysis. It is comparable to
@@ -912,9 +1003,219 @@ analysis)</strong></li>
 <li>A benchmark for transparency and methodological rigor.</li>
 </ul>
 </div>
+<div id="data-extraction-and-coding-in-meta-analysis"
+class="section level2" number="1.3">
+<h2><span class="header-section-number">1.3</span> Data Extraction and
+Coding in Meta-Analysis</h2>
+<p>Once the selection of studies for a meta-analysis is finalized, the
+next essential step is data extraction. This step forms the foundation
+for all subsequent analyses and must be conducted systematically and
+thoroughly. According to best practices, there are three major types of
+information that should be extracted from each study:</p>
+<ol style="list-style-type: decimal">
+<li>Characteristics of the studies</li>
+<li>Data necessary to calculate effect sizes</li>
+<li>Study quality or risk of bias information</li>
+</ol>
+<p>Each category serves a distinct purpose in ensuring transparency,
+reproducibility, and validity in the meta-analytic process.</p>
+<p><strong>1. Characteristics of the Studies</strong></p>
+<p>A high-quality meta-analysis typically presents a table summarizing
+the key features of the included studies. While the exact content may
+vary depending on the research field and specific question, the
+following information should always be included:</p>
+<ul>
+<li>First author’s name</li>
+<li>Year of publication</li>
+<li>Sample size</li>
+</ul>
+<p>In addition, it is common to include characteristics that correspond
+to the PICO framework (Population, Intervention, Comparison, Outcome),
+which helps define the scope and context of the analysis:</p>
+<ul>
+<li>Country where the study was conducted</li>
+<li>Mean or median age of participants</li>
+<li>Proportion of female and male participants</li>
+<li>Description of the intervention or exposure</li>
+<li>Type of control group or comparator, if applicable</li>
+<li>Primary and secondary outcomes assessed</li>
+</ul>
+<p>If certain details are not available in a study, it is important to
+clearly indicate that the information is missing or not reported.</p>
+<p><strong>2. Data for Calculating Effect Sizes</strong></p>
+<p>In addition to descriptive characteristics, numerical data must be
+extracted to compute effect sizes or outcome measures. This could
+include means and standard deviations, proportions, odds ratios, or
+correlation coefficients, depending on the metric chosen for
+synthesis.</p>
+<p>If subgroup analyses or meta-regressions are planned, any relevant
+variables that could act as moderators or covariates must also be
+collected. These may include intervention duration, dosage levels, study
+setting, or publication year. Structuring this data properly in a
+spreadsheet or database is critical for efficient analysis and minimizes
+the risk of error.</p>
+<p><strong>3. Assessment of Study Quality or Risk of Bias</strong></p>
+<p>Assessing the quality or risk of bias of the primary studies is an
+essential component of meta-analysis. The specific approach depends on
+the study design:</p>
+<ul>
+<li><p>For randomized controlled trials, the <strong>Cochrane Risk of
+Bias Tool</strong> is the standard. This tool evaluates various domains
+where bias could occur, such as random sequence generation, allocation
+concealment, blinding, incomplete outcome data, and selective reporting.
+Each domain is rated as “low risk,” “high risk,” or “some
+concerns.”</p></li>
+<li><p>The focus of the risk of bias tool is not on the overall
+methodological quality of the study but on whether specific aspects of
+the design or conduct increase the likelihood of systematic errors in
+the findings. A study might follow all standard practices in its field
+and still have a high risk of bias due to subtle flaws in execution or
+reporting.</p></li>
+<li><p>For non-randomized studies, the <strong>ROBINS-I tool</strong>
+(Risk Of Bias In Non-randomized Studies - of Interventions) is commonly
+used. It adapts the risk of bias framework for studies where
+participants are not randomly assigned to conditions.</p></li>
+</ul>
+<p>Visual summaries of risk of bias assessments are often created to
+clearly communicate the findings. These summaries allow readers to
+quickly understand the potential weaknesses in the included studies and
+judge how much confidence to place in the results.</p>
+<p>In some disciplines, particularly outside of medicine, standardized
+assessments of study quality or bias are less common. For example, in
+fields like psychology, quality assessments may be inconsistent or
+entirely absent. In such cases, researchers can try to adapt existing
+tools to fit their needs or refer to high-quality meta-analyses in
+related areas to identify practical strategies for evaluating study
+credibility.</p>
+<p><strong>Distinguishing Study Quality from Risk of Bias</strong>
+Although the terms are sometimes used interchangeably, study quality and
+risk of bias refer to different concepts:</p>
+<ul>
+<li><strong>Study quality</strong> generally refers to the extent to
+which a study follows accepted methodological standards and reporting
+practices.</li>
+<li><strong>Risk of bias</strong> focuses specifically on whether the
+results of the study may be distorted due to systematic errors in the
+design, conduct, or reporting.</li>
+</ul>
+<p>A study might be considered high quality based on standard criteria
+yet still be at risk of bias in ways that could affect the
+trustworthiness of its results. Therefore, evaluating risk of bias
+directly is essential to determine whether the findings are credible and
+usable in a meta-analysis.</p>
+</div>
+<div id="simpsons-paradox-and-visualization" class="section level2"
+number="1.4">
+<h2><span class="header-section-number">1.4</span> Simpson’s Paradox and
+Visualization</h2>
+<p><strong>What Is Simpson’s Paradox?</strong></p>
+<p>Simpson’s paradox, sometimes called the <em>ecological fallacy</em>,
+occurs when the relationship between two variables reverses when a third
+variable is taken into account. In other words, a trend present within
+multiple subgroups can disappear or even reverse when the data are
+aggregated.</p>
+<p>In meta-analysis, this paradox often arises when the size of
+treatment arms is imbalanced across studies. For example, in the
+rosiglitazone meta-analysis, individual trials suggested that the
+treatment increased myocardial infarction (MI) risk, yet when data were
+pooled across all trials without stratification, the overall effect
+appeared reversed or null.</p>
+<p><strong>Why Does It Happen?</strong></p>
+<p>The paradox occurs because a confounding variable (like study size or
+allocation imbalance) distorts the aggregated association. This
+confounder may not be random but instead structured—such as when trials
+with more rosiglitazone patients also have shorter follow-ups and fewer
+events, giving misleading overall results.</p>
+<p><strong>How to Perform Stratification</strong></p>
+<p>To avoid Simpson’s paradox, one must stratify the analysis by the
+confounding variable—in meta-analysis, this is usually the study
+(trial). Rather than pooling all 2×2 tables directly, meta-analytic
+methods like the Mantel-Haenszel or inverse-variance weighting approach
+stratify by trial and then combine effect estimates.</p>
+<p><strong>How to Visualize Simpson’s Paradox</strong></p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Scatter Plot</strong></p>
+<ul>
+<li>X-axis: Proportion of patients receiving active treatment in each
+trial</li>
+<li>Y-axis: Event rate (e.g., MI incidence)</li>
+<li>Each point represents a trial. If there’s a negative trend, it may
+misleadingly suggest treatment reduces risk—hence potential for
+Simpson’s paradox.</li>
+</ul></li>
+<li><p><strong>Line Plot</strong></p>
+<ul>
+<li><p>X-axis: Treatment (0 = control, 1 = active)</p></li>
+<li><p>Y-axis: Event rate for each arm within a trial</p></li>
+<li><p>Each line shows the within-trial risk difference.</p></li>
+<li><p>Additional lines include:</p>
+<ul>
+<li>Green: unweighted average risk difference</li>
+<li>Blue: precision-weighted meta-analytic estimate</li>
+<li>Red: naive pooled result (without stratification), which may show a
+reversed effect</li>
+</ul></li>
+</ul>
+<p>Diamond symbols can indicate the size of treatment/control arms to
+reflect influence.</p></li>
+<li><p><strong>Overlay Plot</strong></p>
+<ul>
+<li>Combines scatter and line plots</li>
+<li>Each line represents a trial (with risk difference slope), and a
+point on the line indicates the overall event rate for that trial, based
+on its treatment allocation.</li>
+<li>Useful for visualizing how varying treatment proportions influence
+trial outcomes and contribute to the paradox.</li>
+</ul></li>
+</ol>
+<pre class="r"><code>df &lt;-  read.csv(&quot;./01_Datasets/Simpson_Meta-Analysis_Data.csv&quot;)  
+
+# 1. Scatterplot: Treatment Proportion vs Overall Event Rate
+ggplot(df, aes(x = Treatment_Prop, y = Overall_Rate)) +
+  geom_point(size = 3) +
+  geom_smooth(method = &quot;lm&quot;, se = FALSE, linetype = &quot;dashed&quot;, color = &quot;blue&quot;) +
+  ggtitle(&quot;Scatterplot of Event Rate vs Treatment Proportion&quot;) +
+  xlab(&quot;Proportion Treated&quot;) +
+  ylab(&quot;Overall Event Rate&quot;)</code></pre>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code># 2. Line Plot: Within-Trial Risk Difference
+line_data &lt;- df %&gt;%
+  select(Trial, Treated_Rate, Control_Rate) %&gt;%
+  pivot_longer(cols = c(&quot;Treated_Rate&quot;, &quot;Control_Rate&quot;),
+               names_to = &quot;Group&quot;,
+               values_to = &quot;Event_Rate&quot;) %&gt;%
+  mutate(Group = ifelse(Group == &quot;Control_Rate&quot;, 0, 1))
+
+ggplot(line_data, aes(x = Group, y = Event_Rate, group = Trial)) +
+  geom_line(alpha = 0.6) +
+  geom_point() +
+  stat_summary(fun = mean, geom = &quot;line&quot;, aes(group = 1), color = &quot;green&quot;, linetype = &quot;dashed&quot;, size = 1) +
+  ggtitle(&quot;Line Plot of Event Rate by Treatment Group (Per Trial)&quot;) +
+  xlab(&quot;Treatment Group (0 = Control, 1 = Treated)&quot;) +
+  ylab(&quot;Event Rate&quot;)</code></pre>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
+<pre class="r"><code># 3. Overlay Plot: Combine Scatter and Line Plot
+overlay_data &lt;- line_data %&gt;%
+  group_by(Trial) %&gt;%
+  summarise(slope = diff(Event_Rate),
+            intercept = first(Event_Rate)) %&gt;%
+  left_join(df %&gt;% select(Trial, Treatment_Prop, Overall_Rate), by = &quot;Trial&quot;)
+
+ggplot() +
+  geom_abline(data = overlay_data,
+              aes(intercept = intercept, slope = slope, group = Trial),
+              alpha = 0.5) +
+  geom_point(data = overlay_data,
+             aes(x = Treatment_Prop, y = Overall_Rate),
+             size = 3, color = &quot;red&quot;) +
+  ggtitle(&quot;Overlay Plot Showing Simpson’s Paradox&quot;) +
+  xlab(&quot;Proportion Treated&quot;) +
+  ylab(&quot;Event Rate&quot;)</code></pre>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-1-3.png" width="672" /></p>
+</div>
 <div id="fixed-effects-and-random-effects" class="section level2"
-number="1.2">
-<h2><span class="header-section-number">1.2</span> Fixed-Effects and
+number="1.5">
+<h2><span class="header-section-number">1.5</span> Fixed-Effects and
 Random-Effects</h2>
 <p>In meta-analysis, we aim to combine results from multiple independent
 studies to arrive at an overall conclusion about a treatment or effect.
@@ -953,8 +1254,62 @@ test direction)</li>
 <span class="math inline">\(\hat{\sigma}_i^2\)</span>. Meta-analysis
 combines these estimates across studies to evaluate the overall
 effect.</p>
-<div id="fixed-effects-model" class="section level3" number="1.2.1">
-<h3><span class="header-section-number">1.2.1</span> Fixed-Effects
+<p>In the context of meta-analysis, the model’s role is to explain the
+distribution of effect sizes across studies. Even though each study
+reports a slightly different effect size, we typically believe that
+there is some <em>true</em> underlying effect, and that differences
+between studies arise due to random sampling error—or possibly due to
+other systematic factors like study design, sample characteristics, or
+measurement methods.</p>
+<p>So, the purpose of a meta-analytic model is twofold:</p>
+<ol style="list-style-type: decimal">
+<li><strong>To estimate the overall (true) effect size</strong> across
+all studies.</li>
+<li><strong>To account for and explain the variation</strong> in effect
+sizes between studies.</li>
+</ol>
+<p>This means our model must not only compute an average effect but also
+describe how and why the results of individual studies deviate from this
+average.</p>
+<p><strong>Two Primary Models in Meta-Analysis</strong></p>
+<p>There are two main statistical models used in meta-analysis, each
+offering a different explanation for between-study variability:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Fixed-Effect Model</strong></p>
+<ul>
+<li>Assumes that all studies share one true effect size.</li>
+<li>Differences in observed effect sizes are solely due to sampling
+error.</li>
+<li>Appropriate when studies are highly similar in design, population,
+and measurement.</li>
+<li><strong>The idea behind the fixed-effect model is that observed
+effect sizes may vary from study to study, but this is only because of
+the sampling error. In reality, their true effect sizes are all the
+same: they are fixed. For this reason, the fixed-effect model is
+sometimes also referred to as the “equal effects” or “common effect”
+model.</strong></li>
+</ul></li>
+<li><p><strong>Random-Effects Model</strong></p>
+<ul>
+<li>Assumes that the true effect size may vary from study to study.</li>
+<li>Observed differences reflect both sampling error and real
+differences in underlying effects.</li>
+<li>More appropriate when studies differ in methods, populations, or
+interventions.</li>
+<li><strong>The random-effects model assumes that there is not only one
+true effect size but a distribution of true effect sizes. The goal of
+the random-effects model is therefore not to estimate the one true
+effect size of all studies, but the mean of the distribution of true
+effects.</strong></li>
+</ul></li>
+</ol>
+<p>Although these models are based on different assumptions, they are
+conceptually linked. Both aim to estimate a central tendency of effect
+sizes, but they do so in different ways depending on their view of
+heterogeneity—the degree to which effect sizes genuinely differ across
+studies.</p>
+<div id="fixed-effects-model" class="section level3" number="1.5.1">
+<h3><span class="header-section-number">1.5.1</span> Fixed-Effects
 Model</h3>
 <p><strong>Assumption</strong>: All studies estimate the <strong>same
 true effect</strong> δ. Any variation among study results is due to
@@ -1017,8 +1372,8 @@ class="math inline">\(w_i = \frac{1}{\hat{\sigma}_i^2}\)</span></li>
 ratios or risk ratios across 2x2 tables using the hypergeometric
 distribution.</p>
 </div>
-<div id="random-effects-model" class="section level3" number="1.2.2">
-<h3><span class="header-section-number">1.2.2</span> Random-Effects
+<div id="random-effects-model" class="section level3" number="1.5.2">
+<h3><span class="header-section-number">1.5.2</span> Random-Effects
 Model</h3>
 <p><strong>Assumption</strong>: Each study estimates its <strong>own
 true effect</strong> <span class="math inline">\(\delta_i\)</span>,
@@ -1051,8 +1406,8 @@ using the DerSimonian-Laird method).</p>
 way as with fixed-effects, but with the adjusted weights accounting for
 both within- and between-study variability.</p>
 </div>
-<div id="compare" class="section level3" number="1.2.3">
-<h3><span class="header-section-number">1.2.3</span> Compare</h3>
+<div id="compare" class="section level3" number="1.5.3">
+<h3><span class="header-section-number">1.5.3</span> Compare</h3>
 <p>The decision between using a fixed-effects model or a random-effects
 model in meta-analysis is <strong>not solely determined by statistical
 tests for heterogeneity</strong>, such as the Cochran’s Q test or the I²
@@ -1183,8 +1538,8 @@ variation</strong>, the random-effects model is typically preferred for
 inference</strong>.</p>
 </div>
 </div>
-<div id="implementation-in-r" class="section level2" number="1.3">
-<h2><span class="header-section-number">1.3</span> Implementation in
+<div id="implementation-in-r" class="section level2" number="1.6">
+<h2><span class="header-section-number">1.6</span> Implementation in
 R</h2>
 <p>The <strong>rmeta</strong> package (by Thomas Lumley) and
 <strong>meta</strong> package (by Guido Schwarzer) provide functions for
@@ -1212,8 +1567,8 @@ outputs such as:</p>
 <li>Confidence intervals for pooled effect size</li>
 </ul>
 <div id="meta-package-analysis-for-different-data"
-class="section level3" number="1.3.1">
-<h3><span class="header-section-number">1.3.1</span> meta Package:
+class="section level3" number="1.6.1">
+<h3><span class="header-section-number">1.6.1</span> meta Package:
 Analysis for Different Data</h3>
 <ul>
 <li>Meta-analysis of binary outcome data <code>metabin</code></li>
@@ -1254,10 +1609,10 @@ print(mg1, digits=2)</code></pre>
 ## - Calculation of I^2 based on Q</code></pre>
 <pre class="r"><code>## Forest plot
 plot(mg1)</code></pre>
-<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-1-1.png" width="960" /></p>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <pre class="r"><code>## To assess potential publication bias informally, we generate the funnel plot and visually assess whether it is symmetric. 
 funnel(mg1)</code></pre>
-<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-1-2.png" width="960" /></p>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
 <p>Meta-Analysis of Cross-Over Trials</p>
 <pre class="r"><code># meta-analysis of these cross-over trials
 mg2 &lt;- metagen(mean, SE, studlab=paste(author, year),
@@ -1306,14 +1661,14 @@ print(summary(mg2), digits=2)</code></pre>
 ## - Q-Profile method for confidence interval of tau^2 and tau
 ## - Calculation of I^2 based on Q</code></pre>
 <pre class="r"><code>plot(mg2)</code></pre>
-<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-2-1.png" width="960" /></p>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <pre class="r"><code>funnel(mg2)</code></pre>
-<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-2-2.png" width="960" /></p>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
 </div>
 </div>
 <div id="combining-p-values-in-meta-analysis" class="section level2"
-number="1.4">
-<h2><span class="header-section-number">1.4</span> Combining p-Values in
+number="1.7">
+<h2><span class="header-section-number">1.7</span> Combining p-Values in
 Meta-Analysis</h2>
 <p><strong>Combining p-values in meta-analysis</strong> is a statistical
 approach used when studies report only p-values rather than full effect
@@ -1404,13 +1759,846 @@ available. It is particularly useful in early-phase systematic reviews,
 meta-analyses of hypothesis tests, or when only limited summary data are
 accessible.</p>
 </div>
+<div id="effect-size-correction" class="section level2" number="1.8">
+<h2><span class="header-section-number">1.8</span> Effect Size
+Correction</h2>
+<p>Effect sizes estimated from individual studies do not always
+perfectly reflect the true population effect. These deviations may be
+due to two types of errors:</p>
+<ul>
+<li><strong>Random (sampling) error</strong>: inherent variability due
+to sample size</li>
+<li><strong>Systematic error (bias)</strong>: distortions caused by
+small sample sizes, measurement error, or limited range of data</li>
+</ul>
+<p>To improve the accuracy of meta-analytic estimates, specific
+correction techniques can be applied. These include adjustments for
+small sample bias, unreliability in measurement, and range
+restriction.</p>
+<hr />
+<p><strong>1. Small Sample Bias Correction – Hedges’ g</strong></p>
+<p>When using standardized mean differences (SMDs), studies with small
+sample sizes (especially n ≤ 20) tend to overestimate the true effect
+size. Hedges’ g corrects for this upward bias.</p>
+<ul>
+<li><p><strong>Correction Formula</strong>: Hedges’ g = SMD × (1 − 3 /
+(4n − 9)) where <em>n</em> is the total sample size</p></li>
+<li><p><strong>R Implementation</strong>:</p>
+<pre class="r"><code>library(esc)
+SMD &lt;- 0.5
+n &lt;- 30
+g &lt;- hedges_g(SMD, n)</code></pre></li>
+<li><p><strong>Key Point</strong>: Hedges’ g is always less than or
+equal to the uncorrected SMD. The smaller the sample size, the larger
+the correction.</p></li>
+</ul>
+<hr />
+<p><strong>2. Correction for Unreliability (Measurement
+Error)</strong></p>
+<p>Instruments used in studies often introduce error, reducing the
+reliability of the measurements. This unreliability attenuates
+correlations or SMDs, underestimating the true effect.</p>
+<ul>
+<li><p><strong>Key Terms</strong>: Reliability coefficient (rₓₓ): ranges
+from 0 (unreliable) to 1 (perfectly reliable)</p></li>
+<li><p><strong>Correction for SMD</strong>: Corrected SMD = SMD /
+√rₓₓ</p></li>
+<li><p><strong>Correction for Correlation</strong>:</p>
+<ul>
+<li>If only x has unreliability: rₓy(corrected) = rₓy / √rₓₓ</li>
+<li>If both x and y have unreliability: rₓy(corrected) = rₓy / (√rₓₓ ×
+√ryy)</li>
+</ul></li>
+<li><p><strong>Correction for Standard Error</strong>: Adjust SEs using
+the same logic:</p>
+<ul>
+<li>SE(corrected) = SE / √rₓₓ (or divided by both reliabilities if
+correcting both variables)</li>
+</ul></li>
+<li><p><strong>R Example</strong>:</p>
+<pre class="r"><code>r_xy &lt;- 0.34
+se_r_xy &lt;- 0.09
+smd &lt;- 0.65
+se_smd &lt;- 0.18
+r_xx &lt;- 0.8
+r_yy &lt;- 0.7
+
+smd_c &lt;- smd / sqrt(r_xx)
+se_c_smd &lt;- se_smd / sqrt(r_xx)
+r_xy_c &lt;- r_xy / (sqrt(r_xx) * sqrt(r_yy))
+se_c_r &lt;- se_r_xy / (sqrt(r_xx) * sqrt(r_yy))</code></pre></li>
+<li><p><strong>Important Note</strong>: This correction can only be used
+if the reliability coefficients are available for all studies, or if a
+reasonable and justifiable estimate is used across all.</p></li>
+</ul>
+<hr />
+<p><strong>3. Correction for Range Restriction</strong></p>
+<p>Range restriction occurs when the variability of a variable in a
+study is smaller than in the population, leading to attenuated effect
+sizes.</p>
+<ul>
+<li><p><strong>Example</strong>: A study looking at age and cognition
+but only including participants aged 65–69 would likely report a weak
+correlation due to limited age variation.</p></li>
+<li><p><strong>Correction involves calculating a ratio U</strong>:</p>
+<ul>
+<li>U = SD(unrestricted population) / SD(restricted sample)</li>
+</ul></li>
+<li><p><strong>Correction Formula for Correlation</strong>:
+rₓy(corrected) = (U × rₓy) / √[(U² − 1) × rₓy² + 1]</p></li>
+<li><p><strong>Correction Formula for SMD</strong>: SMD(corrected) = (U
+× SMD) / √[(U² − 1) × SMD² + 1]</p></li>
+<li><p><strong>Standard Error Correction</strong>:</p>
+<ul>
+<li>SE(corrected) = (corrected effect / original effect) ×
+SE(original)</li>
+</ul></li>
+<li><p><strong>R Example</strong>:</p>
+<pre class="r"><code>r_xy &lt;- 0.34
+se_r_xy &lt;- 0.09
+sd_restricted &lt;- 11
+sd_unrestricted &lt;- 18
+U &lt;- sd_unrestricted / sd_restricted
+
+r_xy_c &lt;- (U * r_xy) / sqrt((U^2 - 1) * r_xy^2 + 1)
+se_r_xy_c &lt;- (r_xy_c / r_xy) * se_r_xy</code></pre></li>
+<li><p><strong>Usage Caveat</strong>: Like reliability corrections, this
+adjustment should be applied consistently across all studies. It is
+especially useful when range restriction is severe and clearly
+documented.</p></li>
+</ul>
+<hr />
+<p><strong>Summary of Key Corrections</strong></p>
+<table>
+<colgroup>
+<col width="18%" />
+<col width="22%" />
+<col width="34%" />
+<col width="24%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Correction Type</th>
+<th>Bias Addressed</th>
+<th>Input Needed</th>
+<th>Applies To</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Hedges’ g</td>
+<td>Small sample size</td>
+<td>Total sample size (n)</td>
+<td>Standardized Mean Differences</td>
+</tr>
+<tr class="even">
+<td>Attenuation Correction</td>
+<td>Measurement unreliability</td>
+<td>Reliability coefficients (rₓₓ, ryy)</td>
+<td>Correlations and SMDs</td>
+</tr>
+<tr class="odd">
+<td>Range Restriction</td>
+<td>Limited variable variation</td>
+<td>SD of restricted and unrestricted samples</td>
+<td>Correlations and SMDs</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="between-study-heterogeneity" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Between-Study
+Heterogeneity</h1>
+<p>In meta-analysis, <strong>heterogeneity</strong> refers to the
+variation in study outcomes beyond what would be expected by random
+sampling alone. In other words, it captures how different the effect
+sizes are across studies. Understanding and quantifying heterogeneity is
+essential because it influences the choice of meta-analytic model
+(fixed-effect vs random-effects) and the interpretation of results.</p>
+<p>When using the <code>meta</code> package in R (e.g., through
+functions like <code>metacont()</code> or <code>metabin()</code>), the
+output includes a section called <strong>“Quantifying
+heterogeneity”</strong> and <strong>“Test of heterogeneity”</strong>,
+which provides several statistics to assess this variability.</p>
+<p><strong>Summary of Interpretation</strong></p>
+<ul>
+<li><strong>Q statistic</strong> tells you whether heterogeneity is
+present (yes/no)</li>
+<li><strong>τ²</strong> tells you how much true heterogeneity exists (in
+raw variance units)</li>
+<li><strong>H</strong> tells you how much more variability is observed
+than expected</li>
+<li><strong>I²</strong> tells you the proportion of observed variance
+that is true heterogeneity</li>
+</ul>
+<div id="cochrans-q" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Cochran’s Q</h2>
+<p>In meta-analysis, one of the key questions is whether the variability
+among the observed study effect sizes can be explained by sampling error
+alone or whether there is true variability in the underlying effects
+across studies. Cochran’s Q statistic is one of the oldest and most
+widely used tools to assess this question.</p>
+<p><strong>Purpose of Cochran’s Q</strong></p>
+<p>Cochran’s Q is used to test the <strong>null hypothesis</strong> that
+all studies in a meta-analysis share a <strong>common true effect
+size</strong>. In other words, it tests whether the differences we see
+between studies are due to chance (sampling error) or if there is
+<strong>real, underlying heterogeneity</strong> between study
+effects.</p>
+<p>In reality, two sources of variation influence the observed effect
+sizes:</p>
+<ul>
+<li><strong>Sampling error</strong> (εₖ): random variation due to finite
+sample size.</li>
+<li><strong>Between-study heterogeneity</strong> (ζₖ): true differences
+in effect sizes caused by study-level differences (e.g., population,
+intervention method).</li>
+</ul>
+<p>Cochran’s Q tries to disentangle these by testing if the observed
+dispersion in effect sizes exceeds what would be expected from sampling
+error alone.</p>
+<p><strong>The Formula for Cochran’s Q</strong></p>
+<p>The statistic is calculated as a <strong>weighted sum of squared
+deviations</strong> of each study’s effect estimate (θ̂ₖ) from the
+overall summary effect (θ̂):</p>
+<p>  <strong>Q = ∑ₖ wₖ (θ̂ₖ − θ̂)²</strong></p>
+<p>Where:</p>
+<ul>
+<li><strong>θ̂ₖ</strong> is the observed effect size from study
+<em>k</em>.</li>
+<li><strong>θ̂</strong> is the pooled effect size under the fixed-effect
+model.</li>
+<li><strong>wₖ</strong> is the inverse-variance weight for study
+<em>k</em> (usually 1 / variance of θ̂ₖ).</li>
+</ul>
+<p>Because the weights depend on the precision of the study, studies
+with smaller standard errors (i.e. larger sample sizes) contribute more
+to Q.</p>
+<p><strong>Interpreting Q</strong></p>
+<p>Under the null hypothesis of homogeneity (i.e. no between-study
+heterogeneity), Cochran’s Q follows a <strong>chi-squared
+distribution</strong> with <strong>K−1 degrees of freedom</strong>,
+where K is the number of studies. If Q is significantly larger than this
+expected distribution, it suggests <strong>excess variation</strong>—a
+sign of <strong>true heterogeneity</strong> among studies.</p>
+<p><strong>Limitations and Cautions</strong></p>
+<p>Despite its popularity, Cochran’s Q has several limitations:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Sensitivity to Study Count (K)</strong>: Q increases with
+the number of studies. With many studies, even small differences can
+lead to a significant Q, possibly <strong>overstating
+heterogeneity</strong>.</p></li>
+<li><p><strong>Sensitivity to Study Precision</strong>: High-precision
+studies (e.g., with large samples) contribute more to Q. Even small
+deviations from the mean can yield large Q values, which may
+<strong>inflate the signal</strong> of heterogeneity.</p></li>
+<li><p><strong>Interpretation Is Not Binary</strong>: It’s not
+sufficient to simply rely on the <strong>p-value of the Q-test</strong>
+to decide whether to use a fixed-effect or random-effects model. A
+significant Q does not always mean true heterogeneity is practically
+important.</p></li>
+<li><p><strong>Chi-Squared Distribution May Be Misleading</strong>: The
+actual distribution of Q in real-world meta-analyses may differ from the
+theoretical chi-squared distribution. As noted by Hoaglin (2016), this
+misfit can lead to biases, especially in methods like DerSimonian-Laird
+which rely on Q.</p></li>
+</ol>
+<p><strong>Conclusion and Best Practice</strong></p>
+<p>Cochran’s Q is a foundational tool for assessing heterogeneity in
+meta-analysis. However, its interpretation requires caution:</p>
+<ul>
+<li>Do not use Q alone to determine model choice.</li>
+<li>Consider the <strong>magnitude</strong> and
+<strong>consistency</strong> of heterogeneity.</li>
+<li>Complement Q with <strong>other heterogeneity statistics</strong>,
+such as I² or τ², which quantify heterogeneity rather than simply test
+for its presence.</li>
+</ul>
+</div>
+<div id="tau-squared-τ²" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Tau-squared (τ²)</h2>
+<p>Tau-squared estimates the <strong>between-study variance</strong>,
+i.e., the variance of the true effect sizes across studies. This value
+is crucial in <strong>random-effects models</strong>, where it directly
+influences the weights assigned to each study.</p>
+<p>Tau-squared is estimated using the <strong>DerSimonian and Laird
+method</strong>:</p>
+<p><strong>τ² = (Q − (K − 1)) / U</strong></p>
+<p>Where:</p>
+<ul>
+<li>Q is Cochran’s Q statistic</li>
+<li>K is the number of studies</li>
+<li>U is a function of the study weights</li>
+</ul>
+<p>If Q &lt; K − 1 due to sampling error, τ² is set to zero. A larger τ²
+indicates more dispersion in the true effects.</p>
+</div>
+<div id="h²-statistic-ratio-based-measure-of-heterogeneity"
+class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> H² Statistic:
+Ratio-Based Measure of Heterogeneity</h2>
+<p>The H² statistic, also introduced by Higgins and Thompson (2002), is
+another measure of between-study heterogeneity in meta-analyses. Like
+I², it is based on Cochran’s Q statistic but offers a slightly different
+interpretation.</p>
+<p>H² quantifies the ratio between the observed variability (as measured
+by Q) and the amount of variability expected from sampling error alone
+(i.e., under the null hypothesis of homogeneity). It is calculated
+as:</p>
+<p><strong>H² = Q / (K − 1)</strong></p>
+<p>Where:</p>
+<ul>
+<li><strong>Q</strong> is Cochran’s Q statistic.</li>
+<li><strong>K</strong> is the number of studies.</li>
+<li><strong>K − 1</strong> represents the degrees of freedom under the
+null hypothesis.</li>
+</ul>
+<p><strong>Interpretation</strong></p>
+<ul>
+<li><strong>H² = 1</strong>: All variation is due to sampling error
+(i.e., no between-study heterogeneity).</li>
+<li><strong>H² &gt; 1</strong>: Suggests that additional variability
+exists beyond what would be expected by chance, indicating the presence
+of heterogeneity.</li>
+</ul>
+<p>Unlike I², there is no need to adjust H² values if Q is smaller than
+(K − 1). H² values are always ≥ 1.</p>
+<p>A confidence interval for H can be constructed by assuming that
+<strong>ln(H)</strong> is approximately normally distributed. If the
+lower bound of this interval is above 1, it suggests statistically
+significant heterogeneity.</p>
+<p>The formula for the standard error of ln(H) depends on the value of
+Q:</p>
+<ul>
+<li>If Q &gt; K: SE is estimated using log transformations</li>
+<li>If Q ≤ K: SE uses a different approximation due to boundary
+issues</li>
+</ul>
+</div>
+<div id="higgins-thompsons-i²-statistic" class="section level2"
+number="2.4">
+<h2><span class="header-section-number">2.4</span> Higgins &amp;
+Thompson’s I² Statistic</h2>
+<p>The I² statistic, introduced by Higgins and Thompson in 2002,
+provides a clear way to quantify the proportion of variability in effect
+sizes that is due to true heterogeneity, rather than random sampling
+error. It is derived from Cochran’s Q statistic and is expressed as a
+percentage.</p>
+<p><strong>Purpose and Interpretation</strong></p>
+<p>I² indicates the proportion of observed variation across studies that
+is real and not due to chance:</p>
+<ul>
+<li>An I² value of 0% suggests all variability is due to random
+error.</li>
+<li>An I² value of 100% suggests all variability is due to actual
+differences between studies.</li>
+</ul>
+<p>This makes I² a helpful indicator when assessing consistency in
+meta-analysis results.</p>
+<p><strong>Formula</strong></p>
+<p>The I² statistic is calculated as:</p>
+<p> I² = (Q - (K - 1)) / Q</p>
+<p>Where:</p>
+<ul>
+<li>Q is Cochran’s Q value.</li>
+<li>K is the number of studies.</li>
+<li>K − 1 is the degrees of freedom.</li>
+</ul>
+<p>If the result is negative (i.e., when Q &lt; K − 1), I² is set to 0,
+since negative variance proportions are not meaningful.</p>
+<p>This value ranges from 0% to 100%:</p>
+<ul>
+<li><strong>0–25%</strong>: low heterogeneity</li>
+<li><strong>25–50%</strong>: moderate heterogeneity</li>
+<li><strong>50–75%</strong>: substantial heterogeneity</li>
+<li><strong>75–100%</strong>: considerable heterogeneity</li>
+<li>Negative values of I² are set to 0 by convention. If the
+<strong>lower bound of the confidence interval for I² is greater than
+zero</strong>, heterogeneity is considered statistically
+significant.</li>
+</ul>
+<p>Alternatively, I² can be computed from H:</p>
+<p><strong>I² = (H² − 1) / H² × 100%</strong></p>
+<p>This formulation is used to derive confidence intervals for I² from
+those for H.</p>
+<p><strong>Strengths of the I² Statistic</strong></p>
+<ul>
+<li>It offers a standardized, easy-to-understand measure of
+heterogeneity.</li>
+<li>It is commonly included by default in meta-analysis software
+outputs.</li>
+<li>It allows comparison across meta-analyses with different sample
+sizes or outcomes.</li>
+</ul>
+<p><strong>Limitations</strong></p>
+<ul>
+<li>Since I² depends on Cochran’s Q, it inherits Q’s sensitivity to the
+number of studies and study precision.</li>
+<li>Low I² values might appear even when real heterogeneity exists if
+studies are small or imprecise.</li>
+<li>It does not express the <strong>magnitude</strong> of heterogeneity
+in absolute terms, unlike τ².</li>
+</ul>
+</div>
+<div id="assessing-heterogeneity-in-r" class="section level2"
+number="2.5">
+<h2><span class="header-section-number">2.5</span> Assessing
+Heterogeneity in R</h2>
+<div id="basic-outlier-removal-in-r" class="section level3"
+number="2.5.1">
+<h3><span class="header-section-number">2.5.1</span> Basic Outlier
+Removal in R</h3>
+<p>In meta-analysis, some studies may report unusually extreme results
+that differ substantially from the overall effect size. These studies
+are called outliers. Removing such outliers can help improve the
+accuracy of the pooled effect estimate and the measures of
+heterogeneity. One simple method to detect outliers is based on
+comparing confidence intervals.</p>
+<p>A study is considered an outlier if its 95% confidence interval does
+not overlap with the confidence interval of the pooled effect estimate.
+Specifically, this means:</p>
+<ul>
+<li><p>The upper bound of the study’s confidence interval is lower than
+the lower bound of the pooled effect’s confidence interval, suggesting
+the study shows an extremely small effect.</p></li>
+<li><p>The lower bound of the study’s confidence interval is higher than
+the upper bound of the pooled effect’s confidence interval, suggesting
+the study shows an extremely large effect.</p></li>
+</ul>
+<p>This method is straightforward and practical. Studies with large
+standard errors often have wide confidence intervals that are more
+likely to overlap with the pooled effect. Therefore, they are less
+likely to be flagged as outliers. However, if a study has a narrow
+confidence interval and still shows a strong deviation from the pooled
+effect, it is more likely to be classified as an outlier.</p>
+<p><strong>Using the find.outliers Function from the dmetar
+Package</strong></p>
+<p>The <code>find.outliers</code> function, available in the R package
+<code>dmetar</code>, automates the process of detecting outliers using
+the method described above. This function requires a meta-analysis
+object created using the <code>meta</code> package (such as from the
+<code>metagen</code> function).</p>
+<pre class="r"><code>m.gen &lt;- metagen(TE = TE,
+                 seTE = seTE,
+                 studlab = Author,
+                 data = ThirdWave,
+                 sm = &quot;SMD&quot;,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = &quot;REML&quot;,
+                 method.random.ci = &quot;HK&quot;,
+                 title = &quot;Third Wave Psychotherapies&quot;)
+summary(m.gen)</code></pre>
+<pre><code>## Review:     Third Wave Psychotherapies
+## 
+##                           SMD            95%-CI %W(random)
+## Call et al.            0.7091 [ 0.1979; 1.2203]        5.0
+## Cavanagh et al.        0.3549 [-0.0300; 0.7397]        6.3
+## DanitzOrsillo          1.7912 [ 1.1139; 2.4685]        3.8
+## de Vibe et al.         0.1825 [-0.0484; 0.4133]        7.9
+## Frazier et al.         0.4219 [ 0.1380; 0.7057]        7.3
+## Frogeli et al.         0.6300 [ 0.2458; 1.0142]        6.3
+## Gallego et al.         0.7249 [ 0.2846; 1.1652]        5.7
+## Hazlett-Stevens &amp; Oren 0.5287 [ 0.1162; 0.9412]        6.0
+## Hintz et al.           0.2840 [-0.0453; 0.6133]        6.9
+## Kang et al.            1.2751 [ 0.6142; 1.9360]        3.9
+## Kuhlmann et al.        0.1036 [-0.2781; 0.4853]        6.3
+## Lever Taylor et al.    0.3884 [-0.0639; 0.8407]        5.6
+## Phang et al.           0.5407 [ 0.0619; 1.0196]        5.3
+## Rasanen et al.         0.4262 [-0.0794; 0.9317]        5.1
+## Ratanasiripong         0.5154 [-0.1731; 1.2039]        3.7
+## Shapiro et al.         1.4797 [ 0.8618; 2.0977]        4.2
+## Song &amp; Lindquist       0.6126 [ 0.1683; 1.0569]        5.7
+## Warnecke et al.        0.6000 [ 0.1120; 1.0880]        5.2
+## 
+## Number of studies: k = 18
+## 
+##                              SMD           95%-CI    t  p-value
+## Random effects model (HK) 0.5771 [0.3782; 0.7760] 6.12 &lt; 0.0001
+## 
+## Quantifying heterogeneity (with 95%-CIs):
+##  tau^2 = 0.0820 [0.0295; 0.3533]; tau = 0.2863 [0.1717; 0.5944]
+##  I^2 = 62.6% [37.9%; 77.5%]; H = 1.64 [1.27; 2.11]
+## 
+## Test of heterogeneity:
+##      Q d.f. p-value
+##  45.50   17  0.0002
+## 
+## Details of meta-analysis methods:
+## - Inverse variance method
+## - Restricted maximum-likelihood estimator for tau^2
+## - Q-Profile method for confidence interval of tau^2 and tau
+## - Calculation of I^2 based on Q
+## - Hartung-Knapp adjustment for random effects model (df = 17)</code></pre>
+<pre class="r"><code>find.outliers(m.gen)</code></pre>
+<pre><code>## Identified outliers (random-effects model) 
+## ------------------------------------------ 
+## &quot;DanitzOrsillo&quot;, &quot;Shapiro et al.&quot; 
+##  
+## Results with outliers removed 
+## ----------------------------- 
+## Review:     Third Wave Psychotherapies
+## 
+## Number of studies: k = 16
+## 
+##                              SMD           95%-CI    t  p-value
+## Random effects model (HK) 0.4528 [0.3257; 0.5800] 7.59 &lt; 0.0001
+## 
+## Quantifying heterogeneity (with 95%-CIs):
+##  tau^2 = 0.0139 [0.0000; 0.1032]; tau = 0.1180 [0.0000; 0.3213]
+##  I^2 = 24.8% [0.0%; 58.7%]; H = 1.15 [1.00; 1.56]
+## 
+## Test of heterogeneity:
+##      Q d.f. p-value
+##  19.95   15  0.1739
+## 
+## Details of meta-analysis methods:
+## - Inverse variance method
+## - Restricted maximum-likelihood estimator for tau^2
+## - Q-Profile method for confidence interval of tau^2 and tau
+## - Calculation of I^2 based on Q
+## - Hartung-Knapp adjustment for random effects model (df = 15)</code></pre>
+<p>The function outputs:</p>
+<ul>
+<li>A list of studies identified as outliers.</li>
+<li>A new meta-analysis object excluding these outliers.</li>
+<li>Updated heterogeneity statistics and pooled effect estimates.</li>
+</ul>
+<p><strong>Advantages of This Method</strong></p>
+<ul>
+<li>It is simple and intuitive.</li>
+<li>It helps to quickly identify influential studies that may distort
+the results.</li>
+<li>It supports sensitivity analyses by allowing comparison of results
+before and after outlier removal.</li>
+</ul>
+<p><strong>Limitations to Consider</strong></p>
+<ul>
+<li>The method is rule-based and does not rely on statistical testing,
+which can sometimes lead to over-identification of outliers.</li>
+<li>It is not suitable for automatic or blind removal of studies. Each
+flagged study should be reviewed for methodological quality or reasons
+for its deviation.</li>
+<li>The presence of moderate or high heterogeneity can make
+interpretation more complex.</li>
+</ul>
+</div>
+<div id="influence-analysis" class="section level3" number="2.5.2">
+<h3><span class="header-section-number">2.5.2</span> Influence
+Analysis</h3>
+<p>While detecting and removing outliers is a useful step in
+meta-analysis, it only partially addresses the issue of robustness. Some
+studies might not have extreme effect sizes, but they can still exert a
+large influence on the overall meta-analytic results. Influence analysis
+helps us identify such cases.</p>
+<p>For instance, if a meta-analysis finds a significant pooled effect,
+but this significance disappears once a single study is removed, that
+study is considered influential. Recognizing such studies is crucial,
+particularly when we want to evaluate the reliability of our
+findings.</p>
+<p><strong>Distinction Between Outliers and Influential
+Studies</strong></p>
+<p>Outliers and influential studies are related but not identical:</p>
+<ul>
+<li>Outliers are identified by the <strong>magnitude</strong> of their
+effect size—i.e., their result is extreme compared to the pooled
+average.</li>
+<li>Influential studies are those that significantly <strong>impact the
+meta-analysis results</strong>, such as the pooled effect size or
+heterogeneity, <strong>regardless</strong> of their effect size
+value.</li>
+</ul>
+<p>A study can be an outlier without being influential (if it does not
+change the overall result much), and vice versa. However, in practice,
+some outliers are indeed influential.</p>
+<p><strong>Methodology: Leave-One-Out Analysis</strong></p>
+<p>The most common way to detect influential studies is through the
+<strong>leave-one-out method</strong>. This method involves repeating
+the meta-analysis multiple times, each time leaving out one study from
+the dataset. If there are <code>K</code> studies, the meta-analysis is
+run <code>K</code> times.</p>
+<p>Each of these iterations provides an updated pooled effect estimate.
+By comparing how the overall results change when each study is excluded,
+we can evaluate which studies have the most influence.</p>
+<p><strong>Influence Diagnostics</strong></p>
+<p>The results from leave-one-out analyses can be used to compute
+several diagnostic metrics. These include:</p>
+<ul>
+<li>The change in the pooled effect size</li>
+<li>The change in heterogeneity (I²)</li>
+<li>Measures like DFBETAs and Cook’s distance, similar to regression
+diagnostics</li>
+</ul>
+<p>These metrics help us systematically assess the influence of each
+individual study.</p>
+<p><strong>Using the <code>InfluenceAnalysis()</code> Function from
+dmetar</strong></p>
+<p>The <code>InfluenceAnalysis()</code> function from the
+<code>dmetar</code> R package makes it easy to perform influence
+diagnostics for any meta-analysis object created using functions from
+the <code>meta</code> package.</p>
+<pre class="r"><code>m.gen.inf &lt;- InfluenceAnalysis(m.gen, random = TRUE)</code></pre>
+<pre><code>## [===========================================================================] DONE</code></pre>
+<pre class="r"><code>m.gen.inf</code></pre>
+<pre><code>## Leave-One-Out Analysis (Sorted by I2) 
+##  ----------------------------------- 
+##                                 Effect  LLCI  ULCI    I2
+## Omitting DanitzOrsillo           0.507 0.349 0.666 0.481
+## Omitting Shapiro et al.          0.521 0.344 0.699 0.546
+## Omitting de Vibe et al.          0.608 0.404 0.811 0.576
+## Omitting Kang et al.             0.542 0.349 0.735 0.598
+## Omitting Kuhlmann et al.         0.606 0.405 0.806 0.614
+## Omitting Hintz et al.            0.601 0.391 0.811 0.636
+## Omitting Gallego et al.          0.572 0.359 0.784 0.638
+## Omitting Call et al.             0.574 0.362 0.786 0.642
+## Omitting Frogeli et al.          0.579 0.364 0.793 0.644
+## Omitting Cavanagh et al.         0.596 0.384 0.808 0.645
+## Omitting Song &amp; Lindquist        0.580 0.366 0.793 0.646
+## Omitting Frazier et al.          0.595 0.380 0.809 0.647
+## Omitting Lever Taylor et al.     0.593 0.381 0.805 0.647
+## Omitting Warnecke et al.         0.580 0.367 0.794 0.647
+## Omitting Hazlett-Stevens &amp; Oren  0.585 0.371 0.800 0.648
+## Omitting Phang et al.            0.584 0.371 0.797 0.648
+## Omitting Rasanen et al.          0.590 0.378 0.802 0.648
+## Omitting Ratanasiripong          0.583 0.372 0.794 0.648
+## 
+## 
+## Influence Diagnostics 
+##  ------------------- 
+##                                 rstudent dffits cook.d cov.r QE.del   hat
+## Omitting Call et al.               0.332  0.040  0.002 1.119 44.706 0.050
+## Omitting Cavanagh et al.          -0.647 -0.209  0.047 1.145 45.066 0.063
+## Omitting DanitzOrsillo             3.211  0.914  0.643 0.655 30.819 0.038
+## Omitting de Vibe et al.           -1.377 -0.368  0.124 1.019 37.742 0.079
+## Omitting Frazier et al.           -0.489 -0.190  0.040 1.184 45.317 0.073
+## Omitting Frogeli et al.            0.136 -0.018  0.000 1.165 44.882 0.063
+## Omitting Gallego et al.            0.396  0.059  0.004 1.129 44.260 0.057
+## Omitting Hazlett-Stevens &amp; Oren   -0.148 -0.092  0.009 1.166 45.447 0.060
+## Omitting Hintz et al.             -0.899 -0.269  0.076 1.120 44.006 0.069
+## Omitting Kang et al.               1.699  0.421  0.162 0.906 39.829 0.039
+## Omitting Kuhlmann et al.          -1.448 -0.338  0.107 1.007 41.500 0.063
+## Omitting Lever Taylor et al.      -0.520 -0.172  0.032 1.142 45.336 0.056
+## Omitting Phang et al.             -0.107 -0.076  0.006 1.149 45.439 0.053
+## Omitting Rasanen et al.           -0.400 -0.139  0.021 1.137 45.456 0.051
+## Omitting Ratanasiripong           -0.143 -0.065  0.004 1.103 45.493 0.037
+## Omitting Shapiro et al.            2.460  0.718  0.416 0.754 35.207 0.042
+## Omitting Song &amp; Lindquist          0.084 -0.029  0.001 1.152 45.146 0.057
+## Omitting Warnecke et al.           0.049 -0.036  0.001 1.143 45.263 0.052
+##                                 weight infl
+## Omitting Call et al.             5.036     
+## Omitting Cavanagh et al.         6.267     
+## Omitting DanitzOrsillo           3.751    *
+## Omitting de Vibe et al.          7.880     
+## Omitting Frazier et al.          7.337     
+## Omitting Frogeli et al.          6.274     
+## Omitting Gallego et al.          5.703     
+## Omitting Hazlett-Stevens &amp; Oren  5.982     
+## Omitting Hintz et al.            6.854     
+## Omitting Kang et al.             3.860     
+## Omitting Kuhlmann et al.         6.300     
+## Omitting Lever Taylor et al.     5.586     
+## Omitting Phang et al.            5.332     
+## Omitting Rasanen et al.          5.086     
+## Omitting Ratanasiripong          3.678     
+## Omitting Shapiro et al.          4.165     
+## Omitting Song &amp; Lindquist        5.664     
+## Omitting Warnecke et al.         5.246     
+## 
+## 
+## Baujat Diagnostics (sorted by Heterogeneity Contribution) 
+##  ------------------------------------------------------- 
+##                                 HetContrib InfluenceEffectSize
+## Omitting DanitzOrsillo              14.385               0.298
+## Omitting Shapiro et al.             10.044               0.251
+## Omitting de Vibe et al.              6.403               1.357
+## Omitting Kang et al.                 5.552               0.121
+## Omitting Kuhlmann et al.             3.746               0.256
+## Omitting Hintz et al.                1.368               0.129
+## Omitting Gallego et al.              1.183               0.060
+## Omitting Call et al.                 0.768               0.028
+## Omitting Frogeli et al.              0.582               0.039
+## Omitting Cavanagh et al.             0.409               0.027
+## Omitting Song &amp; Lindquist            0.339               0.017
+## Omitting Warnecke et al.             0.230               0.009
+## Omitting Frazier et al.              0.164               0.021
+## Omitting Lever Taylor et al.         0.159               0.008
+## Omitting Phang et al.                0.061               0.003
+## Omitting Hazlett-Stevens &amp; Oren      0.052               0.003
+## Omitting Rasanen et al.              0.044               0.002
+## Omitting Ratanasiripong              0.010               0.000</code></pre>
+<p><strong>Generated Diagnostic Plots</strong></p>
+<p>The function produces four different types of plots to visualize
+influence:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Baujat Plot</strong> This plot displays studies based on
+their contribution to heterogeneity (x-axis) and to the pooled effect
+size (y-axis). Studies in the top right corner are both highly
+heterogeneous and influential.</p></li>
+<li><p><strong>Influence Diagnostics (Viechtbauer and Cheung)</strong> A
+panel of diagnostic statistics like DFBETAs, Cook’s distance, and
+covariance ratios is calculated and visualized. These are adapted from
+influence analysis in regression models.</p></li>
+<li><p><strong>Leave-One-Out Results (Sorted by Effect Size)</strong>
+This plot shows how the overall pooled effect estimate changes when each
+study is excluded, sorted by effect size.</p></li>
+<li><p><strong>Leave-One-Out Results (Sorted by I²)</strong> This shows
+how heterogeneity changes when each study is excluded, helping to
+identify studies responsible for most of the between-study
+variability.</p></li>
+</ol>
+<pre class="r"><code>plot(m.gen.inf, type = &quot;baujat&quot;)</code></pre>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>plot(m.gen.inf, type = &quot;influence&quot;)</code></pre>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-8-2.png" width="672" /></p>
+<pre class="r"><code>plot(m.gen.inf, type = &quot;es.id&quot;)</code></pre>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-8-3.png" width="672" /></p>
+<pre class="r"><code>plot(m.gen.inf, type = &quot;i2.id&quot;)</code></pre>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-8-4.png" width="672" /></p>
+<p><strong>Interpreting Results</strong></p>
+<ul>
+<li>If the pooled effect size or I² changes significantly after
+excluding a particular study, that study may be influential.</li>
+<li>If several studies affect the results, it may indicate that your
+meta-analysis is sensitive and that the pooled effect is not
+robust.</li>
+<li>These findings can be used in sensitivity analyses and discussed in
+the results section of your report or publication.</li>
+</ul>
+</div>
+<div id="gosh-plot-analysis" class="section level3" number="2.5.3">
+<h3><span class="header-section-number">2.5.3</span> GOSH Plot
+Analysis</h3>
+<p>After conducting leave-one-out influence analyses, another powerful
+approach to exploring heterogeneity in a meta-analysis is the Graphic
+Display of Heterogeneity (GOSH) plot, introduced by Olkin, Dahabreh, and
+Trikalinos (2012). A GOSH plot visualizes the effect size and
+heterogeneity across all possible subsets of included studies. Unlike
+leave-one-out methods, which generate K models (one per study excluded),
+the GOSH approach fits 2^K − 1 meta-analysis models, corresponding to
+every possible subset of studies.</p>
+<p>Due to the computational intensity of fitting this many models, the R
+implementation limits the number of combinations to a maximum of one
+million randomly selected subsets. Once calculated, the effect sizes are
+plotted on the x-axis, and the corresponding heterogeneity statistics
+(typically I²) on the y-axis. The distribution of these points can
+indicate clusters or patterns. For example, the presence of several
+distinct clusters may suggest the existence of different subpopulations
+in the dataset.</p>
+<p>To use GOSH plots in R, the {metafor} package is required.
+Additionally, since GOSH relies on {metafor}, the original {meta}
+analysis object must be translated into a format accepted by the rma
+function from {metafor}. The required arguments are the effect sizes
+(TE), their standard errors (seTE), and the between-study heterogeneity
+estimator method.tau. Knapp-Hartung adjustments can also be
+specified.</p>
+<pre class="r"><code>## save the newly generated {metafor}-based meta-analysis under the name m.rma.
+m.rma &lt;- rma(yi = m.gen$TE,
+             sei = m.gen$seTE,
+             method = m.gen$method.tau,
+             test = &quot;knha&quot;)
+res.gosh &lt;- gosh(m.rma)
+plot(res.gosh, alpha = 0.01)</code></pre>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>To investigate which studies contribute to clusters in the GOSH plot,
+use the gosh.diagnostics function from the {dmetar} package. This
+function applies three clustering algorithms: k-means, DBSCAN
+(density-based clustering), and Gaussian Mixture Models. It highlights
+studies that frequently appear in specific clusters—especially those
+associated with high heterogeneity or large influence.</p>
+<pre class="r"><code>res.gosh.diag &lt;- gosh.diagnostics(res.gosh, 
+                                  km.params = list(centers = 2),
+                                  db.params = list(eps = 0.08, 
+                                                   MinPts = 50))</code></pre>
+<pre><code>##   
+##  Perform Clustering... 
+##  |==========================================================================================| DONE</code></pre>
+<pre class="r"><code>res.gosh.diag</code></pre>
+<pre><code>## GOSH Diagnostics 
+## ================================ 
+## 
+##  - Number of K-means clusters detected: 2
+##  - Number of DBSCAN clusters detected: 4
+##  - Number of GMM clusters detected: 7
+## 
+##  Identification of potential outliers 
+##  --------------------------------- 
+## 
+##  - K-means: Study 3, Study 16
+##  - DBSCAN: Study 3, Study 4, Study 16
+##  - Gaussian Mixture Model: Study 3, Study 4, Study 11, Study 16</code></pre>
+<p><strong>Sensitivity Analysis After GOSH Diagnostics</strong></p>
+<p>To assess the impact of removing potentially influential studies
+(e.g., study 3, 4, and 16), rerun the meta-analysis without them:</p>
+<p>update(m.gen, exclude = c(3, 4, 16)) %&gt;% summary()</p>
+<p>In the example given, the revised meta-analysis showed:</p>
+<ul>
+<li>A reduced I² of 4.6%, indicating much lower between-study
+heterogeneity.</li>
+<li>A slightly smaller pooled effect size (g = 0.48 vs. 0.58).</li>
+<li>Similar statistical significance, suggesting robustness of the
+result.</li>
+</ul>
+<p><strong>Reporting Influence Analysis Results</strong></p>
+<p>When studies are identified as influential, report both the original
+results and a sensitivity analysis excluding those studies. A table is
+an effective format:</p>
+<table>
+<colgroup>
+<col width="31%" />
+<col width="6%" />
+<col width="14%" />
+<col width="10%" />
+<col width="15%" />
+<col width="4%" />
+<col width="17%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Analysis</th>
+<th>g</th>
+<th>95% CI</th>
+<th>p-value</th>
+<th>95% PI</th>
+<th>I²</th>
+<th>95% CI (I²)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Main Analysis</td>
+<td>0.58</td>
+<td>0.38–0.78</td>
+<td>&lt;0.001</td>
+<td>–0.06–1.22</td>
+<td>63%</td>
+<td>39–78</td>
+</tr>
+<tr class="even">
+<td>Infl. Cases Removed¹</td>
+<td>0.48</td>
+<td>0.36–0.60</td>
+<td>&lt;0.001</td>
+<td>0.36–0.61</td>
+<td>5%</td>
+<td>0–56</td>
+</tr>
+</tbody>
+</table>
+<p>¹Removed as outliers: DanitzOrsillo, de Vibe, Shapiro</p>
+<p>This kind of presentation ensures transparency and clearly shows the
+robustness of the meta-analytic conclusions. Additional rows can be
+added for other sensitivity analyses, such as risk-of-bias
+restrictions.</p>
+</div>
+</div>
 </div>
 <div id="continuous-outcomes-using-fixed-effect-model"
-class="section level1" number="2">
-<h1><span class="header-section-number">2</span> Continuous Outcomes
+class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Continuous Outcomes
 using Fixed Effect Model</h1>
-<div id="effect-measures" class="section level2" number="2.1">
-<h2><span class="header-section-number">2.1</span> Effect Measures</h2>
+<div id="effect-measures" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Effect Measures</h2>
 <p>Meta-analysis typically focuses on comparing two interventions, which
 we refer to as experimental and control. When the response is continuous
 (i.e. quantitative) typically the mean, standard deviation and sample
@@ -1441,8 +2629,8 @@ literature but typically lead to very similar results for reasonably
 sized samples</li>
 </ul>
 <div id="estimating-the-mean-difference-δ" class="section level3"
-number="2.1.1">
-<h3><span class="header-section-number">2.1.1</span> Estimating the Mean
+number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> Estimating the Mean
 Difference (Δ)</h3>
 <p>When all studies in the meta-analysis report outcomes using the same
 scale or unit, we can directly compute and combine the raw <strong>mean
@@ -1485,8 +2673,15 @@ m1_MD &lt;- metacont(n.psyc, mean.psyc, sd.psyc, n.cont, mean.cont, sd.cont,
                   data = Fleiss1993cont, 
                   studlab=rownames(Fleiss1993cont),
                   sm = &quot;MD&quot;)
-m1_MD</code></pre>
-<pre><code>## Number of studies: k = 5
+summary(m1_MD)</code></pre>
+<pre><code>##        MD             95%-CI %W(common) %W(random)
+## 1 -1.5000 [-4.7855;  1.7855]        2.8        5.2
+## 2 -1.2000 [-2.0837; -0.3163]       38.6       33.3
+## 3 -2.4000 [-6.1078;  1.3078]        2.2        4.1
+## 4  0.2000 [-0.7718;  1.1718]       31.9       30.6
+## 5 -0.8800 [-1.9900;  0.2300]       24.5       26.8
+## 
+## Number of studies: k = 5
 ## Number of observations: o = 232 (o.e = 106, o.c = 126)
 ## 
 ##                           MD             95%-CI     z p-value
@@ -1507,11 +2702,11 @@ m1_MD</code></pre>
 ## - Q-Profile method for confidence interval of tau^2 and tau
 ## - Calculation of I^2 based on Q</code></pre>
 <pre class="r"><code>plot(m1_MD)</code></pre>
-<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-5-1.png" width="960" /></p>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 </div>
 <div id="estimating-the-standardized-mean-difference-δ"
-class="section level3" number="2.1.2">
-<h3><span class="header-section-number">2.1.2</span> Estimating the
+class="section level3" number="3.1.2">
+<h3><span class="header-section-number">3.1.2</span> Estimating the
 Standardized Mean Difference (δ)</h3>
 <p>When different studies use <strong>different measurement
 scales</strong>, it’s not meaningful to compare or pool raw mean
@@ -1619,7 +2814,7 @@ data.frame(
 ## - Calculation of I^2 based on Q
 ## - Hedges&#39; g (bias corrected standardised mean difference; using exact formulae)</code></pre>
 <pre class="r"><code>plot(m1_SMD)</code></pre>
-<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <pre class="r"><code># Use Cohen&#39;s d instead of Hedges&#39; g as effect measure
 update(m1_SMD, method.smd = &quot;Cohen&quot;)</code></pre>
 <pre><code>## Number of studies: k = 5
@@ -1645,138 +2840,9 @@ update(m1_SMD, method.smd = &quot;Cohen&quot;)</code></pre>
 ## - Cohen&#39;s d (standardised mean difference; using exact formulae)</code></pre>
 </div>
 </div>
-<div id="heterogeneity-in-meta-analysis" class="section level2"
-number="2.2">
-<h2><span class="header-section-number">2.2</span> Heterogeneity in
-Meta-Analysis</h2>
-<p>In meta-analysis, <strong>heterogeneity</strong> refers to the
-variation in study outcomes beyond what would be expected by random
-sampling alone. In other words, it captures how different the effect
-sizes are across studies. Understanding and quantifying heterogeneity is
-essential because it influences the choice of meta-analytic model
-(fixed-effect vs random-effects) and the interpretation of results.</p>
-<p>When using the <code>meta</code> package in R (e.g., through
-functions like <code>metacont()</code> or <code>metabin()</code>), the
-output includes a section called <strong>“Quantifying
-heterogeneity”</strong> and <strong>“Test of heterogeneity”</strong>,
-which provides several statistics to assess this variability.</p>
-<p><strong>Summary of Interpretation</strong></p>
-<ul>
-<li><strong>Q statistic</strong> tells you whether heterogeneity is
-present (yes/no)</li>
-<li><strong>τ²</strong> tells you how much true heterogeneity exists (in
-raw variance units)</li>
-<li><strong>H</strong> tells you how much more variability is observed
-than expected</li>
-<li><strong>I²</strong> tells you the proportion of observed variance
-that is true heterogeneity</li>
-</ul>
-<hr />
-<p><strong>Test of Heterogeneity: Cochran’s Q</strong></p>
-<p>Cochran’s Q statistic is a classical test that evaluates whether the
-variability in observed effects across studies is greater than expected
-by chance.</p>
-<p>It is defined as:</p>
-<p><strong>Q = Σ wi × (δ̂i − δ̂)²</strong></p>
-<p>Where:</p>
-<ul>
-<li><strong>δ̂i</strong> is the effect estimate from the <em>i</em>th
-study</li>
-<li><strong>δ̂</strong> is the overall pooled effect estimate</li>
-<li><strong>wi</strong> is the weight assigned to the <em>i</em>th
-study, typically inverse variance</li>
-</ul>
-<p>This formula calculates a <strong>weighted sum of squared
-deviations</strong> of the individual effect sizes from the overall
-effect.</p>
-<p>Under the null hypothesis that all studies share the same true effect
-size (i.e., no heterogeneity), <strong>Q follows a chi-squared
-distribution with (K − 1) degrees of freedom</strong>, where K is the
-number of studies.</p>
-<p>If the <strong>p-value associated with Q</strong> is less than a
-chosen significance level (e.g., 0.05), the null hypothesis is rejected,
-indicating <strong>significant heterogeneity</strong> across
-studies.</p>
-<p>However, the Q test has limitations:</p>
-<ul>
-<li>It has <strong>low power</strong> when the number of studies is
-small, meaning it may <strong>fail to detect real
-heterogeneity</strong>.</li>
-<li>It has <strong>excessive power</strong> when the number of studies
-is large, meaning it may flag <strong>trivial heterogeneity as
-significant</strong>.</li>
-</ul>
-<p>Because of these issues, researchers often use additional statistics
-to <strong>quantify</strong> the amount of heterogeneity, not just test
-for its presence.</p>
-<p>Beyond the Q test, the <code>meta</code> package provides three
-additional indices to <strong>describe the magnitude of
-heterogeneity</strong>: τ² (tau-squared), H, and I².</p>
-<hr />
-<p><strong>Tau-squared (τ²)</strong></p>
-<p>Tau-squared estimates the <strong>between-study variance</strong>,
-i.e., the variance of the true effect sizes across studies. This value
-is crucial in <strong>random-effects models</strong>, where it directly
-influences the weights assigned to each study.</p>
-<p>Tau-squared is estimated using the <strong>DerSimonian and Laird
-method</strong>:</p>
-<p><strong>τ² = (Q − (K − 1)) / U</strong></p>
-<p>Where:</p>
-<ul>
-<li>Q is Cochran’s Q statistic</li>
-<li>K is the number of studies</li>
-<li>U is a function of the study weights</li>
-</ul>
-<p>If Q &lt; K − 1 due to sampling error, τ² is set to zero. A larger τ²
-indicates more dispersion in the true effects.</p>
-<hr />
-<p><strong>H Index</strong></p>
-<p>The H index expresses heterogeneity as a <strong>ratio</strong>
-comparing the observed variability to what would be expected if all
-studies had the same true effect size.</p>
-<p>It is defined as:</p>
-<p><strong>H = √(Q / (K − 1))</strong></p>
-<p>If <strong>H = 1</strong>, it implies perfect homogeneity (no excess
-variability). Values of H &gt; 1 indicate increasing levels of
-heterogeneity.</p>
-<p>A confidence interval for H can be constructed by assuming that
-<strong>ln(H)</strong> is approximately normally distributed. If the
-lower bound of this interval is above 1, it suggests statistically
-significant heterogeneity.</p>
-<p>The formula for the standard error of ln(H) depends on the value of
-Q:</p>
-<ul>
-<li>If Q &gt; K: SE is estimated using log transformations</li>
-<li>If Q ≤ K: SE uses a different approximation due to boundary
-issues</li>
-</ul>
-<hr />
-<p><strong>I-squared (I²)</strong></p>
-<p>I² quantifies the <strong>percentage of total variation</strong> in
-observed effects that is due to <strong>real heterogeneity</strong>
-rather than chance. It is arguably the most commonly reported measure of
-heterogeneity.</p>
-<p>The formula is:</p>
-<p><strong>I² = [(Q − (K − 1)) / Q] × 100%</strong></p>
-<p>This value ranges from 0% to 100%:</p>
-<ul>
-<li><strong>0–25%</strong>: low heterogeneity</li>
-<li><strong>25–50%</strong>: moderate heterogeneity</li>
-<li><strong>50–75%</strong>: substantial heterogeneity</li>
-<li><strong>75–100%</strong>: considerable heterogeneity</li>
-</ul>
-<p>Negative values of I² are set to 0 by convention. If the
-<strong>lower bound of the confidence interval for I² is greater than
-zero</strong>, heterogeneity is considered statistically
-significant.</p>
-<p>Alternatively, I² can be computed from H:</p>
-<p><strong>I² = (H² − 1) / H² × 100%</strong></p>
-<p>This formulation is used to derive confidence intervals for I² from
-those for H.</p>
-</div>
 <div id="inverse-variance-weighted-average-method"
-class="section level2" number="2.3">
-<h2><span class="header-section-number">2.3</span> Inverse
+class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Inverse
 Variance-Weighted Average Method</h2>
 <p>There are two methods for the fixed effects model meta-analysis: the
 IVW and weighted SZ. The fixed effects model assumes that all studies in
@@ -1849,13 +2915,13 @@ forest(mc1, comb.random=FALSE, xlab=
          &quot;Difference in mean response (intervention - control)
 units: maximum % fall in FEV1&quot;,
        xlim=c(-50,10), xlab.pos=-20, smlab.pos=-20)</code></pre>
-<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-7-1.png" width="960" /></p>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <pre class="r"><code># invisible(dev.off()) 
 # uncomment line to save PDF file</code></pre>
 </div>
 <div id="generic-inverse-variance-meta-analysis-metagen"
-class="section level2" number="2.4">
-<h2><span class="header-section-number">2.4</span> Generic inverse
+class="section level2" number="3.3">
+<h2><span class="header-section-number">3.3</span> Generic inverse
 variance meta-analysis <code>metagen</code></h2>
 <p>Fixed effect and random effects meta-analysis based on estimates
 (e.g. log hazard ratios) and their standard errors. The inverse variance
@@ -1907,8 +2973,8 @@ c(mc1$TE.fixed, mc1$TE.random)</code></pre>
 <pre class="r"><code>c(mc1.gen$TE.fixed, mc1.gen$TE.random)</code></pre>
 <pre><code>## [1] -15.51403 -15.64702</code></pre>
 </div>
-<div id="weighted-sum-of-z-scores" class="section level2" number="2.5">
-<h2><span class="header-section-number">2.5</span> Weighted Sum of
+<div id="weighted-sum-of-z-scores" class="section level2" number="3.4">
+<h2><span class="header-section-number">3.4</span> Weighted Sum of
 Z-Scores</h2>
 <p>Another popular method for the fixed effects model meta-analysis is
 calculating the weighted SZ from the follows studies. Let <span
@@ -1929,11 +2995,11 @@ w_{S Z, i}=\sqrt{N_{i}}
 </div>
 </div>
 <div id="continuous-outcomes-using-random-effects-model"
-class="section level1" number="3">
-<h1><span class="header-section-number">3</span> Continuous Outcomes
+class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Continuous Outcomes
 using Random Effects Model</h1>
-<div id="introduction-1" class="section level2" number="3.1">
-<h2><span class="header-section-number">3.1</span> Introduction</h2>
+<div id="introduction-1" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Introduction</h2>
 <p>The random effects model seeks to account for the fact that the study
 effect estimates <span class="math inline">\(\hat{\theta}_{k}\)</span>
 are often more variable than assumed in the fixed effect model. Under
@@ -1982,8 +3048,8 @@ be calculated by <span class="math display">\[\hat{\theta}_{R} \pm
 z_{1-\frac{\alpha}{2}} \text { S.E.
 }\left(\hat{\theta}_{R}\right)\]</span></p>
 </div>
-<div id="implementation" class="section level2" number="3.2">
-<h2><span class="header-section-number">3.2</span> Implementation</h2>
+<div id="implementation" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Implementation</h2>
 <p><strong>Estimation of Between-Study Variance</strong></p>
 <ul>
 <li>DerSimonian–Laird estimator (method.tau=“DL”) (default)</li>
@@ -2340,11 +3406,11 @@ forest(m,
        leftcols=c(&quot;studlab&quot;, &quot;tau2&quot;),
        leftlabs=c(&quot;Method&quot;, &quot;Between-study\nheterogeneity&quot;),
        print.byvar=FALSE)</code></pre>
-<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-9-1.png" width="960" /></p>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <pre class="r"><code># invisible(dev.off()) # uncomment line to save PDF file   </code></pre>
 </div>
-<div id="hartung-knapp-adjustment" class="section level2" number="3.3">
-<h2><span class="header-section-number">3.3</span> Hartung-Knapp
+<div id="hartung-knapp-adjustment" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Hartung-Knapp
 Adjustment</h2>
 <p>Hartung and Knapp (2001a,b) proposed an alternative method for random
 effects meta-analysis based on a refined variance estimator for the
@@ -2407,8 +3473,8 @@ et al., 2017)</li>
 </ul>
 </div>
 </div>
-<div id="meta-regression" class="section level1" number="4">
-<h1><span class="header-section-number">4</span> Meta-Regression</h1>
+<div id="meta-regression" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Meta-Regression</h1>
 <p><strong>Meta-regression</strong> is an extension of meta-analysis
 designed to explain <strong>residual heterogeneity</strong> among study
 results by incorporating <strong>study-level moderators</strong> (also
@@ -2419,8 +3485,8 @@ treatment dosage, study quality score, or geographic region.</p>
 size</strong> changes across studies depending on these moderators. This
 helps uncover patterns and improve understanding of why studies differ
 in their results.</p>
-<div id="basic-concept" class="section level2" number="4.1">
-<h2><span class="header-section-number">4.1</span> Basic Concept</h2>
+<div id="basic-concept" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Basic Concept</h2>
 <p>Just as a standard regression model evaluates how a dependent
 variable is influenced by one or more predictors, a meta-regression
 regresses the <strong>effect sizes</strong> reported in individual
@@ -2490,8 +3556,8 @@ F-test), testing whether all β’s are jointly zero</li>
 </ul>
 </div>
 <div id="implementing-meta-regression-in-r-with-metafor"
-class="section level2" number="4.2">
-<h2><span class="header-section-number">4.2</span> Implementing
+class="section level2" number="5.2">
+<h2><span class="header-section-number">5.2</span> Implementing
 Meta-Regression in R with metafor</h2>
 <p>The <code>meta</code> and <code>rmeta</code> packages do not support
 meta-regression. Instead, the <strong><code>metafor</code></strong>
@@ -2614,8 +3680,8 @@ causation</strong>.</li>
 </ul>
 </div>
 <div id="meta-regression-vs.-weighted-regression" class="section level2"
-number="4.3">
-<h2><span class="header-section-number">4.3</span> Meta-regression
+number="5.3">
+<h2><span class="header-section-number">5.3</span> Meta-regression
 vs. Weighted Regression</h2>
 <p><strong>Meta-regression vs. Weighted Regression</strong> is a subtle
 but important distinction in statistical modeling, especially in the
@@ -2689,10 +3755,10 @@ meta-regression.</li>
 </ul>
 </div>
 </div>
-<div id="binary-outcomes" class="section level1" number="5">
-<h1><span class="header-section-number">5</span> Binary Outcomes</h1>
-<div id="effect-measures-1" class="section level2" number="5.1">
-<h2><span class="header-section-number">5.1</span> Effect Measures</h2>
+<div id="binary-outcomes" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Binary Outcomes</h1>
+<div id="effect-measures-1" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> Effect Measures</h2>
 <p>In meta-analysis, especially when dealing with binary outcomes (such
 as “event occurred” vs. “event did not occur”), choosing an appropriate
 <strong>effect measure</strong> is crucial for meaningful interpretation
@@ -2810,8 +3876,8 @@ settings.</li>
 </div>
 <div
 id="analysis-with-risk-ratio-fixed-effect---inverse-variance-method"
-class="section level2" number="5.2">
-<h2><span class="header-section-number">5.2</span> Analysis with
+class="section level2" number="6.2">
+<h2><span class="header-section-number">6.2</span> Analysis with
 Risk-Ratio <a href="#fixed-effect---inverse-variance-method">Fixed
 Effect - Inverse Variance Method</a></h2>
 <p>The risk ratio (RR), also known as relative risk, is a widely used
@@ -2935,8 +4001,8 @@ package</strong></p>
 </div>
 <div
 id="analysis-with-risk-difference-fixed-effect---inverse-variance-method"
-class="section level2" number="5.3">
-<h2><span class="header-section-number">5.3</span> Analysis with Risk
+class="section level2" number="6.3">
+<h2><span class="header-section-number">6.3</span> Analysis with Risk
 Difference <a href="#fixed-effect---inverse-variance-method">Fixed
 Effect - Inverse Variance Method</a></h2>
 <p>While the <strong>risk ratio (RR)</strong> is widely used for
@@ -3087,17 +4153,17 @@ summary(RD.Statin)</code></pre>
 ## - Q-Profile method for confidence interval of tau^2 and tau
 ## - Calculation of I^2 based on Q</code></pre>
 <pre class="r"><code>plot(RD.Statin)</code></pre>
-<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-14-1.png" width="960" /></p>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
 <pre><code>metabin(Ee, Ne, Ec, Nc, sm=&quot;RD&quot;, method=&quot;I&quot;,
         data=data7, subset=study==&quot;Milpied&quot;)</code></pre>
 </div>
 <div id="meta-analysis-with-odds-ratio" class="section level2"
-number="5.4">
-<h2><span class="header-section-number">5.4</span> Meta-Analysis with
+number="6.4">
+<h2><span class="header-section-number">6.4</span> Meta-Analysis with
 Odds Ratio</h2>
 <div id="fixed-effect---inverse-variance-method" class="section level3"
-number="5.4.1">
-<h3><span class="header-section-number">5.4.1</span> Fixed Effect -
+number="6.4.1">
+<h3><span class="header-section-number">6.4.1</span> Fixed Effect -
 Inverse Variance Method</h3>
 <p>The odds ratio for study <span class="math inline">\(k,
 \psi_{k}\)</span>, is defined as the ratio of the odds of an event in
@@ -3167,13 +4233,13 @@ metabin(event.e, n.e, event.c, n.c, data=Fleiss93, sm=&quot;OR&quot;)</code></pr
 metaresult&lt;-metabin(event.e, n.e,event.c,n.c,data=Fleiss93,sm=&quot;OR&quot;,
                     studlab=paste(study, year),random=FALSE)
 plot(metaresult)</code></pre>
-<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-15-1.png" width="960" /></p>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
 <p><strong>Unfortunately, for sparse data, the pooled estimates based on
 the inverse variance method are biased</strong></p>
 </div>
 <div id="meta-analysis-using-mantel-haenszel-method-fixed-effect"
-class="section level3" number="5.4.2">
-<h3><span class="header-section-number">5.4.2</span> Meta-Analysis using
+class="section level3" number="6.4.2">
+<h3><span class="header-section-number">6.4.2</span> Meta-Analysis using
 Mantel-Haenszel Method (Fixed Effect)</h3>
 <p><strong>Detailed Explanation of the Mantel-Haenszel (MH) Method in
 Meta-Analysis</strong></p>
@@ -3435,7 +4501,7 @@ summary(ORMH.Statin)</code></pre>
 ## - Q-Profile method for confidence interval of tau^2 and tau
 ## - Calculation of I^2 based on Q</code></pre>
 <pre class="r"><code>plot(ORMH.Statin)</code></pre>
-<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-18-1.png" width="960" /></p>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
 <p>The <strong>Mantel-Haenszel method</strong> is a reliable and
 efficient approach to pooling odds ratios across studies, especially
 when:</p>
@@ -3446,8 +4512,8 @@ when:</p>
 </ul>
 </div>
 <div id="estimation-in-sparse-data---continuity-correction"
-class="section level3" number="5.4.3">
-<h3><span class="header-section-number">5.4.3</span> Estimation in
+class="section level3" number="6.4.3">
+<h3><span class="header-section-number">6.4.3</span> Estimation in
 Sparse Data - Continuity correction</h3>
 <p><strong>Sparse data</strong> refers to cases where the number of
 events is very low—sometimes <strong>zero</strong>—in one or more groups
@@ -3654,8 +4720,8 @@ class="math display">\[\widehat{\operatorname{Var}}\left(\log
 \cdot\]</span></p>
 </div>
 <div id="peto-odds-ratio-fixed-effect" class="section level3"
-number="5.4.4">
-<h3><span class="header-section-number">5.4.4</span> Peto Odds Ratio
+number="6.4.4">
+<h3><span class="header-section-number">6.4.4</span> Peto Odds Ratio
 (Fixed Effect)</h3>
 <p>The <strong>Peto method</strong> is another fixed-effect approach to
 meta-analyzing binary outcomes, particularly when effect sizes are small
@@ -3809,7 +4875,7 @@ summary(ORPeto.Statin)</code></pre>
 ## - Q-Profile method for confidence interval of tau^2 and tau
 ## - Calculation of I^2 based on Q</code></pre>
 <pre class="r"><code>plot(ORPeto.Statin)</code></pre>
-<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-21-1.png" width="960" /></p>
+<p><img src="06-Analysis-Meta-Analysis_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
 <p><strong>When to Use Peto’s Method</strong></p>
 <p>Peto’s method is most appropriate when:</p>
 <ul>
@@ -3828,8 +4894,8 @@ summary(ORPeto.Statin)</code></pre>
 method</strong> is typically preferred.</p>
 </div>
 </div>
-<div id="random-effect-model" class="section level2" number="5.5">
-<h2><span class="header-section-number">5.5</span> Random Effect
+<div id="random-effect-model" class="section level2" number="6.5">
+<h2><span class="header-section-number">6.5</span> Random Effect
 Model</h2>
 <p>In real-world meta-analysis of binary outcomes (e.g., treatment
 success/failure, survival/death), the differences between study results
@@ -4011,15 +5077,15 @@ class="math inline">\(\sigma_k^2 + \tau^2\)</span></td>
 </div>
 </div>
 <div id="meta-analysis-for-rare-events" class="section level1"
-number="6">
-<h1><span class="header-section-number">6</span> Meta-Analysis for Rare
+number="7">
+<h1><span class="header-section-number">7</span> Meta-Analysis for Rare
 Events</h1>
 </div>
-<div id="reference-apa-style" class="section level1" number="7">
-<h1><span class="header-section-number">7</span> Reference (APA
+<div id="reference-apa-style" class="section level1" number="8">
+<h1><span class="header-section-number">8</span> Reference (APA
 Style)</h1>
-<div id="book" class="section level2" number="7.1">
-<h2><span class="header-section-number">7.1</span> Book</h2>
+<div id="book" class="section level2" number="8.1">
+<h2><span class="header-section-number">8.1</span> Book</h2>
 <p>Harrer, M., Cuijpers, P., Furukawa, T.A., &amp; Ebert, D.D. (2021).
 <em>Doing Meta-Analysis with R: A Hands-On Guide</em>. Boca Raton, FL
 and London: Chapmann &amp; Hall/CRC Press. ISBN 978-0-367-61007-4. <a
@@ -4034,8 +5100,8 @@ Meta-Analysis with R. Springer. <a
 href="https://doi.org/10.1007/978-3-319-21416-0"
 class="uri">https://doi.org/10.1007/978-3-319-21416-0</a></p>
 </div>
-<div id="meta-analysis" class="section level2" number="7.2">
-<h2><span class="header-section-number">7.2</span> Meta Analysis</h2>
+<div id="meta-analysis" class="section level2" number="8.2">
+<h2><span class="header-section-number">8.2</span> Meta Analysis</h2>
 <p>Berkey, C. S., D. C. Hoaglin, A. Antezak-Bouckoms, F. Mosteller, and
 G. A. Colditz (1998). Meta-analysis of multiple outcomes by regression
 with random effects. Statistics in Medicine 17, 2537–2550.</p>
@@ -4068,6 +5134,8 @@ trials. Controlled Clinical Trials 7, 177–188.</p>
 <p>Hartung, J., G. Knapp, and B. K. Sinha (2008). Statistical
 Meta-Analysis with Applications. Hoboken, New Jersey: John Wiley &amp;
 Sons, Inc.</p>
+<p>Rucker2008-Simpson’s paradox visualized The example of the
+Rosiglitazone meta-analysis</p>
 </div>
 </div>
 
@@ -4106,6 +5174,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
 <script>
 $(document).ready(function ()  {
