@@ -8,6 +8,7 @@ output:
     number_sections: No
     toc: yes
     toc_float: yes
+    code_folding: "hide" 
   word_document:
     toc: yes
 fontsize: 10pt
@@ -24,8 +25,8 @@ knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
 # <!-- ---------------------------------------------------------------------- --> 
 
 ## if(!require(psych)){install.packages("psych")}
-
-packages<-c("tidyverse","kableExtra")
+packages<-c("tidyverse","kableExtra",
+            "pwr","pwrss","binom")
 
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
@@ -94,8 +95,8 @@ Power and sample size calculations are fundamental components in the design of a
 
 ## pwr built-in visualization
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library(pwr)
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library(pwr)
 
 power1 <-pwr.2p.test(h = ES.h(p1 = 0.60, p2 = 0.50), sig.level = 0.05, power = .80)
 plot(power1)
@@ -104,7 +105,7 @@ plot(power1)
 
 ## Trellised Power Curves::pwr
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 fn_pwr <- function(n, d) {
   power <- pwr.t.test(n = n,
                       d = d,
@@ -176,9 +177,9 @@ The `pwrss` R package enables statistical power and minimum required sample size
 
 The alternative hypothesis can be formulated as “not equal,” “less,” “greater,” “non-inferior,” “superior,” or “equivalent” in (1), (2), (3), and (4); as “not equal,” “less,” or “greater” in (5), (6), (7), and (8); and always as “greater” in (9), (10), (11), (12), (13), and (14). 
  
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
-library(pwrss)
-library(binom)
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library(pwrss)
+# library(binom)
 
 n_chronos <- seq(250,350,by=5)
 
@@ -202,7 +203,7 @@ data_listing %>%
 ```
 
 
-```{r,include=F,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+```{r,include=F,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Define a function to calculate power for given n2 values
 calculate_power <- function(n2) {
   power <- sapply(seq(100, 200, by = 5), function(n1) {
@@ -221,7 +222,7 @@ Power$nARES <- factor(Power$nARES)
 
 
 
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Plot the results 
 ggplot(Power, aes(x = n, y = power, color = nARES)) +
   geom_point() +
@@ -240,7 +241,7 @@ ggplot(Power, aes(x = n, y = power, color = nARES)) +
 ## Effect Size
 
 
-```{r,include=F, echo = F,message = FALSE, error = FALSE, warning = FALSE}
+```{r,include=F, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 power.p.curve <- function(n){
   
 cd <- seq(.1,1.5,.1)  #Vector of effect size
@@ -269,7 +270,7 @@ power.p.curve(n)
  
 ## Hit Point 
 
-```{r,include=F, echo = F,message = FALSE, error = FALSE, warning = FALSE}
+```{r,include=F, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 pwrss.z.2props(p1 = 0.431, p2 = 0.60,
                kappa = 1.33,
                alpha = 0.05,
@@ -308,7 +309,7 @@ SSC_60 <- SSC_60 %>%
 ```
 
 
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 SSC_60 %>%
   mutate(CHRONOS_p = percent(CHRONOS_p), 
          ARES_p = percent(ARES_p)) %>%

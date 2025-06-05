@@ -8,6 +8,7 @@ output:
     number_sections: No
     toc: yes
     toc_float: yes
+    code_folding: "hide" 
   word_document:
     toc: yes
 fontsize: 10pt
@@ -19,15 +20,18 @@ colorlinks: yes
 
 ```{r, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 # getwd()
 # Sys.setlocale("LC_ALL","English")
  
 # devtools::install_github("kupietz/kableExtra")
 packages<-c("tidyverse", "kableExtra", 
-            "ggpubr","gridExtra","ggtext",
+            "ggpubr","gridExtra","ggtext","patchwork","ggiraph",
             "plotly","RColorBrewer",
             "glue","viridis","hrbrthemes")
+ 
+
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(new.pkg)) 
@@ -40,7 +44,7 @@ ipak(packages)
  
 # Basic Aesthetic
  
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Color Aesthetic
 ggplot(data = diamonds) + 
   geom_bar(mapping = aes(x = cut, fill = cut ))
@@ -63,7 +67,7 @@ ggplot(data = diamonds, mapping = aes(x = cut, fill = clarity)) +
 
 ## Position Option
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # library(viridis)
 # library(hrbrthemes)
 
@@ -93,7 +97,7 @@ p3
 
 ## Facet Option
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 ggplot(data = diamonds, mapping = aes(x = cut, colour = clarity)) + 
   geom_bar(fill = NA, position = "identity")+
   facet_wrap(~color) +
@@ -115,7 +119,7 @@ ggplot(data = diamonds, mapping = aes(x = cut, colour = clarity)) +
   
 Stacked barplot with negative values with ggplot2
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Load the dataset that is stored on the web
 data <- read.table("./01_Datasets/stacked_barplot_negative_values.csv", header=T, sep=",")
 
@@ -145,7 +149,7 @@ ggplot(data_long, aes(fill=group, y=value, x=x)) +
 
 ## Calculate Percentage in Data
 
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 data <- data.frame(
   group=c("Very effective", 
           "Effective", 
@@ -184,7 +188,7 @@ data %>% ggplot(aes(x = group, y = value)) +
 ## Transfer Percentage in ggplot
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 data(tips, package = "reshape2")
 library(scales)  # for percentage scales
 
@@ -233,7 +237,7 @@ ggplot(tips, aes(x= day,  group=sex)) +
 
 ## Add Text by Group 1
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 Rotation_5 <- readRDS(file = "./01_Datasets/Rotation_5.rds")
 
 ggplot(data = Rotation_5, aes(x = Visit, y= Percentage, fill=Treatment)) +
@@ -257,7 +261,7 @@ ggplot(data = Rotation_5, aes(x = Visit, y= Percentage, fill=Treatment)) +
 
 In this bar plot, the relatively complex data set is boiled down to a very simple visualization. The relative amount of time is plotted against time and treatment group. Furthermore, the coloring is chosen in a sensible way. Grey is used for SOC whereas different shades of green are used for the Rx treatments using increasing intensities with higher dose levels. The horizontal lines and the y-axis tick marks could have been removed to make it even less cluttered, because the percentage is shown in each bar.
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 dat <- read.csv("./01_Datasets/simulated_data.csv", sep = ",", dec = ".")
 # Create function to calculate the percentage per patient:
 num.f <- function(x) length(which(x >= 72 & x <= 140)) / length(x)
@@ -294,7 +298,7 @@ ggplot(res, aes(y=Value, x=VISITNUM, fill=TREATMENT)) +
 
 The ggtext package defines two new theme elements, element_markdown() and element_textbox(). Both behave similarly to element_text() but render the provided text as markdown/html. element_markdown() is meant as a direct replacement for element_text(), and it renders text without word wrapping. To start a new line, use the <br> tag or add two spaces before the end of a line.
 
-```{r ggtext, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r ggtext, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # remotes::install_github("wilkelab/ggtext")
 # library("ggtext") 
 # library("glue")
@@ -325,7 +329,7 @@ data %>% mutate(
   
 # Change Coordinate
 
-```{r coordinary system, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r coordinary system, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # coord_polar() uses polar coordinates
 bar <- ggplot(data = diamonds) + 
   geom_bar(
@@ -342,7 +346,7 @@ bar + coord_polar()
 
 # Ordered Bar Plot
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Ordered Bar Chart 
 cty_mpg <- aggregate(mpg$cty, by=list(mpg$manufacturer), FUN=mean)  # aggregate
 colnames(cty_mpg) <- c("make", "mileage")  # change column names
@@ -362,7 +366,7 @@ ggplot(cty_mpg, aes(x=make, y=mileage)) +
 **Ordered bar plots by group** 
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Load data
 data("mtcars")
 dfm <- mtcars
@@ -395,7 +399,7 @@ ggbarplot(dfm, x = "name", y = "mpg",
 
 # Lollipop Chart
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Lollipop charts conveys the same information as in bar charts. By reducing the thick bars into thin lines, it reduces the clutter and lays more emphasis on the value. It looks nice and modern.
 ggplot(cty_mpg, aes(x=make, y=mileage)) + 
   geom_point(size=3) + 
@@ -413,7 +417,7 @@ ggplot(cty_mpg, aes(x=make, y=mileage)) +
 # Deviation Graphs
  
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Data Prep
 data("mtcars")  # load data
 mtcars$`car name` <- rownames(mtcars)  # create new column for car names
@@ -436,7 +440,7 @@ ggplot(mtcars, aes(x=`car name`, y=mpg_z, label=mpg_z)) +
 
 **Alternative using ggpubr package**
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Diverging Barcharts
 mtcars %>%
   ggbarplot(x = "car name", y = "mpg_z",
@@ -470,7 +474,7 @@ mtcars %>%
 
 # Means and Error Bars
 
-```{r geom_errorbar, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r geom_errorbar, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 PrimEnd <- data.frame('Primary Endpoint'=c("Primary Analysis", 
                                            "Sensitivity Analysis 1",
                                            "Sensitivity Analysis 2",
@@ -586,7 +590,7 @@ ggplot(tgc2, aes(x=dose, y=len, fill=supp)) +
 
 ## Basic Using coord_polar() 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Create dataset
 data <- data.frame(
   id=seq(1,60),
@@ -635,7 +639,7 @@ p
 
 ## Circular barplot with gap 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Create dataset
 data <- data.frame(
   individual=paste( "Mister ", seq(1,60), sep=""),
@@ -677,7 +681,7 @@ p
 
 ## Groups
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Create dataset
 data <- data.frame(
   individual=paste( "Mister ", seq(1,60), sep=""),
@@ -725,7 +729,7 @@ p
 ## Customization
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Create dataset
 data <- data.frame(
   individual=paste( "Mister ", seq(1,60), sep=""),
@@ -797,7 +801,7 @@ ggplot(data, aes(x=as.factor(id), y=value, fill=group)) +       # Note that id i
 
 ## Circular Stacked Barplot
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Create dataset
 data <- data.frame(
   individual=paste( "Mister ", seq(1,60), sep=""),
@@ -887,7 +891,7 @@ p
 
 ## plotly package
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # library(viridis)
 # library(hrbrthemes)
 
@@ -919,10 +923,10 @@ ggplotly(p3)
 
 ## ggiraph package
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # reference https://rkabacoff.github.io/datavis/Interactive.html#ggiraph
-library("ggiraph")
-library("patchwork")
+# library("ggiraph")
+# library("patchwork")
 data(gapminder, package="gapminder")
 
 # subset Asian countries

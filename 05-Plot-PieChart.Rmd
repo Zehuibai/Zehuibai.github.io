@@ -8,6 +8,7 @@ output:
     number_sections: No
     toc: yes
     toc_float: yes
+    code_folding: "hide" 
   word_document:
     toc: yes
 fontsize: 10pt
@@ -23,8 +24,9 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 # getwd()
 # Sys.setlocale("LC_ALL","English")
 
-## devtools::install_github("kupietz/kableExtra")
+# devtools::install_github("sada1993/d3treeR") 
 packages<-c("tidyverse", "kableExtra",  
+            "plotly","treemap","d3treeR",
             "ggpubr","gridExtra","ggtext","gt")
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
@@ -38,7 +40,7 @@ ipak(packages)
 
 ## BarChart circular with coord_polar()
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Create Data
 data <- data.frame(
   group=LETTERS[1:5],
@@ -65,7 +67,7 @@ ggplot(data, aes(x="", y=value, fill=group)) +
 
 ## Adding labels with geom_text()
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Create Data
 data <- data.frame(
   group=LETTERS[1:5],
@@ -92,7 +94,7 @@ ggplot(data, aes(x="", y=prop, fill=group)) +
  
 ## Add Lable in Legend
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 data <- data.frame(
   group=c("Severe retinal detachments", 
           "Traumatic retinal detachments", 
@@ -136,8 +138,8 @@ ggplot(data, aes(x="", y=value, fill=group)) +
 
 ## Interactive Pie Chart
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library(plotly)
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library(plotly)
 # Create fake data
 df <- data.frame(
   genre=c("Pop", "HipHop", "Latin", "Jazz"), 
@@ -154,7 +156,7 @@ plot_ly(data=df,labels=~genre, values=~values, type="pie") %>%
 
 ### Basic Doughnut
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Create test data.
 data <- data.frame(
   category=c("A", "B", "C"),
@@ -180,7 +182,7 @@ ggplot(data, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category)) +
 
 ### Customization
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Create test data.
 data <- data.frame(
   category=c("A", "B", "C"),
@@ -217,7 +219,7 @@ ggplot(data, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category)) +
 
 ### Donut Thickness
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Create test data.
 data <- data.frame(
   category=c("A", "B", "C"),
@@ -257,8 +259,8 @@ ggplot(data, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category)) +
 
 ### Basic Treemap
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library("treemap")
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library("treemap")
 group <- c("group-1","group-2","group-3")
 value <- c(13,5,22)
 data <- data.frame(group,value)
@@ -276,7 +278,7 @@ treemap(data,
 ### Treemap with subgroups
 
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Build Dataset
 group <- c(rep("group-1",4),rep("group-2",2),rep("group-3",3))
 subgroup <- paste("subgroup" , c(1,2,3,4,1,2,1,2,3), sep="-")
@@ -297,9 +299,9 @@ treemap(data, index=c("group","subgroup"),
 
 ### Interactive Treemap
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 ## devtools::install_github("sada1993/d3treeR")
-library(d3treeR)
+# library(d3treeR)
 
 # dataset
 group <- c(rep("group-1",4),rep("group-2",2),rep("group-3",3))

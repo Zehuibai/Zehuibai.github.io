@@ -8,6 +8,7 @@ output:
     number_sections: No
     toc: yes
     toc_float: yes
+    code_folding: "hide" 
   word_document:
     toc: yes
 fontsize: 10pt
@@ -25,9 +26,11 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 ## devtools::install_github("kupietz/kableExtra")
 packages<-c("tidyverse", "kableExtra", 
-            "haven",
-            "ggpubr","gridExtra","ggtext","plotly",
-            "ggExtra","hrbrthemes","viridis")
+            "haven","GGally", 
+            "ggpubr","gridExtra","ggtext","plotly","gt","psych",
+            "ggridges","hrbrthemes","viridis")
+
+
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(new.pkg)) 
@@ -42,7 +45,7 @@ ipak(packages)
 
 ## General Appearance
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 smaller <- diamonds %>% 
   filter(carat < 3)
 p1 <- ggplot(data = smaller, mapping = aes(x = carat, fill=color))+
@@ -63,7 +66,7 @@ p1
 Scales control the details of how data values are translated to visual properties. Many [different scales](https://ggplot2.tidyverse.org/reference/index.html#section-scales) are offered by ggplot2. The most widely one is probably the log scale.
 
 
-```{r Change Scales, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r Change Scales, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 
 # Load dataset from github
 data <- read.table("./01_Datasets/OneNum.csv", header=TRUE)
@@ -91,7 +94,7 @@ data %>%
 
 ## Mirror Histogram/Density Chart
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # library(hrbrthemes)
 
 # Dummy data
@@ -125,7 +128,7 @@ ggplot(data, aes(x=x) ) +
 
 This can be achieved using the ggMarginal() function in the "ggExtra" package. In addition to histograms, you can choose to draw marginal box plots or density plots by setting the corresponding type options.
 
-```{r Marginal Plot, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r Marginal Plot, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # library("ggExtra")
 
 mpg_select <- mpg[mpg$hwy >= 35 & mpg$cty > 27, ]
@@ -142,7 +145,7 @@ ggMarginal(g, type = "density",   fill="transparent")
 
 ## Interactive Plot 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 smaller <- diamonds %>% 
   filter(carat < 3)
 p1 <- ggplot(data = smaller, mapping = aes(x = carat, fill=color))+
@@ -159,7 +162,7 @@ ggplotly(p1)
 
 ### Multi density chart using geom_freqpoly()
 
-```{r freqpoly, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r freqpoly, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 smaller <- diamonds %>% 
   filter(carat < 3)
 ggplot(data = smaller, mapping = aes(x = carat, colour = cut)) +
@@ -182,7 +185,7 @@ ggplot(mpg, aes(cty)) +
 
 ### Multi density chart using geom_density()
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # library("hrbrthemes") 
 # library("viridis") 
 # The diamonds dataset is natively available with R.
@@ -206,7 +209,7 @@ grid.arrange(p1, p2, nrow = 1)
 
 ### Small Multiple with facet_wrap()
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Using Small multiple
 ggplot(data=diamonds, aes(x=price, group=cut, fill=cut)) +
     geom_density(adjust=1.5) +
@@ -221,7 +224,7 @@ ggplot(data=diamonds, aes(x=price, group=cut, fill=cut)) +
 
 ### Stacked density chart
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Stacked density plot:
 ggplot(data=diamonds, aes(x=price, group=cut, fill=cut)) +
     geom_density(adjust=1.5, position="fill") +
@@ -230,7 +233,7 @@ ggplot(data=diamonds, aes(x=price, group=cut, fill=cut)) +
 
 ### Density plot with annotation
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Load dataset from github
 data <- read.table("./01_Datasets/probly.csv", header=TRUE, sep=",")
 data <- data %>%
@@ -265,7 +268,7 @@ data %>%
 ## Animated density plot
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # library(ggplot2)
 # library(dplyr)
 # library(tidyr)
@@ -350,15 +353,15 @@ This graph includes stacked density plots, sometimes known as a ridgeline plot. 
 
 A title has been added to give a clear interpretation of the overall message.
 
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 WW_data <- read.csv("./01_Datasets/WWW_example_minimal_clinical_improvement.csv")
 
-library(tidyverse)
-library(ggplot2)
-library(dplyr)
-library(ggridges)
-library(gt)
-library(psych)
+# library(tidyverse)
+# library(ggplot2)
+# library(dplyr)
+# library(ggridges)
+# library(gt)
+# library(psych)
 
 #####
 #1 - calculate SEM 
@@ -471,8 +474,8 @@ rcc
 
 ## GGally Package
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library(GGally)
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library(GGally)
 
 adsl <- read_xpt("./01_Datasets/adsl.xpt")
 adsl_data <- adsl[, c("AGE", "BMIBL", "HEIGHTBL", "WEIGHTBL","SEX")]

@@ -17,7 +17,7 @@ editor_options:
 colorlinks: yes
 ---
  
-```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
 
 # <!-- ---------------------------------------------------------------------- -->
@@ -27,7 +27,8 @@ knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
 # if(!require(psych)){install.packages("psych")}
 # devtools::install_github("MathiasHarrer/dmetar")
 packages<-c("tidyverse","gdata",
-            "meta","rmeta","metafor","dmetar", 
+            "meta","rmeta","metafor","dmetar", "metasens",
+            "brms",
             "kableExtra")
 
 ipak <- function(pkg){
@@ -57,7 +58,9 @@ data6 <- read.csv("./01_Datasets/dataset06.csv", as.is=TRUE)
 data7 <- read.csv("./01_Datasets/dataset07.csv", as.is=TRUE)
 data8 <- read.csv("./01_Datasets/dataset08.csv", as.is=TRUE)
 
-# glimpse(data8)
+
+data(ThirdWave)
+# glimpse(ThirdWave)
 ```
 
 
@@ -643,7 +646,7 @@ These tools help analysts perform meta-analyses and produce key outputs such as:
 * Estimates of heterogeneity (I², τ²)
 * Confidence intervals for pooled effect size
 
-### meta Package: Analysis for Different Data
+**meta Package: Analysis for Different Data**
 
 * Meta-analysis of binary outcome data `metabin`
 * Meta-analysis of continuous outcome data `metacont`
@@ -896,7 +899,8 @@ Range restriction occurs when the variability of a variable in a study is smalle
 | Attenuation Correction | Measurement unreliability  | Reliability coefficients (rₓₓ, ryy)       | Correlations and SMDs         |
 | Range Restriction      | Limited variable variation | SD of restricted and unrestricted samples | Correlations and SMDs         |
 
- 
+
+
 
 
 # Between-Study Heterogeneity 
@@ -1666,7 +1670,7 @@ Knapp, 2001a,b; IntHout et al., 2014; Langan et al., 2019) show **improved cover
 compared to the classic random effects method. 
 
 
-Hartung和Knapp 在随机效应模型中引入了一种基于改进方差估计器的新的会萃分析方法。与DerSimonianLaird方法相比，首选Hartung-Knapp方法。 代替使方差估计
+Hartung and Knapp introduced a new convergent analysis method based on an improved variance estimator in the random effects model. The Hartung-Knapp method is preferred over the DerSimonianLaird method.
 $$
 \widehat{\operatorname{Var}}\left(\hat{\theta}_{R}\right)=\frac{1}{\sum_{k=1}^{K} w_{k}^{*}}
 $$
@@ -1721,54 +1725,342 @@ In essence, meta-regression allows us to model how the **effect size** changes a
 ## Basic Concept 
 
 
-Just as a standard regression model evaluates how a dependent variable is influenced by one or more predictors, a meta-regression regresses the **effect sizes** reported in individual studies on one or more **study-level characteristics**. The key difference is that each effect size is estimated with a known variance (from the original studies), and that this variance should be incorporated into the estimation procedure.
+**Meta-Regression in Meta-Analysis: A Detailed Explanation**
 
-The effect size from study *i* is denoted as **δ̂ᵢ**. These observed effect sizes vary due to both:
+Meta-regression is a method used in meta-analysis to examine how study-level characteristics (also known as *moderators*) explain variation in effect sizes across studies. It is an extension of the methods discussed in subgroup analysis, but it offers more flexibility and statistical power. While subgroup analysis tests for differences between groups of studies (e.g., comparing studies in adults vs. children), meta-regression allows for **continuous** or **multiple predictors** and provides a **quantitative** relationship between predictors and effect sizes.
 
-1. **Within-study sampling variance** (denoted σ̂²ᵢ), and
-2. **Between-study variance** (denoted τ²), which is estimated if a **random-effects model** is used.
+Subgroup analysis is essentially a **special case of meta-regression**, where the predictor variable is categorical (like a factor with two or more levels). Meta-regression generalizes this approach and allows us to:
 
-The general **meta-regression model** can be written as:
+* Use continuous predictors (e.g., year of publication, treatment dose).
+* Model multiple predictors at once.
+* Explore interactions between predictors.
 
-**δᵢ = β₀ + β₁xᵢ₁ + β₂xᵢ₂ + … + βₚxᵢₚ + νᵢ + εᵢ**
+ 
+**Core Concept of Regression**
 
-* δᵢ: true effect size for study *i*
-* xᵢ₁, xᵢ₂, ..., xᵢₚ: study-level moderators
-* β₀: intercept (mean effect when all covariates are 0)
-* βⱼ: regression coefficient for moderator *j*
-* νᵢ \~ N(0, τ²): between-study random effect (residual heterogeneity)
-* εᵢ \~ N(0, σ̂²ᵢ): within-study error (sampling variance from each study)
+In standard regression (outside meta-analysis), we typically model a relationship like this:
 
----
+  ŷᵢ = β₀ + β₁xᵢ
 
-**Fixed-Effects vs Random-Effects Meta-Regression**
+Here:
 
-In **fixed-effects meta-regression**, it is assumed that all residual variation in effect size across studies is due to within-study sampling error (τ² = 0). This is appropriate only if there is no heterogeneity beyond sampling error.
+* ŷᵢ is the predicted value of the dependent variable (for example, test score of person *i*),
+* xᵢ is the predictor (for example, number of hours studied),
+* β₀ is the intercept,
+* β₁ is the slope or regression coefficient.
 
-In contrast, **random-effects meta-regression** allows for additional variability in true effect sizes not explained by sampling error, acknowledging that effect sizes may truly differ across studies.
-
-* Use fixed-effects meta-regression when you believe studies share a common true effect.
-* Use random-effects meta-regression when studies likely differ in their true effects, even after accounting for moderators.
+In this model, individual observations (often people or samples) are used to estimate the relationship between the predictor and the outcome.
 
 ---
 
-**Interpreting Meta-Regression**
+**Applying Regression to Meta-Analysis: Study-Level Model**
 
-The main goals are:
+In **meta-regression**, the logic of regression is applied, not to individuals, but to **studies**.
 
-* To identify which moderators significantly **explain** heterogeneity.
-* To understand the **direction** and **magnitude** of association between moderators and effect sizes.
-* To quantify how much **residual heterogeneity** (unexplained variance) remains after including moderators.
+* Each study provides an effect size (such as a mean difference or odds ratio).
+* Each study may also report a study-level characteristic, such as sample size, country, intervention dose, or study year.
+* We use these study characteristics to explain variation in the effect sizes across studies.
 
-Statistical output includes:
+The model used in meta-regression is:
 
-* Estimates of **β coefficients** (effect of each moderator on the outcome)
-* Their **standard errors**, **z-values**, and **p-values**
-* The estimate of **τ²**, which is the residual heterogeneity **after** accounting for moderators
-* Measures like **QM** (analogous to the regression F-test), testing whether all β’s are jointly zero
+  θ̂ₖ = θ + βxₖ + εₖ + ζₖ
+
+Where:
+
+* θ̂ₖ is the **observed effect size** in study *k*.
+* xₖ is the **predictor variable** for study *k* (such as year of publication).
+* β is the **regression coefficient** that quantifies how much the effect size changes per unit change in x.
+* θ is the **intercept**, representing the average effect size when x = 0.
+* εₖ is the **sampling error** (variation due to within-study uncertainty).
+* ζₖ is the **between-study heterogeneity** (variation in true effect sizes between studies).
+
+This equation reflects a **mixed-effects model**, because it includes both fixed effects (θ and β) and random effects (ζₖ). The random effects capture the unmeasured variability among the true effects of different studies.
+
+---
+
+**Understanding the Components of the Model**
+
+1. **Fixed Effect (βxₖ):**
+   This is the main part of the model that captures the relationship between the predictor and the outcome (effect size). For instance, if β = 0.1 and xₖ is the study year, then for every one-year increase in publication year, the effect size increases by 0.1.
+
+2. **Random Effects (ζₖ):**
+   These represent variability in true effect sizes that cannot be explained by the predictor. This component is characterized by the **between-study variance**, denoted τ². It acknowledges that studies differ in ways we cannot fully measure.
+
+3. **Sampling Error (εₖ):**
+   This accounts for the fact that even if we knew the true effect size of each study, the observed value still varies due to chance (e.g., smaller sample sizes lead to less precise estimates).
+
+---
+
+**Why Use Meta-Regression**
+
+Meta-regression is useful when:
+
+* Heterogeneity (I² or τ²) is substantial, and we want to understand its sources.
+* We have **continuous moderators** (like year or dosage), which cannot be handled easily in traditional subgroup analysis.
+* We want to **control for multiple moderators simultaneously** (e.g., comparing dosage while adjusting for study quality).
+
+---
+
+**Limitations and Considerations**
+
+1. **Sample Size:**
+   While meta-regression works with study-level data, it still requires a sufficient number of studies to yield meaningful results. As a general guideline, at least 10 studies are recommended per predictor, but this is not a strict rule.
+
+2. **Ecological Fallacy:**
+   Because meta-regression uses **study-level** data, there is a risk of drawing incorrect conclusions about individuals (known as ecological fallacy). For example, just because studies with older participants show higher effects does not mean older individuals themselves benefit more.
+
+3. **Collinearity:**
+   When using multiple predictors, high correlation among them (multicollinearity) can distort estimates, just as in standard regression.
+
+4. **Overfitting:**
+   With too many predictors and too few studies, the model can become overly complex and unstable. Simpler models with theoretically meaningful predictors are usually more reliable.
+   
+### Meta-Regression with a Categorical Predictor
+
+A **categorical predictor** represents a variable with discrete levels or groups—such as "drug vs. placebo," "adult vs. child," or "high quality vs. low quality" studies.
+
+In standard subgroup analysis, we manually compare mean effect sizes between such groups. Meta-regression offers a mathematically equivalent but more general approach: **dummy coding** categorical variables and fitting them into a regression model.
+
+Here’s how that works:
+
+Let’s say you have a binary subgroup variable with two categories:
+
+* Subgroup A (reference group)
+* Subgroup B (comparison group)
+
+You define a **dummy variable** `Dg`:
+
+* `Dg = 0` if the study belongs to subgroup A
+* `Dg = 1` if the study belongs to subgroup B
+
+The meta-regression formula looks like this:
+
+  **θ̂ₖ = θ + β·Dg + εₖ + ζₖ**
+
+Where:
+
+* **θ̂ₖ** is the observed effect size in study *k*
+* **θ** is the intercept (mean effect size for subgroup A)
+* **β** is the regression coefficient: the **difference** in effect size between subgroup B and A
+* **Dg** is the dummy-coded group variable (0 or 1)
+* **εₖ** is the within-study sampling error
+* **ζₖ** is the between-study random effect (heterogeneity)
+
+Because the dummy variable takes values of 0 or 1, it acts like a switch:
+
+* If **Dg = 0**, the formula simplifies to θ̂ₖ = θ + εₖ + ζₖ → the predicted value is just θ, the mean of subgroup A
+* If **Dg = 1**, then θ̂ₖ = θ + β + εₖ + ζₖ → the predicted value is θ + β, i.e., the mean of subgroup B
+
+Thus, β represents the difference in average effect size **between the two subgroups**.
+
+When this model is estimated, the regression result will give you:
+
+* An intercept: the average effect for subgroup A
+* A slope: the estimated difference between subgroup B and A
+* A p-value for the slope: indicating whether the subgroup difference is statistically significant
+
+This shows that subgroup analysis is a special case of meta-regression—when the predictor is categorical and dummy-coded.
 
 
-## Implementing Meta-Regression in R with metafor
+![](./02_Plots/Meta/meta-regression with a categorical predictor.png)
+
+### Meta-Regression with a Continuous Predictor
+
+While subgroup analyses (or categorical meta-regression) allow us to compare discrete groups, **continuous meta-regression** enables analysis of predictors that take on a range of values, such as:
+
+* Year of publication
+* Age of participants
+* Dosage of a drug
+* Duration of treatment
+
+In this case, the model looks like:
+
+  **θ̂ₖ = θ + β·xₖ + εₖ + ζₖ**
+
+Where:
+
+* **xₖ** is the continuous predictor (e.g., treatment dose in study *k*)
+* **β** is the slope of the regression line
+* All other terms are as described above
+
+Here, the interpretation of **β** is:
+
+* For every **unit increase** in x (e.g., each additional mg of dose), the predicted effect size increases by **β** units.
+
+The model estimates a **regression line** through the scatter of study effect sizes and predictor values. This line expresses a pattern: how the effect changes in relation to x. A **positive β** indicates increasing effect size with increasing x; a **negative β** indicates the opposite.
+
+---
+
+**Understanding the Regression Terms**
+
+A key aspect of the formula is the distinction between *fixed* and *random* terms:
+
+* **θ** and **β** are *fixed* across all studies. They summarize the overall pattern in the data.
+* **εₖ** varies across studies because each study has a different standard error.
+* **ζₖ** represents random variation in the true effect size across studies that cannot be explained by xₖ.
+
+Together, this combination makes the meta-regression a **mixed-effects model**, because it blends fixed effects (predictable, consistent components) with random effects (unexplained variability).
+
+
+
+![](./02_Plots/Meta/meta-regression with a continuous predictor.png)
+
+
+
+## Assessing the Model Fit 
+
+Meta-regression is a statistical tool that allows us to model how study-level characteristics (predictors) explain variation in effect sizes across studies. Just like in regular regression, once a meta-regression model is built, we need to evaluate how well it fits the data. This is critical because it helps us determine whether the predictor(s) meaningfully explain the heterogeneity (i.e., between-study variation) in the meta-analysis.
+
+---
+
+**The Relationship Between Meta-Regression and Random-Effects Meta-Analysis**
+
+Before we explore model fit, it’s important to recognize that meta-regression is an **extension of the random-effects model**:
+
+* The standard random-effects model can be seen as a meta-regression with **no slope**—that is, it assumes there is **one pooled effect size**, and every study deviates from this average due to sampling error and heterogeneity.
+* In contrast, meta-regression **adds predictors** (covariates) to explain differences in effect sizes across studies.
+
+In this way, meta-regression is more flexible: it still models random variation across studies, but it also allows **systematic variation** based on study-level characteristics.
+
+---
+
+**Step 1: Estimating Between-Study Variance (τ²)**
+
+In the first step, meta-regression begins by estimating **τ²**, the between-study variance. This step is shared with the random-effects model and typically uses methods such as:
+
+* **DerSimonian-Laird**
+* **REML (Restricted Maximum Likelihood)**
+
+This initial τ² estimate represents how much variation exists between study effect sizes **before** including any predictors.
+
+---
+
+**Step 2: Estimating Regression Coefficients (θ and β)**
+
+In the second step, the model estimates the regression parameters:
+
+* **θ** is the intercept: the predicted effect when the predictor is 0.
+* **β** is the slope: how much the effect size increases (or decreases) per unit of the predictor.
+
+Instead of ordinary least squares (OLS), meta-regression uses **weighted least squares (WLS)**. This is because:
+
+* Not all studies are equally reliable—some have larger standard errors and thus more uncertainty.
+* WLS gives **more weight** to studies with smaller standard errors, which are considered to provide more precise estimates of effect sizes.
+
+---
+
+**Step 3: Evaluating Model Fit Using Explained Heterogeneity**
+
+Once we fit the meta-regression model, we want to know: **Did the predictor help explain the variation in effect sizes across studies?**
+
+To answer this, we compare:
+
+* The **original between-study variance** (before regression): τ²\_total (or τ²\_REM)
+* The **residual between-study variance** (after regression): τ²\_unexplained (or τ²\_MEM)
+
+If τ² becomes smaller after adding the predictor, then the model **explains part of the heterogeneity**.
+
+To quantify this improvement, we calculate an index called **R²**\* (R-squared star), which tells us the **proportion of heterogeneity variance explained** by the model:
+
+  **R²* = 1 − (τ²\_unexplained / τ²\_total)*\*
+
+Alternatively, it can be written as:
+
+  **R²* = (τ²\_REM − τ²\_MEM) / τ²\_REM*\*
+
+Where:
+
+* **τ²\_REM** is the between-study variance from the random-effects model (no predictor).
+* **τ²\_MEM** is the residual variance from the mixed-effects meta-regression model.
+
+The higher the R²\*, the more variance is explained by the predictor. For example, an R²\* of 0.40 means that 40% of the original heterogeneity has been explained.
+
+---
+
+**Step 4: Testing the Significance of Predictors**
+
+Aside from knowing that the model explains more variance, we want to test whether the **slope β is significantly different from zero**. This tells us whether the predictor has a statistically meaningful association with effect size.
+
+To test this, we calculate a **z-statistic**:
+
+  **z = β̂ / SE(β̂)**
+
+Where:
+
+* **β̂** is the estimated slope coefficient,
+* **SE(β̂)** is its standard error.
+
+This z-statistic is then compared to the **standard normal distribution** to compute a **p-value**. If p < 0.05, we typically conclude that the predictor is statistically significant.
+
+---
+
+**Alternative: Knapp-Hartung Adjustment**
+
+The z-test is the conventional method, but it can sometimes **underestimate uncertainty**, especially in meta-analysis where the number of studies is small.
+
+An improved method is the **Knapp-Hartung adjustment**, which:
+
+* Adjusts the standard error of β̂.
+* Uses a **t-distribution** instead of a z-distribution for hypothesis testing.
+* Is more conservative, reducing the risk of false positives (Type I errors).
+
+Because of its robustness, the Knapp-Hartung method is **often recommended** over the basic z-test in meta-regression.
+
+
+---
+
+**Summary: How to Assess Meta-Regression Model Fit**
+
+1. **Fit the Model**
+
+   * Estimate τ² using REML or another method.
+   * Use WLS to estimate θ (intercept) and β (slope).
+
+2. **Check Residual Heterogeneity**
+
+   * Calculate the new τ² after fitting the model.
+   * Compare it with the original τ² to see if the predictor reduced unexplained heterogeneity.
+
+3. **Compute R²**\*
+
+   * Quantifies the proportion of heterogeneity explained by the model.
+
+4. **Test Predictor Significance**
+
+   * Use either the z-test or (preferably) the Knapp-Hartung method.
+   * A significant β indicates that the predictor explains systematic variation in effect sizes.
+
+
+## Implementing Meta-Regression using meta::metareg
+
+Meta-regression is a technique used to investigate whether certain study-level characteristics (predictors or moderators) can explain differences in effect sizes across studies. In R, the `{meta}` package provides the `metareg()` function to perform meta-regression on a meta-analysis object created with one of `{meta}`'s core functions, such as `metagen()`, `metacont()`, or `metabin()`.
+
+   * **I²** tells us that after including `year` as a predictor, about **29% of the remaining variance** is still unexplained.
+   * **R²**\* (marked as just R² here) indicates that `year` explains **77% of the between-study heterogeneity**—a large and meaningful portion.
+   
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+year <- c(2014, 1998, 2010, 1999, 2005, 2014, 
+          2019, 2010, 1982, 2020, 1978, 2001,
+          2018, 2002, 2009, 2011, 2011, 2013)
+m.gen <- metagen(TE = TE,
+                 seTE = seTE,
+                 studlab = Author,
+                 data = ThirdWave,
+                 sm = "SMD",
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 method.random.ci = "HK",
+                 title = "Third Wave Psychotherapies")
+
+m.gen.reg <- metareg(m.gen, ~year)
+m.gen.reg
+
+## Visualizing with Bubble Plot
+bubble(m.gen.reg, studlab = TRUE)
+```
+
+## Implementing Meta-Regression using metafor
 
 The `meta` and `rmeta` packages do not support meta-regression. Instead, the **`metafor`** package is used, which is designed for flexible meta-analysis and includes advanced features like meta-regression.
 
@@ -1880,11 +2172,7 @@ Here are the main methods you can choose from:
      
      
      
-**To Do with Doing Meta-Analysis in R: A Hands-on Guide**
-
-```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
  
-```
 
 **Practical Notes**
 
@@ -2971,6 +3259,1319 @@ $$
 # Meta-Analysis for Rare Events
 
 
+
+# Subgroup Analyses in Meta-Analysis
+
+Subgroup analyses are a key tool in meta-analysis that allow us to explore why effect sizes differ between studies. While traditional meta-analysis aims to estimate a single overall effect size across all studies, subgroup analyses take a step further: they investigate **sources of heterogeneity**, which refers to variation in study results beyond what would be expected by chance.
+
+## Introduction
+
+ 
+
+
+ 
+To ensure rigor and avoid bias, subgroup analyses should ideally be pre-specified—that is, planned **before** seeing the results of the meta-analysis. This prevents researchers from selectively reporting subgroups that happen to support their preferred narrative.
+
+The choice of subgroup variables should be driven by theoretical or practical considerations. Common examples include:
+
+* Type of treatment (e.g., drug A vs. drug B)
+* Length of follow-up (e.g., short vs. long)
+* Study region (e.g., Western vs. non-Western countries)
+* Patient characteristics (e.g., children vs. adults)
+* Study quality (e.g., high vs. low risk of bias)
+
+**What Subgroup Analyses Actually Do**
+
+Technically, subgroup analysis proceeds in two steps:
+
+1. **Estimate the pooled effect size** within each subgroup.
+2. **Statistically compare** these subgroup-level pooled estimates to test if the observed differences are likely due to more than just sampling error.
+
+This process helps answer the question: **Are differences in effects across studies linked to the subgroup characteristic, or are they simply due to random variation?**
+
+**The Fixed-Effects (Plural) Model**
+
+Subgroup analysis relies on a statistical model that is often called the **fixed-effects (plural) model**—a term coined by Borenstein and Higgins to distinguish it from the standard fixed-effect model used in traditional meta-analysis.
+
+
+![](./02_Plots/Meta/meta-plural model.png)
+ 
+## Subgroup Analysis in R
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# Show first entries of study name and 'RiskOfBias' column
+head(ThirdWave[,c("Author", "RiskOfBias")])
+
+m.gen <- metagen(TE = TE,
+                 seTE = seTE,
+                 studlab = Author,
+                 data = ThirdWave,
+                 sm = "SMD",
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 method.random.ci = "HK",
+                 title = "Third Wave Psychotherapies")
+summary(m.gen)
+
+update(m.gen, 
+       subgroup = RiskOfBias, 
+       tau.common = FALSE)
+```
+
+In the output, we see a new section called Results for subgroups. This part of the output shows the pooled effect size separately for each subgroup. We see that there are 
+k=7 studies with a high risk of bias, and 11 with a low risk of bias. The estimated between-study heterogeneity differs considerably, with I2=77% in high risk of bias studies, but only 26% in studies with a low risk.
+
+The effect sizes of the subgroups also differ. With g=0.43, the effect estimate in low risk of bias studies is smaller than in studies with a high risk of bias. This is a common finding because biased studies are more likely to overestimate the effects of a treatment.
+
+But is the difference statistically significant? We can check this by looking at the results of the Test for subgroup differences. This shows us the Q-test, which, in our example with 2 subgroups, is based on one degree of freedom. The p-value of the test is 0.09, which is larger than the conventional significance threshold, but still indicates a difference on a trend level.
+
+We can also check the results if were to assume a common τ2 estimate in both subgroups. We only have to set tau.common to TRUE.
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+update(m.gen, subgroup = RiskOfBias, tau.common = TRUE)
+```
+
+
+In this model:
+
+* We assume that **each subgroup has its own true effect size**.
+* We are **not assuming** that these subgroups are drawn randomly from a broader population of subgroups.
+* Instead, we treat the subgroups as **fixed and exhaustive** categories (e.g., employed vs. unemployed), meaning they cover all levels we are interested in.
+
+This leads to a hybrid model:
+
+* **Within subgroups**, studies are modeled using a **random-effects model**, recognizing that variation exists within each group.
+* **Between subgroups**, the variation in subgroup means is treated using a **fixed-effects perspective**, since we are only interested in the specific categories we defined.
+
+Because this model mixes random and fixed effects, it is also referred to as a **mixed-effects model**.
+
+**Pooling the Effect in Each Subgroup**
+
+Each subgroup is analyzed as if it were its own mini-meta-analysis:
+
+* The pooled effect size is estimated using a fixed or random-effects model.
+* When subgroup sizes are small (fewer than 5 studies), estimating heterogeneity within that subgroup becomes unstable.
+* For practical reasons, a **pooled estimate of heterogeneity (τ²)** is often calculated across all subgroups and applied uniformly, rather than estimating τ² separately for each small group.
+
+**Comparing the Subgroups**
+
+After obtaining the pooled effect for each subgroup, we test whether these pooled effects **differ more than would be expected by chance**.
+
+This is done using a **Q statistic**, similar to what is used for assessing heterogeneity in a standard meta-analysis:
+
+* The **observed Q** reflects how different the subgroup effect sizes are from each other.
+* It is compared to a **chi-squared distribution** with degrees of freedom equal to the number of subgroups minus one (G − 1).
+* A significant Q suggests that at least one subgroup differs meaningfully from the others.
+
+This **Q test for subgroup differences** is an **omnibus test**: it tells you that there is a difference somewhere, but not where exactly. Follow-up comparisons or graphical analysis may be needed to interpret the direction and magnitude of differences.
+
+**Fixed vs. Random Subgroup Levels**
+
+Not all subgroup variables are fixed. Consider a case where studies are categorized by **country of origin**: if your meta-analysis includes only a handful of countries, and they are not chosen to represent all countries systematically, then it may be more appropriate to treat "country" as a **random effect**.
+
+In such cases, instead of a fixed-effects (plural) model, a **multi-level (hierarchical) model** is more appropriate, the key idea is that the variation among subgroups is treated as another layer of random variability.
+
+**Examples of Subgroup Variables with Fixed Levels**
+
+Subgroup analyses are appropriate when the variable of interest represents meaningful, non-random categories. Some examples include:
+
+* Age groups: children, adults, elderly
+* Geographic regions: Western vs. non-Western
+* Type of outcome measure: self-report vs. clinician-rated
+* Type of intervention: no treatment vs. active treatment
+* Setting: school, hospital, community
+
+Each of these defines **specific, theoretically grounded categories** that are relevant to the topic being studied.
+
+
+
+
+# Publication Bias  
+
+## Publication Bias
+
+Publication bias refers to the **systematic distortion** of meta-analytic findings that arises when the **likelihood of a study being published depends on the direction, magnitude, or significance of its results**. This means that **positive, statistically significant, or hypothesis-confirming results are more likely to be published and accessible**, whereas studies with negative or null findings are often left unpublished or harder to find. As a result, the body of literature available for meta-analysis may **not be representative of all the research that has actually been conducted**.
+
+**Why Does Publication Bias Matter in Meta-Analysis?**
+
+Meta-analysis aims to provide a **comprehensive and unbiased summary** of the available evidence on a specific research question. This goal assumes that the data included are:
+
+* Representative of all relevant studies,
+* Unaffected by systematic exclusion,
+* And sufficiently diverse to reflect the full picture of the field.
+
+**However, if certain kinds of results (e.g., negative or null) are systematically underreported or hidden**, the meta-analytic estimate will likely be **biased**, often **overestimating the true effect size**.
+
+A classic metaphor is trying to estimate the size of an iceberg while only measuring its visible tip — no matter how accurate the measurement is, it won’t reflect the true size if most of the iceberg is submerged and unseen.
+
+
+**Causes of Publication Bias**
+
+1. **Editorial and reviewer preferences**
+   Journals are more likely to accept papers with “positive” or novel findings.
+
+2. **Author decisions**
+   Researchers may choose not to write up or submit studies with insignificant or contrary results.
+
+3. **Funding and stakeholder influence**
+   Industry sponsors may suppress findings that are unfavorable to their products.
+
+4. **Academic pressures**
+   The "publish or perish" culture incentivizes striking findings, not careful or null results.
+
+**Different Types of Bias Related to Publication Bias**
+
+In addition to classic publication bias, other *non-reporting biases* can distort meta-analytic evidence:
+
+| Type of Bias                  | Description                                                                     |
+| ----------------------------- | ------------------------------------------------------------------------------- |
+| **File Drawer Problem**       | Studies with null results are left "in the file drawer" and never published.    |
+| **Citation Bias**             | Positive results are cited more often, making them easier to locate.            |
+| **Time-Lag Bias**             | Positive studies are published faster than negative ones.                       |
+| **Multiple Publication Bias** | Positive results are more likely to be published multiple times.                |
+| **Language Bias**             | Studies published in English are more accessible than those in other languages. |
+| **Outcome Reporting Bias**    | Only favorable outcomes are reported, while unfavorable ones are suppressed.    |
+
+**How Can We Address Publication Bias?**
+
+1. **During Study Selection/Search**
+
+* Search *beyond* peer-reviewed journals (e.g., **grey literature**, such as dissertations, preprints, clinical trial registries).
+* Contact study authors for **unpublished data**.
+* Check **study registries** (e.g., ClinicalTrials.gov, OSF Registries) to compare registered protocols vs. published outcomes.
+
+2. **Using Statistical Techniques**
+
+Meta-analysts can apply methods to detect and adjust for publication bias:
+
+* **Funnel plots**: Visual tool where asymmetry suggests missing studies (especially small ones with null results).
+* **Egger’s regression test**: Statistically tests for funnel plot asymmetry.
+* **Trim-and-fill** method: Imputes and adds hypothetical missing studies to estimate an adjusted effect size.
+* **Selection models**: Model the probability that studies are published based on their results.
+
+While none of these methods can **prove** publication bias, they can provide **evidence consistent with its presence** and help **assess its potential impact**.
+
+
+## Small-Study Effect Methods in Assessing Publication Bias
+
+### Funnel Plot
+
+**Small-Study Effect Methods in Assessing Publication Bias**
+
+Small-study effect methods are a family of diagnostic tools and statistical techniques used to **identify and address publication bias** in meta-analysis. The term "small-study effects" refers to the tendency for **smaller studies to report larger treatment effects** than larger studies. This phenomenon may not necessarily stem from bias alone, but when combined with selective reporting practices, it can signal **systematic distortions** in the data — most notably, **publication bias**.
+
+These methods rest on the assumption that **publication bias disproportionately affects smaller studies**, which typically have **higher standard errors and lower statistical power**.
+
+---
+
+**The Logic Behind Small-Study Effect Assumptions**
+
+According to Borenstein et al. (2011), the rationale for small-study effect methods relies on three key points:
+
+1. **Large studies** are expensive and labor-intensive to conduct. Because of this investment, they are almost always published — regardless of whether their findings are statistically significant. Therefore, large studies are less likely to be missing from the literature.
+
+2. **Medium-sized studies** have a moderate chance of producing significant results. Some may fail to achieve significance and therefore might not be published. Consequently, there’s a moderate risk of non-publication among these studies.
+
+3. **Small studies** are particularly vulnerable. Due to their low statistical power, they tend to produce non-significant findings unless the true effect is very large. Therefore, only small studies with **large, significant effect sizes** are likely to be published, while others remain hidden in the proverbial “file drawer.”
+
+This publication filter leads to a **biased selection**: small studies with large effects are overrepresented, while small studies with modest or null effects are underrepresented. This skews the evidence base and inflates the pooled effect size in meta-analyses.
+
+---
+
+**The Funnel Plot**
+
+A **funnel plot** is a widely used graphical tool to detect small-study effects. It is a **scatter plot** where each study in a meta-analysis is plotted based on:
+
+* The **effect size** (x-axis), and
+* A measure of **study precision** (typically the standard error, on the y-axis — often inverted so that higher precision appears at the top).
+
+When there is **no publication bias**, and the effect sizes only vary due to sampling error, studies should scatter symmetrically around the overall effect size. As precision decreases (i.e., standard error increases), the spread of observed effect sizes should widen — producing an **inverted funnel shape**. Large studies (at the top of the plot) will cluster near the pooled effect, while smaller studies (at the bottom) will fan out.
+
+However, **asymmetry in the funnel plot** — especially if small studies disproportionately show large effects — suggests potential **publication bias** or other small-study effects.
+
+---
+
+**Illustrative Example with R Code**
+ 
+In this plot:
+
+* Each point represents a study.
+* The vertical line shows the average (pooled) effect size from a random-effects model.
+* The spread around the line helps detect symmetry or asymmetry.
+
+If small studies with large effects appear only on one side (e.g., the right), and are not mirrored on the other side (e.g., the left), this suggests a **lack of negative or non-significant small studies**, which may not have been published.
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+m.gen <- metagen(TE = TE,
+                 seTE = seTE,
+                 studlab = Author,
+                 data = ThirdWave,
+                 sm = "SMD",
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 method.random.ci = "HK",
+                 title = "Third Wave Psychotherapies")
+
+# Produce funnel plot
+meta::funnel(m.gen,
+             xlim = c(-0.5, 2),
+             studlab = TRUE)
+
+# Add title
+title("Funnel Plot (Third Wave Psychotherapies)")
+```
+
+---
+
+**Contour-Enhanced Funnel Plots**
+
+To improve interpretation, **contour-enhanced funnel plots** add **shaded regions indicating statistical significance levels**. This allows us to see **whether missing studies would fall in non-significant regions**, suggesting they were less likely to be published.
+
+This visualization helps differentiate **true heterogeneity** from **bias-related asymmetry**. If most small studies fall within shaded (significant) regions and there are none in the non-significant zones, publication bias becomes a more likely explanation.
+
+Here’s how you can generate such a plot in R:
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# Define fill colors for contour
+col.contour = c("gray75", "gray85", "gray95")
+
+# Generate funnel plot (we do not include study labels here)
+meta::funnel(m.gen, xlim = c(-0.5, 2),
+             contour = c(0.9, 0.95, 0.99),
+             col.contour = col.contour)
+
+# Add a legend
+legend(x = 1.6, y = 0.01, 
+       legend = c("p < 0.1", "p < 0.05", "p < 0.01"),
+       fill = col.contour)
+
+# Add a title
+title("Contour-Enhanced Funnel Plot (Third Wave Psychotherapies)")
+```
+
+**NOTE**: While funnel plot asymmetry **may indicate publication bias**, it is not conclusive on its own. Other plausible reasons include:
+
+* **Between-study heterogeneity**: Differences in populations, interventions, or settings may cause true effect sizes to differ across studies.
+* **Differential study quality**: Smaller studies may be more prone to bias due to weaker methodology, leading to inflated effect sizes.
+* **Implementation fidelity**: Smaller trials might have more tightly controlled conditions, exaggerating treatment effects compared to real-world large-scale studies.
+* **Random chance**: Especially when the number of studies is small, asymmetry can arise by chance alone.
+
+Therefore, **funnel plots are suggestive, not definitive**. Interpretation should be combined with statistical testing and examination of study-level characteristics.
+ 
+To move beyond subjective visual inspection, statistical tests such as **Egger’s regression test** are often used. These methods provide **formal, quantitative assessments** of whether asymmetry is statistically significant 
+
+### Egger’s Regression Test
+
+
+Egger’s regression test, introduced by Egger et al. (1997), is one of the most widely used **statistical methods to detect funnel plot asymmetry** in meta-analyses. While it does **not directly identify publication bias**, it provides a **quantitative measure of small-study effects**, which are often a consequence of such bias.
+ 
+Egger’s test is based on a simple linear regression framework, where each study's **standardized effect size** (i.e. the effect size divided by its standard error) is regressed on its **precision**, which is the inverse of the standard error. The regression equation looks like this:
+
+```
+(Effect Size / Standard Error) = Intercept + Slope × (1 / Standard Error)
+```
+
+This means we are regressing the **z-score** of the effect (i.e., how many standard errors the effect size is from zero) on the **precision** of each study.
+
+---
+
+**What the Intercept Tells Us**
+
+In this regression, we are primarily interested in the **intercept**, not the slope. Here’s why:
+
+* If there is **no funnel plot asymmetry**, we expect that **effect sizes from studies with low precision (i.e. high standard errors)** will be symmetrically distributed around the overall effect size.
+* Therefore, when **precision is zero** (theoretically, an infinitely imprecise study), the **expected z-score should be zero**.
+* However, if **small studies with non-significant results are missing**, only small studies with large, significant results are included in the meta-analysis. This leads to a **non-zero intercept**.
+
+A **significantly non-zero intercept** thus suggests that the funnel plot is **asymmetrical**, consistent with **small-study effects** and potential **publication bias**.
+
+
+![](./02_Plots/Meta/meta-eggers-intercept.png)
+
+---
+
+**Running Egger’s Test in R**
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# m.gen <- metagen(TE = TE,
+#                  seTE = seTE,
+#                  studlab = Author,
+#                  data = ThirdWave,
+#                  sm = "SMD",
+#                  fixed = FALSE,
+#                  random = TRUE,
+#                  method.tau = "REML",
+#                  method.random.ci = "HK",
+#                  title = "Third Wave Psychotherapies")
+
+m.gen$data %>% 
+  mutate(y = TE/seTE, x = 1/seTE) %>% 
+  lm(y ~ x, data = .) %>% 
+  summary()
+```
+
+Interpretation:
+
+* The intercept is significantly greater than zero, suggesting **funnel plot asymmetry**.
+* The **t-test and p-value** indicate that the asymmetry is statistically significant.
+
+To streamline the process, `{meta}` offers a function `metabias()`:
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+metabias(m.gen, method.bias = "linreg")
+```
+
+**Reporting the Results**
+
+When reporting Egger’s test, it’s standard to include:
+
+* The intercept estimate and its 95% confidence interval
+* The test statistic (t-value)
+* The p-value
+
+You can automate this reporting with the `{dmetar}` package:
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+dmetar::eggers.test(m.gen)
+```
+
+---
+
+**Caution with Standardized Mean Differences (SMDs)**
+
+Egger’s test can produce **inflated false positives** when used on **standardized mean differences (SMDs)** like Hedges’ g. This is because:
+
+* The SMD and its standard error are **not independent**.
+* The formula for the SE of SMD includes the SMD itself, causing **artifactual correlations**.
+
+---
+
+**Pustejovsky-Rodgers Correction**
+
+To address this problem, Pustejovsky and Rodgers (2019) proposed a corrected standard error that **removes dependence on the effect size**. The adjusted formula is:
+
+```
+SE*_SMD = sqrt((n1 + n2) / (n1 * n2))
+```
+
+Where:
+
+* `n1` and `n2` are the group sample sizes.
+* This correction reduces spurious detection of asymmetry.
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# Add experimental (n1) and control group (n2) sample size
+n1 <- c(62, 72, 44, 135, 103, 71, 69, 68, 95, 
+        43, 79, 61, 62, 60, 43, 42, 64, 63)
+
+n2 <- c(51, 78, 41, 115, 100, 79, 62, 72, 80, 
+        44, 72, 67, 59, 54, 41, 51, 66, 55)
+
+m.gen$n.e = n1; m.gen$n.c = n2
+metabias(m.gen, method.bias = "Pustejovsky")
+```
+
+### Peters’ Regression Test
+ 
+
+Peters’ regression test is a statistical method designed to detect **funnel plot asymmetry in meta-analyses based on binary outcomes** — such as odds ratios, risk ratios, or proportions. It provides an **alternative to Egger’s test** when using **log-transformed binary effect sizes**, because Egger’s method can yield **inflated false positives** in this context due to mathematical dependencies between effect sizes and their standard errors.
+
+---
+
+**Why Is Peters’ Test Needed?**
+
+When working with **binary outcome data**, such as log odds ratios or log risk ratios, the **standard error of the effect size is not independent of the effect size itself**. This dependency is particularly problematic for Egger’s regression test, because:
+
+* It assumes independence between predictor (standard error or precision) and the outcome (z-score).
+* That assumption fails for binary effect sizes, making the test **prone to detecting false positives**.
+
+To address this, Peters et al. (2006) proposed an alternative approach that uses **sample size** rather than **standard error** as the predictor in the regression model.
+ 
+Peters’ regression is defined by the equation:
+
+```
+log(ψₖ) = β₀ + β₁ × (1 / nₖ)
+```
+
+Where:
+
+* `log(ψₖ)` is the **log-transformed effect size** (e.g., log odds ratio) for study `k`,
+* `nₖ` is the **total sample size** in study `k`,
+* `β₀` is the intercept,
+* `β₁` is the **slope**, which is the focus of the asymmetry test.
+
+In contrast to Egger’s test, Peters’ method uses **β₁ (the slope)** as the key indicator:
+
+* If **β₁ is significantly different from 0**, it suggests **funnel plot asymmetry**, indicating possible **publication bias or small-study effects**.
+ 
+The regression is **weighted**, meaning each study contributes differently based on its data characteristics. The weight `wₖ` for each study is computed as:
+
+```
+wₖ = 1 / (1/aₖ + 1/cₖ + 1/bₖ + 1/dₖ)
+```
+
+Where:
+
+* `aₖ` = number of events in the treatment group,
+* `cₖ` = number of events in the control group,
+* `bₖ` = non-events in the treatment group,
+* `dₖ` = non-events in the control group.
+
+This weighting ensures that studies with **more precise event estimates** (i.e., larger sample sizes and event counts) have greater influence in the regression.
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+m.bin <- metabin(event.e = event.e, 
+                 n.e = n.e,
+                 event.c = event.c,
+                 n.c = n.c,
+                 studlab = author,
+                 data = DepressionMortality,
+                 sm = "RR",
+                 method = "MH",
+                 MH.exact = TRUE,
+                 fixed = TRUE,
+                 random = TRUE,
+                 method.tau = "PM",
+                 method.random.ci = "HK",
+                 title = "Depression and Mortality") 
+meta::metabias(m.bin, method.bias = "peters")
+```
+
+**Interpretation:**
+
+* The **t-value is very close to zero** and the **p-value is high (0.94)**, meaning there is **no evidence of funnel plot asymmetry** in this data.
+* The regression slope `β₁ = -11.17` is not significantly different from zero.
+
+---
+
+**Key Differences Between Egger’s and Peters’ Tests**
+
+| Feature              | Egger’s Test                    | Peters’ Test                       |
+| -------------------- | ------------------------------- | ---------------------------------- |
+| Best suited for      | Continuous outcomes (e.g., SMD) | Binary outcomes (e.g., OR, RR)     |
+| Regression predictor | Precision (1/SE)                | Inverse of sample size (1/n)       |
+| Key test statistic   | Intercept (β₀)                  | Slope (β₁)                         |
+| Susceptible to bias  | With dependent SEs (e.g., SMDs) | Less sensitive for binary outcomes |
+
+### Duval & Tweedie Trim and Fill Method
+ 
+
+The **Duval and Tweedie Trim and Fill method** is a popular technique used in meta-analysis to **adjust for funnel plot asymmetry**, which often arises due to **small-study effects** — particularly those driven by **publication bias**. Unlike methods that merely detect asymmetry, the trim-and-fill method offers a **bias-adjusted estimate** of the pooled effect size by imputing missing studies that might not have been published.
+
+When we observe asymmetry in a funnel plot, it raises the concern that **some studies—likely those with non-significant or unfavorable results—are missing from the literature**. This potentially inflates the overall effect size in a meta-analysis. The trim-and-fill method attempts to **simulate what the meta-analytic effect size would be if these missing studies were included**.
+
+The process involves two main steps:
+
+**1. Trimming**
+
+* The algorithm first **identifies asymmetry** in the funnel plot by locating **outlying studies**, typically smaller studies with **large positive effects** that skew the plot.
+* These outliers are then **trimmed**, i.e., temporarily removed.
+* A **new center (pooled effect size)** is calculated using the remaining data, typically using a **fixed-effect model**.
+
+**2. Filling**
+
+* The trimmed studies are **reflected across the new center line**, simulating **imputed missing studies** that would restore symmetry to the funnel plot.
+* These **"filled" studies** are added to the data set.
+* The final pooled effect size is recalculated using **all observed + imputed studies**, typically using a **random-effects model**.
+
+The resulting effect size represents a **bias-adjusted estimate**, assuming that the observed asymmetry was caused by small-study effects such as publication bias.
+
+---
+
+**Limitations**
+
+While useful, the method has some important caveats:
+
+1. **Not reliable under high heterogeneity**:
+
+   * When between-study variance is large (e.g., high I²), even **large studies** can deviate from the mean.
+   * This may lead to the method incorrectly trimming and filling **valid studies**, distorting the correction.
+
+2. **Assumes asymmetry is due to bias**:
+
+   * The method **cannot differentiate** between bias and other sources of asymmetry (e.g., study design differences, true heterogeneity, chance).
+
+3. **Only estimates potential bias**:
+
+   * It **does not prove publication bias** exists—it only estimates what the effect size would be if the asymmetry was due to missing studies.
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# Run trim and fill on the full dataset
+tf <- trimfill(m.gen)
+summary(tf)
+
+# Run trim and fill after excluding outliers (e.g., studies 3 and 16)
+tf.no.out <- trimfill(update(m.gen, subset = -c(3, 16)))
+summary(tf.no.out)
+```
+
+ 
+These results show that:
+
+* The adjusted pooled effect size (`g = 0.34`) is **considerably lower** than the original (`g = 0.58`).
+* This suggests **substantial small-study effects**, likely related to publication bias.
+
+
+**Visualizing Trim-and-Fill Results with Funnel Plots**
+
+In these plots:
+
+* **Observed studies** are solid circles.
+* **Imputed studies** are **open circles** (no fill).
+* Symmetry around the center line improves after imputation.
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# Contour settings
+contour <- c(0.9, 0.95, 0.99)
+col.contour <- c("gray75", "gray85", "gray95")
+ld <- c("p < 0.1", "p < 0.05", "p < 0.01")
+
+# Side-by-side plots
+par(mfrow=c(1,2))
+
+# Funnel plot with full data
+meta::funnel(tf, 
+             xlim = c(-1.5, 2), 
+             contour = contour,
+             col.contour = col.contour)
+legend(x = 1.1, y = 0.01, legend = ld, fill = col.contour)
+title("Funnel Plot (Trim & Fill Method)")
+
+# Funnel plot with outliers removed
+meta::funnel(tf.no.out, 
+             xlim = c(-1.5, 2), 
+             contour = contour,
+             col.contour = col.contour)
+legend(x = 1.1, y = 0.01, legend = ld, fill = col.contour)
+title("Funnel Plot (Trim & Fill) - Outliers Removed")
+```
+
+### PET-PEESE
+
+PET-PEESE is a modern method designed to adjust for small-study effects in meta-analysis, especially when working with standardized mean differences (SMDs). It is based on the idea that small studies are more likely to show exaggerated effects—often due to publication bias or low methodological quality—and that this bias can be modeled and corrected using regression techniques.
+
+The method combines two models:
+
+* PET (Precision Effect Test)
+* PEESE (Precision Effect Estimate with Standard Error)
+
+Each of these models estimates the relationship between effect size and study precision, but they do so in slightly different ways.
+
+The PET model regresses the observed effect size on the standard error of the effect size. The key coefficient of interest is the intercept, which estimates the effect size that would be observed if the standard error were zero—that is, the estimate we would get in an infinitely large, perfectly precise study. This intercept is interpreted as the bias-corrected true effect size.
+
+The PEESE model works similarly, but it uses the squared standard error (i.e., the variance) as the predictor instead. This model tends to be more accurate when the true effect is non-zero.
+
+Both models are weighted by the inverse of the variance of the effect sizes, just like in a fixed-effect meta-analysis. This gives more weight to more precise studies.
+
+To decide which of the two estimates to use, PET-PEESE applies a decision rule. If the intercept from the PET model is significantly greater than zero (using a one-sided test with alpha = 0.05, i.e., p < 0.10), then the intercept from the PEESE model is used. Otherwise, the PET intercept is used as the final estimate.
+
+In practice, this rule is used to guard against overestimation or underestimation, depending on whether the true effect is null or not.
+
+In a typical implementation using R, the process involves preparing a data frame that includes the effect sizes (usually under TE), the corrected standard errors (to reduce correlation between SE and TE), their squares, and inverse variance weights. Two regression models are then fit—one using SE as a predictor (PET), and one using SE squared (PEESE). The appropriate estimate is then selected based on the PET intercept’s value and significance.
+
+$$
+\begin{equation}
+  \hat\theta_{\text{PET-PEESE}}=\begin{cases}
+    \mathrm{P}(\beta_{0_{\text{PET}}} = 0) <0.1~\mathrm{and}~\hat\beta_{0_{\text{PET}}} > 0: & \hat\beta_{0_{\text{PEESE}}}\\
+    \text{else}: & \hat\beta_{0_{\text{PET}}}.
+  \end{cases}
+  \tag{9.9}
+\end{equation}
+$$
+
+PET-PEESE has limitations. It can both overcorrect and undercorrect, especially when fewer than 20 studies are included or when heterogeneity is very high (I² > 80%). It assumes that any relationship between effect size and precision is due to bias, but this is not always the case—heterogeneity and other factors can also create such patterns.
+
+Another important consideration is the type of regression used. The lm function in R assumes multiplicative error, while meta-analyses typically rely on additive error models. For this reason, a better implementation of PET-PEESE in meta-analysis is through the rma.uni function from the metafor package, which allows meta-regression with appropriate assumptions.
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
+# Build data set, starting with the effect size
+dat.petpeese <- data.frame(TE = m.gen$TE)
+# Experimental (n1) and control group (n2) sample size
+n1 <- c(62, 72, 44, 135, 103, 71, 69, 68, 95, 
+        43, 79, 61, 62, 60, 43, 42, 64, 63)
+
+n2 <- c(51, 78, 41, 115, 100, 79, 62, 72, 80, 
+        44, 72, 67, 59, 54, 41, 51, 66, 55)
+
+# Calculate modified SE
+dat.petpeese$seTE_c <- sqrt((n1+n2)/(n1*n2))
+
+# Add squared modified SE (= variance)
+dat.petpeese$seTE_c2 <- dat.petpeese$seTE_c^2
+
+## Lastly, we need to calculate the inverse-variance weights w_k for each study. Here, we also use the squared modified standard error to get an estimate of the variance.
+dat.petpeese$w_k <- 1/dat.petpeese$seTE_c^2
+
+# PET
+pet <- lm(TE ~ seTE_c, weights = w_k, data = dat.petpeese)
+summary(pet)$coefficients
+
+# PEESE
+peese <- lm(TE ~ seTE_c2, weights = w_k, data = dat.petpeese)
+summary(peese)$coefficients
+```
+
+### Rücker’s Limit Meta-Analysis Method
+ 
+
+Rücker’s limit meta-analysis is a statistical approach designed to adjust for **small-study effects** in meta-analyses. These small-study effects are commonly driven by **publication bias**, where smaller studies with non-significant results are less likely to be published, and thus excluded from the evidence base. Rücker’s method goes beyond merely detecting such bias—it attempts to **estimate an adjusted pooled effect size** that accounts for it.
+
+This approach is more advanced than PET-PEESE and other regression-based adjustments. It builds on a more **sophisticated meta-analytic model** that incorporates **bias directly into the estimation process**.
+
+---
+
+**The Basic Random-Effects Meta-Analysis Model**
+
+In a standard random-effects meta-analysis, the observed effect size in study *k*, written as θ̂ₖ, is modeled as the sum of:
+
+* μ: the true overall effect size
+* ϵₖ: the sampling error (random noise)
+* ζₖ: the between-study deviation (heterogeneity)
+
+This relationship can be written as:
+
+θ̂ₖ = μ + ϵₖ + ζₖ
+
+This model assumes that the observed variation between studies comes from sampling error and heterogeneity, but **not from publication bias or other systematic distortions**.
+
+---
+
+**Extension for Small-Study Effects: Adding Bias to the Model**
+
+Rücker’s limit meta-analysis modifies this model by introducing a bias component that interacts with study-level error:
+
+θ̂ₖ = μ\* + θ\_Bias × (ϵₖ + ζₖ)
+
+Here:
+
+* μ\* is the **adjusted global mean**, not equivalent to μ in the unadjusted model.
+* θ\_Bias is a term that **quantifies the impact of small-study effects** on the observed data.
+* The bias term scales with the level of error: the larger the standard error or heterogeneity, the larger the distortion.
+
+This formula captures the idea that **less precise studies are more biased**, and it allows us to estimate how the true effect size would look **if those biases were removed**.
+
+---
+
+**The Limit Concept: What Happens as Standard Error Shrinks**
+
+In PET-PEESE, we assume that smaller standard errors represent more precise studies, and the bias disappears as SE → 0. Rücker’s method applies a similar idea. It evaluates the **limit of the model** as ϵₖ (sampling error) approaches zero.
+
+When we take the expected value of θ̂ₖ as ϵₖ → 0, we get:
+
+E(θ̂ₖ) → μ\* + θ\_Bias × ζₖ
+
+This provides the basis for estimating the **bias-adjusted average effect size**. Since ζₖ is often represented by the standard deviation τ (the square root of the between-study variance τ²), we derive:
+
+θ\* = μ\* + θ\_Bias × τ
+
+Here, θ\* is the **bias-corrected pooled effect size**. It reflects what the pooled effect would be if the influence of small-study effects were neutralized.
+
+---
+
+**Shrinkage of Individual Study Estimates**
+
+The method also allows for calculating a **bias-adjusted effect size for each individual study**. This “shrinking” pulls overly large effects toward the adjusted mean, especially for small studies with large standard errors. The adjusted estimate for each study is:
+
+θ̂*ₖ = μ* + √(τ² / (SEₖ² + τ²)) × (θ̂ₖ − μ\*)
+
+This shrinks each observed effect θ̂ₖ based on how imprecise it is (reflected by SEₖ²). The higher the standard error, the more aggressive the shrinkage.
+
+---
+
+**Implementation in R Using the metasens Package**
+
+The limitmeta method is implemented in the `limitmeta()` function from the `{metasens}` package. This package is designed to work with meta-analysis objects created using the `{meta}` package.
+
+
+In this example, `m.gen` is a meta-analysis object built using standardized mean differences (SMDs). The output shows:
+
+1. **Original study-level effect sizes and confidence intervals**
+2. **Shrinkage-adjusted effect sizes and confidence intervals**
+3. **The adjusted pooled effect size (θ*)*\*
+4. **The unadjusted pooled effect size for comparison**
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
+# Create object
+lmeta <- limitmeta(m.gen)
+lmeta
+```
+
+You can also visualize the results of limitmeta using a funnel plot with an adjustment curve:#
+
+These plots resemble traditional funnel plots but include:
+
+* A **gray curve** representing the predicted bias as standard error increases
+* Optionally, **adjusted study estimates** plotted to show how each effect was corrected
+  
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
+# Basic funnel plot with bias curve
+funnel.limitmeta(lmeta, xlim = c(-0.5, 2))
+
+# Funnel plot with shrunken estimates
+funnel.limitmeta(lmeta, xlim = c(-0.5, 2), shrunken = TRUE)
+```
+
+
+
+**Advantages of Rücker’s Method**
+
+1. **Explicit bias modeling**: It directly incorporates a bias term into the meta-analysis framework.
+2. **Handles heterogeneity better** than PET-PEESE by including τ² in the estimation.
+3. **Robust adjustment**: Shrinks individual effect sizes proportionally to their precision.
+4. **Applicable across effect size types**: Can be used with continuous or binary outcome data.
+
+---
+
+**Limitations**
+
+* The method assumes that the bias increases proportionally with standard error and heterogeneity. This may not hold in all fields.
+* The model is more complex and can be harder to interpret for non-specialists.
+* Like other methods, it **does not prove that publication bias exists**—it assumes small-study effects and adjusts accordingly.
+
+## P-Curve
+
+In scientific publishing, one major issue is **publication bias**—the tendency for studies with statistically significant results to be more likely to be published. Traditional methods to detect this bias often focus on **small-study effects**, assuming that studies with small sample sizes are more likely to show exaggerated effects due to selective reporting.
+
+However, this perspective might miss a crucial point: **researchers and journals prioritize statistically significant *p*-values (< 0.05)** rather than large effect sizes per se. This insight leads to the development of **P-Curve**, a method that assesses publication bias by analyzing the distribution of *p*-values instead of effect sizes.
+
+---
+
+**What Is a P-Curve?**
+
+A **p-curve** is the distribution (or histogram) of the statistically significant *p*-values from studies included in a meta-analysis. For example, it may group studies by their *p*-values:
+
+* *p* < 0.01
+* *p* < 0.02
+* *p* < 0.03
+* ... up to *p* < 0.05
+
+The **shape** of this distribution reveals important information:
+
+* A **flat p-curve** suggests that the results could be false positives (i.e. no real effect).
+* A **right-skewed p-curve** (many very small *p*-values) suggests **evidential value** (a true underlying effect).
+* A **left-skewed p-curve** suggests **p-hacking**, where researchers manipulate analysis until a just-barely-significant *p*-value is achieved.
+
+---
+
+**How Does P-Curve Work?**
+
+P-curve analysis involves:
+
+1. **Selecting only significant studies** (*p* < 0.05).
+2. **Assessing skewness** in the distribution of these *p*-values to infer evidential value.
+3. **Testing for flatness** to rule out the presence of only small or no effects.
+4. **Estimating the true effect size** based on how well the shape of the p-curve matches different non-central distributions.
+
+---
+
+**Statistical Tests in P-Curve Analysis**
+
+P-curve offers **two main tests** to assess evidential value:
+
+1. **Test for Right-Skewness**
+
+   * Based on the assumption that a right-skewed p-curve indicates true effects.
+   * Methods used:
+
+     * **Binomial test** (counts how many p-values fall below 0.025).
+     * **Fisher’s method** (aggregates transformed *p*-values into a χ² statistic).
+
+2. **Test for Flatness**
+
+   * Based on the assumption that a flat distribution indicates no or negligible effect.
+   * Compares the observed p-curve against a theoretical distribution assuming 33% power (chosen arbitrarily to represent a small, borderline-meaningful effect).
+
+These tests can be performed on:
+
+* The **full p-curve** (all significant *p*-values).
+* The **half p-curve** (only *p* < 0.025), to guard against p-hacking.
+
+---
+
+**Summary interpretation rules:**
+
+* **Evidential value present**:
+
+  * Right-skewness test (full or half curve) has *p* < 0.05 or < 0.1.
+* **Evidential value absent**:
+
+  * Flatness test is significant on either the full or half curve.
+* **Unclear (no-no)**:
+
+  * Neither test is significant.
+  
+---
+
+**Conducting P-Curve in R**
+
+The `pcurve()` function (from the `{dmetar}` package) takes a `meta` object and returns:
+
+* Number of significant studies included.
+* Results of right-skewness and flatness tests.
+* Graph of the p-curve.
+* (Optionally) an estimate of the **true effect size**.
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# Remove outliers before analysis
+m.gen_update <- update(m.gen, subset = -c(3, 16))
+
+# Run basic p-curve analysis
+dmetar::pcurve(m.gen_update)
+```
+
+To include **effect size estimation**, provide sample sizes and use the `effect.estimation = TRUE` argument:
+
+The function estimates the **effect size (Cohen’s d)** that best fits the observed p-curve by simulating various non-central distributions and comparing how closely their predicted p-curves resemble the observed one.
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}  
+# Add experimental (n1) and control group (n2) sample size
+# Sample sizes of study 3 and 16 removed
+n1 <- c(62, 72, 135, 103, 71, 69, 68, 95, 
+        43, 79, 61, 62, 60, 43, 64, 63)
+
+n2 <- c(51, 78, 115, 100, 79, 62, 72, 80, 
+        44, 72, 67, 59, 54, 41, 66, 55)
+
+# Run p-curve analysis with effect estimation
+pcurve(m.gen_update, 
+       effect.estimation = TRUE,
+       N = n1+n2, 
+       dmin = 0,
+       dmax = 1)
+```
+
+---
+
+**How to Report P-Curve Results**
+
+A comprehensive report should include:
+
+* Results of right-skewness and flatness tests (binomial, full, and half curves).
+* Interpretation of evidential value presence/absence.
+* Estimated effect size (if applicable).
+* p-curve plot.
+* A **disclosure table** showing how and from where the effect sizes were extracted.
+
+## Which Publication Bias Method Should I Use?
+
+As the research literature and practical experience show, **no single method** consistently outperforms all others. The best strategy is often **triangulation**—applying several publication bias methods and comparing their results.
+
+---
+
+**Why Use Multiple Methods?**
+
+* **No method is flawless**: Each method makes different assumptions and has unique sensitivities.
+* **Results can vary dramatically**: The same data may yield different conclusions depending on the method used.
+* **Greater confidence through convergence**: If multiple methods agree, you can be more confident in your conclusions.
+* **Understanding uncertainty**: Disagreement between methods reveals uncertainty in the robustness of the effect size.
+
+---
+
+**Interpreting Conflicting Results**
+
+When methods disagree:
+
+* Consider the **plausibility of each method’s assumptions** in the context of your data.
+* Reflect on **heterogeneity**, **study size**, and **number of included studies**.
+* A wide range of corrected estimates suggests **greater uncertainty** and **lower trust** in the pooled effect.
+* Use this range to present **a spectrum of possible true effects**, rather than a single value.
+
+---
+
+**Best Practices**
+
+* Always **report multiple estimates**: pooled effect, and those corrected by different bias methods.
+* Be transparent about which **assumptions each method makes**.
+* Avoid over-interpreting any one method's result in isolation.
+* Consider performing **sensitivity analyses** (e.g., exclude outliers, run subgroup analyses).
+* Above all, try to **include unpublished studies** and **preregister your meta-analysis protocol**.
+
+---
+
+| **Method**              | **Advantages**                                                            | **Disadvantages**                                                                        |
+| ----------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| **Trim-and-Fill**       | Easy to use and widely recognized.                                        | Often under-corrects; performs poorly with large heterogeneity.                          |
+| **PET-PEESE**           | Simple, regression-based, intuitive.                                      | Sensitive to small sample sizes, few studies, or high heterogeneity.                     |
+| **Limit Meta-Analysis** | Adjusts for heterogeneity; builds on PET-PEESE logic.                     | Less well studied; unreliable when <10 studies or very high heterogeneity.               |
+| **P-Curve**             | Effective if assumptions met; highlights evidential value.                | Requires many significant studies; assumes no heterogeneity; harder to explain.          |
+| **Selection Models**    | Flexible; can model realistic bias patterns; good simulation performance. | Dependent on model accuracy; hard to interpret; not robust to other small-study effects. |
+
+---
+
+**When to Avoid Publication Bias Methods**
+
+* If your meta-analysis has **very high heterogeneity** (e.g. *I²* ≥ 75%), **none of the current methods are reliable**.
+* In such cases, consider:
+
+  * **Removing outliers**.
+  * **Analyzing more homogeneous subgroups**.
+  * **Reporting findings without correction**, but clearly stating limitations.
+
+
+# Bayesian Meta-Analysis
+
+## Bayesian hierarchical model
+
+Bayesian meta-analysis still serves the same primary goal as conventional meta-analysis: to estimate a pooled effect size from multiple studies. However, it does so within a probabilistic framework, offering several benefits in modeling uncertainty and incorporating prior information.
+
+At its core, Bayesian meta-analysis uses a *Bayesian hierarchical model*. This model recognizes the multi-level structure of meta-analytic data, where individual observations are nested within studies, and study-level parameters are themselves random variables drawn from higher-level distributions.
+
+---
+
+**Model Specification**
+
+To formalize this hierarchical model, consider the following components:
+
+* Let \$\hat{\theta}\_k\$ be the observed effect size in study \$k\$.
+* Let \$\theta\_k\$ be the true (but unobserved) effect size in study \$k\$.
+* Let \$\mu\$ represent the overall pooled effect size.
+* Let \$\tau^2\$ be the between-study variance (heterogeneity).
+* Let \$\sigma\_k^2\$ be the sampling variance of study \$k\$.
+
+The model can be written in two levels:
+
+1. **Sampling level (within-study variability):**
+
+   $$
+   \hat{\theta}_k \sim \mathcal{N}(\theta_k, \sigma_k^2)
+   $$
+
+2. **Study-level (between-study variability):**
+
+   $$
+   \theta_k \sim \mathcal{N}(\mu, \tau^2)
+   $$
+
+This structure reflects that each study's observed effect is a noisy estimate of its true effect, and each true effect varies around an overall mean.
+
+---
+
+**Marginal Form**
+
+By integrating out the latent variable \$\theta\_k\$, we get the marginal distribution for the observed effect size:
+
+$$
+\hat{\theta}_k \sim \mathcal{N}(\mu, \sigma_k^2 + \tau^2)
+$$
+
+This form is equivalent to the random-effects model discussed in frequentist meta-analysis. The resemblance emphasizes that Bayesian meta-analysis is not fundamentally different in structure—it differs in its interpretation and estimation.
+
+---
+
+**Adding the Bayesian Layer**
+
+What makes the model Bayesian is the addition of **prior distributions**:
+
+$$
+(\mu, \tau^2) \sim p(\cdot) \quad \text{with} \quad \tau^2 > 0
+$$
+
+This step introduces prior beliefs about the parameters before seeing the data. For example:
+
+* A prior for \$\mu\$ might be a normal distribution centered around a plausible value.
+* A prior for \$\tau^2\$ might be a half-Cauchy distribution, often used for variance components.
+
+Specifying priors is both a strength and a responsibility. Thoughtful priors can improve estimation, especially when data is sparse. Poorly chosen priors, however, can bias results.
+
+---
+
+**Estimation via MCMC**
+
+Posterior distributions for \$\mu\$ and \$\tau^2\$ are not typically available in closed form. Instead, we use **Markov Chain Monte Carlo (MCMC)** methods to approximate them. 
+
+---
+
+**Why Use Bayesian Methods?**
+
+Bayesian meta-analysis provides several advantages over frequentist approaches:
+
+* **Uncertainty modeling**: Bayesian methods naturally model uncertainty in \$\tau^2\$, leading to more reliable estimates, especially in small-sample contexts.
+* **Posterior distributions**: Instead of fixed point estimates and confidence intervals, Bayesian analysis yields full distributions for each parameter. From these, we can calculate the probability that, say, \$\mu > 0.2\$ or \$\tau^2 < 0.1\$—a feature not available in frequentist methods.
+* **Prior knowledge**: Prior distributions allow us to incorporate external evidence or expert opinion, which is particularly useful when data is limited or heterogeneous.
+
+---
+
+**Relation to Other Models**
+
+This Bayesian formulation generalizes the random-effects model. In fact:
+
+* If we set \$\tau^2 = 0\$, the model reduces to a fixed-effect model.
+* If priors are set to be very vague (non-informative), Bayesian results may closely resemble frequentist results.
+
+Thus, Bayesian meta-analysis can be seen as a more flexible and expressive generalization of standard meta-analytic models.
+
+## Setting Prior Distributions
+
+Before fitting a Bayesian hierarchical model for meta-analysis, we must specify **prior distributions** for the key parameters:
+
+* the pooled effect size **μ**, and
+* the between-study heterogeneity **τ²**.
+
+Priors are a fundamental component of Bayesian analysis. They represent our beliefs about the values of the parameters before observing the data. Especially in meta-analyses with few studies, the choice of priors can heavily influence the results.
+
+---
+
+**Types of Priors**
+
+* **Non-informative priors** assume all parameter values are equally plausible. These are often uniform distributions and are used when we want the data to "speak for itself."
+* **Weakly informative priors** encode general, reasonable assumptions without being overly restrictive. These are usually preferred, as they help stabilize estimation while avoiding extreme biases.
+
+---
+
+**Prior for μ (Pooled Effect Size)**
+
+In many applied meta-analyses, the standardized mean difference (SMD) is unlikely to be extremely large in magnitude. It is reasonable to believe that the true effect size **μ** lies somewhere between −2 and 2. Therefore, a sensible weakly informative prior is:
+
+```
+μ ~ Normal(0, 1)
+```
+
+This prior implies that we assign about 95% of prior probability to μ being between −2 and 2. It reflects weak but reasonable belief, without asserting strong prior knowledge.
+
+---
+
+**Prior for τ² (Between-Study Variance)**
+
+Specifying a prior for **τ²** is more nuanced:
+
+* τ² must be **non-negative**.
+* It can be close to zero (low heterogeneity) or large (high heterogeneity).
+* Priors must reflect this asymmetry.
+
+A popular and appropriate choice is the **Half-Cauchy distribution**, which is defined only for non-negative values. It has a peak at 0 and heavy tails, allowing for both small and large values with decreasing probability.
+
+The Half-Cauchy distribution is specified as:
+
+```
+τ ~ HC(0, s)
+```
+
+Where:
+
+* `0` is the location (mode),
+* `s` is the scale parameter, controlling the "spread" or heaviness of the tails.
+
+Common choices for `s`:
+
+* `s = 0.3`: assumes τ is likely near 0.3 (50% of prior probability is below 0.3).
+* `s = 0.5`: a more conservative choice, with a flatter distribution giving more weight to higher τ values.
+
+
+
+---
+
+**Complete Hierarchical Model with Priors**
+
+Putting it all together, the full Bayesian hierarchical model for meta-analysis looks like this:
+
+1. Sampling model (observed data):
+
+   ```
+   θ̂_k ~ Normal(θ_k, σ²_k)
+   ```
+
+2. Study-level model (true effects across studies):
+
+   ```
+   θ_k ~ Normal(μ, τ²)
+   ```
+
+3. Priors:
+
+   ```
+   μ ~ Normal(0, 1)
+   τ ~ Half-Cauchy(0, 0.5)
+   ```
+
+This model structure enables Bayesian estimation of the pooled effect size and heterogeneity, incorporating uncertainty at each level and allowing prior information to be transparently included.
+
+
+## Bayesian Meta-Analysis in R
+ 
+
+Once we have established the hierarchical model and prior distributions, we can implement our Bayesian meta-analysis using the `{brms}` package in R. `{brms}` is built on top of Stan and allows flexible Bayesian modeling using a familiar formula syntax.
+
+ 
+
+**Fitting the Model**
+
+We use the `ThirdWave` dataset, which includes 18 studies on third-wave psychotherapies for college students.
+
+First, define the **priors** for the model:
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
+priors <- c(
+  prior(normal(0, 1), class = Intercept),
+  prior(cauchy(0, 0.5), class = sd)
+)
+```
+
+Then, fit the random-effects meta-analysis model:
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
+m.brm <- brm(
+  TE | se(seTE) ~ 1 + (1 | Author),
+  data = ThirdWave,
+  prior = priors,
+  iter = 4000
+)
+```
+
+* `TE`: the observed effect size.
+* `seTE`: the standard error of `TE`.
+* `1`: indicates an intercept-only model.
+* `(1 | Author)`: random effects by study.
+
+---
+
+**Assessing Convergence and Model Validity**
+
+Check convergence with:
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
+summary(m.brm)
+```
+
+Key things to look at:
+
+* **Rhat** values should be close to 1 (ideally < 1.01).
+* **Bulk\_ESS** and **Tail\_ESS** should be reasonably large.
+
+Perform posterior predictive checks:
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
+pp_check(m.brm)
+```
+
+If model and data agree well, the observed data and simulated data should align closely.
+
+---
+
+**Interpreting the Results**
+
+From the model summary, inspect:
+
+* **Group-Level Effects**:
+
+  * `sd(Intercept)` = τ: between-study heterogeneity.
+* **Population-Level Effects**:
+
+  * `Intercept` = μ: pooled effect size (overall SMD).
+
+Extract random effects (study-level deviations):
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
+ranef(m.brm)
+```
+
+---
+
+**Accessing Posterior Distributions**
+
+Retrieve posterior samples:
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
+post.samples <- posterior_samples(m.brm, c("^b", "^sd"))
+names(post.samples) <- c("smd", "tau")
+```
+
+Visualize the posteriors:
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
+# μ (SMD)
+ggplot(post.samples, aes(x = smd)) +
+  geom_density(fill = "lightblue", color = "lightblue", alpha = 0.7) +
+  geom_point(x = mean(post.samples$smd), y = 0) +
+  labs(x = expression(italic(SMD)), y = NULL) +
+  theme_minimal()
+
+# τ (heterogeneity)
+ggplot(post.samples, aes(x = tau)) +
+  geom_density(fill = "lightgreen", color = "lightgreen", alpha = 0.7) +
+  geom_point(x = mean(post.samples$tau), y = 0) +
+  labs(x = expression(tau), y = NULL) +
+  theme_minimal()
+```
+
+Estimate the probability that the pooled effect is less than 0.3:
+
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
+smd.ecdf <- ecdf(post.samples$smd)
+smd.ecdf(0.3)  # Example output: [1] 0.002125
+```
+
+This tells us the probability that the true overall effect is smaller than SMD = 0.30.
+
+---
+
+**Generating a Forest Plot**
+
+ 
+
+Extract study-level posterior draws:
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
+library(ggridges)
+library(glue) 
+study.draws <- spread_draws(m.brm, r_Author[Author,], b_Intercept) %>%
+  mutate(b_Intercept = r_Author + b_Intercept)
+ 
+## Get pooled effect:
+pooled.effect.draws <- spread_draws(m.brm, b_Intercept) %>%
+  mutate(Author = "Pooled Effect")
+
+## Merge and clean the data:
+ 
+forest.data <- bind_rows(study.draws, pooled.effect.draws) %>%
+  ungroup() %>%
+  mutate(Author = str_replace_all(Author, "[.]", " ")) %>%
+  mutate(Author = reorder(Author, b_Intercept))
+
+## Summarize posterior draws:
+forest.data.summary <- group_by(forest.data, Author) %>%
+  mean_qi(b_Intercept)
+
+## Generate the plot:
+ggplot(forest.data, aes(b_Intercept, relevel(Author, "Pooled Effect", after = Inf))) +
+  geom_vline(xintercept = fixef(m.brm)[1, 1], color = "grey", size = 1) +
+  geom_vline(xintercept = fixef(m.brm)[1, 3:4], color = "grey", linetype = 2) +
+  geom_vline(xintercept = 0, color = "black", size = 1) +
+  geom_density_ridges(fill = "blue", rel_min_height = 0.01, col = NA, scale = 1, alpha = 0.8) +
+  geom_pointintervalh(data = forest.data.summary, size = 1) +
+  geom_text(data = mutate_if(forest.data.summary, is.numeric, round, 2),
+            aes(label = glue("{b_Intercept} [{.lower}, {.upper}]"), x = Inf),
+            hjust = "inward") +
+  labs(x = "Standardized Mean Difference", y = NULL) +
+  theme_minimal()
+```
+
+---
+
+**Understanding Model-Based Estimates**
+
+The effect sizes in the forest plot represent **model-based estimates** of the true study-specific effects (`θ_k`), not the raw observed effect sizes. This is a key distinction:
+
+* Bayesian hierarchical models **shrink** extreme effect estimates toward the overall mean.
+* This "borrowing of strength" improves estimation, especially when some studies have low precision.
+
+Outlier studies (e.g., with high standard errors) show more shrinkage, producing more stable meta-analytic conclusions.
 
 
 # Reference (APA Style)

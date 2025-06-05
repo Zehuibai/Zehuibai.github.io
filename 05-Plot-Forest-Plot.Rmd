@@ -8,6 +8,7 @@ output:
     number_sections: No
     toc: yes
     toc_float: yes
+    code_folding: "hide" 
   word_document:
     toc: yes
 fontsize: 10pt
@@ -17,23 +18,43 @@ colorlinks: yes
 ---
 
 ```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
-
-# <!-- ---------------------------------------------------------------------- -->
-# <!--                    1. load the required packages                       -->
-# <!-- ---------------------------------------------------------------------- --> 
-
-## if(!require(psych)){install.packages("psych")}
-
-knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(echo = TRUE, fig.width = 12, fig.height = 6)
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+
 # getwd()
 # Sys.setlocale("LC_ALL","English")
 
-## devtools::install_github("kupietz/kableExtra")
-packages<-c("tidyverse", "kableExtra", 
-            "ggpubr","gridExtra","ggtext")
+# install.packages("devtools")
+# devtools::install_github("NightingaleHealth/ggforestplot")
+
+packages <- c(
+  "broom",        # optional
+  "cowplot",
+  "DiagrammeR",
+  "gganimate", 
+  "ggalluvial",
+  "ggforce",
+  "ggplot2",      # included via tidyverse
+  "ggpubr",
+  "ggrepel",
+  "ggtext",
+  "ggforestplot",
+  "grid",
+  "gridExtra",
+  "Gmisc",
+  "gt",
+  "kableExtra",
+  "meta",
+  "metan",
+  "modelr",       # optional
+  "RCurl",
+  "readxl",
+  "scales",
+  "tidyverse",
+  "transformr"    # optional, used for gganimate
+)
+
+
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(new.pkg)) 
@@ -44,13 +65,70 @@ ipak(packages)
 ```
  
  
-# General Forest Plot
+# General 
  
+## Introduction
+
+A **forest plot** is a visual tool commonly used in meta-analysis to present the results of multiple individual studies alongside the combined, or pooled, result. It allows for a quick understanding of the consistency and magnitude of effects across studies.
+
+The layout of a forest plot is fairly standardized, with distinct components organized for clarity:
+
+**1. Study names (left side):**
+On the left side of a forest plot, you will usually find a list of the studies included in the meta-analysis. Each row corresponds to one study. This makes it easy to identify which individual results are being displayed.
+
+**2. Graphical display of effect sizes (center):**
+In the middle of the plot, each study is represented graphically:
+
+* A **square** represents the point estimate of the effect size (e.g., mean difference, odds ratio) for each study.
+* The **horizontal line** through the square illustrates the **confidence interval (CI)** of that effect size. This interval reflects the uncertainty or precision of the estimate.
+* The **size of the square** is proportional to the weight that the study contributes to the meta-analysis. Studies with larger sample sizes or lower variance get more weight and thus larger squares.
+
+**3. Effect size data (often in a table):**
+Next to the graphical display, the numeric values for the point estimate and confidence interval are usually provided. This gives readers access to the exact data behind the plot, supporting reproducibility and transparency.
+
+**4. Reference line (vertical line):**
+A vertical line is often drawn at the value corresponding to "no effect":
+
+* For **mean differences**, this line is typically at **0**.
+* For **ratios** (like risk ratios, odds ratios), it is usually placed at **1**.
+  This line allows for an easy visual check of which studies show significant effects (i.e., their CI does not overlap the reference line) and in what direction.
+
+**5. Summary estimate (bottom of the plot):**
+The overall or pooled effect is shown at the bottom, usually using a **diamond shape**:
+
+* The **center of the diamond** represents the pooled point estimate.
+* The **width of the diamond** reflects the confidence interval for the pooled effect size.
+  This diamond gives a concise visual summary of the overall findings of the meta-analysis.
+
+**6. Heterogeneity information (optional):**
+Some forest plots include statistics like **I²** or **τ²**, which quantify heterogeneity:
+
+* **I²** indicates the percentage of total variation across studies that is due to heterogeneity rather than chance.
+* **τ²** is the between-study variance in a random-effects model.
+
+**7. X-axis scale (linear or logarithmic):**
+Effect sizes are typically plotted along a linear x-axis. However, if the effect size is a **ratio** (such as an odds ratio or risk ratio), a **logarithmic scale** is often used:
+
+* In a log scale, values close to 1 are closer together than values far from 1.
+* This is appropriate because ratio metrics are multiplicative. For example, the reciprocal of 0.5 is 2 (not 1.5), so a log scale makes this symmetry clearer.
+* The reference line is then placed at 1, since that represents no effect for ratios.
+
+In summary, forest plots bring together both **numerical** and **graphical** summaries of multiple studies in one visual, helping researchers quickly assess:
+
+* The individual and overall effects
+* The precision of those effects
+* The consistency or variability between studies
+
+By clearly showing each study's contribution and the combined result, forest plots are an essential tool for interpreting and communicating findings in evidence synthesis.
+
+
+
+
 
 ## Annotated Forest Plots Alternative 1
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 ## Example data frame
 dat <- data.frame(
   Index = c(1, 2, 3, 4), ## This provides an order to the data
@@ -107,17 +185,15 @@ tab2 <- table_base +
   geom_text(aes(y = rev(Index), x = 1, label = CI), size = 4) + 
   ggtitle("95% CI")
 
-## Merge tables with plot
-library("gridExtra") 
+## Merge tables with plot 
 grid.arrange(plot1, tab1, tab2, 
              layout_matrix = matrix(c(1,1,1,1,1,1,1,1,1,1,2,3,3), nrow = 1))
 ```
 
 ## Annotated Forest Plots Alternative 2
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library("gt")
-
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library("gt")
 res_log <- read_csv("https://raw.githubusercontent.com/kathoffman/steroids-trial-emulation/main/output/res_log.csv")
 res <- read_csv("https://raw.githubusercontent.com/kathoffman/steroids-trial-emulation/main/output/res.csv")
 
@@ -233,7 +309,7 @@ p_right <-
 p_right
 
 ## Merge tables with plot
-library("gridExtra")
+# library("gridExtra")
 grid.arrange(p_left, p_mid, p_right, 
              layout_matrix = matrix(c(1,1,1,2,2,2,2,2,2,2,2,2,3,3), nrow = 1))
 
@@ -242,46 +318,152 @@ grid.arrange(p_left, p_mid, p_right,
 ```
 
 
-## meta package
+# meta package
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-Forest.df <- data.frame(study=c('S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7'),
-                        index=1:7,
-                        effect=c(-.4, -.25, -.1, .1, .15, .2, .3),
-                        lower=c(-.43, -.29, -.17, -.02, .04, .17, .27),
-                        upper=c(-.37, -.21, -.03, .22, .24, .23, .33))
-## create forest plot
-ggplot(data=Forest.df, 
-       aes(y=index, x=effect, xmin=lower, xmax=upper,
-           label=as.character(effect))) +
-  geom_label(vjust=-0.1) + 
-  geom_errorbarh(height=.1) +
-  scale_y_continuous(breaks=1:nrow(Forest.df), labels=Forest.df$study) +
-  labs(title='Effect Size by Study', 
-       x='Effect Size', 
-       y = 'Study') +
-  geom_vline(xintercept=0, color='black', linetype='dashed', alpha=.5) +
-  theme_classic() # theme_minimal()
+The most common way to visualize meta-analyses is through forest plots. Such plots provide a graphical display of the observed effect, confidence interval, and usually also the weight of each study. They also display the pooled effect we have calculated in a meta-analysis. Overall, this allows others to quickly examine the precision and spread of the included studies, and how the pooled effect relates to the observed effect sizes.
 
+The {meta} package has an in-built function which makes it very easy to produce beautiful forest plots directly in R. The function has a broad functionality and allows one to change the appearance of the plot as desired. 
 
+## General
+
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 ## https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/forest.html
-library("meta")
+# library("meta")
 data(Fleiss93)
+Fleiss93 %>%
+  kable("html", caption = "Fleiss93 Data from the irr Package") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), 
+                full_width = FALSE, 
+                position = "left")
+  
 metaresult<-metabin(event.e, n.e,event.c,n.c,data=Fleiss93,sm="RR",
                     studlab=paste(study, year),random=FALSE)
-forest(metaresult)
+m.gen <- metagen(TE, seTE, studlab, n.e = n.e + n.c, data = metaresult, sm = "RR")
+
+meta::forest(metaresult)
+
+meta::forest(m.gen, 
+             sortvar = TE,
+             prediction = TRUE, 
+             print.tau2 = FALSE,
+             leftlabs = c("Author", "g", "SE"))
+ 
 ```
 
 
-## ggforestplot package (based on SE)
+## Layout Types
+
+The meta::forest function has two “pre-packaged” layouts, which we can use to bring our forest plot into a specific format without having to specify numerous arguments. One of them is the "JAMA" layout, which gives us a forest plot according to the guidelines of the Journal of the American Medical Association. This layout may be used if you want to publish your meta-analysis in a medical journal.
+
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+meta::forest(m.gen, layout = "JAMA")
+```
+
+The other layout is "RevMan5", which produces a forest plot similar to the ones generated by Cochrane’s Review Manager 5.
+
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+meta::forest(m.gen, layout = "RevMan5")
+```
+
+## Saving the Forest Plots
+
+Forest plots generated by meta::forest can be saved as a PDF, PNG, or scalable vector graphic (SVG) file. In contrast to other plots generated through base R or the {ggplot2} package, the output of meta::forest is not automatically re-scaled when we save it as a file. This means that forest plots are sometimes cut off on two or four sides, and we have to adjust the width and height manually so that everything is visible.
+
+The pdf, png and svg function can be used to save plots via R code. We have to start with a call to one of these functions, which tells R that the output of the following code should be saved in the document. Then, we add our call to the meta::forest function. In the last line, we have to include dev.off(), which will save the generated output to the file we specified above.
+
+All three functions require us to specify the file argument, which should contain the name of the file. The file is then automatically saved in the working directory under that name. Additionally, we can use the width and height argument to control the size of the plot, which can be helpful when the output is cut off.
+
+Assuming we want to save our initial forest plot under the name “forestplot”, we can use the following code to generate a PDF, PNG and SVG file.
+
+**PDF**
+
+```r
+pdf(file = "forestplot.pdf", width = 8, height = 7)
+
+meta::forest(m.gen, 
+             sortvar = TE,
+             prediction = TRUE, 
+             print.tau2 = FALSE,
+             leftlabs = c("Author", "g", "SE"))
+
+dev.off()
+```
+
+
+**PNG**
+
+```r
+png(file = "forestplot.png", width = 2800, height = 2400, res = 300)
+
+meta::forest(m.gen, 
+             sortvar = TE,
+             prediction = TRUE, 
+             print.tau2 = FALSE,
+             leftlabs = c("Author", "g", "SE"))
+
+dev.off()
+```
+
+**SVG**
+
+```r
+svg(file = "forestplot.svg", width = 8, height = 7)
+
+meta::forest(m.gen, 
+             sortvar = TE,
+             prediction = TRUE, 
+             print.tau2 = FALSE,
+             leftlabs = c("Author", "g", "SE"))
+
+dev.off()
+```
+
+## Drapery plots 
+
+Drapery plots are an alternative method for visualizing meta-analysis results. While forest plots are the standard tool for summarizing and displaying meta-analysis findings, drapery plots provide a different perspective that can be useful, especially in discussions involving statistical significance and confidence interpretation.
+
+A forest plot typically shows a 95% confidence interval for each study, along with a pooled effect. However, this is based on a fixed significance threshold, usually p < 0.05. Because of this, forest plots visually separate results into “significant” and “not significant” based on that threshold. This binary distinction can be misleading or overly simplistic.
+
+In recent years, there has been growing concern about over-reliance on p-values and the traditional threshold of significance. Critics argue that this has contributed to reproducibility problems in scientific research. To address this issue, researchers have proposed the use of p-value functions, which are visualized through drapery plots.
+
+A p-value function shows the relationship between the assumed p-value and the corresponding confidence interval. Instead of showing a single interval (like the 95% CI), it shows a range of intervals corresponding to all possible significance levels. As a result, a drapery plot shows how robust the evidence is across different thresholds.
+
+In a drapery plot:
+
+* The x-axis represents the effect size.
+* The y-axis represents either the p-value or the z-value, depending on the setting.
+* Each study is represented by a curve that looks like an inverted V. The peak of the V indicates the point estimate of the effect size.
+* The pooled estimate is shown as a thicker curve.
+* The shaded area around the pooled estimate indicates the prediction interval, which shows the expected range of effects in future studies.
+* Dashed horizontal lines may indicate standard significance thresholds (e.g., p = 0.05, p = 0.01), helping to visualize when the estimate becomes statistically significant.
+
+Interpreting the plot:
+
+* The highest point of each curve represents the study’s point estimate.
+* As you move downward (i.e., smaller p-values), the confidence intervals widen.
+* The closer a study’s curve gets to the x-axis without touching the zero line, the stronger the evidence that the effect is different from zero.
+* If the thick pooled curve reaches the vertical line at zero only when p is already very small (e.g., p < 0.01), this implies strong evidence against the null hypothesis.
+
+Despite their strengths, drapery plots are not meant to replace forest plots. They do not show raw effect size estimates or confidence intervals in the structured, tabular way that forest plots do. Therefore, they are best used as a complement to forest plots, not as a substitute.
+
+In summary, drapery plots enhance the interpretability of meta-analysis results by showing a continuous spectrum of uncertainty. They help reduce over-dependence on arbitrary p-value thresholds and allow a more nuanced view of statistical evidence.
+
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+drapery(m.gen, 
+        labels = "studlab",
+        type = "pval", 
+        legend = FALSE)
+```
+
+# ggforestplot package (based on SE)
 
 The R package ggforestplot allows to plot vertical forest plots, a.k.a. blobbograms, and it’s based on ggplot2, see more click (here)[https://nightingalehealth.github.io/ggforestplot/articles/ggforestplot.html]
 
 ### Basic Forestplot 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # devtools::install_github("NightingaleHealth/ggforestplot")
-library("ggforestplot")
+# library("ggforestplot")
 
 df <-
   ggforestplot::df_linear_associations %>%
@@ -304,7 +486,7 @@ ggforestplot::forestplot(
 
 ### Comparing several traits
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Extract the biomarker names
 selected_bmrs <- df %>% pull(name)
 
@@ -336,8 +518,8 @@ ggforestplot::forestplot(
 
 ### Grouping the biomarkers
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library("ggforce")
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library("ggforce")
 # Filter df_NG_biomarker_metadata, that contain the groups, for only the 30
 # biomarkers under discussion
 df_grouping <-
@@ -373,8 +555,8 @@ forestplot(
  
 ## ggplot2
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE, dev="cairo_pdf"}
-library(readxl)
+```{r, message = FALSE, error = FALSE, warning = FALSE, dev="cairo_pdf"}
+
 Master_Cancer_D01 <- read_excel("./01_Datasets/HR_Ratio_2024.02.09.xlsx")
 
 Breast_Cancer_Factor <- c(
@@ -455,7 +637,7 @@ knitr::include_graphics("./02_Plots/Visualization/ForestPlot/HR_Breast_Cancer.pn
 **Source: Figure 2 in Muntyanu A, Gabrielli S, Donovan J, Gooderham M, Guenther L, Hanna S, et al. The burden of alopecia areata: A scoping review focusing on quality of life, mental health and work productivity. J Eur Acad Dermatol Venereol. 2023; 37: 1490–1520. https://doi.org/10.1111/jdv.18926**
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Example data frame
 data <- data.frame(
   Study_Number = 1:12,
@@ -499,7 +681,7 @@ This is a simple, but clean visualisation with logical ordering of studies based
 ![](./02_Plots/Visualization/ForestPlot/DLQI_2b.png)
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Sample data
 data <- data.frame(
   Study = c("Abedini et al.", "Liu et al.", "Shi et al.", "Ghajarzadeh et al.",
@@ -534,12 +716,9 @@ ggplot(data, aes(y = Study, x = Mean_DLQI, xmin = Lower_CI, xmax = Upper_CI)) +
 
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Clear environment and read in libraries
-rm(list = ls())
-library(tidyverse)
-library(scales)
-library(ggtext)
+rm(list = ls()) 
 
 # Simulate 4 studies with different treatments/sample sizes
 subjects <- as.character(seq(1, 850))
@@ -790,14 +969,11 @@ The visualisation had simulated the DLQI scores of individual patients, to provi
 
 ## Lollipop/forest plot
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE} 
-library(RCurl)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(ggrepel)
-library(cowplot)
-library(ggtext)
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library(RCurl) 
+# library(ggrepel)
+# library(cowplot)
+# library(ggtext)
 
 y <- read.csv("./01_Datasets/CGI_S_3_groups_csv.csv") %>%
    rename(Group = CGI)
@@ -991,17 +1167,17 @@ This plot uses lollipops to display the probability of a given treatment ranking
 
 In the first, rank is displayed on the x-axis and treatment on the y-axis, with the intensity of the colour used to display the probability (ranging from 0=white to 1=red). The left-hand plot displays absolute probability, whilst the right displays cumulative probability. The panel appreciated the two different probabilities each being displayed, suggesting they compliment one another. The cumulative probability plot gives an area-under-the-curve like interpretation, providing a notion of overall performance of the treatment. This could be further enhanced by a logical ordering of the treatments, like seen in submission 2. Similarly, some of the ‘cleaning’ seen in submission 2 would help remove clutter from this plot, such as the background and gridlines. Whilst aesthetically pleasing, the use of a colour gradient could cause confusion as to the discrete nature of the ranks, since a smooth gradient is displayed between each successive rank’s colour. This could be circumvented with the use of a heatmap style display, with a distinct cell displayed for each treatment and rank. The second half of the submission displays the same information, but rather than having rank on the x-axis, each rank corresponds to a concentric ring (with faceting applied to distinguish treatments). This gives an aesthetically pleasing plot that would be great for grabbing attention, although the interpretation is less obvious than the previous plots. That being said, the cumulative probability plots once again provide an area-under-the-curve like interpretation which helps in assessing relative performance (although once more a logical ordering of treatments would support this). The panel highlighted that the main challenge with such plots is that outer rings occupy much more space than inner ones. This makes the worst performing treatment Reboxetine stand out far more on the left-hand plot than the best performing Mirtazapine. Inverting the ring ordering could be considered if wanting to emphasise the best performing treatment.
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE} 
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Read in packages
-require(gganimate)
-library("ggpubr")
-library(modelr)
-library(broom)
-library(grid)
-library(gridExtra)
-library("transformr")
-library(ggtext)
-library('ggforce') 
+# require(gganimate)
+# library("ggpubr")
+# library(modelr)
+# library(broom)
+# library(grid)
+# library(gridExtra)
+# library("transformr")
+# library(ggtext)
+# library('ggforce') 
 
 #data processing
 

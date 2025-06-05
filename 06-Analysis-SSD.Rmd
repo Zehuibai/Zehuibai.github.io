@@ -8,6 +8,7 @@ output:
     number_sections: yes
     toc: yes
     toc_float: yes
+    code_folding: "hide" 
   word_document:
     toc: yes
 fontsize: 10pt
@@ -579,6 +580,17 @@ This framework enables **dynamic, data-driven safety monitoring** under uncertai
 
 ---
 
+ 
+
+**Prior Specifications**
+
+* *p₀* (placebo) based on historical data
+    - Sources: internal data from historical studies, external data via Pharma data sharing platforms (e.g., TransCelerate)
+    - Types: double-blind randomized clinical trial data, open label randomized clinical trial data, single arm multi-center clinical trial data, retrospective cohort, electronic health records
+
+* *p₁* (active) also or noninformative, e.g., *Beta(1/3, 1/3)*
+
+ 
 The **choice of prior distribution** for θ has a major influence on the posterior, especially when event counts are small. A “non-informative” prior might seem neutral but can actually **bias** the result if not chosen carefully.
 
 * **Beta(1/3, 1/3)** (Kerman’s prior) is **centered on the sample mean** and is often used as a neutral or default prior because of its balanced shape.
@@ -695,7 +707,17 @@ In this document, we present 2 methods for monitoring safety data from blinded o
 1)	Bayesian Markov Chain Monte Carlo (MCMC) method: Subject level data with blinded treatment are modeled using a mixture of binomial distribution with an indicator variable and the MCMC algorithm is used to estimate the parameters accounting for variable follow-up times across subjects.
 2)	Simpler Monte Carlo (MC) approximation method: The method is based on study level data for planning purposes and result comparison with the primary method. Because the simpler approximation method is based on study-level data, the model assumes a fixed follow-up time for all subjects and an approximation has to be made to account for this.
 
-### Prior Distributions Chi-square Approach {-}
+### Chi-square Approach {-}
+
+**General Idea**
+
+* Denote the total number of subjects as *N<sub>j</sub>* and the number of subjects with at least one AE as *R<sub>j</sub>* for the *j*-th study;
+* Perform a chi-square test of homogeneity to see whether the distribution of the AE rates are the same across different historical studies;
+* If the null hypothesis is rejected, the study with the largest chi-square components should be excluded; continue until the null hypothesis is not rejected or there is one remaining study;
+* Obtain the overall *N* and *R* values from remaining historical studies;
+* Perform a Bayesian meta-analysis of historical studies using a vague beta prior with parameters close to zero; leads to a *Beta(R, N−R)* posterior, which becomes the prior used in the current blinded study.
+
+**Details**
 
 The Chi-square approach is a practical method to construct an informative prior from multiple historical studies by first assessing their consistency and then pooling their data. It is termed “Chi-square” because it typically relies on **Cochran’s Q (chi-square) test** to check **heterogeneity** (i.e. whether observed differences in event rates across studies are beyond chance variability). In essence, this approach asks: *Can we treat all historical studies as having a common underlying event rate?* If yes, the data are combined (pooled) to form a single prior distribution. If not (significant heterogeneity), adjustments are made – for example, using a *random-effects* meta-analysis to allow each study to have its own rate and account for between-study variance. This approach is appropriate when you have a few historical studies and want a straightforward summary of the historical event rate. It works best if the studies are fairly homogeneous (similar populations, endpoints, etc.), or if you plan to widen the prior’s uncertainty when they differ.
 
@@ -786,7 +808,17 @@ In short, the Chi-square approach is **straightforward but can be rigid**. It wo
 However, be cautious using the Chi-square method if there is **substantial heterogeneity or many historical studies**. In those cases, the MAP approach is usually preferred:
 
 ### Meta-Analytic Predictive (MAP) Approach {-}
- 
+
+**General Idea**
+
+* Use patient-level or aggregate historical data from similar trials to model the event probability $p_j$ for each study $j$;
+* Assume a complementary log-log model: $\log(-\log(1 - p_{ij})) = \alpha_j + \log T_{ij}$, where $T_{ij}$ is the time at risk for patient $i$ in study $j$; If patient-level data are unavailable, use the average or total follow-up time $T_j$ to model event probability at the study level;
+* Assume constant hazard across time and treat $\log T$ as an offset in the model to estimate log-hazard parameters $\alpha_j$;
+* Define a prior for $p_j$ using a Beta distribution: $p_j \sim \text{Beta}(abN, (1 - a)bN)$, where $N$ is the total sample size from historical studies, $a$ is the prior mean, and $b$ is the information discount factor;
+* The resulting prior reflects both the expected event rate and the uncertainty from historical evidence, and is used in the current study's Bayesian analysis.
+
+**Details**
+
 The Meta-Analytic Predictive (MAP) approach is a Bayesian method that formally **models the historical data in a hierarchical framework**, capturing both the common trend and the between-study heterogeneity. Instead of pooling or making yes/no decisions about heterogeneity, MAP treats the true event rate in each historical study as a random draw from a population distribution. This yields a **posterior predictive distribution** for the event rate in a new trial – that predictive distribution *is* the MAP prior for the new trial’s event rate. In other words, MAP uses all historical evidence to “predict” what the new study’s event rate is likely to be, with uncertainty bands naturally widened if the historical results disagree with each other.
 
 Situations appropriate for MAP include having **multiple historical studies, especially with some heterogeneity**. MAP shines in complexity: it can borrow strength from many studies while appropriately down-weighting those that don’t agree. It is a fully Bayesian approach – the historical data and the new data are linked through a hierarchical model. Conceptually, it’s like saying: “We have a distribution of possible event rates (learned from past trials). Let’s use that distribution as our prior for the new trial’s event rate.” The approach is grounded in Bayesian meta-analysis techniques and often implemented with MCMC simulations due to its complexity.
@@ -1591,7 +1623,7 @@ These methods are more complex but better reflect **real-world clinical scenario
 The analyze function tern::estimate_incidence_rate() creates a layout element to estimate an event rate adjusted for person-years at risk, otherwise known as incidence rate. The primary analysis variable specified via vars is the person-years at risk. In addition to this variable, the n_events variable for number of events observed (where a value of 1 means an event was observed and 0 means that no event was observed) must also be specified.
 
 
-```{r echo =F, error=FALSE, message=FALSE, warning=FALSE}
+```{r, error=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
 arm_ache <- data.frame(
   USUBJID = as.character(seq(5)),
   USUBJIDN = as.numeric(seq(5)),
@@ -1730,7 +1762,7 @@ print(final_plot)
 **Incidence Estimate and Confidence intervals**
 
 
-```{r echo =F, error=FALSE, message=FALSE, warning=FALSE}
+```{r, error=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
 arm_ache_combined <- rbind(arm_ache,leg_ache) 
 
 # Build both tables
@@ -1769,6 +1801,187 @@ tbl_exact <- basic_table(show_colcounts = TRUE) %>%
   build_table(arm_ache_combined)
 tbl_exact
 ```
+
+
+### Confidence Interval (CI) Methods for EAIR Difference
+
+Under the Poisson assumption:
+
+$$
+\hat{\lambda}_1 = \frac{n_1}{T_1}, \quad \hat{\lambda}_2 = \frac{n_2}{T_2}
+$$
+
+* $n_1, n_2$: number of events in groups 1 and 2
+* $T_1, T_2$: total exposure time in groups 1 and 2
+* $\hat{\lambda}_1, \hat{\lambda}_2$: estimated event rates
+
+The **rate difference** is:
+
+$$
+\hat{\delta} = \hat{\lambda}_1 - \hat{\lambda}_2
+$$
+
+
+* **Risk Difference (EAIR Difference)**: $\hat{\delta}$
+* **Relative Risk (RR)**: $\hat{\lambda}_1 / \hat{\lambda}_2$
+
+Risk difference is often **preferred** for rare events, as RR is undefined when $\hat{\lambda}_2 = 0$.
+
+Below is a **detailed explanation of the four confidence interval (CI) methods** for estimating the **difference between two Exposure Adjusted Incidence Rates (EAIRs)**, as discussed in Liu et al. (2006).
+
+---
+
+**Goal**
+
+Estimate the confidence interval for the difference in EAIRs:
+
+$$
+\hat{\delta} = \hat{\lambda}_1 - \hat{\lambda}_2 = \frac{n_1}{T_1} - \frac{n_2}{T_2}
+$$
+
+Where:
+
+* $n_1, n_2$: number of events in each group
+* $T_1, T_2$: total exposure time in each group
+* $\hat{\lambda}_1, \hat{\lambda}_2$: estimated event rates
+
+---
+
+**Method 1: Wald’s Method (Normal Approximation)**
+
+Concept: Assumes the sampling distribution of the rate difference is approximately normal.
+
+Formula:
+
+$$
+CI = \hat{\delta} \pm Z_{\alpha/2} \cdot \sqrt{ \frac{n_1}{T_1^2} + \frac{n_2}{T_2^2} }
+$$
+
+Components:
+
+* $Z_{\alpha/2}$: critical value from standard normal distribution (e.g., 1.96 for 95% CI)
+* Variance is estimated assuming Poisson-distributed counts:
+
+  $$
+  \text{Var}(\hat{\lambda}_1 - \hat{\lambda}_2) = \frac{n_1}{T_1^2} + \frac{n_2}{T_2^2}
+  $$
+
+Characteristics:
+
+* Simple and fast
+* Good performance for large sample sizes and moderate-to-high event counts
+* Coverage deteriorates when:
+
+  * Event counts are small
+  * Group follow-up times are very different
+
+---
+
+**Method 2: Two-by-Two Table Method (Miettinen’s Approximation)**
+
+Concept: Analogous to comparing two proportions using a 2x2 table, treating exposure time like sample size.
+
+Formula:
+
+$$
+CI = (\hat{\delta}) \left(1 \pm \frac{Z_{\alpha/2}}{\sqrt{n_1 T_2 - n_2 T_1}} \right)
+$$
+
+Or simplified as:
+
+$$
+CI = \hat{\delta} \pm Z_{\alpha/2} \cdot \sqrt{ \frac{n_1 + n_2}{T_1 T_2} }
+$$
+
+Characteristics:
+
+* Easy to implement
+* Performs poorly when $T_1 \neq T_2$ or when incidence rates differ significantly
+* Coverage probabilities can be lower than nominal (e.g., <95%)
+
+---
+
+**Method 3: Miettinen and Nurminen (MN) Method**
+
+Concept: Likelihood-based method that constrains the rate difference $\delta$ and estimates the variance under this constraint.
+
+Procedure:
+
+1. Solve for $\delta$ such that:
+
+   $$
+   \frac{(\hat{\delta} - \delta)^2}{\tilde{V}} = \chi^2_{1, \alpha}
+   $$
+
+   where $\tilde{V} = \frac{\tilde{\lambda}_1}{T_1} + \frac{\tilde{\lambda}_2}{T_2}$
+
+2. $\tilde{\lambda}_1$ and $\tilde{\lambda}_2$ are MLEs of the rates subject to the constraint $\tilde{\lambda}_1 - \tilde{\lambda}_2 = \delta$
+
+3. Closed-form MLEs under constraint:
+
+$$
+\tilde{\lambda}_2 = \frac{1}{2} \left( \bar{\lambda} - \delta + \sqrt{(\bar{\lambda} - \delta)^2 + \frac{4 n_2 \delta}{T_1 + T_2}} \right)
+$$
+
+$$
+\tilde{\lambda}_1 = \tilde{\lambda}_2 + \delta
+$$
+
+where $\bar{\lambda} = \frac{n_1 + n_2}{T_1 + T_2}$
+
+4. Solve numerically to find the CI limits.
+
+Characteristics:
+
+* Most accurate among all methods
+* Maintains coverage close to nominal (e.g., 95%) even for small sample sizes
+* Computationally intensive (requires iteration)
+
+---
+
+**Method 4: Conditional MN Method**
+
+Concept: Uses a conditional likelihood on $n_1 + n_2$ to simplify estimation.
+
+Estimators under constraint:
+
+$$
+\tilde{\lambda}_2 = \bar{\lambda} - \frac{T_1 \delta}{T_1 + T_2}, \quad \tilde{\lambda}_1 = \tilde{\lambda}_2 + \delta
+$$
+
+Then use the same chi-square formula:
+
+$$
+\frac{(\hat{\delta} - \delta)^2}{\tilde{V}} = \chi^2_{1, \alpha}
+$$
+
+Characteristics:
+
+* Simpler than full MN (no fourth-order polynomial)
+* Performance very close to MN in simulations
+* Assumes Poisson-distributed events with conditional structure
+
+---
+
+**Comparison Summary**
+
+| Method         | Simplicity | Accuracy (Small Samples) | Requires Iteration | Notes                              |
+| -------------- | ---------- | ------------------------ | ------------------ | ---------------------------------- |
+| Wald           | Easy       | Poor                     | No                 | Standard but less robust           |
+| 2x2 Table      | Very Easy  | Poor                     | No                 | Biased if $T_1 \neq T_2$           |
+| MN             | Complex    | Best                     | Yes                | Most accurate, preferred           |
+| Conditional MN | Moderate   | Very Good                | Minimal            | Good balance of speed and accuracy |
+
+---
+
+**Conclusion**
+
+* Use MN Method if precision is critical (e.g., regulatory or publication).
+* Wald is acceptable for large samples and quick estimation.
+* Avoid 2x2 table method unless groups are nearly identical in exposure time.
+* Conditional MN is a practical alternative with excellent performance and less complexity.
+
+ 
 
 
 
@@ -2173,6 +2386,8 @@ https://phuse.s3.eu-central-1.amazonaws.com/Deliverables/Standard+Analyses+and+C
 15. Yao B, Zhu L, Jiang Q, Xia A. Safety monitoring in clinical trials. *Pharmaceutics*. 2013;5:94–106. doi:10.3390/pharmaceutics5010094
 
 16. Waterhouse et al. (2020/2022), *“Using the BDRIBS method to support the decision to refer an event for unblinded evaluation,”* **Pharmaceutical Statistics**, 21(2):372-385.
+
+Liu2006-CIs for an EAIR Difference with Applications to Clinical Trials
 
 
 ## Exposure-Adjusted Incidence Rates (EAIRs)

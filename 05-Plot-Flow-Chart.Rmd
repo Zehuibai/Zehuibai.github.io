@@ -8,6 +8,7 @@ output:
     number_sections: No
     toc: yes
     toc_float: yes
+    code_folding: "hide" 
   word_document:
     toc: yes
 fontsize: 10pt
@@ -16,17 +17,22 @@ editor_options:
 colorlinks: yes
 ---
 
-```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
 
 # <!-- ---------------------------------------------------------------------- -->
 # <!--                    1. load the required packages                       -->
 # <!-- ---------------------------------------------------------------------- --> 
-
-## if(!require(psych)){install.packages("psych")}
-
-packages<-c("tidyverse", "kableExtra",
-            "ggpubr","gridExtra","ggtext")
+ 
+# devtools::install_github("briatte/ggnet")
+packages <- c( 
+  "grid", "Gmisc", "gridExtra", "DiagrammeR",
+  "ggalluvial", "ggpubr", "ggtext", "ggplot2", "kableExtra",
+  "tidyverse", 
+  "metan","consort",
+  # Optional Network/Other Visualization Tools
+  "waffle", "cowplot", "ggnet", "sna", "network", "igraph", "networkD3"
+)
 
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
@@ -37,38 +43,12 @@ ipak <- function(pkg){
 ipak(packages)
  
 
-
 # <!-- ---------------------------------------------------------------------- -->
 # <!--                        2. Basic system settings                        -->
 # <!-- ---------------------------------------------------------------------- -->
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 getwd()
 Sys.setlocale("LC_ALL","English")
-
-## convert backslash to forward slash in R
-# gsub('"', "", gsub("\\\\", "/", readClipboard()))
-
-### get the path
-# rstudioapi::getSourceEditorContext()$path
-# dirname(rstudioapi::getSourceEditorContext()$path)
-
-### set working directory
-# getwd()
-# setwd("c:/Users/zbai/Desktop")
-# Sys.setlocale("LC_ALL","English")
-
-### get the R Version
-# paste(R.Version()[c("major", "minor")], collapse = ".")
-
-### convert backslash to forward slash 
-# scan("clipboard",what="string")
-# gsub('"', "", gsub("\\\\", "/", readClipboard())) 
-
-## Load all r functions
-## The directory where all source code files are saved.
-source_code_dir <- "C:/Users/baiz/Downloads/Data-Analyst-with-R/00 R Function/ZB Function/"  
-file_path_vec <- list.files(source_code_dir, full.names = T)
-for(f_path in file_path_vec){source(f_path)}
  
 ```
  
@@ -126,10 +106,10 @@ Study flow charts in clinical trials are visual representations of the different
 2. **`rectGrob` for Boxes**: Rectangles (`rectGrob`) are drawn around each `textGrob` to create visible boxes.
 3. **`grid.segments` for Connections**: Connections are made with `grid.segments`, adding arrows to match the flow.
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library(grid)
-library(Gmisc)
-library(gridExtra) 
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library(grid)
+# library(Gmisc)
+# library(gridExtra) 
 
 grid.newpage()
 
@@ -208,7 +188,7 @@ grid.segments(x0 = rightx, y0 = 0.25, x1 = rightx, y1 = 0.15, arrow = arrow(type
 
 When the number of subjects in the final analysis is less than the number of subjects initially entering the study, it is important to detail the observation filtering process. This is often done with a consort diagram, and fortunately R has the consort package by Alim Dayim for drawing data-driven diagrams. To demonstrate its use let’s simulate a two-treatment randomized clinical trial in which 1000 subjects were screened for participation.
 
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 require(Hmisc)
 require(data.table)
 require(qreport)
@@ -243,7 +223,7 @@ kabl(r[1 : 15, ])
 Now show the flow of qualifications and exclusions in a consort diagram. consort_plot wants multiple reasons for exclusions to be prioritized in a hierarchy, and NA to be used to denote “no exclusion”. Use the Hmisc function seqFreq that creates a factor variable whose first level is the most common exclusion, second level is the most common exclusion after excluding subjects based on the first exclusion, and so on. seqFreq also returns an attribute obs.per.numcond with a frequency tabulation of the number of observations having a given number of conditions.
 
 
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 r[, exc := seqFreq('pain-free'  = pain  == 0,
                     'Hx med'    = hxmed == 1,
                                   age < 40,
@@ -280,7 +260,7 @@ consort_plot(r,
 
 consort provides another way to build the diagram that may be more flexible and intuitive after we define some helper functions. The built-in R pipe operator |> is used.
 
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 h <- function(n, label) paste0(label, ' (n=', n, ')')
 htab <- function(x, label=NULL, split=! length(label), br='\n') {
   tab <- table(x)
@@ -317,8 +297,8 @@ w <- r[, {
 
 ### Basic flowchart using `grViz`
 
-```{r DiagrammeR,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library("DiagrammeR")
+```{r DiagrammeR,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library("DiagrammeR")
 
 grViz("digraph flowchart {
       # node definitions with substituted label text
@@ -375,7 +355,7 @@ See more under `Graphviz and mermaid in DiagrammeR`
 
 
 
-```{r Graphviz-Attributes,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r Graphviz-Attributes,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 grViz(diagram = "digraph flowchart {
       # define node aesthetics
       node [fontname = Arial, shape = oval, color = Lavender, style = filled]        
@@ -429,9 +409,9 @@ results [label= 'Results']
 3. **Waffle Plots**: `waffle` is used to create individual waffle charts for Treatment A and Treatment B.
 4. **Combining Plots**: `plot_grid` from the `cowplot` package is used to arrange the waffle plots side-by-side and add titles for the overall plot.
 
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
-library(waffle) 
-library(cowplot)
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library(waffle) 
+# library(cowplot)
 
 # Define the data for each treatment group
 data_treatment_A <- c(`Discontinued` = 28, `Completed` = 72)  # Example counts for Treatment A
@@ -466,7 +446,7 @@ print(final_plot)
 # Gantt Chart DiagrammeR Package
 
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Define the Gantt chart and plot the result (not shown)
 # library(DiagrammeR)
 
@@ -491,8 +471,8 @@ https://sankey-dev.apps.vahub.lilly.com
 
 ![Sankey-ShinyApp](./02_Plots/Visualization/FlowChart/Sankey-ShinyApp.png)
 
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
-library(ggalluvial)  
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library(ggalluvial)  
 
 # Create sample data for the Sankey plot
 data <- data.frame(
@@ -550,7 +530,7 @@ A Sankey diagram allows to study flows. Entities (nodes) are represented by rect
 
 A Sankey Diagram is a visualisation technique that allows to display flows. Several entities (nodes) are represented by rectangles or text. Their links are represented with arrow or arcs that have a width proportional to the importance of the flow.
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 ## https://stackoverflow.com/questions/74903359/sankey-diagram-with-ggplot
 tribble(
 ~parm, ~value,
@@ -585,13 +565,13 @@ doc2 <- tribble(
   "b3", 0.289
 )
 
-library("metan")
+# library("metan")
 doc1 <- doc1 %>% mutate(model = "exp")
 doc2 <- doc2 %>% mutate(model = "exp2")
 finalpow <- doc1 %>% full_join(doc2)
 a <- pivot_wider(finalpow, names_from = model, values_from = value)
 
-library("ggalluvial")
+# library("ggalluvial")
 
 ## using your data frame a
 finalpow <- a %>% pivot_longer(cols = c(exp, exp2)) %>%
@@ -624,12 +604,12 @@ ggplot(mapping = aes(y = value, x = name)) +
 
 ## ggnet network visualization
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # devtools::install_github("briatte/ggnet")
 # https://briatte.github.io/ggnet/
-library(ggnet)
-library(sna)
-library(network)
+# library(ggnet)
+# library(sna)
+# library(network)
 
 # random graph
 net = rgraph(10, mode = "graph", tprob = 0.5)
@@ -646,10 +626,10 @@ ggnet2(net, mode = "target", layout.par = list(niter = 100))
 
 ## Interactive network customization
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Libraries
-library("igraph")
-library("networkD3")
+# library("igraph")
+# library("networkD3")
 
 # create a dataset:
 data <- data_frame(

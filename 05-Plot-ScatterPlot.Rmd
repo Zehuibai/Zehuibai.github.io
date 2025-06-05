@@ -8,6 +8,7 @@ output:
     number_sections: No
     toc: yes
     toc_float: yes
+    code_folding: "hide" 
   word_document:
     toc: yes
 fontsize: 10pt
@@ -17,7 +18,7 @@ colorlinks: yes
 --- 
   
 
-```{r, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+```{r, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
 
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
@@ -26,10 +27,12 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 
 # devtools::install_github("kupietz/kableExtra")
-packages<-c("tidyverse", "kableExtra", 
-            "ggpubr","ggrepel","grid","gridExtra","ggtext","ggalt",
-            "haven","readxl","cowplot",
-            "hrbrthemes","plotly","viridis","patchwork")
+packages <- c(
+  "tidyverse", "kableExtra", "ggpubr", "ggrepel", "grid", "gridExtra", "ggtext", "ggalt",
+  "haven", "readxl", "cowplot", "hrbrthemes", "plotly", "viridis", "patchwork",
+  "ggpp", "lme4", "lattice", "gapminder", "forcats", "ggbeeswarm", "showtext"
+)
+
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(new.pkg)) 
@@ -48,7 +51,7 @@ ipak(packages)
 * Shape Aesthetic
 
 
-```{r the aesthetic, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r the aesthetic, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Color Aesthetic
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy, color = class))
@@ -87,7 +90,7 @@ ggplot(data = iris, mapping = aes(x = Petal.Length, y = Petal.Width, shape = Spe
 
 ## geom_smooth
 
-```{r Grouping Aesthetic, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # display different aesthetics in different layers
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
   geom_point(mapping = aes(color = class)) + 
@@ -135,7 +138,7 @@ ggplot(mpg, aes(cty, hwy))+
 ## Exploratory exposure-response analysis
  
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Read in data
 my_data <- 
   read_csv("./01_Datasets/401_case1_PKPDdataset_ard.csv") %>%
@@ -151,7 +154,7 @@ my_data %>%
 ```
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Define custom breaks and labels
 lbr <- scales::trans_breaks("log10", function(x) 10^x)
 llb <- scales::trans_format("log10", scales::math_format(10^.x))
@@ -177,7 +180,7 @@ my_data %>%
 ```
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Cleveland, William S. 1979. “Robust Locally Weighted Regression and Smoothing Scatterplots.” Journal of the American Statistical Association 74 (368): 829–36. https://doi.org/10.1080/01621459.1979.10481038
 # https://graphicsprinciples.github.io/tutorial-case-studies/posts/401-case1-eda/401-case1-eda.html
 my_data %>%
@@ -203,7 +206,7 @@ my_data %>%
 
 **Change the Title rendering using ggtext::element_textbox()**
 
-```{r element_textbox, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r element_textbox, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # library("ggtext")
 ggplot(mtcars, aes(disp, mpg)) + 
   geom_point() +
@@ -252,8 +255,8 @@ ggplot(mtcars, aes(disp, mpg)) +
 # Quadrant Counts
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library(ggpp)
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library(ggpp)
 
 set.seed(4321)
 x <- -50:50
@@ -316,7 +319,7 @@ facet_wrap(), "winding facet", only one standard can be applied to data classifi
 
 facet_grid(), facet the drawing of the combination of two variables
 
-```{r facet_wrap and facet_grid, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r facet_wrap and facet_grid, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy)) + 
   facet_wrap(.~ class, nrow = 2)
@@ -336,8 +339,8 @@ ggplot(data = mpg) +
 
 **Replacing facet strips with text boxes using ggtext::**
 
-```{r Replacing facet strips, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library("cowplot")
+```{r Replacing facet strips, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library("cowplot")
 
 ggplot(mpg, aes(cty, hwy)) + 
   geom_point() +
@@ -366,9 +369,9 @@ ggplot(mpg, aes(cty, hwy)) +
 
 ## XY plots
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library("lme4") # data sleepstudy
-library("lattice")
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library("lme4") # data sleepstudy
+# library("lattice")
 
 ##------------------------------------------------------------------------
 # str(sleepstudy)
@@ -389,8 +392,8 @@ There are two important functions in ggrepel R packages:
 * geom_text_repel()
 
 
-```{r ggrepel, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library("ggrepel")
+```{r ggrepel, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library("ggrepel")
 # Take a subset of 15 random points
 set.seed(1234)
 ss <- sample(1:32, 15)
@@ -420,7 +423,7 @@ p + geom_label_repel(aes(label = rownames(df),
 
 # With selection
 # Data are available in the gapminder package
-library("gapminder")
+# library("gapminder")
 data <- gapminder %>% filter(year=="2007") %>% select(-year)
 # prepare data
 tmp <- data %>%
@@ -438,8 +441,8 @@ tmp %>%
 
 Order `fct_reorder`: Modifying factor order 
 
-```{r fct_reorder, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library("forcats") 
+```{r fct_reorder, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library("forcats") 
 relig_summary <- gss_cat %>%
   group_by(relig) %>%
   summarise(
@@ -456,7 +459,7 @@ ggplot(relig_summary, aes(tvhours, fct_reorder(relig, tvhours))) +
 
 ## Diverging Dot Plot
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Data Prep
 data("mtcars")  # load data
 mtcars$`car name` <- rownames(mtcars)  # create new column for car names
@@ -508,7 +511,7 @@ ggplot(mtcars, aes(x=`car name`, y=mpg_z, label=mpg_z)) +
 
 ## Alternative using ggbur
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # library(ggpubr)
 # https://rpkgs.datanovia.com/ggpubr/
 data("mtcars")
@@ -581,7 +584,7 @@ ggdotchart(dfm, x = "name", y = "mpg",
 
 ## Residuals vs. Fitted Plot
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 #fit regression model
 fit <- lm(mpg ~ qsec, data=mtcars) 
 
@@ -616,7 +619,7 @@ ggplot(fit, aes(x = .fitted, y = .stdresid)) +
  
 ## Plot actual and predicted values
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 #fit regression model
 d <- mtcars
 fit <- lm(mpg ~ hp, data = d) 
@@ -637,7 +640,7 @@ ggplot(d, aes(x = hp, y = mpg)) +
 Color mapped to residual with sign taken into account.  i.e., whether actual value is greater or less than predicted
  
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 ggplot(d, aes(x = hp, y = mpg)) +
   geom_smooth(method = "lm", se = FALSE, formula = y ~ x,color = "lightgrey") +
   geom_segment(aes(xend = hp, yend = predicted), alpha = .2) +
@@ -656,7 +659,7 @@ For more details see (here)[https://drsimonj.svbtle.com/visualising-residuals]
 ## Normal Probability Plot
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 #fit regression model
 fit <- lm(mpg ~ qsec, data=mtcars) 
 
@@ -677,7 +680,7 @@ qq_plot
 
 ## Histogram of Residuals
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 #fit regression model
 fit <- lm(mpg ~ qsec, data=mtcars) 
 
@@ -695,9 +698,9 @@ p.hist
 
 ## Basic 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # The dataset is provided in the gapminder library
-library("gapminder")
+# library("gapminder")
 data <- gapminder %>% filter(year=="2007") %>% dplyr::select(-year)
 
 # Control circle size with scale_size()
@@ -715,8 +718,8 @@ data %>%
 # use of theme_ipsum() of the hrbrthemes package
 # add stroke to circle: change shape to 21 and specify color (stroke) and fill
 
-library(hrbrthemes)
-library(viridis)
+# library(hrbrthemes)
+# library(viridis)
 
 data %>%
   arrange(desc(pop)) %>%
@@ -733,11 +736,11 @@ data %>%
 
 ## Interactive Version
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Libraries
 # library(ggplot2)
 # library(dplyr)
-library(plotly)
+# library(plotly)
 # library(viridis)
 # library(hrbrthemes)
 # library(gapminder)
@@ -778,11 +781,11 @@ In geom_encircle(), set the data to a new data frame containing only points (row
 
 <!-- 在图表中加上某些特殊的点或区域组，以便引起人们对这些特殊情况的注意。 可以使用ggalt包中的geom_encircle（）方便地完成此操作。 -->
 
-```{r Encircling for emphasizen, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r Encircling for emphasizen, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # install 'ggalt' pkg
 # devtools::install_github("hrbrmstr/ggalt")
 options(scipen = 999)
-library(ggalt)
+# library(ggalt)
 midwest_select <- midwest[midwest$poptotal > 350000 & 
                             midwest$poptotal <= 500000 & 
                             midwest$area > 0.01 & 
@@ -811,7 +814,7 @@ ggplot(midwest, aes(x=area, y=poptotal)) +
 Dumbbell plot is used to visualize the relative position of two time points (increase or decrease), it could also be used to compare the distance between 2 categories. In order to get right orders of dumbbell, the variable $Y$ should be treated as factor with conresponding orders shown in figure. 
  
 
-```{r , echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r , message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # library(ggalt)
 
 health <- read.csv("./01_Datasets/health.csv")
@@ -847,9 +850,9 @@ options(warn=0)
 
 ## General
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Read excel data
-library("readxl")
+# library("readxl")
 Cepheid_D01 <- read_excel("./01_Datasets/lab_figure.xlsx")
 
 # Data management
@@ -865,7 +868,7 @@ Cepheid_D01 <-  Cepheid_D01 %>%
 # suppress warnings globally
 options(warn=-1)
 
-library("ggbeeswarm")
+# library("ggbeeswarm")
 PgR_Overall_3group <- ggplot(Cepheid_D01, aes(x = PgR_3groups, y = PR_Cepheid, color = PgR_3groups)) +
   geom_beeswarm(cex = 2) +
   geom_boxplot(varwidth=T, alpha=0.1) +
@@ -891,21 +894,21 @@ options(warn=-1)
 # dev.off()
 
 # Save as png
-png('./02_Plots/Visualization/Scatter/F01_Beeswarm_PgR.png',width=5, height=5,unit="in", res=300)
-PgR_Overall_3group
-dev.off()
+# png('./02_Plots/Visualization/Scatter/F01_Beeswarm_PgR.png',width=5, height=5,unit="in", res=300)
+# PgR_Overall_3group
+# dev.off()
  
 # Save as emf
-library(devEMF)
-emf(file = "./02_Plots/Visualization/Scatter/F01_Beeswarm_PgR.emf")
-PgR_Overall_3group
-dev.off()
+# library(devEMF)
+# emf(file = "./02_Plots/Visualization/Scatter/F01_Beeswarm_PgR.emf")
+# PgR_Overall_3group
+# dev.off()
 ```
 
 
 ## By Subgroup
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Beeswarm HER2 by ER Status
 ER_central.labs <- c("ER status: negative","ER status: positive")
 names(ER_central.labs) <- c("negative", "positive")
@@ -933,8 +936,8 @@ HER2_Bin
 
 ## Multi groups line chart 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library(babynames) # provide the dataset: a dataframe called babynames
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library(babynames) # provide the dataset: a dataframe called babynames
 # library(hrbrthemes)
 # library(viridis)
 
@@ -955,7 +958,7 @@ don %>%
 
 ## Line chart annotation 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Reference: https://r-graph-gallery.com/line_chart_annotation.html
 # library(plotly)
 # library(hrbrthemes)
@@ -978,7 +981,7 @@ data %>%
 
 ## Dual Y axis
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # library(patchwork) # To display 2 charts together
 # library(hrbrthemes)
 
@@ -1029,13 +1032,13 @@ ggplot(data, aes(x=day)) +
 
 ## Advanced Theme Setting
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Reference https://r-graph-gallery.com/web-line-chart-with-labels-at-end-of-line.html
 # Load packages
-library(ggrepel)
+# library(ggrepel)
 # library(ggtext)
 
-library(showtext)
+# library(showtext)
 font_add_google("Lato")
 showtext_auto()
 
@@ -1242,7 +1245,7 @@ Disease activity varied widely between groups and visits, in the periods before 
 *"Change following Intervention" (right subplot)*  
 Nevertheless, I added a summary of mean disease index scores before and after intervention. My assumption was that visits 1-5 were meant to establish a baseline value, to which levels at visits 6 and 7 were to be compared. Treatment groups are shown in the order of their change in median values of their mean disease indices before and after intervention, from greatest decrease (group "F", left) to greatest increase (group "G", right).
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # library(dplyr)        # version 1.1.4  # general grammar
 # library(purrr)        # version 1.0.2  # set_names, list_rbind
 # library(tidyr)        # version 1.3.1  # pivot_longer, pivot_wider
@@ -1438,7 +1441,7 @@ The first was a hypothetical target range for the disease index. The aim of trea
 
 My second additional parameter were the intervals at which the visits were scheduled. This should give a better impression of the variability of the disease index over time, in particular if the visits were not evenly spaced.
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 
 # Intervals at which visits 1-7 took place (e.g. weeks)
 visitIntervals <- c(0, 2, 4, 8, 12, 16, 24)
@@ -1614,7 +1617,7 @@ ggarrange(
  
 # Scatter Plots and Densities
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # library(haven)
 # library(dplyr)
 # library(tidyr)
@@ -1732,7 +1735,7 @@ p2
 
 ## Linear Scala
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 my_data <- read_csv("./01_Datasets/402_case2_PKdataset.csv") %>%
   filter(CMT == 2 & DOSE == 300 & PART == 1 & STUDY == 1) %>%
   mutate(
@@ -1779,7 +1782,7 @@ my_data %>%
 ## Log Scale
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Mean (95% CI) error bars, log scale
 my_data %>%
   ggplot(aes(
@@ -1822,7 +1825,7 @@ my_data %>%
 ## Cmax, Ctrough and AUClast
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 theme_set(theme_bw(base_size = 10))
 
 # Plot cmax, ctrough, AUClast dots (95% CI) in separate panels
@@ -1886,7 +1889,7 @@ grid.arrange(arrangeGrob(gg1, gg2, gg3, nrow = 1), nrow = 1)
 
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 Cmax2  <- Cmax %>%
   mutate(DV = Cmax,
          logDV = log(Cmax),
@@ -1981,7 +1984,7 @@ PKmetrics %>%
 
 ## Post-hoc subgroup analyses
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Read in data and define order for factors.
 # Dervie visit time in weeks from hours
 # Define informative label for plotting subgroups
@@ -2075,13 +2078,13 @@ data_to_plot %>%
  
 # Interactive Plot
 
-```{r interactive, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r interactive, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # load data
-library("gapminder")
+# library("gapminder")
 data <- gapminder %>% filter(year=="2007") %>% select(-year)
 
 # Interactive version
-library("plotly")
+# library("plotly")
 p <- data %>%
   mutate(myText=paste("This country is: " ,country )) %>%
   ggplot( aes(x=gdpPercap, y=lifeExp, size = pop, color = continent, text=myText)) +

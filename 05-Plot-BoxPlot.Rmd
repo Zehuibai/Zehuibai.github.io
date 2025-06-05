@@ -8,6 +8,7 @@ output:
     number_sections: No
     toc: yes
     toc_float: yes
+    code_folding: "hide" 
   word_document:
     toc: yes
 fontsize: 10pt
@@ -16,7 +17,6 @@ editor_options:
 colorlinks: yes
 ---
  
-
 ```{r, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
@@ -25,7 +25,9 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 ## devtools::install_github("kupietz/kableExtra")
 packages<-c("tidyverse", "kableExtra",  
-            "ggpubr","gridExtra","ggtext")
+            "ggpubr","gridExtra","ggtext",
+            "hrbrthemes","viridis","gapminder","ggstatsplot")
+
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(new.pkg)) 
@@ -40,7 +42,7 @@ ipak(packages)
 
 ## Grouped Boxplot
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # create a data frame
 variety=rep(LETTERS[1:7], each=40)
 treatment=rep(c("high","low"),each=20)
@@ -69,7 +71,7 @@ grid.arrange(p0, p1, p2, ncol=2)
 
 ### Basic Order by Median
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 theme_set(theme_classic())
 
 # Using number of observation per group
@@ -101,8 +103,8 @@ grid.arrange(o1,o2,ncol=2)
 ### Cut for Continuous Variable
   
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library(hrbrthemes)
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library(hrbrthemes)
 
 # Start with the diamonds dataset, natively available in R:
 diamonds %>%
@@ -122,7 +124,7 @@ diamonds %>%
 
 ### Basic Color `scale_fill_brewer`
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Top Left: Set a unique color with fill, colour, and alpha
 P1 <- ggplot(mpg, aes(x=class, y=hwy)) + 
     geom_boxplot(color="red", fill="orange", alpha=0.2)
@@ -156,8 +158,8 @@ grid.arrange(P1, P2, P3, P4, ncol=2)
 
 ### Highlighting a group
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library("hrbrthemes")
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library("hrbrthemes")
 # Work with the natively available mpg dataset
 mpg %>% 
 
@@ -176,7 +178,7 @@ mpg %>%
 
 ### Independent Color
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 df <- data.frame(
   Group = c(rep('B-cell\nlymphocytes',50), rep('Natural\nkiller cells', 50)),
   log2(matrix(rexp(200, rate=.1), ncol=2)))
@@ -252,7 +254,7 @@ ggplot(data = df, aes(x = Group, y = Expression)) +
 ### Backgroud
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 value = runif(n = 1000) 
 type = rep(c("a","b","c","d"),250) 
 type2 = rep(c("a","b"),500) 
@@ -278,7 +280,7 @@ ggplot(allResults, aes(y=value, x=type)) + geom_boxplot(aes(fill = type, col=typ
 
 ### stat="identity"
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 DummyA <- readRDS(file = "./01_Datasets/Cylinder_Baseline.rds")
 
 ggplot(DummyA,aes(x=Subgroup,fill=Treatment))+
@@ -321,7 +323,7 @@ ggplot(DummyB, aes(x=Visit,fill=Treatment))+
 
 ### Statistics Text
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 df <- mtcars
 df$cyl <- as.factor(df$cyl)
 
@@ -363,9 +365,9 @@ ggplot(df, aes(x = cyl, y = mpg, fill = cyl)) +
 
 ### Basic Jitter
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library(hrbrthemes)
-library(viridis)
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# library(hrbrthemes)
+# library(viridis)
 
 # create a dataset
 data <- data.frame(
@@ -393,7 +395,7 @@ data %>%
 ### Jitter with Statistic Test
 
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # library("ggpubr") 
 data_D01 <- read.csv("./01_Datasets/Boxplot_paired_dummy.csv",
                      sep=",",
@@ -417,7 +419,7 @@ data_D02_p2p1 %>%
 ```
 
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 data("ToothGrowth")
 df <- ToothGrowth 
 my_comparisons <- list( c("0.5", "1"), c("1", "2"), c("0.5", "2") )
@@ -432,7 +434,7 @@ ggboxplot(df, x = "dose", y = "len",
 
 ## Paried line
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 data_D02_p2p1 %>%
   filter(ID != "6359") %>% 
   ggpaired(x = "Treatment", y = "mean",
@@ -451,7 +453,7 @@ data_D02_p2p1 %>%
 
 In addition to the information provided by the box plot, you can provide clearer information in the form of summary statistics for each group. These points are interlaced to make each point represent an observation value.
 
-```{r Dot Box Plot, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r Dot Box Plot, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # plot
 g <- ggplot(mpg, aes(reorder(manufacturer, cty, FUN = median) , cty))
 g + geom_boxplot() + 
@@ -474,7 +476,7 @@ g + geom_boxplot() +
 
 The violigogram is similar to the box pattern, but the density of the group is displayed. There is no too much information like a box line map.
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 ggplot(mpg, aes(class, cty)) +
   geom_violin() + 
   labs(title="Violin plot", 
@@ -486,7 +488,7 @@ ggplot(mpg, aes(class, cty)) +
 ```
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 df <- ToothGrowth 
 ggviolin(df, x = "dose", y = "len", fill = "dose",
          palette = c("#00AFBB", "#E7B800", "#FC4E07"),
@@ -505,16 +507,16 @@ ggstatsplot is an extension of ggplot2 package for creating graphics with detail
 * to check if a continuous variable differs across multiple groups/conditions
 * to compare distributions visually and check for outliers
 
-```{r test, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r test, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 
-library("gapminder")
+# library("gapminder")
 dplyr::glimpse(x = gapminder::gapminder)
 
 # since the confidence intervals for the effect sizes are computed using
 # bootstrapping, important to set a seed for reproducibility
 # for reproducibility
 set.seed(123)
-library("ggstatsplot")
+# library("ggstatsplot")
 
 # plot
 ggbetweenstats(
@@ -529,7 +531,7 @@ ggbetweenstats(
 ## Boxplot Legend
 
 
-```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 boxplot_framework <- function(upper_limit,
                               family_font = "serif",
                               lower_limit = 0,

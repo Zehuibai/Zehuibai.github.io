@@ -8,6 +8,7 @@ output:
     number_sections: No
     toc: yes
     toc_float: yes
+    code_folding: "hide" 
   word_document:
     toc: yes
 fontsize: 10pt
@@ -16,15 +17,17 @@ editor_options:
 colorlinks: yes
 ---
 
-```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE,  warning = FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
 
 # <!-- ---------------------------------------------------------------------- -->
 # <!--                    1. load the required packages                       -->
 # <!-- ---------------------------------------------------------------------- --> 
-
+ 
 # devtools::install_github("openpharma/visR") 
-packages<-c("tidyverse", "kableExtra","broom","survival","patchwork","labelled","visR")
+packages<-c("tidyverse", "kableExtra","broom",
+            "simsurv","survival","survminer",
+            "patchwork","labelled","visR")
 
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
@@ -79,7 +82,7 @@ for(f_path in file_path_vec){source(f_path)}
 This is a study of a new investigational medicine for the treatment of a rare type of vasculitis, with patients randomised to active treatment or placebo, with an on-treatment period of 52 weeks and a subsequent off-treatment follow-up period of up for 8 weeks. An ideal medicine would reduce vasculitis symptoms and/or enable a reduction in OCS dose and/or reduce the risk of relapse. Additional endpoints are defined for total number of days the patient was in remission during the on-treatment period, and a binary endpoint for whether a patients achieved remission within the first 24 weeks and maintained in remission until the end of the on-treatment period. 
 
 
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+```{r,message = FALSE, error = FALSE,  warning = FALSE, cache=TRUE}
 theme_set(theme_minimal(base_size = 8))
 
 vas_data <- read_csv("./01_Datasets/vas_data.csv")
@@ -169,12 +172,12 @@ If the PH assumption holds, the lines in this plot should appear parallel. Howev
 
 Paul Allison, in *Survival Analysis Using SAS*, highlights an often-overlooked perspective: while the PH assumption might not be perfectly met, the average effect observed over time may still be meaningful. He suggests that the focus on PH might sometimes be excessive, as all models involve assumptions, some of which are less critical than others. Statistical tests like `cox.zph` in R’s *survival* package provide a more objective measure of the PH assumption by testing residuals. This balanced view helps in interpreting models where the assumption might not be entirely satisfied, emphasizing that minor deviations don’t always compromise the model's utility.
 
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
-library(tidyverse) # ol' faithful
-library(simsurv) # for simulating survival (TTE) data 
-library(survival) # for analyzing survival data
-library(survminer) # for analyzing/plotting survival data 
-library(patchwork) # combining plots
+```{r,message = FALSE, error = FALSE,  warning = FALSE, cache=TRUE}
+# library(tidyverse) # ol' faithful
+# library(simsurv) # for simulating survival (TTE) data 
+# library(survival) # for analyzing survival data
+# library(survminer) # for analyzing/plotting survival data 
+# library(patchwork) # combining plots
 
 # Note: it's been commented out, however there is the option to add a covariate (c1) if interested. 
 
@@ -332,7 +335,7 @@ The trial has four treatment arms, patients with centrally confirmed human epide
 
 As defined by Cancer.gov: “the length of time during and after the treatment of a disease, such as cancer, that a patient lives with the disease but it does not get worse. In a clinical trial, measuring the progression-free survival is one way to see how well a new treatment works”.
 
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+```{r,message = FALSE, error = FALSE,  warning = FALSE, cache=TRUE}
 # library(dplyr)
 # library(ggplot2)
 # library(broom)
@@ -393,7 +396,7 @@ a/b +
 Similar to a lasagna plot or heatmap, this chart shows timelines of the patients achieving remissions. The sorting is very helpful for identifying when they started their remission, a message also supported by the title. 
 
 
-```{r,echo = F,message = FALSE, error = FALSE, warning = FALSE}
+```{r,message = FALSE, error = FALSE,  warning = FALSE, cache=TRUE}
 theme_set(theme_minimal(base_size = 8))
 
 vas_data <- read_csv("./01_Datasets/vas_data.csv")
