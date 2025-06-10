@@ -8,6 +8,7 @@ output:
     number_sections: No
     toc: yes
     toc_float: yes
+    code_folding: "hide" 
   word_document:
     toc: yes
 fontsize: 10pt
@@ -16,17 +17,16 @@ editor_options:
 colorlinks: yes
 ---
 
-```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
 
 # <!-- ---------------------------------------------------------------------- -->
 # <!--                    1. load the required packages                       -->
 # <!-- ---------------------------------------------------------------------- --> 
 
-## if(!require(psych)){install.packages("psych")}
-
+ 
 packages<-c("tidyverse", "kableExtra", 
-            "gtsummary","inTextSummaryTable",
+            "gtsummary","inTextSummaryTable","tools",
             "Hmisc","htmltools","clinUtils")
 
 ipak <- function(pkg){
@@ -43,7 +43,301 @@ ipak(packages)
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 getwd()
 Sys.setlocale("LC_ALL","English")
+
+
+
+# load example data
+data(dataADaMCDISCP01)
+dataAll <- dataADaMCDISCP01
+labelVars <- attr(dataAll, "labelVars")
 ```
 
 
+# Subject disposition
+
+## inTextSummaryTable
+ 
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+ # data of interest
+data_in <- dataAll$ADSL
+
+varDMFL <- grep("FL$", colnames(data_in), value = TRUE)
+varDMFLLabel <- sub(" Flag$", "", labelVars[varDMFL])
+
+getSummaryStatisticsTable(
+    data = data_in,
+    var = varDMFL, varFlag = varDMFL, varGeneralLab = "Analysis Set, N", 
+    varLab = varDMFLLabel,
+    stats = getStats("n (%)"),
+    colVar = "TRT01P",
+    labelVars = labelVars,
+    colTotalInclude = TRUE, colTotalLab = "All subjects",
+    varInclude0 = TRUE,
+    title = tools::toTitleCase("Table: subject disposition")
+    # file = file.path("tables_CSR", "Table_subjectDisposition.docx")
+)
+```
+
+
+## gtsummary
+ 
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+data_in <- dataAll$ADSL
+
+# Identify flag variables ending in "FL"
+varDMFL <- grep("FL$", colnames(data_in), value = TRUE)
+
+# Get label replacements: named list of formulas
+varDMFLLabel <- setNames(
+  sub(" Flag$", "", labelVars[varDMFL]),
+  varDMFL
+)
+label_list <- map2(varDMFL, varDMFLLabel, ~ as.formula(paste0(.x, ' ~ "', .y, '"')))
+
+# Optional: Ensure all flag variables are factors
+data_in[varDMFL] <- lapply(data_in[varDMFL], factor)
+
+# Generate the table
+data_in %>%
+  select(TRT01P, all_of(varDMFL)) %>%
+  tbl_summary(
+    by = TRT01P,
+    type = all_of(varDMFL) ~ "categorical",
+    statistic = all_categorical() ~ "{n} ({p}%)",
+    label = label_list,
+    missing = "no"
+  ) %>%
+  add_overall(last = TRUE, col_label = "All subjects") %>%
+  modify_caption("**Table: Subject Disposition**")
+```
+
+
+# Demographics
+
+## inTextSummaryTable
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# data of interest
+data_in <- subset(dataAll$ADSL, SAFFL == "Y")
+
+# variables of interest
+# Note: if available: ethnicity is included
+varsDM <- c(
+  "SEX", "AGE", "AGEGR1",
+  "RACE", "ETHNIC",
+  "HEIGHTBL", "WEIGHTBL", 
+  "BMIBL", "BMIBLGR1"
+)
+
+# Sort variables according to corresponding numeric variable
+data_in$AGEGR1 <- with(data_in, reorder(AGEGR1, AGEGR1N))
+data_in$RACE <- with(data_in, reorder(RACE, RACEN))
+data_in$TRT01P <- with(data_in, reorder(TRT01P, TRT01PN))
+
+## Define set of statistics of interest:
+statsDM <- getStatsData(
+  data = data_in, var = varsDM,
+  # different for continuous and categorical variable
+  # type = c(cont = "median (range)", cat = "n (%)"),
+  type = c(cont = "n", cont = "mean (sd)",cont = "median\n(range)", 
+         cat = "n (%)"),
+  # for categorical variable, statistic name (here: 'n (%)')
+  # should not be included in the table
+  args = list(cat = list(includeName = FALSE))
+)
+
+## create the table:
+
+getSummaryStatisticsTable(
+  data = data_in, 
+  # variables to summarize
+  var = varsDM, 
+  varGeneralLab = "Parameter",
+  # column
+  colVar = "TRT01P", colTotalInclude = TRUE, colTotalLab = "All subjects",
+  # statistics
+  stats = statsDM,
+  statsGeneralLab = "",
+  labelVars = labelVars,
+  # if only one category, should be included in separated row (e.g. RACE: White)
+  rowAutoMerge = FALSE,
+  rowInclude0 = FALSE, emptyValue = 0,
+  title = tools::toTitleCase("Table: Demographic Data (safety Analysis Set)")
+  # file = file.path("tables_CSR", "Table_demographicData.docx")
+)
+```
+
+
+
+## gtsummary
+ 
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# Subset Safety Analysis Set
+data_in <- subset(dataAll$ADSL, SAFFL == "Y")
+
+# Variables of interest
+varsDM <- c(
+  "SEX", "AGE", "AGEGR1",
+  "RACE", "ETHNIC",
+  "HEIGHTBL", "WEIGHTBL", 
+  "BMIBL", "BMIBLGR1"
+)
+
+# Reorder factor levels
+data_in <- data_in %>%
+  mutate(
+    AGEGR1 = fct_reorder(AGEGR1, AGEGR1N),
+    RACE = fct_reorder(RACE, RACEN),
+    TRT01P = fct_reorder(TRT01P, TRT01PN)
+  )
+
+# Identify variable types
+cont_vars <- varsDM[sapply(data_in[varsDM], is.numeric)]
+cat_vars  <- setdiff(varsDM, cont_vars)
+
+# Format type list
+type_list <- c(
+  lapply(cont_vars, function(x) as.formula(paste0(x, " ~ 'continuous2'"))),
+  lapply(cat_vars,  function(x) as.formula(paste0(x, " ~ 'categorical'")))
+)
+
+# Format label list
+label_list <- lapply(varsDM, function(x) {
+  lbl <- labelVars[[x]]
+  if (is.null(lbl)) lbl <- x
+  as.formula(paste0(x, " ~ '", lbl, "'"))
+})
+
+# Build table
+tbl <- data_in %>%
+  select(all_of(c("TRT01P", varsDM))) %>%
+  tbl_summary(
+    by = TRT01P,
+    type = type_list,
+    statistic = list(
+      all_continuous2() ~ c("Mean (SD)" = "{mean} ({sd})",
+                            "Median" = "{median} ",
+                            "(Min - Max)" = "({min} - {max})"),
+      all_categorical() ~ "{n} ({p}%)"
+    ),
+    label = label_list,
+    missing = "no"
+  ) %>%
+  add_overall(last = TRUE, col_label = "All subjects") %>%
+  modify_caption("**Table: Demographic Data (Safety Analysis Set)**") %>%
+  bold_labels()
+
+tbl
+```
+
+
+# Baseline disease characteristics
+
+## inTextSummaryTable
+
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# data of interest
+data_in <- subset(dataAll$ADSL, SAFFL == "Y")
+
+# create table
+getSummaryStatisticsTable(
+    data = data_in,
+    var = c("DURDIS", "EDUCLVL"), varGeneralLab = "Parameter", 
+    colVar = "TRT01P", colTotalInclude = TRUE, colTotalLab = "All subjects",
+    stats = getStats("median\n(range)"), statsGeneralLab = "",
+    rowAutoMerge = FALSE,
+    labelVars = labelVars,
+    title = tools::toTitleCase("Table: Baseline Disease Characteristics (safety analysis set)")
+    # file = file.path("tables_CSR", "Table_BaselineCharacteristics.docx")
+)
+```
+
+
+## gtsummary
+ 
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+# Subset data
+data_in <- subset(dataAll$ADSL, SAFFL == "Y")
+
+# Variables of interest
+vars <- c("DURDIS", "EDUCLVL")
+
+# Identify variable types
+cont_vars <- vars[sapply(data_in[vars], is.numeric)]
+cat_vars <- setdiff(vars, cont_vars)
+
+# Set types: "continuous2" for median + range on separate row
+type_list <- c(
+  lapply(cont_vars, function(x) as.formula(paste0(x, " ~ 'continuous2'"))),
+  lapply(cat_vars, function(x) as.formula(paste0(x, " ~ 'categorical'")))
+)
+
+# Set labels
+label_list <- lapply(vars, function(x) {
+  lbl <- labelVars[[x]]
+  if (is.null(lbl)) lbl <- x
+  as.formula(paste0(x, " ~ '", lbl, "'"))
+})
+
+# Create table
+tbl <- data_in %>%
+  select(all_of(c("TRT01P", vars))) %>%
+  tbl_summary(
+    by = TRT01P,
+    type = type_list,
+    statistic = list(
+      all_continuous2() ~ c("Mean (SD)" = "{mean} ({sd})",
+                            "Median" = "{median} ",
+                            "(Min - Max)" = "({min} - {max})"),
+      all_categorical() ~ "{n} ({p}%)"
+    ),
+    label = label_list,
+    missing = "no"
+  ) %>%
+  add_overall(last = TRUE, col_label = "All subjects") %>%
+  modify_caption("**Table: Baseline Disease Characteristics (Safety Analysis Set)**") %>%
+  bold_labels()
+
+# View the table
+tbl
+```
+
+# Medical History and Concomitant Diseases
+
+## inTextSummaryTable
+
+ 
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+data_in <- subset(dataAll$ADCM, SAFFL == "Y")
+
+# sort variable according to corresponding numeric variables
+data_in$TRTA <- with(data_in, reorder(TRTA, TRTAN))
+
+# Terms should be in lower-case
+data_in$CMDECOD <- simpleCap(tolower(data_in$CMDECOD))
+data_in$CMCLAS <- simpleCap(tolower(data_in$CMCLAS))
+        
+getSummaryStatisticsTable(
+    data = data_in,
+    colVar = "TRTA", colTotalInclude = TRUE, colTotalLab = "All subjects",
+    rowVar = c("CMCLAS", "CMDECOD"), 
+    # include total across generic terms and across ATC4 classes
+    rowVarTotalInclude = c("CMCLAS", "CMDECOD"), 
+    rowTotalLab = "Any prior and concomitant medication",
+    stats = getStats("n (%)"),
+    # sort rows based on counts of subjects in the total column 
+    rowOrder = "total",
+    labelVars = labelVars,
+    emptyValue = 0,
+    title = tools::toTitleCase(paste("Prior and concomitant therapies",
+        "by medication class and generic term (safety analyis set)"
+    ))
+    # file = file.path("tables_CSR", "Table_CM.docx")
+)
+```
+ 
+
+# Reference
+
+* [inTextSummaryTable: Creation of in-Text Summary Table](https://cran.r-project.org/web/packages/inTextSummaryTable/index.html)
 

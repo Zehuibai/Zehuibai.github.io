@@ -1,7 +1,7 @@
 ---
 title: |
   ![](logo.png){width=3in}  
-  Clinical Pharmacokinetics Analysis
+  Efficacy Analysis 
 output:
   html_document:
     df_print: paged
@@ -17,7 +17,6 @@ editor_options:
 colorlinks: yes
 ---
 
-
 ```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
 
@@ -27,7 +26,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
 
 ## if(!require(psych)){install.packages("psych")}
 
-packages<-c("tidyverse", "kableExtra", 
+packages<-c("tidyverse", "kableExtra", "tools",
             "gtsummary","inTextSummaryTable",
             "Hmisc","htmltools","clinUtils")
 
@@ -45,7 +44,41 @@ ipak(packages)
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 getwd()
 Sys.setlocale("LC_ALL","English")
+
+ # load example data
+data(dataADaMCDISCP01)
+
+dataAll <- dataADaMCDISCP01
+labelVars <- attr(dataAll, "labelVars")
 ```
 
+# Continious Variables
 
+```{r,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+dataAdasCog11 <- subset(dataAll$ADQSADAS, PARAMCD == "ACTOT")
+dataCIBIC <- subset(dataAll$ADQSCIBC, PARAMCD == "CIBICVAL")
 
+dataEfficacy <- plyr::rbind.fill(dataAdasCog11, dataCIBIC)
+
+dataEfficacy$TRTP <- with(dataEfficacy, reorder(TRTP, TRTPN))
+dataEfficacy$AVISIT <- with(dataEfficacy, reorder(AVISIT, AVISITN))
+
+stats <- getStatsData(
+    data = dataEfficacy, 
+    var = c("AVAL", "CHG"), 
+    type = c("n", "mean (se)", "median (range)")
+)
+
+getSummaryStatisticsTable(
+    data = dataEfficacy,
+    rowVar = "PARAM",
+    colVar = c("TRTP", "AVISIT"),
+    var = c("AVAL", "CHG"), 
+    stats = stats,
+    labelVars = labelVars,
+    title = paste("Table: efficacy endpoints", 
+        toTitleCase("actual value and changes from baseline per time point"             
+    ))
+    # file = file.path("tables_CSR", "Table_efficacy.docx")
+)
+```
