@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> General Consideration</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Biosimilar-Trials.html">Statistical Considerations for the Design and Analysis of Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Alternatives-to-Power.html">Bayesian methods - Alternatives to Power</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Continuous-Endpoint.html">Sample Size Determination for Continuous Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Categorical-Endpoint.html">Sample Size Determination for Categorical Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-Determination-for-Counts-and-Rates.html">Sample Size Determination for Counts and Rates</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Survival-Endpoint.html">Sample Size Determination for Survival Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Repeated-Measures.html">Sample Size Determination for Repeated Measures</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Sequential-Design.html">Statistical Considerations for Group Sequential Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Adaptive-Design.html">Statistical Considerations for Adaptive Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-Multiple-Test.html">Sample Size for Multiple Test</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-General-Consideration.html">General Consideration</a>
+    </li>
+    <li>
+      <a href="04-Design-Estimands-Framework.html">Estimands Framework</a>
+    </li>
+    <li>
+      <a href="04-Design-Estimands-Practice.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Complex-Sequential-Trials.html">Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Adaptive-Clinical-Trials.html">Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bayesian-Clinical-Trials.html">Bayesian Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Single-Arm-Clinical-Trials.html">Single Arm Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Diagnostic-Study-Design-and-Evaluation.html">Diagnostic Study-Design and Evaluation</a>
+    </li>
+    <li>
+      <a href="04-Design-Diagnostic-Study-MRMC.html">Diagnostic Study-Multireader Multicase (MRMC)</a>
+    </li>
+    <li>
+      <a href="04-Design-Vaccine-Design.html">Vaccine Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Considerations for the Design and Conduct of Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Regulatory-Submission.html">Regulatory Submission from Stats Perspective</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot-Time-To-Event.html">Time to Event Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-PRO-Data.html">Patient Reported Outcome Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-SSC-and-Power-Calculation.html">Sample Size and Power Calculations Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Correlation.html">Correlation Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Model-Table.html">Clinical Data and Model visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-ScatterPlot.html">Scatter and Line Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-BarPlot.html">Bar Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-PieChart.html">Pie Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-BoxPlot.html">Box Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Histogram.html">Histogram</a>
+    </li>
+    <li>
+      <a href="05-Plot-Forest-Plot.html">Forest Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Flow-Chart.html">Flow Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-calculator"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Linear-Regression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-SSD.html">Safety Signal Detection and Evaluation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Meta-Analysis.html">Meta Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Time-Series-Analysis.html">Time Series Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-SEM.html">Structural Equation Modeling</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Factor-Analysis.html">Factor Analysis</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-bar-chart"></span>
+     
+    Machine Learning
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="07-ML-Bayesian-Theory.html">Bayesian Theory</a>
+    </li>
+    <li>
+      <a href="07-ML-Bayesian-Analysis.html">Bayesian Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Regularization-Penalized-Regression.html">Regularization Penalized Regression</a>
+    </li>
+    <li>
+      <a href="07-ML-Loss-Regression.html">Loss Functions in Machine Learning</a>
+    </li>
+    <li>
+      <a href="07-ML-PCA.html">Principal Component Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-KNN.html">K-Nearest Neighbors</a>
+    </li>
+    <li>
+      <a href="07-ML-SVM.html">Support Vector Machine</a>
+    </li>
+    <li>
+      <a href="07-ML-Tree-Models.html">Tree Models</a>
+    </li>
+    <li>
+      <a href="07-ML-LDA.html">Linear Discriminant Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Cluster-Analysis.html">Cluster Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Neural-Networks.html">Neural Network</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-stethoscope"></span>
+     
+    Clinical Analysis (ADaM)
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="08-Clinical-Disposition-Baseline.html">Disposition and Baseline</a>
+    </li>
+    <li>
+      <a href="08-Clinical-Efficacy.html">Efficacy Analysis</a>
+    </li>
+    <li>
+      <a href="08-Clinical-Pharmacokinetics-Analysis.html">Pharmacokinetics Analysis</a>
+    </li>
+    <li>
+      <a href="08-Clinical-Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="08-Clinical-Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="08-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+<li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+General Consideration</p></h1>
+
+</div>
+
+
+<div id="clinical-trial-considerations" class="section level1">
+<h1>Clinical Trial Considerations</h1>
+<div id="design-and-conduct-of-clinical-trial" class="section level2">
+<h2>Design and Conduct of Clinical Trial</h2>
+<p><strong>1. Trial Objective and Context</strong></p>
+<p>The foundation of any clinical trial lies in a clear understanding of
+its scientific objective. It is crucial to define whether the trial aims
+to <strong>predict outcomes</strong> or <strong>explain
+mechanisms</strong>. Specifically, the trial should clarify whether it
+intends to determine if an intervention is <strong>better, worse, or
+equivalent</strong>, and if so, for which specific patient subgroups
+this conclusion applies.</p>
+<p>Equally important is identifying the <strong>primary
+audience</strong> for the trial’s conclusions. This could be:</p>
+<ul>
+<li><strong>Regulatory authorities</strong>, such as the FDA or EMA,
+particularly relevant for trials in phases II or III where approval
+decisions are influenced.</li>
+<li><strong>The scientific community</strong>, with the intention of
+contributing to peer-reviewed literature and advancing medical
+understanding.</li>
+<li><strong>The general public</strong>, especially for trials
+addressing high-profile diseases or public health crises.</li>
+</ul>
+<p>In designing the trial, practical limitations must be considered,
+such as:</p>
+<ul>
+<li>The <strong>availability of eligible patients</strong>, which is
+particularly significant in trials for <strong>rare
+diseases</strong>.</li>
+<li>The <strong>timeline and financial resources</strong>, which dictate
+the scope and feasibility of the study.</li>
+<li>The level of <strong>available expertise and diagnostic
+infrastructure</strong>, ensuring the trial is executable under current
+operational conditions.</li>
+</ul>
+<hr />
+<p><strong>2. Data and Endpoint Considerations</strong></p>
+<p>Careful planning is required regarding the <strong>data to be
+collected</strong>, ensuring:</p>
+<ul>
+<li>All data points are <strong>scientifically justified</strong>,
+relevant to the objectives, and ethically appropriate.</li>
+<li>Compliance with <strong>legal and ethical standards</strong>, such
+as patient privacy laws (e.g., GDPR) and informed consent
+requirements.</li>
+</ul>
+<p>A clear mapping must exist between the collected data and:</p>
+<ul>
+<li><p>The <strong>endpoint type</strong>, which could be:</p>
+<ul>
+<li><strong>Continuous endpoints</strong>, e.g., blood pressure
+levels.</li>
+<li><strong>Categorical endpoints</strong>, e.g., response/no
+response.</li>
+<li><strong>Time-to-event (survival) endpoints</strong>, e.g., time to
+disease progression.</li>
+</ul></li>
+</ul>
+<p>Additionally, the chosen <strong>estimator</strong>, such as a
+<strong>hazard ratio</strong> for survival data, must align
+appropriately with both the data type and the trial objectives.</p>
+<hr />
+<p><strong>3. Hypothesis Construction</strong></p>
+<p>The trial should explicitly define its <strong>primary
+hypothesis</strong>, which can take several forms:</p>
+<ul>
+<li><strong>Superiority</strong>, aiming to demonstrate that one
+intervention is better than another.</li>
+<li><strong>Equivalence</strong>, showing that two interventions have no
+meaningful difference.</li>
+<li><strong>Non-inferiority</strong>, testing whether one intervention
+is not worse than another by a pre-specified margin.</li>
+<li><strong>Super-superiority</strong>, seeking to demonstrate not only
+superiority but an exceptionally large effect size.</li>
+</ul>
+<p>If the trial involves <strong>multiple tests or comparisons</strong>,
+it is essential to:</p>
+<ul>
+<li><p>Define how <strong>overall trial success</strong> will be
+determined, using:</p>
+<ul>
+<li>A <strong>conjunctive approach</strong> (all tests must be
+positive).</li>
+<li>A <strong>disjunctive approach</strong> (success if at least one
+test is positive).</li>
+<li>A <strong>marginal approach</strong> (success based on individual
+outcomes).</li>
+</ul></li>
+<li><p>Implement a strategy to control the <strong>Type I error
+rate</strong>, such as:</p>
+<ul>
+<li><strong>Family-Wise Error Rate (FWER)</strong> control.</li>
+<li><strong>False Discovery Rate (FDR)</strong> control.</li>
+<li>Other statistically sound approaches to maintain integrity of
+results.</li>
+</ul></li>
+</ul>
+<hr />
+<p><strong>4. Trial Design Considerations</strong></p>
+<p>Selecting an appropriate <strong>trial design</strong> is central to
+obtaining reliable and interpretable results. Possible designs
+include:</p>
+<ul>
+<li><strong>Parallel-group designs</strong>, where different groups
+receive different interventions simultaneously.</li>
+<li><strong>Cross-over designs</strong>, allowing subjects to receive
+multiple interventions in sequence.</li>
+<li><strong>Single-arm trials</strong>, often used when no control group
+is ethical or feasible.</li>
+<li><strong>Multi-arm trials</strong>, comparing several interventions
+simultaneously.</li>
+</ul>
+<p>The design impacts both:</p>
+<ul>
+<li>The <strong>efficiency</strong> of obtaining results.</li>
+<li>The types of <strong>inferences</strong> that can legitimately be
+drawn.</li>
+</ul>
+<p>If <strong>randomization</strong> is required, considerations
+include:</p>
+<ul>
+<li>The <strong>method of randomization</strong>, such as simple
+randomization, stratified randomization, or minimization.</li>
+<li>The <strong>level of randomization</strong>, e.g., individual or
+cluster-based.</li>
+<li>Strategies to <strong>maintain blinding</strong>, ensuring that
+treatment assignments remain concealed where necessary.</li>
+</ul>
+<hr />
+<p><strong>5. Estimator, Effect Size, and Estimand
+Considerations</strong></p>
+<p>A well-defined <strong>estimand strategy</strong> ensures clarity in
+interpreting treatment effects, considering:</p>
+<ul>
+<li><p>Whether the estimand reflects:</p>
+<ul>
+<li>The effect of receiving treatment as assigned.</li>
+<li>The effect while actually on treatment.</li>
+<li>A hypothetical scenario (e.g., assuming full adherence).</li>
+</ul></li>
+</ul>
+<p>The <strong>estimator</strong> selected must:</p>
+<ul>
+<li>Be <strong>appropriate</strong> for the estimand and endpoint.</li>
+<li>Demonstrate sufficient <strong>robustness</strong>, meaning it
+remains reliable under reasonable deviations from assumptions.</li>
+<li>Ensure that the logical link from <strong>estimand to estimator to
+estimate</strong> is coherent and scientifically valid.</li>
+</ul>
+<p>Approaches for handling:</p>
+<ul>
+<li><strong>Missing data</strong>, using techniques such as multiple
+imputation.</li>
+<li>Other <strong>intercurrent events (ICEs)</strong>, such as treatment
+discontinuation, should be pre-specified and consistently applied.</li>
+</ul>
+<hr />
+<p><strong>6. Statistical Model and Test Considerations</strong></p>
+<p>The <strong>statistical model</strong> forms the backbone of data
+analysis, and its selection should:</p>
+<ul>
+<li><p>Align with the <strong>endpoint</strong>, <strong>trial
+design</strong>, and <strong>estimand strategy</strong>.</p></li>
+<li><p>Be chosen for its <strong>efficiency</strong>, ensuring maximum
+power with minimal sample size.</p></li>
+<li><p>Be compared against alternatives through:</p>
+<ul>
+<li><strong>Power calculations</strong>.</li>
+<li><strong>Simulations</strong> to assess robustness and operating
+characteristics.</li>
+</ul></li>
+</ul>
+<p>Additional considerations include:</p>
+<ul>
+<li>The model’s <strong>sensitivity to assumptions</strong> and
+potential for misspecification.</li>
+<li>Available <strong>options and tuning parameters</strong> to enhance
+model performance and adaptability.</li>
+</ul>
+<hr />
+<p><strong>7. Advanced Trial Aspects</strong></p>
+<p>For complex trials, advanced methodologies may be considered, such
+as:</p>
+<ul>
+<li><p><strong>Adaptive Designs</strong>, where pre-planned adaptations
+(e.g., sample size adjustments, early stopping) are permitted based on
+interim data. Key factors include:</p>
+<ul>
+<li>Clear <strong>decision criteria</strong> for adaptations.</li>
+<li>Integration of adaptations into the <strong>trial’s operational
+logistics</strong>, such as Data Monitoring Committee (DMC)
+workflows.</li>
+<li>Statistical justification of adaptations through
+<strong>simulations</strong>, demonstrating control of Type I error and
+other performance metrics.</li>
+</ul></li>
+<li><p><strong>Bayesian Approaches</strong>, which incorporate prior
+knowledge through:</p>
+<ul>
+<li>Well-justified <strong>prior distributions</strong>, possibly based
+on existing data or expert elicitation.</li>
+<li>Verification that the Bayesian framework maintains appropriate Type
+I error control.</li>
+</ul></li>
+</ul>
+<p>Engagement with <strong>regulatory authorities and
+stakeholders</strong> is critical, ensuring alignment with their:</p>
+<ul>
+<li><strong>Requirements</strong>, including statistical standards.</li>
+<li><strong>Preferences</strong>, which may involve pre-specification of
+methods and transparent communication.</li>
+</ul>
+<hr />
+<p><strong>8. Sample Size Considerations</strong></p>
+<p>An adequate <strong>sample size</strong> is essential to ensure:</p>
+<ul>
+<li>Sufficient power to detect meaningful treatment effects.</li>
+<li>Avoidance of <strong>Type S (sign) errors</strong> (wrong direction)
+or <strong>Type M (magnitude) errors</strong> (overestimated
+effects).</li>
+</ul>
+<p>If practical constraints limit sample size:</p>
+<ul>
+<li>The <strong>effect size</strong> deemed detectable must be
+clinically and scientifically justifiable.</li>
+<li>A clear strategy to <strong>maximize recruitment</strong>, such as
+outreach programs or site expansion, should be in place.</li>
+<li>Efforts to <strong>enhance adherence</strong> during the trial,
+including patient engagement and compliance monitoring, are essential to
+preserve data integrity and trial validity.</li>
+</ul>
+</div>
+<div id="common-pitfalls-in-clinical-trial-design-and-analysis"
+class="section level2">
+<h2>Common Pitfalls in Clinical Trial Design and Analysis</h2>
+<p><strong>1. “Simplifying” Data and/or Model</strong></p>
+<ul>
+<li><p><strong>Dichotomania and Loss of Efficiency</strong>
+Dichotomizing continuous variables (turning them into “yes/no”,
+“responder/non-responder”, etc.) severely reduces statistical
+efficiency:</p>
+<ul>
+<li>Even in the <strong>most favorable, perfectly balanced
+case</strong>, dichotomization leads to approximately a <strong>33% loss
+of efficiency</strong>.</li>
+<li>This translates directly into <strong>sample size inflation</strong>
+— you may need <strong>20–30% more patients</strong> to maintain the
+same statistical power compared to analyzing the continuous variable
+properly.</li>
+<li>For most real-world scenarios, the efficiency loss is even
+<strong>worse</strong>, making dichotomization highly undesirable from
+both scientific and resource perspectives.</li>
+</ul></li>
+<li><p><strong>Pitman Efficiency Curve</strong></p>
+<ul>
+<li>Maximum efficiency occurs when continuous data are used
+appropriately.</li>
+<li>As soon as you dichotomize or select arbitrary cutpoints, efficiency
+drops significantly.</li>
+<li>This inefficiency affects <strong>sample size calculations</strong>
+and increases the risk of inconclusive results.</li>
+</ul></li>
+<li><p><strong>Responder Analysis Pitfalls</strong> Responder analyses
+are especially problematic because:</p>
+<ul>
+<li><p>They inherently involve dichotomization based on arbitrary
+thresholds.</p></li>
+<li><p>Thresholds often lack a clear clinical or biological
+justification.</p></li>
+<li><p>When based on <strong>change from baseline</strong> variables,
+responder analyses can produce <strong>misleading scenarios</strong>,
+where:</p>
+<ul>
+<li>Apparent improvements depend entirely on arbitrary thresholds.</li>
+<li>Counterintuitive or inflated power is observed for some
+endpoints.</li>
+</ul></li>
+<li><p>As highlighted by Senn and others in the literature, responder
+analyses frequently:</p>
+<ul>
+<li>Waste valuable information.</li>
+<li>Create interpretation challenges.</li>
+<li>Lead to incorrect conclusions.</li>
+</ul></li>
+</ul></li>
+<li><p><strong>Best Practice Principle</strong></p>
+<ul>
+<li><p>Always use the data <strong>as close to its original form as
+possible</strong>:</p>
+<ul>
+<li>Continuous variables should be analyzed as continuous.</li>
+<li>Count data should be modeled properly as counts.</li>
+<li>Time-to-event (survival) data should use appropriate survival
+models.</li>
+</ul></li>
+<li><p>Avoid “simplifying” data just to make results easier to explain
+to non-technical stakeholders — this shortcut sacrifices scientific
+integrity.</p></li>
+</ul></li>
+</ul>
+<hr />
+<p><strong>2. Not Justifying or Understanding Design</strong></p>
+<ul>
+<li><p>Trial designs must be evaluated for:</p>
+<ul>
+<li><strong>Robustness</strong>: Ability to withstand deviations from
+ideal assumptions.</li>
+<li><strong>Efficiency</strong>: How well the design uses available
+resources to detect true effects.</li>
+</ul></li>
+<li><p>Correct interpretation of:</p>
+<ul>
+<li><strong>p-values</strong> — avoiding common misinterpretations
+(e.g., equating p &gt; 0.05 with evidence of no effect).</li>
+<li><strong>Hypotheses</strong> — ensuring the correct choice between
+superiority, equivalence, or non-inferiority frameworks.</li>
+</ul></li>
+<li><p>Justification of <strong>equivalence or non-inferiority
+margins</strong> is critical and must be:</p>
+<ul>
+<li>Clinically meaningful.</li>
+<li>Pre-specified.</li>
+<li>Supported by scientific reasoning.</li>
+</ul></li>
+</ul>
+<hr />
+<p><strong>3. Post-hoc Design Changes or Rationalization</strong></p>
+<ul>
+<li><p>Avoid making unplanned design or analysis changes after seeing
+the data:</p>
+<ul>
+<li>This includes <strong>p-hacking</strong>, <strong>data
+dredging</strong>, or excessive subgroup exploration.</li>
+<li>Such practices inflate Type I error and undermine the credibility of
+findings.</li>
+</ul></li>
+<li><p>Particularly, avoid:</p>
+<ul>
+<li>Including <strong>post-randomization covariates</strong> in models,
+which introduces bias.</li>
+<li>Retrospective model adjustments based on observed outcomes.</li>
+</ul></li>
+<li><p>Instead:</p>
+<ul>
+<li>Pre-specify the design and analysis plan as comprehensively as
+possible.</li>
+<li>Register protocols and statistical analysis plans (SAP) publicly
+when feasible.</li>
+</ul></li>
+</ul>
+<hr />
+<p><strong>4. Covariates: Use Them Properly</strong></p>
+<ul>
+<li><p>If you collect baseline covariates (e.g., age, gender, smoking
+status, biomarkers), <strong>use them in the analysis</strong>,
+especially:</p>
+<ul>
+<li>In ANCOVA or regression models for continuous outcomes.</li>
+<li>In logistic or Cox models for binary or time-to-event outcomes.</li>
+</ul></li>
+<li><p>Proper covariate adjustment:</p>
+<ul>
+<li>Increases statistical power.</li>
+<li>Reduces residual variability (unexplained error).</li>
+<li>Improves precision of estimates.</li>
+</ul></li>
+<li><p>This is supported by:</p>
+<ul>
+<li>FDA guidance emphasizing the importance of covariate
+adjustment.</li>
+<li>The logical argument that if you believe a covariate is worth
+measuring (even if expensive or complex), it should be leveraged
+analytically.</li>
+</ul></li>
+<li><p><strong>Caveat</strong>: Only <strong>pre-randomization
+covariates</strong> should be included:</p>
+<ul>
+<li>These reflect baseline characteristics, independent of
+treatment.</li>
+<li>Including <strong>post-randomization covariates</strong> can
+introduce bias and inflate Type I error, as they may be influenced by
+treatment itself.</li>
+</ul></li>
+</ul>
+<hr />
+<p><strong>5. Not Involving Other Stakeholders (Early and
+Often)</strong></p>
+<ul>
+<li><p>Early involvement and feedback from:</p>
+<ul>
+<li><strong>Regulators</strong> (e.g., FDA, EMA), to ensure the design
+meets approval requirements.</li>
+<li><strong>Patients</strong>, to improve feasibility, relevance, and
+acceptability.</li>
+<li><strong>Data professionals</strong>, to address data quality and
+analysis feasibility.</li>
+</ul></li>
+<li><p>This collaboration increases the likelihood of trial success and
+reduces avoidable mistakes.</p></li>
+</ul>
+<p><strong>Quote from Ronald Fisher</strong></p>
+<blockquote>
+<p><em>“To call in the statistician after the experiment is done may be
+no more than asking him to perform a postmortem examination: he may be
+able to say what the experiment died of.”</em></p>
+</blockquote>
+<ul>
+<li><p>Ronald Fisher, a pioneer in modern statistics, emphasizes
+that:</p>
+<ul>
+<li>Poorly designed trials often cannot be “rescued” by statistical
+analysis after the fact.</li>
+<li>Statisticians should be involved from the <strong>design
+stage</strong>, not just during analysis.</li>
+<li>Otherwise, flaws (like inadequate power, bias, poor endpoint
+selection) may doom the trial, with statisticians merely diagnosing the
+failure afterwards.</li>
+</ul></li>
+</ul>
+<hr />
+<p><strong>Overall Message</strong></p>
+<p>Clinical trial success requires:</p>
+<p>✔ Rigorous design based on sound statistical principles. ✔ Avoidance
+of unnecessary simplifications that reduce power and efficiency. ✔
+Pre-specification to minimize bias and misleading findings. ✔ Early,
+active collaboration with all stakeholders. ✔ Proper interpretation of
+statistical results aligned with scientific objectives.</p>
+<p>Failing to respect these principles increases the risk of invalid,
+inefficient, or irreproducible trial outcomes.</p>
+</div>
+<div id="power-as-trial-design-choice-tool" class="section level2">
+<h2>Power as Trial Design Choice Tool</h2>
+<p><strong>Background on Power</strong></p>
+<ul>
+<li><strong>Power</strong> refers to the probability of correctly
+detecting a true treatment effect in a trial, commonly set at 80% or
+90%.</li>
+<li>A well-powered trial has a higher chance of producing meaningful
+results and avoiding false negatives (Type II errors).</li>
+<li>Power is influenced by several trial design choices, which can
+either enhance or reduce power—and thus directly affect trial success
+and resource requirements.</li>
+</ul>
+<div id="dichotomization" class="section level3 unnumbered">
+<h3 class="unnumbered">1. <strong>Dichotomization</strong></h3>
+<ul>
+<li><p><strong>Explanation:</strong> This refers to converting a
+continuous outcome into a binary one (e.g., “responder”
+vs. “non-responder”).</p></li>
+<li><p><strong>Impact on Power:</strong></p>
+<ul>
+<li><strong>Significantly reduces power</strong> because it discards
+information from the continuous scale.</li>
+<li>Results in <strong>increased sample size requirements</strong> to
+achieve the same power as a continuous outcome.</li>
+</ul></li>
+<li><p><strong>Example:</strong> Turning a pain score from 0-10 into
+“improved” vs. “not improved” reduces sensitivity.</p></li>
+<li><p><strong>Bottom Line:</strong> <strong>Responder analysis is
+(nearly) always a poor choice</strong> if a continuous measure is
+available.</p></li>
+</ul>
+<hr />
+</div>
+<div id="including-covariates" class="section level3 unnumbered">
+<h3 class="unnumbered">2. <strong>Including Covariates</strong></h3>
+<ul>
+<li><p><strong>Explanation:</strong> Adding relevant covariates
+(baseline characteristics) into the statistical model.</p></li>
+<li><p><strong>Impact on Power:</strong></p>
+<ul>
+<li><strong>Increases power proportional to variance explained
+(R²)</strong> by the covariates.</li>
+<li>More variance explained → less residual variability → greater
+ability to detect a treatment effect.</li>
+</ul></li>
+<li><p><strong>Important Caveats:</strong></p>
+<ul>
+<li>No power gain from including post-randomization covariates or simple
+score change.</li>
+<li>Only <strong>pre-randomization covariates</strong> should be
+included to avoid bias.</li>
+</ul></li>
+<li><p><strong>Example:</strong> Adjusting for baseline age or disease
+severity can boost efficiency.</p></li>
+</ul>
+<hr />
+</div>
+<div id="group-sequential-design" class="section level3 unnumbered">
+<h3 class="unnumbered">3. <strong>Group Sequential Design</strong></h3>
+<ul>
+<li><p><strong>Explanation:</strong> Trial includes planned interim
+analyses with the possibility of stopping early for efficacy or
+futility.</p></li>
+<li><p><strong>Impact on Power and Sample Size:</strong></p>
+<ul>
+<li>Slight increase in <strong>maximum sample size</strong> needed (if
+trial runs to full completion).</li>
+<li>However, <strong>expected sample size decreases</strong>
+significantly due to possibility of early stopping.</li>
+</ul></li>
+<li><p><strong>Example:</strong> Trial designed to stop at interim if
+strong positive effect is seen—reduces average trial size over many
+repetitions.</p></li>
+</ul>
+<hr />
+</div>
+<div id="randomization-level" class="section level3 unnumbered">
+<h3 class="unnumbered">4. <strong>Randomization Level</strong></h3>
+<ul>
+<li><p><strong>Explanation:</strong> The structure or level at which
+randomization is applied.</p></li>
+<li><p><strong>Impact on Power:</strong></p>
+<ul>
+<li><strong>Paired/crossover designs</strong> have higher power (if
+appropriate) compared to parallel designs, as within-subject comparisons
+reduce variability.</li>
+<li><strong>Parallel designs</strong> have higher power than
+<strong>cluster randomized designs</strong>, because clustering
+introduces intraclass correlation (ICC); higher ICC means lower
+power.</li>
+<li><strong>Factorial designs</strong> may offer higher power if
+evaluating multiple interventions efficiently.</li>
+</ul></li>
+<li><p><strong>Example:</strong></p>
+<ul>
+<li>Crossover trial comparing two drugs reduces variability as subjects
+serve as their own controls.</li>
+<li>Cluster randomization (e.g., by hospital) requires larger sample
+size to account for correlation within clusters.</li>
+</ul></li>
+</ul>
+<hr />
+</div>
+<div id="test-estimator-choice" class="section level3 unnumbered">
+<h3 class="unnumbered">5. <strong>Test + Estimator Choice</strong></h3>
+<ul>
+<li><p><strong>Explanation:</strong> The specific statistical tests and
+estimators used in the analysis.</p></li>
+<li><p><strong>Impact on Power:</strong></p>
+<ul>
+<li>Highly <strong>context dependent</strong>.</li>
+<li>Power depends on how well the chosen test aligns with the actual
+data distribution and structure.</li>
+</ul></li>
+<li><p><strong>Example:</strong></p>
+<ul>
+<li>Even with non-normal data, a <strong>t-test</strong> may still be
+appropriate due to robustness.</li>
+<li>In other cases, nonparametric tests or alternative estimators may be
+needed to maintain power.</li>
+</ul></li>
+<li><p><strong>Recommendation:</strong> Compare performance of candidate
+tests under plausible scenarios during planning.</p></li>
+</ul>
+<hr />
+<p><strong>Summary Takeaways</strong></p>
+<ul>
+<li>Avoid dichotomization when possible.</li>
+<li>Use pre-randomization covariates to increase power.</li>
+<li>Group sequential designs can reduce expected sample size.</li>
+<li>Prefer designs like paired/crossover or parallel over cluster when
+feasible.</li>
+<li>Choose statistical tests carefully based on data properties.</li>
+</ul>
+</div>
+</div>
+<div id="clinical-trial-milestones" class="section level2">
+<h2>Clinical Trial Milestones</h2>
+<p>The practice of milestone prediction in clinical trials is
+multifaceted, blending statistical rigor with strategic foresight. It’s
+about more than just adhering to a schedule; it’s about adapting to
+realities on the ground and ensuring that a trial can meet its
+objectives without wasting resources. Effective milestone management
+helps maintain the integrity of the trial process, ensuring that
+therapeutic potentials are accurately assessed while upholding the
+highest standards of safety and efficacy.</p>
+<p>In clinical trial management, understanding both enrollment dynamics
+and event occurrence—including dropouts, cures, or any factors
+preventing subjects from experiencing key events—is crucial. Given the
+commonality of delays, with approximately 80% of trials experiencing
+slowdowns and about 85% failing to reach recruitment goals, the need for
+robust milestone prediction is evident. This prediction involves
+assessing practical elements such as enrollment strategies and resource
+allocation, which are essential to maintaining trial timelines and
+efficiency.</p>
+<p><strong>Key Challenges and Strategies in Milestone
+Prediction</strong></p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Enrollment and Event Tracking</strong>: The primary
+milestones in most trials involve patient enrollment and tracking event
+occurrences, like patient survival or endpoint achievement. In
+event-driven studies, such as those focusing on survival, predicting
+when the study might conclude or when interim analyses might be needed
+is paramount.</p></li>
+<li><p><strong>Handling Practical Challenges</strong>: Addressing
+practical issues involves predicting enrollment timelines and
+identifying potential delays early. If enrollment lags, strategies might
+include opening new trial sites or closing underperforming ones.
+Proactive resource management, such as reallocating resources to more
+critical areas, becomes possible with accurate milestone
+forecasting.</p></li>
+<li><p><strong>Data Availability and Prediction Management</strong>:</p>
+<ul>
+<li><strong>Data Handling</strong>: Trials might not have access to all
+data, particularly unblinded data. Predictors might need to rely on
+blinded data or assume an overall global event process rather than
+specific data from individual groups. The complexity of the methodology
+used can vary depending on data access levels.</li>
+<li><strong>Site and Subject Level Data</strong>: Access to detailed
+site or subject level data can provide greater flexibility and precision
+in predictions, allowing for more tailored adjustments in trial
+management.</li>
+</ul></li>
+<li><p><strong>Frequency and Timing of Predictions</strong>:</p>
+<ul>
+<li><strong>Continuous vs. Intermittent Predictions</strong>: There is a
+debate between continuously updating predictions as new data comes in
+and waiting for patterns to develop. Continuous updates might disrupt
+the trial’s natural progression, particularly if early trial phases
+naturally exhibit slower recruitment.</li>
+<li><strong>Resource Management</strong>: Overly frequent adjustments
+might lead to inefficient resource use, such as unnecessary expansion of
+trial sites which can overwhelm staff and inflate costs.</li>
+</ul></li>
+<li><p><strong>Special Considerations for Survival Studies</strong>:</p>
+<ul>
+<li><strong>Delayed Effects</strong>: In studies involving treatments
+like immunotherapies, delayed effects are common, where the treatment’s
+impact takes time to manifest. This must be factored into milestone
+predictions to avoid premature conclusions about treatment efficacy or
+participant response.</li>
+</ul></li>
+<li><p><strong>External Predictions</strong>: Employing external experts
+for milestone predictions can reduce bias and provide access to a
+broader range of methodologies. External predictors, less influenced by
+internal trial dynamics, might offer a clearer, unbiased
+perspective.</p></li>
+</ol>
+<p><strong>Additional Considerations</strong></p>
+<ul>
+<li><strong>Safety and Regulatory Benchmarks</strong>: Besides primary
+outcomes, secondary considerations might include safety analyses and
+regulatory compliance milestones. These are crucial for maintaining
+ethical standards and satisfying regulatory requirements.</li>
+<li><strong>Sponsor-Specific Requests</strong>: Tailoring milestone
+predictions to meet specific sponsor requests or interests from
+regulatory bodies can also guide the frequency and method of prediction
+updates.</li>
+</ul>
+</div>
+</div>
+<div id="enrollment-event-milestone-predictions" class="section level1">
+<h1>Enrollment &amp; Event Milestone Predictions</h1>
+<div id="enrollment-prediction" class="section level2">
+<h2>Enrollment Prediction</h2>
+<p>Enrollment prediction is a crucial aspect of clinical trial planning
+and management, serving as a foundational metric for assessing a trial’s
+timeline and resource allocation. It encompasses predicting both the
+rate and completeness of participant recruitment over the course of the
+study. This process not only impacts the financial and logistical
+aspects of a trial but also its scientific validity, as timely
+enrollment ensures that the trial can achieve its intended statistical
+power and objectives.</p>
+<p>Implementing effective enrollment predictions requires a
+multi-faceted approach: - <strong>Data integration:</strong> Combining
+data from multiple sources, including historical trial data, current
+site performance, and external factors. - <strong>Continuous
+monitoring:</strong> Regularly updating predictions based on new data to
+stay responsive to changing conditions. - <strong>Stakeholder
+communication:</strong> Using prediction data to maintain open dialogue
+with sponsors and adjust expectations and strategies as needed.</p>
+<p><strong>Initial and Mid-Trial Predictions</strong></p>
+<p>Enrollment predictions typically begin with estimating how long it
+will take to recruit the full sample size needed to meet the study’s
+power requirements. This involves assessing: -
+<strong>Demographics:</strong> The availability and willingness of the
+target population to participate. - <strong>Competing studies:</strong>
+Other ongoing trials that could affect participant availability. -
+<strong>Site capabilities:</strong> Each site’s ability to recruit and
+manage participants.</p>
+<p>Mid-trial predictions evaluate whether enrollment is on track to meet
+planned timelines. Adjustments might be needed if the trial is
+progressing faster or slower than expected.</p>
+<p><strong>Challenges with Early and Later Phase Trials</strong></p>
+<ul>
+<li><strong>Early-phase trials</strong> often struggle with recruitment
+due to the experimental nature of the treatments and the typically
+smaller pool of eligible participants.</li>
+<li><strong>Later-phase trials</strong> may face competition from
+established treatments, making it harder to recruit participants unless
+the new treatment offers clear advantages.</li>
+</ul>
+<p><strong>Site-Specific Predictions</strong></p>
+<p>More sophisticated approaches to enrollment prediction involve
+modeling each recruitment site or region separately. This allows for: -
+<strong>Detailed tracking:</strong> Identifying which sites are
+underperforming. - <strong>Resource reallocation:</strong> Shifting
+resources to more effective sites or boosting those that are lagging. -
+<strong>Adaptive strategies:</strong> Adjusting recruitment tactics
+based on real-time data.</p>
+</div>
+<div id="methodologies-for-enrollment-prediction"
+class="section level2">
+<h2>Methodologies for Enrollment Prediction</h2>
+<p><strong>Simple Statistical Models</strong> These include linear or
+polynomial models that provide a basic forecast based on past
+recruitment rates.</p>
+<p><strong>Piecewise Parametric Models</strong> These models identify
+changes in recruitment pace, such as an initial slow start followed by a
+faster rate, allowing for more nuanced predictions.</p>
+<p><strong>Simulation-Based Modeling</strong> Simulation offers a
+flexible and dynamic approach to modeling recruitment. It allows
+for:</p>
+<ul>
+<li><strong>Scenario testing:</strong> Simulating different recruitment
+strategies to see potential outcomes.</li>
+<li><strong>Bootstrapping:</strong> Using resampling techniques to
+estimate prediction intervals and assess uncertainty.</li>
+</ul>
+<p><strong>Bayesian Models</strong> These incorporate prior data and
+expert opinions to refine predictions, adapting as new data becomes
+available during the trial.</p>
+<p><strong>Machine Learning Approaches</strong> While not covered in
+detail here, machine learning methods can analyze complex datasets to
+predict recruitment outcomes, potentially uncovering hidden patterns
+that affect enrollment.</p>
+<p><img src="02_Plots/Predict_Enroll.PNG" width="75%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="event-prediction" class="section level2">
+<h2>Event Prediction</h2>
+<p>In survival trials, the occurrence of key events such as death or
+disease progression is fundamental to determining the trial’s timeline
+and outcomes. The predictive modeling of these events is complex due to
+the multifaceted nature of survival data, which can include various
+competing risks and time-dependent factors.</p>
+<p><strong>Event-Driven Endpoints:</strong> In many clinical trials,
+especially those concerning life-threatening conditions, the trial’s
+endpoint is driven by the accumulation of specific events among
+participants (e.g., death, disease progression). The number of events
+directly impacts the trial’s power and its ability to provide
+statistically meaningful results. Without a sufficient number of events,
+the trial cannot conclude or make robust inferences.</p>
+<p><strong>Challenges in Event Prediction</strong></p>
+<ol style="list-style-type: decimal">
+<li><strong>Continuous Enrollment:</strong> If enrollment is ongoing,
+predictions must account not only for current participants but also for
+how new enrollees might alter the event dynamics.</li>
+<li><strong>Competing Risks:</strong> Factors such as alternative
+treatments, dropouts, or other medical interventions can influence the
+timing and occurrence of the primary events of interest.</li>
+<li><strong>Event Scarcity:</strong> In scenarios where events are fewer
+than expected, it can delay the trial significantly, affecting timelines
+and potentially increasing costs and resource usage.</li>
+</ol>
+<p><strong>Modeling Techniques for Event Prediction</strong></p>
+<ul>
+<li><p><strong>Parametric Models:</strong> These models, such as the
+exponential or Weibull models, assume a specific distribution for the
+time until an event occurs. They are straightforward but often too
+simplistic for complex survival data.</p></li>
+<li><p><strong>Piecewise Parametric Models:</strong> These improve on
+simple parametric models by allowing different parameters in different
+phases of the study, accommodating varying hazard rates across the
+trial’s duration.</p></li>
+<li><p><strong>Simulation-Based Models:</strong> Simulations provide a
+flexible and dynamic approach to understanding how different factors
+might impact event rates. This method is particularly useful in survival
+trials where complex interactions between patient characteristics and
+treatment effects need to be considered.</p></li>
+</ul>
+<p><strong>Practical Implementation of Event Prediction</strong></p>
+<ul>
+<li><p><strong>Exponential Models:</strong> Assume constant hazard rates
+throughout the trial period. This is simplistic but can serve as a
+baseline for understanding baseline event rates.</p></li>
+<li><p><strong>Piecewise Exponential Models:</strong> Offer more
+flexibility by dividing the trial into segments, each with its own
+hazard rate, better modeling the natural progression of disease or
+treatment effects over time.</p></li>
+<li><p><strong>Two-Parameter Models:</strong> These models account for
+the duration a participant has been in the study, adjusting the event
+probability based on this tenure. They are useful in long-term studies
+where the risk of an event may increase or decrease over time.</p></li>
+<li><p><strong>Model Selection and Evaluation:</strong> Employing
+information criteria like AIC (Akaike Information Criterion) helps in
+selecting the best-fitting model amongst various candidates. Advanced
+techniques might also dynamically allocate change points to adapt the
+model to observed data patterns more accurately.</p></li>
+</ul>
+<p><img src="02_Plots/Predict_Event.PNG" /></p>
+</div>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<div id="webinars" class="section level2">
+<h2>Webinars</h2>
+<ul>
+<li>Statistical Power from First Principles: <a
+href="https://www.statsols.com/guides/statistical-power-from-first-principles"
+class="uri">https://www.statsols.com/guides/statistical-power-from-first-principles</a></li>
+<li>Everything to Know About Sample Size Determination: <a
+href="https://www.statsols.com/articles/everything-to-know-about-sample-size-determination"
+class="uri">https://www.statsols.com/articles/everything-to-know-about-sample-size-determination</a></li>
+<li>Selecting the Right Clinical Trial Design <a
+href="https://www.statsols.com/guides/selecting-the-right-clinical-trial-design"
+class="uri">https://www.statsols.com/guides/selecting-the-right-clinical-trial-design</a></li>
+<li>A Guide to Projecting How Long Your Trial Will Take <a
+href="https://www.statsols.com/guides/projecting-how-long-your-trial-will-take"
+class="uri">https://www.statsols.com/guides/projecting-how-long-your-trial-will-take</a></li>
+</ul>
+</div>
+<div id="trial-design-overviews" class="section level2">
+<h2>Trial Design Overviews</h2>
+<p>Senn, S. S. (2021). Statistical issues in drug development (3rd ed.).
+John Wiley &amp; Sons.</p>
+<p>Harrell, F. (2025). Biostatistics for Biomedical Research. Vanderbilt
+Department of Biostatistics. Available at: <a
+href="https://hbiostat.org/bbr/"
+class="uri">https://hbiostat.org/bbr/</a></p>
+<p>Lakens, D. (2016). Improving your statistical inferences. Available
+at: <a href="https://lakens.github.io/statistical_inferences"
+class="uri">https://lakens.github.io/statistical_inferences</a></p>
+<p>Meinert, C. L. (2012). Clinical trials: Design, conduct and analysis
+(Vol. 39). OUP USA.</p>
+<p>Friedman, L. M., Furberg, C. D., DeMets, D. L., Reboussin, D. M.,
+&amp; Granger, C. B. (2015). Fundamentals of clinical trials.
+Springer.</p>
+<p>American Medical Association. (2023). Guidelines for conducting
+clinical trials. Journal of Clinical Research, 29(3), 211–230.</p>
+<p>International Council for Harmonisation of Technical Requirements for
+Pharmaceuticals for Human Use (ICH). (1998). Statistical principles for
+clinical trials (E9). Available at: <a
+href="https://database.ich.org/sites/default/files/E9_Guideline.pdf"
+class="uri">https://database.ich.org/sites/default/files/E9_Guideline.pdf</a></p>
+<p>International Council for Harmonisation of Technical Requirements for
+Pharmaceuticals for Human Use (ICH). (2019). Addendum on estimands and
+sensitivity analysis in clinical trials to the guideline on statistical
+principles for clinical trials (E9[R1]). Available at: <a
+href="https://database.ich.org/sites/default/files/E9-R1_Step4_Guideline_2019_1203.pdf"
+class="uri">https://database.ich.org/sites/default/files/E9-R1_Step4_Guideline_2019_1203.pdf</a></p>
+<p>Kahan, B. C., Hindley, J., Edwards, M., Cro, S., &amp; Morris, T. P.
+(2024). The estimands framework: A primer on the ICH E9 (R1) addendum.
+BMJ, 384.</p>
+<p>Senn, S. S. (2002). Cross-over trials in clinical research (2nd ed.).
+John Wiley &amp; Sons.</p>
+<p>International Council for Harmonisation of Technical Requirements for
+Pharmaceuticals for Human Use (ICH). (2021). General considerations for
+clinical studies (E8[R1]). Available at: <a
+href="https://database.ich.org/sites/default/files/ICH_E8-R1_Guideline_Step4_2021_1006.pdf"
+class="uri">https://database.ich.org/sites/default/files/ICH_E8-R1_Guideline_Step4_2021_1006.pdf</a></p>
+<p>International Council for Harmonisation of Technical Requirements for
+Pharmaceuticals for Human Use (ICH). ICH Guidelines. Available at: <a
+href="https://www.ich.org/page/ich-guidelines"
+class="uri">https://www.ich.org/page/ich-guidelines</a></p>
+<p>U.S. Food and Drug Administration (FDA). Clinical Trials Guidance
+Documents. Available at: <a
+href="https://www.fda.gov/science-research/clinical-trials-and-human-subject-protection/clinical-trials-guidance-documents"
+class="uri">https://www.fda.gov/science-research/clinical-trials-and-human-subject-protection/clinical-trials-guidance-documents</a></p>
+<p>European Medicines Agency (EMA). Clinical Trials Regulation.
+Available at: <a
+href="https://www.ema.europa.eu/en/human-regulatory-overview/research-and-development/clinical-trials-human-medicines/clinical-trials-regulation"
+class="uri">https://www.ema.europa.eu/en/human-regulatory-overview/research-and-development/clinical-trials-human-medicines/clinical-trials-regulation</a></p>
+<p>SPIRIT-CONSORT Group. SPIRIT-CONSORT Guidelines. Available at: <a
+href="https://www.consort-spirit.org/"
+class="uri">https://www.consort-spirit.org/</a></p>
+<p>van Smeden, M. (2022). A very short list of common pitfalls in
+research design, data analysis, and reporting. PRiMER: Peer-Reviewed
+Reports in Medical Education Research, 6, 26.</p>
+<p>Sydes, M. R., &amp; Langley, R. E. (2010). Potential pitfalls in the
+design and reporting of clinical trials. The Lancet Oncology, 11(7),
+694–700.</p>
+<p>Zlowodzki, M., Jönsson, A., &amp; Bhandari, M. (2005). Common
+pitfalls in the conduct of clinical research. Medical Principles and
+Practice, 15(1), 1–8.</p>
+<p>Dahly, D. (2024). Sorry, what was the question again? Available at:
+<a
+href="https://statsepi.substack.com/p/sorry-what-was-the-question-again"
+class="uri">https://statsepi.substack.com/p/sorry-what-was-the-question-again</a></p>
+<p>Altman, D. BMJ Statistics Notes. Available at: <a
+href="https://www.bmj.com/specialties/statistics-notes"
+class="uri">https://www.bmj.com/specialties/statistics-notes</a></p>
+<p><strong>Covariates/Randomization Issues</strong></p>
+<p>Senn, S. (2006). Change from baseline and analysis of covariance
+revisited. <em>Statistics in Medicine</em>, 25(24), 4334–4344.</p>
+<p>Senn, S. (2019). The well-adjusted statistician: Analysis of
+covariance explained. <em>Applied Clinical Trials</em>.</p>
+<p>Van Breukelen, G. J. (2006). ANCOVA versus change from baseline had
+more power in randomized studies and more bias in nonrandomized studies.
+<em>Journal of Clinical Epidemiology</em>, 59(9), 920–925.</p>
+<p>Food and Drug Administration (FDA). (2023). <em>Adjusting for
+covariates in randomized clinical trials for drugs and biological
+products: Guidance for industry</em>. Available at: <a
+href="https://www.fda.gov/media/148910/download">https://www.fda.gov/media/148910/download</a></p>
+<p>Bland, J. M., &amp; Altman, D. G. (2011). Comparisons against
+baseline within randomised groups are often used and can be highly
+misleading. <em>Trials</em>, 12, Article 264.</p>
+<p>Senn, S. (2013). Seven myths of randomisation in clinical trials.
+<em>Statistics in Medicine</em>, 32(9), 1439–1450.</p>
+<hr />
+<p><strong>Recruitment, Adherence, and Missing Data</strong></p>
+<p>Brown, J. T., &amp; Smith, R. A. (2022). Patient recruitment
+strategies in clinical trials: Challenges and solutions. <em>Journal of
+Clinical Trials</em>, 15(1), 45–67.</p>
+<p>Sterne, J. A., White, I. R., Carlin, J. B., Spratt, M., Royston, P.,
+Kenward, M. G., Wood, A. M., &amp; Carpenter, J. R. (2009). Multiple
+imputation for missing data in epidemiological and clinical research:
+Potential and pitfalls. <em>BMJ</em>, 338, Article b2393.</p>
+<p>Hughes, R. A., Heron, J., Sterne, J. A., &amp; Tilling, K. (2019).
+Accounting for missing data in statistical analyses: Multiple imputation
+is not always the answer. <em>International Journal of
+Epidemiology</em>, 48(4), 1294–1304.</p>
+<p>Sacristán, J. A., Aguarón, A., Avendaño-Solá, C., Garrido, P.,
+Carrión, J., Gutiérrez, A., Kroes, R., &amp; Flores, A. (2016). Patient
+involvement in clinical research: Why, when, and how. <em>Patient
+Preference and Adherence</em>, 10, 631–640.</p>
+<hr />
+<p><strong>P-values: Misinterpretation and P-hacking</strong></p>
+<p>Wasserstein, R. L., &amp; Lazar, N. A. (2016). The ASA statement on
+p-values: Context, process, and purpose. <em>The American
+Statistician</em>, 70(2), 129–133.</p>
+<p>Altman, D. G., &amp; Bland, J. M. (1995). Statistics notes: Absence
+of evidence is not evidence of absence. <em>BMJ</em>, 311(7003),
+485.</p>
+<p>Smith, G. D., &amp; Ebrahim, S. (2002). Data dredging, bias, or
+confounding: They can all get you into the BMJ and the Friday papers.
+<em>BMJ</em>, 325(7378), 1437–1438.</p>
+<p>Stefan, A. M., &amp; Schönbrodt, F. D. (2023). Big little lies: A
+compendium and simulation of p-hacking strategies. <em>Royal Society
+Open Science</em>, 10(2), 220346.</p>
+<p>Stefan, A. M., &amp; Schönbrodt, F. D. (2023). Gazing into the abyss
+of p-hacking: A Shiny app for p-hacking simulation. Available at: <a
+href="https://shiny.psy.lmu.de/felix/ShinyPHack/">https://shiny.psy.lmu.de/felix/ShinyPHack/</a></p>
+</div>
+<div id="complex-design-simulation" class="section level2">
+<h2>Complex Design + Simulation</h2>
+<p>Food and Drug Administration (FDA), 2019. Adaptive Designs for
+Clinical Trials of Drugs and Biologics Guidance for Industry. Download
+at: <a href="https://www.fda.gov/media/78495/download"
+class="uri">https://www.fda.gov/media/78495/download</a> A Practical
+Adaptive &amp; Novel Designs and Analysis toolkit (PANDA). Find at: <a
+href="https://panda.shef.ac.uk/"
+class="uri">https://panda.shef.ac.uk/</a> Jennison, C., &amp; Turnbull,
+B. W. (1999). Group sequential methods with applications to clinical
+trials. CRC Press. Wassmer, G., &amp; Brannath, W. (2016). Group
+sequential and confirmatory adaptive designs in clinical trials. Cham:
+Springer International Publishing. Bauer, P., Bretz, F., Dragalin, V.,
+König, F. and Wassmer, G., 2016. Twenty‐five years of confirmatory
+adaptive designs: opportunities and pitfalls. Statistics in Medicine,
+35(3), pp.325-347. Pallmann, P., Bedding, A.W., Choodari-Oskooei, B.,
+Dimairo, M., Flight, L., Hampson, L.V., Holmes, J., Mander, A.P.,
+Odondi, L.O., Sydes, M.R. and Villar, S.S., 2018. Adaptive designs in
+clinical trials: why use them, and how to run and report them. BMC
+medicine, 16(1), pp.1-15. Arnold, B.F., Hogan, D.R., Colford, J.M. and
+Hubbard, A.E., 2011. Simulation methods to estimate design power: an
+overview for applied research. BMC medical research methodology, 11,
+pp.1-10. Kimko, H.C. and Duffull, S.B., 2002. Simulation for designing
+clinical trials. Marcel Dekker Incorporated. Landau, S. and Stahl, D.,
+2013. Sample size and power calculations for medical studies by
+simulation when closed form expressions are not available. Statistical
+methods in medical research, 22(3), pp.324-345. Eng, J., 2004. Sample
+size estimation: a glimpse beyond simple formulas. Radiology, 230(3),
+pp.606-612. Meyer, K.M., Mooij, W.M., Vos, M., Hol, W.G. and van der
+Putten, W.H., 2009. The power of simulating experiments. Ecological
+Modelling, 220(19), pp.2594-2597. PowerSimulate: <a
+href="https://shiny.jdl-svr.lat/PowerSimulate/"
+class="uri">https://shiny.jdl-svr.lat/PowerSimulate/</a> Dallow,
+N, Best, N, Montague, TH., 2018. Better decision making in drug
+development through adoption of formal prior elicitation. Pharmaceutical
+Statistics. 17: 301– 316.  Oakley, J. E. and O’Hagan, A. SHELF: The
+Sheffield Elicitation Framework (version 2.0), School of Mathematics and
+Statistics, University of Sheffield, 2010 <a
+href="http://tonyohagan.co.uk/shelf"
+class="uri">http://tonyohagan.co.uk/shelf</a>.</p>
+</div>
+<div id="enrollment-and-prediction" class="section level2">
+<h2>Enrollment and Prediction</h2>
+<p><strong>Background</strong></p>
+<ul>
+<li>Lamberti, M.J. (2012). State of Clinical Trials Industry. Thomson
+Centerwatch, Clinical Trials Arena. Retrieved from <a
+href="https://www.clinicaltrialsarena.com/analysis/featureclinical-trial-patient-recruitment"
+class="uri">https://www.clinicaltrialsarena.com/analysis/featureclinical-trial-patient-recruitment</a></li>
+<li>McDonald, A.M., Knight, R.C., Campbell, M.K., Entwistle, V.A.,
+Grant, A.M., Cook, J.A., Elbourne, D.R., Francis, D., Garcia, J.,
+Roberts, I., &amp; Snowdon, C. (2006). What influences recruitment to
+randomised controlled trials? A review of trials funded by two UK
+funding agencies. Trials, 7(1), 1-8.</li>
+<li>Bower, P., Brueton, V., Gamble, C., Treweek, S., Smith, C.T., Young,
+B., &amp; Williamson, P. (2014). Interventions to improve recruitment
+and retention in clinical trials: a survey and workshop to assess
+current practice and future priorities. Trials, 15(1), 1-9.</li>
+<li>Cognizant. (2015). Patient Recruitment Forecast in Clinical Trials.
+Retrieved from <a
+href="https://www.cognizant.com/whitepapers/patients-recruitment-forecast-in-clinical-trials-codex1382.pdf"
+class="uri">https://www.cognizant.com/whitepapers/patients-recruitment-forecast-in-clinical-trials-codex1382.pdf</a></li>
+<li>Gkioni, E., Rius, R., Dodd, S., &amp; Gamble, C. (2019). A
+systematic review describes models for recruitment prediction at the
+design stage of a clinical trial. Journal of Clinical Epidemiology, 115,
+141-149.</li>
+<li>Kearney, A., Harman, N.L., Rosala-Hallas, A., Beecher, C., Blazeby,
+J.M., Bower, P., … Gamble, C. (2018). Development of an online resource
+for recruitment research in clinical trials to organise and map current
+literature. Clinical Trials, 15(6), 533-542. <a
+href="https://doi.org/10.1177/1740774518796156"
+class="uri">https://doi.org/10.1177/1740774518796156</a></li>
+</ul>
+<p><strong>Enrollment</strong></p>
+<ul>
+<li>Lee, Y.J. (1983). Interim recruitment goals in clinical trials.
+Journal of Chronic Diseases, 36(5), 379-389.</li>
+<li>Comfort, S. (2013). Improving clinical trial enrollment forecasts
+using SORM. Applied Clinical Trials, 22(5), 32.</li>
+<li>Carter, R.E., Sonne, S.C., &amp; Brady, K.T. (2005). Practical
+considerations for estimating clinical trial accrual periods:
+application to a multi-center effectiveness study. BMC Medical Research
+Methodology, 5(1), 1-5.</li>
+<li>Carter, R.E. (2004). Application of stochastic processes to
+participant recruitment in clinical trials. Controlled Clinical Trials,
+25(5), 429-436.</li>
+<li>Senn, S. (1998). Some controversies in planning and analyzing
+multi‐centre trials. Statistics in Medicine, 17(15-16), 1753-1765.</li>
+<li>Anisimov, V.V., &amp; Fedorov, V.V. (2007). Modelling, prediction
+and adaptive adjustment of recruitment in multicentre trials. Statistics
+in Medicine, 26(27), 4958-4975.</li>
+<li>Anisimov, V. (2009). Predictive modelling of recruitment and drug
+supply in multicenter clinical trials. In Proc. of Joint Statistical
+Meeting (pp. 1248-1259).</li>
+<li>Anisimov, V.V. (2011). Statistical modeling of clinical trials
+(recruitment and randomization). Communications in Statistics - Theory
+and Methods, 40(19-20), 3684-3699.</li>
+<li>Bakhshi, A., Senn, S., &amp; Phillips, A. (2013). Some issues in
+predicting patient recruitment in multi‐centre clinical trials.
+Statistics in Medicine, 32(30), 5458-5468.</li>
+<li>Jiang, Y., Guarino, P., Ma, S., Simon, S., Mayo, M.S., Raghavan, R.,
+&amp; Gajewski, B.J. (2016). Bayesian accrual prediction for interim
+review of clinical studies: open source R package and smartphone
+application. Trials, 17(1), 1-8.</li>
+<li>Gajewski, B.J., Simon, S.D., &amp; Carlson, S.E. (2008). Predicting
+accrual in clinical trials with Bayesian posterior predictive
+distributions. Statistics in Medicine, 27(13), 2328-2340.</li>
+<li>Abbas, I., Rovira, J., &amp; Casanovas, J. (2007). Clinical trial
+optimization: Monte Carlo simulation Markov model for planning clinical
+trials recruitment. Contemporary Clinical Trials, 28(3), 220-231.</li>
+<li>Moussa, M.A.A. (1984). Planning a clinical trial with allowance for
+cost and patient recruitment rate. Computer Programs in Biomedicine,
+18(3), 173-179.</li>
+</ul>
+<p><strong>Events</strong></p>
+<ul>
+<li>Lakatos, E. (1988). Sample sizes based on the log-rank statistic in
+complex clinical trials. Biometrics, 229-241.</li>
+<li>Fang, L., &amp; Su, Z. (2011). A hybrid approach to predicting
+events in clinical trials with time-to-event outcomes. Contemporary
+Clinical Trials, 32(5), 755-759.</li>
+<li>Rufibach, K. (2016). Event projection: quantify uncertainty and
+manage expectations of broader teams. Retrieved from <a
+href="http://bbs.ceb-institute.org/wp-content/uploads/2016/06/Kaspar-event_tracking.pdf"
+class="uri">http://bbs.ceb-institute.org/wp-content/uploads/2016/06/Kaspar-event_tracking.pdf</a></li>
+<li>Walke, R. (2010). Example for a Piecewise Constant Hazard Data
+Simulation in R. Max Planck Institute for Demographic Research.</li>
+<li>Goodman, M.S., Li, Y., &amp; Tiwari, R.C. (2011). Detecting multiple
+change points in piecewise constant hazard functions. Journal of Applied
+Statistics, 38(11), 2523-2532.</li>
+<li>Guyot, P., Ades, A.E., Beasley, M., Lueza, B., Pignon, J.P., &amp;
+Welton, N.J. (2017). Extrapolation of survival curves from cancer trials
+using external information. Medical Decision Making, 37(4),
+353-366.</li>
+<li>Royston, P. (2012). Tools to simulate realistic censored
+survival-time distributions. The Stata Journal, 12(4), 639-654.</li>
+<li>Crowther, M.J., &amp; Lambert, P.C. (2012). Simulating complex
+survival data. The Stata Journal, 12(4), 674-687.</li>
+</ul>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
