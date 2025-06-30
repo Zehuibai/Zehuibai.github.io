@@ -718,7 +718,7 @@ ggplot(data, aes(y = Study, x = Mean_DLQI, xmin = Lower_CI, xmax = Upper_CI)) +
 
 ```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 # Clear environment and read in libraries
-rm(list = ls()) 
+# rm(list = ls()) 
 
 # Simulate 4 studies with different treatments/sample sizes
 subjects <- as.character(seq(1, 850))
@@ -813,7 +813,7 @@ dlqi_df <- df %>%
                        values_fn = length,
                        values_fill = 0) %>%
            mutate(time = as.numeric(time),
-                  dlqi = dlqi_calc(n(), A, B, C, D, time, study_eff, sub_eff),
+                  dlqi = dlqi_calc(nrow(.), A, B, C, D, time, study_eff, sub_eff),
                   
                   # Apply cut-off thresholds
                   dlqi = case_when(
@@ -976,14 +976,14 @@ The visualisation had simulated the DLQI scores of individual patients, to provi
 # library(ggtext)
 
 y <- read.csv("./01_Datasets/CGI_S_3_groups_csv.csv") %>%
-   rename(Group = CGI)
+   dplyr::rename(Group = CGI)
 
 l <- y %>%
   pivot_longer(cols = X1:X7,
                names_to = "Category",
                values_to = "n") %>%
   mutate(Category = as.numeric(gsub("X", "", Category))) %>%
-  group_by(Week, Group) %>%
+  dplyr::group_by(Week, Group) %>%
   arrange(Category) %>%
   mutate(
     CumN = cumsum(n),
@@ -994,8 +994,8 @@ l <- y %>%
     `%` = round(Freq * 100, 1)
   ) %>%
   ungroup() %>%
-  group_by(Week, Category) %>%
-  arrange(Group, .by_group = T) %>%
+  dplyr::group_by(Week, Category) %>%
+  arrange(Group) %>%
   mutate(
     Odds = CumFreq / (1 - CumFreq),
     OR = ifelse(Group == "Active", round(Odds / Odds[2], 2), NA),
@@ -1177,22 +1177,24 @@ In the first, rank is displayed on the x-axis and treatment on the y-axis, with 
 # library(gridExtra)
 # library("transformr")
 # library(ggtext)
-# library('ggforce') 
+# library('ggforce')
 
 #data processing
 
 # Set working directory using setwd()
-rnk1 <-  read.csv("./01_Datasets/bayesian_ranking.csv")
-rnk2<-tibble(rnk1)
-rnk3 <- mutate(rnk2, rowid_to_column(rnk2, "ID"))
-
-rnk4 <- rnk3 %>%
-  pivot_longer(!c(Treatment,ID), names_to = "ranks", values_to = "prop")
-rnk5 <- mutate(rnk4, ranker=str_replace_all(string=ranks, pattern="Rank", replacement="")) 
-rnk6 <- mutate(rnk5, rnk=as.numeric(ranker), r1=rnk-0.5, r2=rnk+0.5, p2=prop*12, rnkr=1/rnk, clr=letters[4])
-rnk <- rnk6 %>% group_by(Treatment) %>% mutate(cp=cumsum(prop))
+# rnk1 <-  read.csv("./01_Datasets/bayesian_ranking.csv")
+# rnk2<-tibble(rnk1)
+# rnk3 <- mutate(rnk2, rowid_to_column(rnk2, "ID"))
+# 
+# rnk4 <- rnk3 %>%
+#   tidyr::pivot_longer(!c(Treatment,ID), names_to = "ranks", values_to = "prop")
+# rnk5 <- mutate(rnk4, ranker=str_replace_all(string=ranks, pattern="Rank", replacement="")) 
+# rnk6 <- mutate(rnk5, rnk=as.numeric(ranker), r1=rnk-0.5, r2=rnk+0.5, p2=prop*12, rnkr=1/rnk, clr=letters[4])
+# rnk <- rnk6 %>% group_by(Treatment) %>% mutate(cp=cumsum(prop))
+# saveRDS(rnk, file = "01_Datasets/rnk.rds")
 
 #drawing
+rnk <- readRDS("01_Datasets/rnk.rds")
 
 p<-
 ggplot() +
@@ -1203,8 +1205,6 @@ ggplot() +
   scale_x_discrete(name ="Rank", limits=c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'))
 print(p)     
  
-
-
 
 q<-
 ggplot() +
@@ -1250,13 +1250,7 @@ print(s)
 
 On the left-hand side, a horizontal bar chart is displayed, representing the SUCRA (surface under the cumulative ranking). A description of this metric is provided, and this metric is used consistently throughout to order plots for individual treatments from best to worst, which the panel complimented. The user can select a treatment of interest from a drop-down box, and this treatment is highlighted in blue in all plots, with other treatments displayed in grey and pushed to the background. This nicely highlights a treatment of interest in a way that could be considered for enhancing submission 1. On the right-hand side of the app, the user can explore a range of plots. The first are line graphs and the user can select to display either absolute or cumulative probabilities. By hovering over the plot, the user can view the probability that each treatment ranks in each position, meaning the entire underlying dataset can be recovered. This feature can also be used to identify an interesting treatment from the plot and subsequently select it from the drop-down box. The user can either view all lines on a single plot select to display faceted plots by treatment to make it easier to follow the line for a given treatment. More could be done on these plots to emphasise the discrete nature of the ranks, although the ability to hover and see the discrete probabilities does go some way towards doing this. The user can also select to view bar charts. These have probability on the x-axis and allow the user to display whether to stack by treatment or by rank. Depending on this selection, either treatment or rank is displayed on the y-axis, with the other used to fill the stacked bars. This better emphasises the discrete nature of the ranks than the line graphs and allows the user to make both treatment-wise and rank-wise comparisons. Small updates could further enhance this submission, such as widening the extremes of the colour gradient on the bar charts. This would make individual sections of the stacked bars easier to distinguish in the presence of many treatments/ranks. Similarly, the consistent use of colouring applied throughout the plots (blue for the selected treatments, grey for the others), could be extended to legends and labels to further strengthen the connection.
 
-
-```{r showChoro1}
-shiny::includeHTML("./02_Plots/Visualization/ForestPlot/bayesian_ranking_lineup.html")
-```
-
-
-This second dashboard comes with a range of interactive features to help the user drive the display. Again, treatments are displayed on the ‘y-axis’ and ranks on the ‘x-axis’. Bars are displayed to indicate the corresponding probability and are presented in such a way to emphasise the discrete nature of the ranks. For the top 3 ranks, the probability is displayed as a weighted sum. Although this may not be of the most interest for this example and the choice of top 3 is somewhat arbitrary here, one can easily imagine use cases where this would be an extremely useful feature. Further, the user can assign the weights used in computing this weighted sum (again, not the most directly relevant here but certainly relevant in other use cases). Here, the weighted sum shows an interesting message that a treatment could have a much higher probability of being 1st specifically, but not necessarily have any/much higher probability of being ranked in say the top 3. This can be seen somewhat in cumulative probability plots from other submissions but is most easily identified here. In addition to the bars, box plots are displayed at the top of each column, displaying the distribution within each rank. These highlight the contrasting behaviour of the extreme and intermediate ranks, as seen in submission 1. Like the previous dashboard, this one allows the user to view each individual probability by hovering and goes further in providing selection boxes which can be used to keep these probabilities displayed at all times. The app allows the user to search for a treatment of interest and to sort the visualization within/across ranks. This not only allows for a logical ordering of treatments but allows the user to determine which ordering they consider to be the most logical and display the visualization that way.
+ 
 
 # Reference
 

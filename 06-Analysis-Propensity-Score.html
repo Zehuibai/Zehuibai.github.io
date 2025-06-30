@@ -1,0 +1,2715 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title> Propensity Score</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zehui Bai</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="02-Clinical_Experience.html">
+    <span class="fa fa-user"></span>
+     
+    Clinical Experience
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-sliders"></span>
+     
+    Sample Size
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="03-SSC-Everything-to-Know-About-Sample-Size-Determination.html">Everything to Know About Sample Size Determination</a>
+    </li>
+    <li>
+      <a href="03-SSC-Choosing-the-Effect-Size-for-Sample-Size-Calculations.html">Choosing the Effect Size</a>
+    </li>
+    <li>
+      <a href="03-SSC-Biosimilar-Trials.html">Statistical Considerations for the Design and Analysis of Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-and-Power-for-Non-Parametric-Analysis.html">Sample Size and Power for Non-Parametric Analysis</a>
+    </li>
+    <li>
+      <a href="03-SSC-Power-for-Complex-Hypotheses.html">Power for Complex Hypotheses</a>
+    </li>
+    <li>
+      <a href="03-SSC-Alternatives-to-Power.html">Bayesian methods - Alternatives to Power</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-for-Pilot-Studies.html">Sample Size for Pilot Studies</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Continuous-Endpoint.html">Sample Size Determination for Continuous Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Categorical-Endpoint.html">Sample Size Determination for Categorical Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Sample-Size-Determination-for-Counts-and-Rates.html">Sample Size Determination for Counts and Rates</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Survival-Endpoint.html">Sample Size Determination for Survival Endpoint</a>
+    </li>
+    <li>
+      <a href="03-SSC-Case-Repeated-Measures.html">Sample Size Determination for Repeated Measures</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Sequential-Design.html">Statistical Considerations for Group Sequential Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-IA-Adaptive-Design.html">Statistical Considerations for Adaptive Design</a>
+    </li>
+    <li>
+      <a href="03-SSC-Multiple-Test.html">Sample Size for Multiple Test</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-pencil-square-o"></span>
+     
+    Study Design
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="04-Design-General-Consideration.html">General Consideration</a>
+    </li>
+    <li>
+      <a href="04-Design-Estimands-Framework.html">Estimands Framework</a>
+    </li>
+    <li>
+      <a href="04-Design-Estimands-Practice.html">Estimands and Sensitivity Analyses</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-I-Trials---Design-Considerations.html">Phase I Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-II-Trials---Design-Considerations.html">Phase II Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-III-Trials---Design-Considerations.html">Phase III Trials - Design Considerations</a>
+    </li>
+    <li>
+      <a href="04-Design-Phase-IV-Trials---Design-Considerations.html">Phase IV Trials - Design Considerations for Post Marketing Surveillance</a>
+    </li>
+    <li>
+      <a href="04-Design-Complex-Sequential-Trials.html">Complex Sequential Analysis Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Adaptive-Clinical-Trials.html">Adaptive Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bayesian-Clinical-Trials.html">Bayesian Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Dose-Escalation-and-Stratification-Designs.html">Dose Escalation and Stratification Designs in Early Oncology Development</a>
+    </li>
+    <li>
+      <a href="04-Design-Single-Arm-Clinical-Trials.html">Single Arm Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Diagnostic-Study-Design-and-Evaluation.html">Diagnostic Study-Design and Evaluation</a>
+    </li>
+    <li>
+      <a href="04-Design-Diagnostic-Study-MRMC.html">Diagnostic Study-Multireader Multicase (MRMC)</a>
+    </li>
+    <li>
+      <a href="04-Design-Vaccine-Design.html">Vaccine Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Externally-Controlled-Trials.html">Externally Controlled Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Noninferiority-Trials.html">Noninferiority Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Bioequivalence-and-Biosimilar-Trials.html">Bioequivalence and Biosimilar Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Exploring-Survival-Analysis-Designs-for-Clinical-Trials.html">Exploring Survival Analysis Designs for Clinical Trials</a>
+    </li>
+    <li>
+      <a href="04-Design-Hierarchical-composite-endpoints.html">Hierarchical Composite Endpoints</a>
+    </li>
+    <li>
+      <a href="04-Design-Regulatory-Submission.html">Regulatory Submission from Stats Perspective</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-line-chart"></span>
+     
+    Data Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="05-Plot-Time-To-Event.html">Time to Event Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-PRO-Data.html">Patient Reported Outcome Data Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-SSC-and-Power-Calculation.html">Sample Size and Power Calculations Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Correlation.html">Correlation Visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-Model-Table.html">Clinical Data and Model visualization</a>
+    </li>
+    <li>
+      <a href="05-Plot-ScatterPlot.html">Scatter and Line Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-BarPlot.html">Bar Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-PieChart.html">Pie Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-BoxPlot.html">Box Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Histogram.html">Histogram</a>
+    </li>
+    <li>
+      <a href="05-Plot-Forest-Plot.html">Forest Plot</a>
+    </li>
+    <li>
+      <a href="05-Plot-Flow-Chart.html">Flow Chart</a>
+    </li>
+    <li>
+      <a href="05-Plot-Some-Interesting.html">Some Interesting Plots</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-calculator"></span>
+     
+    Statistical Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="06-Analysis-Linear-Regression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Logistic-Regression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Mixed-Model.html">Mixed Model</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MMRM.html">Mixed Model Repeated Measures</a>
+    </li>
+    <li>
+      <a href="06-Analysis-GEE.html">Generalized Estimating Equation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-ANOVA.html">Analysis of Variance</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Analysis.html">Survival Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Survival-Competing-Risk.html">Survival Analysis - Competing Risk</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Missing-Data.html">Missing Data Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-MI-Implementation.html">Multiple Imputation Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-SSD.html">Safety Signal Detection and Evaluation</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Meta-Analysis.html">Meta Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-PK-and-PD.html">PK and PD Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Time-Series-Analysis.html">Time Series Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-SEM.html">Structural Equation Modeling</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Factor-Analysis.html">Factor Analysis</a>
+    </li>
+    <li>
+      <a href="06-Analysis-Propensity-Score.html">Propensity Score Analysis</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-bar-chart"></span>
+     
+    Machine Learning
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="07-ML-Bayesian-Theory.html">Bayesian Theory</a>
+    </li>
+    <li>
+      <a href="07-ML-Bayesian-Analysis.html">Bayesian Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Regularization-Penalized-Regression.html">Regularization Penalized Regression</a>
+    </li>
+    <li>
+      <a href="07-ML-Loss-Regression.html">Loss Functions in Machine Learning</a>
+    </li>
+    <li>
+      <a href="07-ML-PCA.html">Principal Component Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-KNN.html">K-Nearest Neighbors</a>
+    </li>
+    <li>
+      <a href="07-ML-SVM.html">Support Vector Machine</a>
+    </li>
+    <li>
+      <a href="07-ML-Tree-Models.html">Tree Models</a>
+    </li>
+    <li>
+      <a href="07-ML-LDA.html">Linear Discriminant Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Cluster-Analysis.html">Cluster Analysis</a>
+    </li>
+    <li>
+      <a href="07-ML-Neural-Networks.html">Neural Network</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-stethoscope"></span>
+     
+    Clinical Analysis (ADaM)
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="08-Clinical-Disposition-Baseline.html">Disposition and Baseline</a>
+    </li>
+    <li>
+      <a href="08-Clinical-Efficacy.html">Efficacy Analysis</a>
+    </li>
+    <li>
+      <a href="08-Clinical-Pharmacokinetics-Analysis.html">Pharmacokinetics Analysis</a>
+    </li>
+    <li>
+      <a href="08-Clinical-Adverse-Event.html">Adverse Event Visualization</a>
+    </li>
+    <li>
+      <a href="08-Clinical-Laboratory-Data.html">Laboratory Data Visualization</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="08-CV.html">
+    <span class="fa fa-file-pdf-o"></span>
+     
+    CV
+  </a>
+</li>
+<li>
+  <a href="mailto:zehuibai@outlook.com">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Zehuibai">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore"><p><img src="logo.png"
+style="width:3in" /><br />
+Propensity Score</p></h1>
+
+</div>
+
+
+<div id="introduction" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<div id="causal-framework-ate-and-att" class="section level2"
+number="1.1">
+<h2><span class="header-section-number">1.1</span> Causal Framework (ATE
+and ATT)</h2>
+<p>In causal inference, particularly when evaluating treatment effects,
+we often rely on <strong>potential outcomes</strong> to understand how a
+treatment or intervention affects individuals. The two key concepts
+often used are:</p>
+<ul>
+<li><strong>Average Treatment Effect (ATE)</strong>: The average
+difference in outcomes if <em>everyone</em> in the population were
+treated versus if <em>everyone</em> were untreated.</li>
+<li><strong>Average Treatment Effect on the Treated (ATT)</strong>: The
+average difference in outcomes, but only among those who actually
+received the treatment.</li>
+</ul>
+<p>For each individual <strong>i</strong> in the study:</p>
+<ul>
+<li><p><strong><span class="math inline">\(Y_i(1)\)</span></strong> =
+The potential outcome if individual <strong>i</strong> receives the
+treatment (exposure).</p></li>
+<li><p><strong><span class="math inline">\(Y_i(0)\)</span></strong> =
+The potential outcome if individual <strong>i</strong> does not receive
+the treatment (control).</p></li>
+<li><p><strong><span class="math inline">\(Z_i\)</span></strong> =
+Treatment assignment:</p>
+<ul>
+<li><span class="math inline">\(Z_i = 1\)</span> if individual
+<strong>i</strong> is assigned to the treatment group.</li>
+<li><span class="math inline">\(Z_i = 0\)</span> if assigned to the
+control group.</li>
+</ul></li>
+<li><p><strong><span class="math inline">\(Y_i\)</span></strong> = The
+observed outcome for individual <strong>i</strong>, depending on their
+treatment assignment.</p></li>
+</ul>
+<p>Since each individual either receives treatment or not, <strong>we
+can only observe one of the two potential outcomes</strong> for any
+given person—not both. This is known as the <strong>Fundamental Problem
+of Causal Inference</strong>.</p>
+<p>The observed outcome can be written as:</p>
+<p><span class="math display">\[
+Y_i = Z_i \times Y_i(1) + (1 - Z_i) \times Y_i(0)
+\]</span></p>
+<p>This means:</p>
+<ul>
+<li><p>If <span class="math inline">\(Z_i = 1\)</span> (treated),
+then:</p>
+<p><span class="math display">\[
+Y_i = Y_i(1)
+\]</span></p></li>
+<li><p>If <span class="math inline">\(Z_i = 0\)</span> (control),
+then:</p>
+<p><span class="math display">\[
+Y_i = Y_i(0)
+\]</span></p></li>
+</ul>
+<p>In other words, for each individual, we only observe the outcome
+corresponding to their actual treatment status.</p>
+<div id="defining-the-average-treatment-effect-ate"
+class="section level3" number="1.1.1">
+<h3><span class="header-section-number">1.1.1</span> Defining the
+Average Treatment Effect (ATE)</h3>
+<p>The <strong>Average Treatment Effect (ATE)</strong> measures the
+expected difference in outcomes between treatment and control across the
+<em>entire</em> population:</p>
+<p><span class="math display">\[
+ATE = E[Y_i(1) - Y_i(0)]
+\]</span></p>
+<p>Interpretation:</p>
+<ul>
+<li>Imagine a hypothetical world where <strong>everyone</strong> in the
+population is treated, and compare that to a world where
+<strong>everyone</strong> is untreated.</li>
+<li>The ATE is the average difference in outcomes between those two
+hypothetical worlds.</li>
+</ul>
+<p>In practice, we never observe both potential outcomes for an
+individual, but with appropriate study design (e.g., randomization) or
+statistical adjustment (e.g., propensity scores), we can estimate the
+ATE.</p>
+</div>
+<div id="defining-the-average-treatment-effect-on-the-treated-att"
+class="section level3" number="1.1.2">
+<h3><span class="header-section-number">1.1.2</span> Defining the
+Average Treatment Effect on the Treated (ATT)</h3>
+<p>The <strong>Average Treatment Effect on the Treated (ATT)</strong>
+focuses only on those individuals who actually received the
+treatment:</p>
+<p><span class="math display">\[
+ATT = E[Y_i(1) - Y_i(0) | Z_i = 1]
+\]</span></p>
+<p>Interpretation:</p>
+<ul>
+<li>Among those who received the treatment, how much did the treatment,
+on average, improve or change their outcome compared to if they had not
+received it?</li>
+<li>This is especially relevant when evaluating real-world
+effectiveness, as it reflects the benefit to those who actually get the
+intervention.</li>
+</ul>
+</div>
+<div id="relationship-between-ate-and-att" class="section level3"
+number="1.1.3">
+<h3><span class="header-section-number">1.1.3</span> Relationship
+Between ATE and ATT</h3>
+<ul>
+<li>In <strong>ideal Randomized Controlled Trials (RCTs)</strong>, where
+randomization is perfect and adherence is complete, ATE and ATT are
+often the same.</li>
+<li>In <strong>observational studies</strong>, where treatment
+assignment is not random and may depend on characteristics of
+individuals, ATE and ATT can differ.
+<ul>
+<li>In observational settings, treated individuals may differ
+systematically from untreated ones (e.g., sicker patients are more
+likely to be treated).</li>
+<li>Methods like <strong>propensity score matching</strong>,
+<strong>inverse probability weighting</strong>, or <strong>regression
+adjustment</strong> are used to adjust for these differences and
+estimate ATE or ATT.</li>
+</ul></li>
+</ul>
+<p>In causal inference, we can only observe one potential outcome for
+each individual, depending on treatment assignment.</p>
+<ul>
+<li>The <strong>ATE</strong> answers: “What is the average effect of the
+treatment if applied to everyone?”</li>
+<li>The <strong>ATT</strong> answers: “What is the average effect of the
+treatment among those who actually received it?”</li>
+<li>In RCTs, ATE and ATT often align; in observational studies, they may
+differ and require statistical adjustment.</li>
+<li>Methods like <strong>propensity score matching</strong> or
+<strong>inverse probability weighting</strong> help approximate these
+effects under certain assumptions.</li>
+</ul>
+<p>Here focuses on ATE and ATT, other estimands exist:</p>
+<table>
+<colgroup>
+<col width="12%" />
+<col width="87%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Treatment Effect Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>ATC</strong></td>
+<td>Average Treatment Effect for the Control group.</td>
+</tr>
+<tr class="even">
+<td><strong>SATE</strong></td>
+<td>Sample Average Treatment Effect — treatment effect in the
+sample.</td>
+</tr>
+<tr class="odd">
+<td><strong>PATE</strong></td>
+<td>Population Average Treatment Effect — treatment effect in the entire
+population (including those not sampled).</td>
+</tr>
+<tr class="even">
+<td><strong>LATE</strong></td>
+<td>Local Average Treatment Effect — effect for a subgroup defined by
+specific conditions (e.g., compliers in an instrumental variable
+analysis).</td>
+</tr>
+<tr class="odd">
+<td><strong>CATE</strong></td>
+<td>Conditional Average Treatment Effect — treatment effect conditional
+on certain covariates or subgroups.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="propensity-score-matching" class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> Propensity score
+matching</h2>
+<p>Propensity score matching is a statistical technique used to balance
+observed covariates between treatment and control groups in an
+observational study. The core idea is to estimate the propensity score,
+which is the probability that an individual receives the treatment or
+exposure based on their observed characteristics. This score is
+typically estimated using regression models, such as logistic regression
+or probit models, where the dependent variable is treatment assignment
+and the predictors are baseline covariates.</p>
+<p>In randomized controlled trials (RCTs), treatment assignment is
+random, meaning individuals are assigned to either the treatment or
+control groups by chance. If randomization is properly implemented, both
+observed and unobserved characteristics should be equally distributed
+across groups, reducing the risk of confounding. After randomization,
+researchers often check whether the groups are balanced with respect to
+important covariates, but if the randomization process is sound, balance
+is generally achieved naturally.</p>
+<p>In contrast, observational studies lack random assignment. As a
+result, there is often imbalance between treatment groups, meaning
+individuals in different groups may differ systematically in ways that
+affect the outcome. This imbalance introduces potential bias and
+confounding, making it harder to draw valid causal conclusions.</p>
+<p>To address this issue in observational studies, researchers can use
+multiple regression models or propensity score methods. Multiple
+regression models adjust for confounding by including observable
+covariates directly in the model that estimates the outcome. Propensity
+score methods take a different approach by estimating the probability of
+treatment based on observed covariates, then using this probability to
+adjust for differences between groups.</p>
+<p>If implemented correctly, propensity score matching can mimic the
+balance achieved in a randomized trial, at least with respect to
+observed characteristics. It is important to note that propensity score
+methods do not account for unobserved confounders unless certain
+assumptions hold, but under these assumptions, the groups can be
+balanced in a way similar to an RCT.</p>
+</div>
+<div id="key-assumptions" class="section level2" number="1.3">
+<h2><span class="header-section-number">1.3</span> Key Assumptions</h2>
+<ul>
+<li><strong>Conditional Independence Assumption (CIA)</strong>:
+Treatment assignment must be conditionally independent of potential
+outcomes, given the covariates (no unmeasured confounders).</li>
+<li><strong>Overlap</strong>: Every subject must have a nonzero
+probability of receiving each treatment option, ensuring that each
+treatment group is representative of the whole population.</li>
+</ul>
+<p>When both assumptions are satisfied, the propensity score can be
+effectively used as a balancing score, where treated and untreated
+subjects with similar propensity scores will have similar distributions
+of observed covariates. This allows researchers to approximate the
+conditions of a randomized controlled trial, thereby enabling them to
+estimate causal treatment effects from observational data.</p>
+<ul>
+<li><strong>Modeling</strong>: Typically, propensity scores are
+estimated using logistic regression, where the treatment assignment is
+regressed on observed covariates. Other methods such as machine learning
+techniques can also be employed to enhance the estimation accuracy,
+especially in complex datasets.</li>
+<li><strong>Adjustment Methods</strong>: Once estimated, propensity
+scores can be used to adjust for the treatment effect in several ways,
+including matching, stratification, inverse probability treatment
+weighting (IPTW), and covariate adjustment, each with its strengths and
+limitations depending on the specific study context.</li>
+</ul>
+<div id="conditional-independence-assumption-cia" class="section level3"
+number="1.3.1">
+<h3><span class="header-section-number">1.3.1</span> 1. Conditional
+Independence Assumption (CIA)</h3>
+<ul>
+<li><strong>Concept</strong>: This assumption, also known as
+unconfoundedness, posits that treatment assignment is independent of
+potential outcomes, given the observed baseline covariates.</li>
+<li><strong>Details</strong>: The assumption means that once we control
+for the observed baseline characteristics (X), the treatment assignment
+(D) is independent of the potential outcomes (Y(0) for control and Y(1)
+for treatment). This is key because it implies that any differences in
+outcomes between the treated and untreated groups can be attributed
+solely to the treatment and not to pre-existing differences.</li>
+<li><strong>Importance</strong>: It’s referred to as the “no unmeasured
+confounders” assumption because it relies on the idea that all variables
+that influence both the treatment assignment and the outcomes have been
+measured and included in X. If there are unmeasured confounders, the
+treatment effect estimation may be biased.</li>
+</ul>
+</div>
+<div id="overlap-or-positivity-assumption" class="section level3"
+number="1.3.2">
+<h3><span class="header-section-number">1.3.2</span> 2. Overlap (or
+Positivity) Assumption</h3>
+<ul>
+<li><strong>Concept</strong>: This assumption states that every subject
+in the study has a nonzero probability of receiving each treatment
+option, conditioned on the covariates.</li>
+<li><strong>Details</strong>: Mathematically, this is expressed as <span
+class="math inline">\(0 &lt; P(D = 1 | X) &lt; 1\)</span>, where <span
+class="math inline">\(P(D = 1 | X)\)</span> is the probability of
+receiving the treatment given covariates X.</li>
+<li><strong>Importance</strong>: The overlap assumption ensures that for
+each set of covariates X, there are both treated and untreated subjects.
+This is crucial for comparison and helps avoid situations where
+treatment effects cannot be estimated because certain types of subjects
+only receive one kind of treatment.</li>
+<li><strong>Application</strong>: In practice, ensuring overlap involves
+checking that the propensity scores for the treated and untreated groups
+span a common range, thereby confirming that for every individual in the
+study, there is a comparable individual with a similar likelihood of
+treatment across the spectrum.</li>
+</ul>
+</div>
+</div>
+<div id="four-methods" class="section level2" number="1.4">
+<h2><span class="header-section-number">1.4</span> Four Methods</h2>
+<div id="propensity-score-matching-1" class="section level3"
+number="1.4.1">
+<h3><span class="header-section-number">1.4.1</span> 1.Propensity Score
+Matching</h3>
+<p>Propensity score matching (PSM) is a statistical technique used to
+create comparable groups in observational studies where random
+assignment is not possible. This method helps to reduce bias in
+estimates of treatment effects by balancing observed covariates between
+treated and untreated groups. Here’s a closer look at how PSM works and
+the steps involved:</p>
+<p>PSM aims to mimic the conditions of a randomized controlled trial by
+matching units (e.g., patients, schools, etc.) that have received a
+treatment with similar units that have not, based on their propensity
+scores. A propensity score is the probability of a unit being assigned
+to a particular treatment, given a set of observed covariates.</p>
+<p><strong>Alternative Methods Using Propensity Scores</strong></p>
+<p>Besides matching, propensity scores can be utilized through: -
+<strong>Stratification</strong>: Dividing the sample into quintiles or
+deciles based on propensity scores and comparing outcomes within these
+strata. - <strong>Regression Adjustment</strong>: Including the
+propensity score as a covariate in a regression model. -
+<strong>Weighting</strong>: Applying weights based on the inverse
+probability of treatment to create a synthetic sample in which the
+distribution of measured baseline covariates is independent of treatment
+assignment.</p>
+<p><img src="02_Plots/PSM_Unadjusted.PNG" /> <img
+src="02_Plots/PSM_AdjustPSM.PNG" /></p>
+<p><strong>Variance Estimation in Propensity Score Matched
+Samples</strong></p>
+<ol style="list-style-type: decimal">
+<li><strong>Independence Assumption (Schafer and Kang, 2008)</strong>:
+<ul>
+<li>Schafer and Kang suggest treating the treated and untreated subjects
+within a matched sample as independent. This perspective simplifies the
+variance estimation but might overlook the intrinsic pairing and
+similarities between matched units.</li>
+</ul></li>
+<li><strong>Paired Variance Calculation (Imbens, 2004)</strong>:
+<ul>
+<li>Imbens advocates for calculating the variance as one would in a
+paired experimental design, acknowledging that each treated unit is
+explicitly paired with a control unit based on similar propensity
+scores. This method reflects the dependent nature of the matched
+pairs.</li>
+</ul></li>
+<li><strong>Lack of Independence (Austin)</strong>:
+<ul>
+<li>Austin emphasizes that the matched samples are not independent
+observations. Since treated and untreated subjects within a matched set
+are similar in their propensity scores and therefore their baseline
+covariates, they are likely to have correlated outcomes. This
+correlation must be considered when estimating the variance of the
+treatment effect to avoid underestimating the standard errors.</li>
+</ul></li>
+</ol>
+<p><strong>Types of Matching Designs</strong></p>
+<ol style="list-style-type: decimal">
+<li><strong>Bipartite Matching</strong>: This is the most common form
+and involves one-to-one matching without replacement. Once a control
+unit is matched with a treatment unit, it cannot be used again. This
+method helps to ensure that each match is unique and limits the reuse of
+control units.</li>
+<li><strong>Non-Bipartite Matching</strong>: In this design, matching
+allows for replacement. It means a control unit can be matched to
+multiple treatment units. This approach can be beneficial in scenarios
+where there are insufficient control units that have close propensity
+scores to the treatment units.</li>
+</ol>
+<p><strong>Steps in Propensity Score Matching</strong></p>
+<ol style="list-style-type: decimal">
+<li><strong>Data Collection and Preparation</strong>: Gather all
+necessary data and prepare it for analysis, ensuring that it includes
+all relevant covariates that might influence both the treatment
+assignment and the outcome.</li>
+<li><strong>Estimating Propensity Scores</strong>: Use statistical
+methods like logistic regression, discriminant analysis, or machine
+learning techniques like random forests to estimate the propensity
+scores.</li>
+<li><strong>Matching Participants</strong>: Match treatment and control
+units based on their propensity scores. This can be done using various
+algorithms like nearest neighbor matching, caliper matching, or optimal
+matching.</li>
+<li><strong>Evaluating Match Quality</strong>: After matching, it’s
+crucial to check the balance of covariates across the treatment and
+control groups. A well-performed match should show no significant
+differences in the distribution of covariates across groups, indicating
+that the matching process has effectively mimicked randomization.</li>
+</ol>
+<p><img src="02_Plots/PSM_Implementation.png" /> <img
+src="02_Plots/PSM_ImplementDetail1.png" /> <img
+src="02_Plots/PSM_ImplementDetail2.png" /></p>
+<p><strong>Matching Algorithms</strong></p>
+<p>Matching algorithms play a pivotal role in propensity score matching
+(PSM) by determining how participants in treatment and control groups
+are paired based on their estimated propensity scores. Here’s a detailed
+breakdown of the key matching methods and algorithms, as well as the
+critical decisions involved in the process:</p>
+<ol style="list-style-type: decimal">
+<li><strong>One-to-One Matching</strong>: Each participant in the
+treatment group is paired with one participant from the control
+group.</li>
+<li><strong>Variable Matching</strong>: The algorithm determines the
+optimal number of control participants to match with each treatment
+participant, ensuring the best possible match based on the data.</li>
+<li><strong>Fixed Matching</strong>: A predetermined number of controls
+(k) are matched to each treatment participant, adhering to a fixed
+ratio.</li>
+</ol>
+<p><strong>Matching Algorithms</strong></p>
+<ul>
+<li><p><strong>Greedy Matching</strong>: Quickly selects matches based
+on immediate proximity in propensity scores, without considering future
+matches. This includes:</p>
+<ul>
+<li><strong>Caliper Matching</strong>: Imposes a maximum allowable
+difference between the propensity scores of matched units.</li>
+<li><strong>Nearest Neighbor Matching</strong>: Pairs each treatment
+unit with the closest untreated unit based on the propensity score.</li>
+</ul></li>
+<li><p><strong>Genetic Matching</strong>: Refines matches iteratively by
+considering both propensity scores and Mahalanobis distance, enhancing
+the overall match quality.</p></li>
+<li><p><strong>Optimal Matching</strong>: Aims to minimize the total
+within-pair difference in propensity scores across all pairs, striving
+for the most statistically balanced matches.</p></li>
+</ul>
+<p><strong>Matching without Replacement vs. Matching with
+Replacement</strong></p>
+<ul>
+<li><strong>Without Replacement</strong>: Ensures unique pairings by
+using each untreated subject only once, which may reduce bias but can
+limit matching options in unbalanced datasets.</li>
+<li><strong>With Replacement</strong>: Allows reuse of untreated
+subjects in multiple matches, increasing flexibility but complicating
+variance estimation as the independence of observations is
+compromised.</li>
+</ul>
+<p><strong>Greedy vs. Optimal Matching</strong></p>
+<ul>
+<li><strong>Greedy Matching</strong>: Prioritizes immediate match
+quality, potentially sacrificing optimal long-term pairings.</li>
+<li><strong>Optimal Matching</strong>: Considers all possible matches to
+minimize overall disparity in propensity scores, often at a greater
+computational cost.</li>
+</ul>
+<p><strong>Common Propensity Score Matching Algorithms</strong></p>
+<p><img src="02_Plots/PSM_MatchingAlgorithms.PNG" /></p>
+<ol style="list-style-type: decimal">
+<li><strong>Nearest Neighbor Matching</strong>:
+<ul>
+<li><strong>Description</strong>: Matches each treated unit to one or
+more control units based on the closest propensity score.</li>
+<li><strong>Trade-offs</strong>: Can reduce bias but may increase
+variance if only a few controls are used repeatedly for multiple treated
+units.</li>
+</ul></li>
+<li><strong>Caliper Matching</strong>:
+<ul>
+<li><strong>Description</strong>: Similar to nearest neighbor but
+restricts matches to those within a predefined propensity score range
+(the caliper).</li>
+<li><strong>Trade-offs</strong>: Helps avoid poor matches that could
+increase bias, but might exclude potential matches, increasing variance
+due to a smaller sample.</li>
+</ul></li>
+<li><strong>Stratification or Interval Matching</strong>:
+<ul>
+<li><strong>Description</strong>: Divides the range of propensity scores
+into intervals and matches treated and control units within these
+strata.</li>
+<li><strong>Trade-offs</strong>: Reduces variance by using more of the
+available data for matching but might increase bias if intervals are not
+narrow enough to ensure comparable groups.</li>
+</ul></li>
+<li><strong>Kernel and Local Linear Matching</strong>:
+<ul>
+<li><strong>Description</strong>: Weights control units based on the
+distance of their propensity scores from the treated unit, often using a
+kernel function to smooth differences.</li>
+<li><strong>Trade-offs</strong>: Typically reduces bias by using a
+weighted average of multiple controls but can increase variance if the
+smoothing parameter is not optimally chosen.</li>
+</ul></li>
+</ol>
+<p><strong>Factors Influencing the Choice of Matching
+Method</strong></p>
+<ul>
+<li><strong>Dataset Size and Balance</strong>: Larger or more balanced
+datasets might favor non-replacement methods, providing sufficient
+matches without needing to reuse controls.</li>
+<li><strong>Computational Resources</strong>: The availability of
+computational power can dictate whether optimal or greedy matching is
+feasible.</li>
+<li><strong>Research Goals</strong>: The specific objectives and the
+required precision of the study influence the matching strategy,
+balancing the need for accurate treatment effect estimation against
+practical constraints.</li>
+</ul>
+<p><strong>Understanding the Trade-off Between Bias and
+Variance</strong></p>
+<p>When implementing propensity score matching (PSM) in observational
+studies, selecting the right matching algorithm is crucial, especially
+when sample sizes are small. The choice of algorithm affects the
+trade-off between bias and variance, and ultimately, the validity and
+reliability of the estimated treatment effects.</p>
+<ul>
+<li><strong>Bias</strong>: Occurs when there is systematic error in
+estimating the treatment effect. Bias can arise from inadequate
+matching, where the control units do not adequately represent the
+counterfactual for the treated units.</li>
+<li><strong>Variance</strong>: Refers to the variability of the
+estimated treatment effects across different samples. A higher variance
+means less precision and potentially wider confidence intervals.</li>
+</ul>
+<p>In propensity score matching, achieving a balance between minimizing
+bias and variance is essential. A match that is too strict (e.g.,
+requiring exact matches on many covariates) may reduce bias but increase
+variance because fewer matches are available, leading to less precise
+estimates. Conversely, more lenient matching criteria can increase the
+sample size of matched pairs but may introduce bias if the matches are
+not sufficiently similar.</p>
+<p><strong>Assessing the Matching Quality</strong></p>
+<p>Assessing the quality of matching in propensity score analysis is a
+crucial step to ensure the validity of causal inference. Below are
+detailed methodologies and considerations to check the quality of
+matching, focusing on overlap and common support, and subsequent steps
+to validate matching effectiveness:</p>
+<p><strong>1. Overlap and Common Support</strong></p>
+<p><strong>Visual Analysis</strong></p>
+<ul>
+<li><strong>Density Plots</strong>: The simplest and most
+straightforward method is to plot the density distribution of the
+propensity scores for both treatment and control groups. Overlapping
+distributions suggest good common support.</li>
+<li><strong>Range Comparison</strong>: Compare the minimum and maximum
+propensity scores in both groups. Lack of overlap indicates that there
+are regions where comparisons might not be valid, leading to biased
+estimates.</li>
+</ul>
+<p><strong>Sensitivity to Extreme Values</strong></p>
+<ul>
+<li><strong>Tenth Smallest/Largest Observations</strong>: As suggested
+by Lechner (2002), consider replacing the absolute minima and maxima
+with the tenth smallest and largest observations to mitigate the impact
+of extreme values. This method checks for robustness against outliers in
+the propensity score distribution.</li>
+</ul>
+<p><strong>2. Assessing Matching Quality</strong></p>
+<p><strong>Standardized Bias (SB)</strong></p>
+<ul>
+<li><strong>Calculation</strong>: The standardized bias for each
+covariate is calculated as the difference in means between the treatment
+and control groups, divided by the standard deviation of the covariate
+in the full sample.</li>
+<li><strong>Acceptable Levels</strong>: An SB below 3% to 5% after
+matching is typically considered indicative of good balance.</li>
+</ul>
+<p><strong>Two-Sample t-Test</strong></p>
+<ul>
+<li><strong>Purpose</strong>: Used to test if there are statistically
+significant differences in the means of the covariates between the
+treatment and control groups after matching. The expectation is that no
+significant differences should exist if the matching is successful.</li>
+</ul>
+<p><strong>Joint Significance and Pseudo-R^2</strong></p>
+<ul>
+<li><strong>Re-Estimation of Propensity Score</strong>: After matching,
+re-estimate the propensity score on the matched samples to check for
+residual differences.</li>
+<li><strong>Pseudo-R^2</strong>: Measures how well the covariates
+explain the treatment assignment in the matched sample. A low pseudo-R^2
+after matching suggests that the matching process has successfully
+balanced the covariates.</li>
+<li><strong>Likelihood Ratio Test</strong>: Perform this test to check
+for the joint significance of all regressors in the model before and
+after matching. The hypothesis should ideally be rejected after
+matching, indicating no systematic differences between groups.</li>
+</ul>
+<p><strong>Stratification Test</strong></p>
+<ul>
+<li><strong>Strata Based on Propensity Scores</strong>: Divide
+observations into strata based on their propensity scores. Within each
+stratum, use t-tests to check for balance in covariates.</li>
+<li><strong>Adjustment</strong>: If imbalances persist, consider adding
+higher-order terms and interactions to the propensity score model and
+re-assess balance.</li>
+</ul>
+<p><strong>3. Estimating the Variance of Treatment Effects</strong></p>
+<p><strong>Complexity in Variance Estimation</strong></p>
+<ul>
+<li><strong>Sources of Variance</strong>: The variance of the estimated
+treatment effects should account for the variability introduced by
+estimating the propensity score, the determination of common support,
+and the matching procedure (especially if matching without
+replacement).</li>
+<li><strong>Statistical Significance</strong>: Standard errors must be
+adjusted to reflect these sources of variability to ensure accurate
+inference about the treatment effects.</li>
+</ul>
+<p><strong>Criticisms and Challenges</strong></p>
+<ul>
+<li><strong>Estimation Uncertainty</strong>: Since the true propensity
+score is never known, there is always a degree of uncertainty regarding
+the accuracy of the score estimates. This can limit the reliability of
+the matching process.</li>
+<li><strong>Methodological Critiques</strong>: Some researchers, like
+King (2016), argue against using propensity scores for matching due to
+inherent limitations and biases in observational data.</li>
+<li><strong>Iterative Balancing</strong>: Rosenbaum and Rubin (1983)
+suggest iterative checking of propensity scores for balance. However,
+this can be challenging in practice due to data limitations and
+computational complexity.</li>
+<li><strong>Alternative Methods</strong>: Genetic matching proposed by
+Diamond and Sekhon offers an alternative that reduces the need for
+iterative balance checks by dynamically adjusting both the scores and
+the matching criteria.</li>
+</ul>
+</div>
+<div id="stratification-on-the-propensity-score" class="section level3"
+number="1.4.2">
+<h3><span class="header-section-number">1.4.2</span> 2.Stratification on
+the Propensity Score</h3>
+<p>Stratification on the propensity score is a method of controlling for
+confounding in observational studies by dividing subjects into strata
+based on their estimated propensity scores. This technique aims to make
+the treatment and control groups within each stratum more comparable,
+thereby reducing bias and approximating the conditions of a randomized
+controlled trial.</p>
+<p><strong>Overview</strong></p>
+<ul>
+<li><p><strong>Stratification Process</strong>: Subjects are ranked and
+divided into mutually exclusive subsets based on the quintiles of their
+estimated propensity scores. This division often results in five
+equal-size groups, each representing a different segment of the
+propensity score distribution.</p></li>
+<li><p><strong>Bias Reduction</strong>: According to research by Cochran
+(1968) and later by Rosenbaum and Rubin (1984), stratifying on the
+quintiles of a continuous confounder can eliminate approximately 90% of
+the bias. This effectiveness is maintained when applying stratification
+to the propensity score, significantly reducing the bias due to measured
+confounders.</p></li>
+<li><p><strong>Increasing Strata for Bias Reduction</strong>: While
+increasing the number of strata can further reduce bias, the marginal
+benefit decreases with more strata. This diminishing return needs to be
+balanced against the complexity and sample size requirements of
+additional strata.</p></li>
+</ul>
+<p><strong>Estimation of Treatment Effects within Strata</strong></p>
+<ul>
+<li><p><strong>Quasi-Randomized Controlled Trials (quasi-RCTs)</strong>:
+Each stratum can be seen as an independent quasi-RCT where the treatment
+effect is estimated by directly comparing outcomes between treated and
+untreated subjects within that stratum.</p></li>
+<li><p><strong>Pooling of Stratum-Specific Estimates</strong>: The
+treatment effects estimated within each stratum can be pooled to derive
+an overall estimate of the treatment effect. This is done using weighted
+averages, where weights are typically equal to 1/K for K strata, or
+proportional to the number of treated subjects in each stratum to focus
+on the average treatment effect on the treated (ATT).</p></li>
+<li><p><strong>Variance Estimation</strong>: Pooling the variances of
+the stratum-specific treatment effects provides a comprehensive estimate
+of the variance for the overall treatment effect. This aspect of
+variance estimation is crucial for assessing the precision and
+statistical significance of the estimated effects.</p></li>
+<li><p><strong>Within-Stratum Regression Adjustment</strong>: To further
+refine the estimates and account for any residual differences between
+treated and untreated subjects within each stratum, regression
+adjustment can be applied. This step adjusts for covariates that may
+still be imbalanced within strata.</p></li>
+<li><p><strong>Stratum-Specific Effects</strong>: Each stratum-specific
+effect provides insight into how treatment effects might vary across
+different levels of propensity score, offering a more nuanced
+understanding of the treatment’s impact across different
+subgroups.</p></li>
+</ul>
+</div>
+<div id="propensity-score-weighting" class="section level3"
+number="1.4.3">
+<h3><span class="header-section-number">1.4.3</span> 3.Propensity Score
+Weighting</h3>
+<p>Propensity score weighting is a statistical technique commonly used
+in observational studies to control for confounding variables. This
+technique allows researchers to estimate the effect of a treatment by
+creating a more balanced comparison between treated and untreated
+groups.</p>
+<p><img src="02_Plots/PSM_Unadjusted.PNG" /></p>
+<p><img src="02_Plots/PSM_AdjustPSW.PNG" /></p>
+<p><strong>Overview</strong></p>
+<ul>
+<li><strong>Propensity Score</strong>: This is the probability of
+receiving the treatment given a set of observed covariates. The score is
+typically estimated using logistic regression, where the treatment
+assignment (treated vs. untreated) is the dependent variable and the
+covariates are the independent variables.</li>
+<li><strong>Propensity Score Weighting</strong>: Once propensity scores
+are calculated, each subject is assigned a weight. The main types of
+weights include:
+<ul>
+<li><strong>Inverse Probability of Treatment Weighting (IPTW)</strong>:
+Patients in the treatment group are weighted by the inverse of their
+propensity score, while those in the control group are weighted by the
+inverse of one minus their propensity score. This method helps to create
+a synthetic sample in which the distribution of covariates is
+independent of treatment assignment.</li>
+<li><strong>Stabilized Weights</strong>: These are similar to IPTW but
+are normalized using the marginal probability of receiving the
+treatment, reducing the variance of the weights and improving the
+stability of estimates.</li>
+</ul></li>
+</ul>
+<p><strong>Advantages</strong></p>
+<ul>
+<li><strong>Inclusion of All Patients</strong>: Unlike matching, where
+subjects without a counterpart in the opposite group are excluded,
+weighting includes all patients. This is particularly crucial in studies
+with small sample sizes, where losing even a small number of subjects
+can significantly impact the power and generalizability of the
+findings.</li>
+<li><strong>Reduction of Bias</strong>: By adjusting for confounders
+through weighting, this approach helps to reduce selection bias and
+makes the groups more comparable on observed characteristics.</li>
+<li><strong>Efficiency and Simplicity</strong>: Weighting can be more
+straightforward to implement than more complex multivariable techniques
+and does not require the discarding of unmatched cases.</li>
+<li><strong>Handling of Uncommon Events</strong>: In situations where
+the treatment or outcome is rare, matching might not be feasible due to
+the difficulty of finding matches. Weighting can handle these scenarios
+more effectively.</li>
+</ul>
+<p><strong>Limitations</strong></p>
+<ul>
+<li><strong>Reliance on Observed Covariates</strong>: Propensity score
+methods can only adjust for observed and correctly measured covariates.
+Any hidden bias due to unmeasured confounders cannot be accounted
+for.</li>
+<li><strong>Overemphasis on Certain Cases</strong>: Extremely high or
+low weights can disproportionately influence the analysis, sometimes
+leading to large variances in estimates.</li>
+</ul>
+<p><strong>Propensity Score Weighting Methods</strong></p>
+<p>In Real-World Evidence (RWE) studies, different propensity score
+weighting methods are tailored to specific analytical goals and study
+designs. Here, to outline three common methods and their specific
+applications and advantages in the context of estimating treatment
+effects:</p>
+<p><img src="02_Plots/PSM_PSWMethod.png" /></p>
+<p><strong>1. Inverse Probability of Treatment Weighting
+(IPTW)</strong></p>
+<p>IPTW is designed to estimate the Average Treatment Effect (ATE)
+across the entire population under study, assuming that every individual
+could potentially receive the treatment. This method assigns weights
+based on the inverse probability of receiving the treatment as predicted
+by the propensity score. Specifically: - <strong>Treated
+patients</strong> receive weights of <span
+class="math inline">\(\frac{1}{\text{propensity score}}\)</span>. -
+<strong>Control patients</strong> receive weights of <span
+class="math inline">\(\frac{1}{1 - \text{propensity
+score}}\)</span>.</p>
+<p><strong>Advantages:</strong></p>
+<ul>
+<li>Ensures a balanced representation by adjusting for the differences
+in baseline characteristics across the treated and control groups.</li>
+<li>Particularly useful when evaluating the potential impact of a
+treatment on a general population.</li>
+</ul>
+<p><strong>2. Standardized Mortality or Morbidity Ratio (SMR)
+Weighting</strong></p>
+<p>SMR weighting is tailored to studies where it is important to
+preserve the characteristics of one study arm, typically the clinical
+trial arm, while making comparisons with an external control arm (ECA).
+This approach adjusts the ECA so that it resembles the trial population
+more closely, rather than balancing both populations to a common
+standard.</p>
+<p><strong>Advantages:</strong> - <strong>Preservation of Trial
+Results:</strong> Keeps the integrity of the clinical trial arm intact
+while adjusting the ECA. - <strong>Useful for External
+Comparisons:</strong> Ideal for studies incorporating ECAs where the
+clinical trial data is considered the standard.</p>
+<p><strong>3. Overlap Weighting</strong></p>
+<p>Overlap weighting focuses on the subset of patients whose
+characteristics most strongly overlap between the treated and untreated
+groups. It assigns weights that are inherently bounded between zero and
+one, which represents a proportionate influence based on the degree of
+overlap in their propensity scores.</p>
+<p><strong>Advantages:</strong> - <strong>Reduction of Extreme
+Weights:</strong> Unlike IPTW, which can give rise to extreme weights if
+patients have very low or very high propensity scores, overlap weighting
+naturally bounds weights, reducing the influence of outliers. -
+<strong>Balances Confounders:</strong> Ensures a more perfect balance of
+measured confounders between treatment groups, minimizing residual
+confounding.</p>
+<p><strong>Practical Considerations:</strong> - <strong>Selection of
+Method:</strong> The choice between IPTW, SMR, and overlap weighting
+should depend on the specific objectives of the study and the nature of
+the data. - <strong>Addressing Limitations:</strong> While these methods
+can significantly reduce bias due to confounding, they still rely on the
+assumption that all relevant confounders have been measured and
+correctly modeled. - <strong>Software Implementation:</strong> In R,
+packages like <code>MatchIt</code> and <code>twang</code> provide tools
+to implement these weighting methods efficiently, allowing for robust
+sensitivity analyses and diagnostics to check the balance and
+performance of the weights.</p>
+</div>
+<div id="covariate-adjustment-using-the-propensity-score"
+class="section level3" number="1.4.4">
+<h3><span class="header-section-number">1.4.4</span> 4.Covariate
+Adjustment Using the Propensity Score</h3>
+<p>Covariate adjustment using the propensity score involves
+incorporating the propensity score as a covariate in a regression model
+that also includes the treatment indicator. This approach allows for the
+control of confounding variables that are accounted for in the
+propensity score, providing a more precise estimate of the treatment
+effect.</p>
+<p><strong>Steps</strong></p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Propensity Score Estimation</strong>: First, calculate
+the propensity score for each participant. This score is typically
+estimated using logistic regression, where the treatment assignment is
+regressed on observed covariates.</p></li>
+<li><p><strong>Regression Model</strong>: Choose the appropriate
+regression model based on the nature of the outcome variable:</p>
+<ul>
+<li><strong>Continuous Outcomes</strong>: Use a linear regression model
+where the outcome variable is regressed on the treatment indicator and
+the propensity score.</li>
+<li><strong>Dichotomous Outcomes</strong>: Use a logistic regression
+model where the binary outcome is regressed on the treatment indicator
+and the propensity score.</li>
+</ul></li>
+<li><p><strong>Treatment Effect Estimation</strong>:</p>
+<ul>
+<li><strong>Linear Model</strong>: The treatment effect is the estimated
+coefficient of the treatment indicator, representing the adjusted
+difference in means between the treatment and control groups.</li>
+<li><strong>Logistic Model</strong>: The treatment effect is expressed
+as an adjusted odds ratio, derived from the coefficient of the treatment
+indicator.</li>
+</ul></li>
+</ol>
+<p><strong>Key Considerations</strong></p>
+<ul>
+<li><strong>Model Specification</strong>: It is crucial to correctly
+specify the relationship between the propensity score, the treatment
+indicator, and the outcome. Mis-specification can lead to biased
+estimates of the treatment effect.</li>
+<li><strong>Assumption of Correct Modeling</strong>: This method assumes
+that the relationship between the propensity score and the outcome is
+correctly modeled. Any deviation from this assumption can compromise the
+validity of the findings.</li>
+<li><strong>Comparative Advantage</strong>: Unlike other propensity
+score methods that only use matching or stratification, covariate
+adjustment can provide a more comprehensive adjustment for confounding
+because it directly adjusts the outcome analysis for the propensity
+score.</li>
+</ul>
+<p><strong>Advantages</strong></p>
+<ul>
+<li><strong>Precision</strong>: This method can lead to more precise
+estimates of the treatment effect by directly adjusting for differences
+in baseline covariates as represented by the propensity score.</li>
+<li><strong>Flexibility</strong>: It accommodates different types of
+outcomes through the choice of regression models, making it versatile
+across various study designs.</li>
+</ul>
+<p><strong>Disadvantages</strong></p>
+<ul>
+<li><strong>Dependence on Model Accuracy</strong>: The effectiveness of
+this approach heavily relies on the accurate estimation of the
+propensity score and the correct specification of the regression
+model.</li>
+<li><strong>Potential for Overadjustment</strong>: If the propensity
+score model is overly complex or includes irrelevant covariates, it
+might lead to overadjustment, which can obscure true treatment
+effects.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="propensity-score-matching-2" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Propensity Score
+Matching</h1>
+<div id="nearest-neighbor-approach" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Nearest Neighbor
+Approach</h2>
+<p>The first propensity score matching technique is the nearest neighbor
+approach. This is where the algorithm will match an individual with
+another individual with the closest propensity score. We can refine how
+close using the caliper size. If there are ties, then the algorithm will
+randomly select a match. For those individuals that do not match, they
+are dropped from the data.</p>
+<p>There are many ways to perform the nearest neighbor approach (e.g.,
+<strong>Mahalanobis, Greedy, optimal</strong>). In this example, we will
+use the Greedy method (also known as nearest in R).</p>
+<p>We will use a caliper size of 0.01 and perform matching without
+replacement. Matching can also be done with replacement where
+individuals in the control group will be used more than once in a match
+with the treatment group. This will result in an imbalanced in the
+number of individuals in the treatment and control group.</p>
+<p>In our example, we will not apply the replacement option. Instead, we
+want to have 1:1 matching without replacement. This will give us equal
+number of responders who have and do not have a diagnosis of
+diabetes.</p>
+<p>Lastly, we will estimate the propensity score using several observed
+characteristics (age, sex, race, poverty, and martial status).</p>
+<pre class="r"><code>##########################################################
+## Propensity Score Matching - Nearest Neighbor Approach
+##########################################################
+match1 &lt;- matchit(diabetes ~ age + sex + race + poverty + marital_status,
+                  data = hc2021p,
+                  method = &quot;nearest&quot;,
+                  discard = &quot;both&quot;,
+                  caliper = 0.01)</code></pre>
+<p><strong>Visual Inspection</strong></p>
+<p>After performing the matching, a visual inspection is conducted to
+assess the quality of the matching. A Love plot is generated to display
+the standardized differences for each covariate included in the
+propensity score model between responders with and without diabetes. The
+goal is to have these covariates fall within an acceptable threshold,
+which, in this example, is defined as a standardized difference of less
+than 0.1. Additionally, the Kolmogorov-Smirnov test is performed to
+evaluate whether the differences are statistically significant. The
+target is to obtain a p-value greater than 0.05, indicating no
+significant difference.</p>
+<p>Based on the love plot, the covariates appear to be well-balanced
+between responders who have and do not have a diagnosis of diabetes.</p>
+<pre class="r"><code>## Inspect matching
+summary(match1)</code></pre>
+<pre><code>## 
+## Call:
+## matchit(formula = diabetes ~ age + sex + race + poverty + marital_status, 
+##     data = hc2021p, method = &quot;nearest&quot;, discard = &quot;both&quot;, caliper = 0.01)
+## 
+## Summary of Balance for All Data:
+##                             Means Treated Means Control Std. Mean Diff.
+## distance                           0.2193        0.1290          0.8088
+## age                               63.3841       49.3954          1.0276
+## sex                                1.5380        1.5378          0.0004
+## raceWhite                          0.6982        0.7685         -0.1531
+## raceBlack                          0.2048        0.1389          0.1633
+## raceAI/AN                          0.0154        0.0077          0.0626
+## raceAsian                          0.0496        0.0573         -0.0352
+## raceMultiple                       0.0320        0.0277          0.0245
+## povertyPoor                        0.2296        0.1469          0.1966
+## povertyNear Poor                   0.0700        0.0458          0.0948
+## povertyLow Income                  0.1583        0.1285          0.0815
+## povertyMiddle Income               0.2795        0.2797         -0.0004
+## povertyHigh Income                 0.2626        0.3990         -0.3100
+## marital_statusMarried              0.4491        0.4652         -0.0323
+## marital_statusWidowed              0.1674        0.0754          0.2463
+## marital_statusDivorced             0.1947        0.1348          0.1514
+## marital_statusSeparated            0.0377        0.0217          0.0840
+## marital_statusNever Married        0.1511        0.3029         -0.4241
+##                             Var. Ratio eCDF Mean eCDF Max
+## distance                        1.1806    0.2438   0.3785
+## age                             0.5344    0.2057   0.3576
+## sex                             1.0002    0.0001   0.0002
+## raceWhite                            .    0.0703   0.0703
+## raceBlack                            .    0.0659   0.0659
+## raceAI/AN                            .    0.0077   0.0077
+## raceAsian                            .    0.0076   0.0076
+## raceMultiple                         .    0.0043   0.0043
+## povertyPoor                          .    0.0827   0.0827
+## povertyNear Poor                     .    0.0242   0.0242
+## povertyLow Income                    .    0.0297   0.0297
+## povertyMiddle Income                 .    0.0002   0.0002
+## povertyHigh Income                   .    0.1364   0.1364
+## marital_statusMarried                .    0.0160   0.0160
+## marital_statusWidowed                .    0.0920   0.0920
+## marital_statusDivorced               .    0.0600   0.0600
+## marital_statusSeparated              .    0.0160   0.0160
+## marital_statusNever Married          .    0.1519   0.1519
+## 
+## Summary of Balance for Matched Data:
+##                             Means Treated Means Control Std. Mean Diff.
+## distance                           0.2177        0.2177          0.0001
+## age                               63.2943       63.7663         -0.0347
+## sex                                1.5390        1.5349          0.0082
+## raceWhite                          0.7013        0.7379         -0.0798
+## raceBlack                          0.2030        0.1850          0.0446
+## raceAI/AN                          0.0139        0.0098          0.0333
+## raceAsian                          0.0496        0.0433          0.0291
+## raceMultiple                       0.0322        0.0240          0.0466
+## povertyPoor                        0.2280        0.2327         -0.0113
+## povertyNear Poor                   0.0695        0.0565          0.0507
+## povertyLow Income                  0.1582        0.1547          0.0095
+## povertyMiddle Income               0.2804        0.2877         -0.0162
+## povertyHigh Income                 0.2640        0.2684         -0.0100
+## marital_statusMarried              0.4490        0.4531         -0.0083
+## marital_statusWidowed              0.1670        0.1601          0.0186
+## marital_statusDivorced             0.1955        0.2097         -0.0359
+## marital_statusSeparated            0.0369        0.0319          0.0265
+## marital_statusNever Married        0.1516        0.1452          0.0176
+##                             Var. Ratio eCDF Mean eCDF Max Std. Pair Dist.
+## distance                        1.0004    0.0001   0.0019          0.0003
+## age                             0.9761    0.0070   0.0256          0.1621
+## sex                             0.9988    0.0021   0.0041          0.2121
+## raceWhite                            .    0.0366   0.0366          0.2476
+## raceBlack                            .    0.0180   0.0180          0.2793
+## raceAI/AN                            .    0.0041   0.0041          0.1513
+## raceAsian                            .    0.0063   0.0063          0.2152
+## raceMultiple                         .    0.0082   0.0082          0.2582
+## povertyPoor                          .    0.0047   0.0047          0.2380
+## povertyNear Poor                     .    0.0129   0.0129          0.1868
+## povertyLow Income                    .    0.0035   0.0035          0.2206
+## povertyMiddle Income                 .    0.0073   0.0073          0.1625
+## povertyHigh Income                   .    0.0044   0.0044          0.1378
+## marital_statusMarried                .    0.0041   0.0041          0.1835
+## marital_statusWidowed                .    0.0069   0.0069          0.2098
+## marital_statusDivorced               .    0.0142   0.0142          0.2544
+## marital_statusSeparated              .    0.0051   0.0051          0.1956
+## marital_statusNever Married          .    0.0063   0.0063          0.1675
+## 
+## Sample Sizes:
+##           Control Treated
+## All         19262    3184
+## Matched      3167    3167
+## Unmatched   15974      16
+## Discarded     121       1</code></pre>
+<pre class="r"><code>cobalt::bal.tab(match1)</code></pre>
+<pre><code>## Balance Measures
+##                                  Type Diff.Adj
+## distance                     Distance   0.0001
+## age                           Contin.  -0.0347
+## sex_2                          Binary   0.0041
+## race_White                     Binary  -0.0366
+## race_Black                     Binary   0.0180
+## race_AI/AN                     Binary   0.0041
+## race_Asian                     Binary   0.0063
+## race_Multiple                  Binary   0.0082
+## poverty_Poor                   Binary  -0.0047
+## poverty_Near Poor              Binary   0.0129
+## poverty_Low Income             Binary   0.0035
+## poverty_Middle Income          Binary  -0.0073
+## poverty_High Income            Binary  -0.0044
+## marital_status_Married         Binary  -0.0041
+## marital_status_Widowed         Binary   0.0069
+## marital_status_Divorced        Binary  -0.0142
+## marital_status_Separated       Binary   0.0051
+## marital_status_Never Married   Binary   0.0063
+## 
+## Sample sizes
+##           Control Treated
+## All         19262    3184
+## Matched      3167    3167
+## Unmatched   15974      16
+## Discarded     121       1</code></pre>
+<pre class="r"><code>## Visual inspection using Love plot
+cobalt::love.plot(match1, 
+                  stats = c(&quot;m&quot;, &quot;ks&quot;), ### m = mean difference; ks = Kolmogorov-Smirnov
+                  thresholds = c(m = 0.1, ks = 0.05), 
+                  drop.distance = TRUE, 
+                  colors = c(&quot;dodgerblue4&quot;, &quot;firebrick&quot;),
+                  shapes = c(16, 17),
+                  stars = &quot;none&quot;)</code></pre>
+<p><img src="06-Analysis-Propensity-Score_files/figure-html/unnamed-chunk-2-1.png" width="960" /></p>
+<p><strong>Convert Propensity Score Matched Results into an Analyzable
+Dataset</strong></p>
+<p>Once the propensity score matched groups are obtained, a dataset
+containing these individuals needs to be created. This dataset is
+referred to as <strong><code>match_data</code></strong>.</p>
+<pre class="r"><code>match_data &lt;- match.data(match1)
+match_data |&gt; 
+  head() |&gt; 
+  kable(format = &quot;html&quot;, caption = &quot;First 6 Rows of match_data&quot;) |&gt; 
+  kable_styling(full_width = F, bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;))</code></pre>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+First 6 Rows of match_data
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+dupersid
+</th>
+<th style="text-align:right;">
+age
+</th>
+<th style="text-align:right;">
+sex
+</th>
+<th style="text-align:left;">
+race
+</th>
+<th style="text-align:left;">
+poverty
+</th>
+<th style="text-align:right;">
+diabetes
+</th>
+<th style="text-align:left;">
+marital_status
+</th>
+<th style="text-align:right;">
+totexp
+</th>
+<th style="text-align:right;">
+ertexp
+</th>
+<th style="text-align:right;">
+year
+</th>
+<th style="text-align:right;">
+distance
+</th>
+<th style="text-align:right;">
+weights
+</th>
+<th style="text-align:left;">
+subclass
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2320012102
+</td>
+<td style="text-align:right;">
+81
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+White
+</td>
+<td style="text-align:left;">
+Low Income
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Widowed
+</td>
+<td style="text-align:right;">
+9813
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2021
+</td>
+<td style="text-align:right;">
+0.3107312
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2320024101
+</td>
+<td style="text-align:right;">
+44
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+White
+</td>
+<td style="text-align:left;">
+Low Income
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+Married
+</td>
+<td style="text-align:right;">
+2106
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2021
+</td>
+<td style="text-align:right;">
+0.0856385
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+415
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2320028101
+</td>
+<td style="text-align:right;">
+43
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+White
+</td>
+<td style="text-align:left;">
+Middle Income
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Married
+</td>
+<td style="text-align:right;">
+377
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2021
+</td>
+<td style="text-align:right;">
+0.0735631
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2320038101
+</td>
+<td style="text-align:right;">
+83
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+White
+</td>
+<td style="text-align:left;">
+High Income
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+Married
+</td>
+<td style="text-align:right;">
+7677
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2021
+</td>
+<td style="text-align:right;">
+0.2673017
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+327
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2320038102
+</td>
+<td style="text-align:right;">
+83
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+White
+</td>
+<td style="text-align:left;">
+High Income
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+Married
+</td>
+<td style="text-align:right;">
+3953
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2021
+</td>
+<td style="text-align:right;">
+0.2405909
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+262
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2320040101
+</td>
+<td style="text-align:right;">
+63
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+White
+</td>
+<td style="text-align:left;">
+High Income
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Widowed
+</td>
+<td style="text-align:right;">
+18740
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2021
+</td>
+<td style="text-align:right;">
+0.1145834
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+3
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="propensity-score-weighting-1" class="section level1"
+number="3">
+<h1><span class="header-section-number">3</span> Propensity Score
+Weighting</h1>
+<div id="inverse-probability-weight-ipw-methods" class="section level2"
+number="3.1">
+<h2><span class="header-section-number">3.1</span> Inverse Probability
+Weight (IPW) Methods</h2>
+<p>The <strong>nearest neighbor approach</strong> effectively identifies
+the best matches for individuals, resembling the structure of a
+randomized controlled trial. However, a significant limitation of this
+approach is that many individuals who could not be matched are excluded
+from the dataset.</p>
+<p>In certain situations, such exclusion is undesirable.</p>
+<p>An alternative is the <strong>inverse probability weighting
+(IPW)</strong> method, which allows for the retention of as much data as
+possible. This method assigns weights to each individual based on their
+estimated propensity score. These weights are then incorporated into the
+analysis to produce <strong>weighted estimates of the treatment
+effect</strong>, ensuring that unmatched individuals still contribute to
+the overall analysis.</p>
+<p><strong>Estimating the Propensity Score Using Logistic
+Regression</strong></p>
+<p>The propensity score is estimated using a logistic regression model
+with observable covariates. In this model, <strong>the dependent
+variable is the diabetes status</strong>.</p>
+<p>Once the logistic regression is performed, predicted probabilities of
+having a diabetes diagnosis are generated. These predicted probabilities
+represent the <strong>propensity scores</strong>.</p>
+<pre class="r"><code>##########################################################
+## Propensity Score Estimation
+##########################################################
+### Construct a logistic regression model
+logit1 &lt;- glm(diabetes ~ age + sex + race + poverty + marital_status, 
+              data = hc2021p,
+              family = &quot;binomial&quot;(link = &quot;logit&quot;))
+summary(logit1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = diabetes ~ age + sex + race + poverty + marital_status, 
+##     family = binomial(link = &quot;logit&quot;), data = hc2021p)
+## 
+## Coefficients:
+##                              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)                 -3.810998   0.124969 -30.496  &lt; 2e-16 ***
+## age                          0.045751   0.001448  31.604  &lt; 2e-16 ***
+## sex                         -0.141087   0.041395  -3.408 0.000654 ***
+## raceBlack                    0.474756   0.053747   8.833  &lt; 2e-16 ***
+## raceAI/AN                    0.933197   0.177984   5.243 1.58e-07 ***
+## raceAsian                    0.288761   0.093057   3.103 0.001915 ** 
+## raceMultiple                 0.566715   0.118194   4.795 1.63e-06 ***
+## povertyNear Poor            -0.140514   0.090899  -1.546 0.122149    
+## povertyLow Income           -0.287948   0.068344  -4.213 2.52e-05 ***
+## povertyMiddle Income        -0.407309   0.059286  -6.870 6.41e-12 ***
+## povertyHigh Income          -0.853575   0.061451 -13.890  &lt; 2e-16 ***
+## marital_statusWidowed       -0.121386   0.065844  -1.844 0.065248 .  
+## marital_statusDivorced       0.016357   0.056997   0.287 0.774125    
+## marital_statusSeparated      0.354424   0.114800   3.087 0.002020 ** 
+## marital_statusNever Married -0.197674   0.063481  -3.114 0.001846 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 18330  on 22445  degrees of freedom
+## Residual deviance: 16263  on 22431  degrees of freedom
+## AIC: 16293
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<pre class="r"><code>## Calculate PS Score
+prs_df &lt;- data.frame(pr_score = predict(logit1, type = &quot;response&quot;),
+                     diabetes = logit1$model$diabetes)
+head(prs_df)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["pr_score"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["diabetes"],"name":[2],"type":["dbl+lbl"],"align":["right"]}],"data":[{"1":"0.26981305","2":"0","_rn_":"1"},{"1":"0.41308478","2":"0","_rn_":"2"},{"1":"0.11698497","2":"0","_rn_":"3"},{"1":"0.03776022","2":"0","_rn_":"4"},{"1":"0.03613260","2":"0","_rn_":"5"},{"1":"0.31073120","2":"1","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>There are two common approaches to generating these predicted
+values:</p>
+<ol style="list-style-type: decimal">
+<li>Using the <code>augment_columns()</code> function</li>
+<li>Using the <code>mutate()</code> function</li>
+</ol>
+<p>After obtaining the predicted probabilities for diabetes diagnosis,
+the distribution of these propensity scores can be visualized for
+respondents <strong>with and without diabetes</strong>, allowing for an
+assessment of the balance between groups.</p>
+<pre class="r"><code>## Method 1: Using augment_columns
+prob_fitted &lt;- augment_columns(logit1, 
+                               data = hc2021p,
+                               type.predict = &quot;response&quot;) %&gt;%
+                rename(propensity_score = .fitted)
+
+## Inspect propensity scores (propensity_score)
+summary(prob_fitted$propensity_score)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.01311 0.05468 0.10972 0.14185 0.20192 0.68263</code></pre>
+<pre class="r"><code>## Method 2: Using mutate
+prob_fitted2 &lt;- hc2021p %&gt;%
+    mutate(
+        propensity_score =  glm(diabetes ~ age + sex + race + poverty + marital_status, 
+                                data = hc2021p,
+                                family = &quot;binomial&quot;(link = &quot;logit&quot;)) %&gt;%
+          predict(type = &quot;response&quot;)
+          )
+
+## Inspect propensity scores (propensity_score)
+summary(prob_fitted2$propensity_score)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.01311 0.05468 0.10972 0.14185 0.20192 0.68263</code></pre>
+<p><strong>Examining the region of common support</strong></p>
+<pre class="r"><code>## Visualize the propensity score distributions between the diabetes and no-diabetes groups
+ps_fitted &lt;- prob_fitted2 %&gt;%
+    tidyr::spread(diabetes, propensity_score, sep = &quot;_&quot;)
+
+ggplot(ps_fitted) +  
+  geom_histogram(aes(x = diabetes_0, fill = &quot;Without Diabetes&quot;), 
+                 bins = 50, alpha = 0.7, color = &quot;black&quot;) +  
+  geom_histogram(aes(x = diabetes_1, y = -after_stat(count), fill = &quot;With Diabetes&quot;), 
+                 bins = 50, alpha = 0.7, color = &quot;black&quot;) + 
+  # Add axis and titles
+  ylab(&quot;Count&quot;) + xlab(&quot;Propensity Score&quot;) +
+  geom_hline(yintercept = 0, linewidth = 0.5) +
+  scale_y_continuous(labels = abs) +
+  # Color definitions
+  scale_fill_manual(values = c(&quot;Without Diabetes&quot; = &quot;dodgerblue&quot;, 
+                               &quot;With Diabetes&quot; = &quot;firebrick&quot;)) +
+  theme_minimal() +
+  ggtitle(&quot;Mirrored Distribution of Propensity Scores by Diabetes Group&quot;) +
+  labs(fill = &quot;Diabetes Group&quot;)</code></pre>
+<p><img src="06-Analysis-Propensity-Score_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
+<p><strong>Visual inspection</strong></p>
+<p>It is useful to plot the mean of each covariate against the estimated
+propensity score, separately by treatment status. If matching is done
+well, the treatment and control groups will have (near) identical means
+of each covariate at each value of the propensity score.</p>
+<pre class="r"><code>fn_bal &lt;- function(ps_fitted, variable) {
+  
+  # Dynamically pull the variable of interest outside mutate
+  ps_fitted$variable_value &lt;- ps_fitted[[variable]]
+  ps_fitted$diabetes &lt;- as.factor(ps_fitted$diabetes)
+  
+  # Determine y-axis support for consistent scale
+  support &lt;- range(ps_fitted$variable_value, na.rm = TRUE)
+  
+  # Create the plot
+  ggplot(ps_fitted, aes(x = propensity_score, y = variable_value, color = diabetes)) +
+    geom_point(alpha = 0.2, size = 1.3) +
+    geom_smooth(method = &quot;loess&quot;, se = FALSE) +
+    xlab(&quot;Propensity Score&quot;) +
+    ylab(variable) +
+    theme_bw() +
+    ylim(support) +
+    scale_color_manual(values = c(&quot;0&quot; = &quot;dodgerblue&quot;, &quot;1&quot; = &quot;firebrick&quot;),
+                       labels = c(&quot;Without Diabetes&quot;, &quot;With Diabetes&quot;),
+                       name = &quot;Diabetes Status&quot;) +
+    ggtitle(paste(&quot;Covariate Balance for&quot;, variable, &quot;by Propensity Score&quot;))
+}
+
+fn_bal(prob_fitted2, &quot;age&quot;)</code></pre>
+<p><img src="06-Analysis-Propensity-Score_files/figure-html/unnamed-chunk-7-1.png" width="960" /></p>
+<div id="ipw-for-ate" class="section level3" number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> IPW for ATE</h3>
+<p>Once the propensity scores are obtained, the <strong>inverse
+probability weights (IPW)</strong> for the <strong>average treatment
+effect (ATE)</strong> can be estimated. For each respondent, the
+estimated propensity score <span class="math inline">\(p_i\)</span> is
+used to calculate the IPW for the ATE (<span
+class="math inline">\(\text{ipwATE}_i\)</span>) based on their diabetes
+status (<span class="math inline">\(Z_i = 1\)</span> for individuals
+with a diagnosis of diabetes and <span class="math inline">\(Z_i =
+0\)</span> for those without).</p>
+<p>The formula for estimating the IPW for the ATE is given by:</p>
+<p><span class="math display">\[
+\text{ipwATE}_i = \frac{Z_i}{p_i} + \frac{1 - Z_i}{1 - p_i}
+\]</span></p>
+<p>Once these weights are estimated, the resulting dataset containing
+the IPW for the ATE is saved as <strong><code>ate_fitted</code></strong>
+for subsequent analysis.</p>
+<pre class="r"><code>##############
+#### ATE IPW
+##############
+ate_fitted &lt;- prob_fitted2 %&gt;%
+    mutate(
+        ipw_ate = (diabetes / propensity_score) + ((1 - diabetes) / (1 - propensity_score))
+          )
+
+## Visualize the propensity scores between the diabetes and no-diabetes groups
+ps_ate &lt;- ate_fitted %&gt;%
+  tidyr::spread(diabetes, propensity_score, sep = &quot;_&quot;)
+
+ggplot(ps_ate) +
+  geom_histogram(bins = 50, aes(diabetes_1), alpha = 0.5) + 
+  geom_histogram(bins = 50, aes(diabetes_1, weight = ipw_ate), fill = &quot;green&quot;, alpha = 0.5) + 
+  geom_histogram(bins = 50, alpha = 0.5, aes(x = diabetes_0, y = -..count..)) + 
+  geom_histogram(bins = 50, aes(x = diabetes_0, weight = ipw_ate, y = -..count..), fill = &quot;blue&quot;, alpha = 0.5) + 
+  # Add group labels
+  annotate(&quot;text&quot;, x = 0.8, y = max(table(cut(ps_ate$diabetes_1, 50))), label = &quot;With Diabetes&quot;, color = &quot;firebrick&quot;, size = 5, hjust = 1) +
+  annotate(&quot;text&quot;, x = 0.8, y = -max(table(cut(ps_ate$diabetes_0, 50))), label = &quot;Without Diabetes&quot;, color = &quot;dodgerblue&quot;, size = 5, hjust = 1) +
+  ylab(&quot;count&quot;) + xlab(&quot;p&quot;) +
+  geom_hline(yintercept = 0, lwd = 0.5) +
+  scale_y_continuous(label = abs) </code></pre>
+<p><img src="06-Analysis-Propensity-Score_files/figure-html/unnamed-chunk-8-1.png" width="960" /></p>
+</div>
+<div id="ipw-for-att" class="section level3" number="3.1.2">
+<h3><span class="header-section-number">3.1.2</span> IPW for ATT</h3>
+<p>Once the propensity scores are obtained, the <strong>inverse
+probability weights (IPW)</strong> for the <strong>average treatment
+effect on the treated (ATT)</strong> can be estimated. For each
+respondent, the estimated propensity score <span
+class="math inline">\(p_i\)</span> is used to calculate the IPW for the
+ATT (<span class="math inline">\(\text{ipwATT}_i\)</span>) based on
+their diabetes status (<span class="math inline">\(Z_i = 1\)</span> for
+individuals with a diagnosis of diabetes and <span
+class="math inline">\(Z_i = 0\)</span> for those without).</p>
+<p>The formula for estimating the IPW for the ATT is given by:</p>
+<p><span class="math display">\[
+\text{ipwATT}_i = \frac{Z_i}{p_i} + \frac{p_i(1 - Z_i)}{1 - p_i}
+\]</span></p>
+<p>Once these weights are estimated, the resulting dataset containing
+the IPW for the ATT is saved as <strong><code>att_fitted</code></strong>
+for subsequent analysis.</p>
+<p>The <strong>inverse probability weighting (IPW) for the ATT</strong>
+focuses specifically on respondents who had a diagnosis of diabetes. The
+weights are generated to reflect this focus, with individuals who did
+not have a diabetes diagnosis receiving substantially reduced weights.
+This reduction is visually apparent as a large grey area for respondents
+without diabetes, contrasted with the blue area, which represents the
+retained influence of those individuals based on their reduced
+weights.</p>
+<pre class="r"><code>##############
+#### ATT IPW
+##############
+att_fitted &lt;- prob_fitted2 %&gt;%
+  mutate(
+    ipw_att = ((propensity_score * diabetes) / propensity_score) + ((propensity_score * (1 - diabetes)) / (1 - propensity_score))
+        )
+
+## Visualize the propensity scores between the diabetes and no-diabetes groups
+ps_att &lt;- att_fitted %&gt;%
+  tidyr::spread(diabetes, propensity_score, sep = &quot;_&quot;)
+
+ggplot(ps_att) +
+  geom_histogram(bins = 50, aes(diabetes_1), alpha = 0.5) + 
+  geom_histogram(bins = 50, aes(diabetes_1, weight = ipw_att), fill = &quot;green&quot;, alpha = 0.5) + 
+  geom_histogram(bins = 50, alpha = 0.5, aes(x = diabetes_0, y = -..count..)) + 
+  geom_histogram(bins = 50, aes(x = diabetes_0, weight = ipw_att, y = -..count..), fill = &quot;blue&quot;, alpha = 0.5) + 
+  # Add group labels
+  annotate(&quot;text&quot;, x = 0.8, y = max(table(cut(ps_ate$diabetes_1, 50))), label = &quot;With Diabetes&quot;, color = &quot;firebrick&quot;, size = 5, hjust = 1) +
+  annotate(&quot;text&quot;, x = 0.8, y = -max(table(cut(ps_ate$diabetes_0, 50))), label = &quot;Without Diabetes&quot;, color = &quot;dodgerblue&quot;, size = 5, hjust = 1) +
+  ylab(&quot;count&quot;) + xlab(&quot;p&quot;) +
+  geom_hline(yintercept = 0, lwd = 0.5) +
+  scale_y_continuous(label = abs) </code></pre>
+<p><img src="06-Analysis-Propensity-Score_files/figure-html/unnamed-chunk-9-1.png" width="960" /></p>
+</div>
+</div>
+<div id="comparison-of-propensity-score-matched-methods"
+class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Comparison of
+propensity score matched methods</h2>
+<p>Following these matching approaches, total healthcare expenditures
+between respondents with and without diabetes can be estimated. A linear
+regression model will be applied, where <strong>total healthcare
+expenditure</strong> (<code>totexp</code>) serves as the dependent
+variable and <strong>diabetes status</strong> as the primary predictor.
+Adjustment for observed characteristics such as age, sex, race, poverty
+status, and marital status is not required in the primary models, as
+these covariates were already accounted for during the propensity score
+estimation. However, in certain analyses, these variables may be
+included to further refine the model.</p>
+<p>The linear regression model is specified as follows:</p>
+<p><span class="math display">\[
+\text{Expenditures}_i = \beta_0 + \beta_1 \times \text{Diabetes}_i +
+\epsilon_i
+\]</span></p>
+<p>Four analyses will be conducted for comparison:</p>
+<ol style="list-style-type: decimal">
+<li>An unadjusted analysis using the raw MEPS data with no matching or
+weighting</li>
+<li>An analysis using the nearest neighbor matched sample</li>
+<li>An analysis using IPW based on ATE weights</li>
+<li>An analysis using IPW based on ATT weights</li>
+</ol>
+<pre class="r"><code>## No matching
+model0 &lt;- glm(totexp ~ diabetes,
+              data = hc2021p)
+summary(model0)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = totexp ~ diabetes, data = hc2021p)
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   7644.8      212.3   36.00   &lt;2e-16 ***
+## diabetes      9057.8      563.8   16.07   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 868430410)
+## 
+##     Null deviance: 1.9715e+13  on 22445  degrees of freedom
+## Residual deviance: 1.9491e+13  on 22444  degrees of freedom
+## AIC: 525691
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>## Nearest neighbor matching
+model1 &lt;- glm(totexp ~ diabetes,
+              data = match_data)
+summary(model1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = totexp ~ diabetes, data = match_data)
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  10548.9      495.3  21.299   &lt;2e-16 ***
+## diabetes      6183.8      700.4   8.828   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 776887846)
+## 
+##     Null deviance: 4.9798e+12  on 6333  degrees of freedom
+## Residual deviance: 4.9193e+12  on 6332  degrees of freedom
+## AIC: 147641
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>## IPW with ATE
+model2 &lt;- glm(totexp ~ diabetes, 
+              data = ate_fitted, 
+              weight = ipw_ate)
+summary(model2)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = totexp ~ diabetes, data = ate_fitted, weights = ipw_ate)
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   8085.1      258.9   31.23   &lt;2e-16 ***
+## diabetes      6980.4      373.6   18.68   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 1508361886)
+## 
+##     Null deviance: 3.4380e+13  on 22445  degrees of freedom
+## Residual deviance: 3.3854e+13  on 22444  degrees of freedom
+## AIC: 529952
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>## IPW with ATT
+model3 &lt;- glm(totexp ~ diabetes, 
+              data = att_fitted, 
+              weight = ipw_att)
+summary(model3)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = totexp ~ diabetes, data = att_fitted, weights = ipw_att)
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  10704.8      283.5   37.76   &lt;2e-16 ***
+## diabetes      5997.8      402.6   14.90   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 260161980)
+## 
+##     Null deviance: 5.8968e+12  on 22445  degrees of freedom
+## Residual deviance: 5.8391e+12  on 22444  degrees of freedom
+## AIC: 541393
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>#### Comparing the models together
+model_list &lt;- list(&quot;No matching&quot; = model0,
+                   &quot;Nearest neighbor matching&quot; = model1,
+                   &quot;IPW wih ATE&quot; = model2,
+                   &quot;IPW with ATT&quot; = model3)
+
+modelsummary1 &lt;- modelsummary(model_list,
+             stars = TRUE,
+             gof_omit = &quot;.IC&quot;,
+             fmt = fmt_decimal(digits = 0, pdigits = 3),
+             statistic = NULL,
+             conf_level = 0.95,
+             vcov = &quot;robust&quot;,
+             estimate = &quot;{estimate} [{conf.low}, {conf.high}] {stars}&quot;,
+             notes = list(&quot;*** P&lt;0.001&quot;)) 
+modelsummary1</code></pre>
+<!-- preamble start -->
+
+    <script>
+
+      function styleCell_cjfit18vb13dkr574xqa(i, j, css_id) {
+          var table = document.getElementById("tinytable_cjfit18vb13dkr574xqa");
+          var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
+          if (cell) {
+              console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
+              cell.classList.add(css_id);
+          } else {
+              console.warn(`Cell at (${i}, ${j}) not found.`);
+          }
+      }
+      function insertSpanRow(i, colspan, content) {
+        var table = document.getElementById('tinytable_cjfit18vb13dkr574xqa');
+        var newRow = table.insertRow(i);
+        var newCell = newRow.insertCell(0);
+        newCell.setAttribute("colspan", colspan);
+        // newCell.innerText = content;
+        // this may be unsafe, but innerText does not interpret <br>
+        newCell.innerHTML = content;
+      }
+      function spanCell_cjfit18vb13dkr574xqa(i, j, rowspan, colspan) {
+        var table = document.getElementById("tinytable_cjfit18vb13dkr574xqa");
+        const targetRow = table.rows[i];
+        const targetCell = targetRow.cells[j];
+        for (let r = 0; r < rowspan; r++) {
+          // Only start deleting cells to the right for the first row (r == 0)
+          if (r === 0) {
+            // Delete cells to the right of the target cell in the first row
+            for (let c = colspan - 1; c > 0; c--) {
+              if (table.rows[i + r].cells[j + c]) {
+                table.rows[i + r].deleteCell(j + c);
+              }
+            }
+          }
+          // For rows below the first, delete starting from the target column
+          if (r > 0) {
+            for (let c = colspan - 1; c >= 0; c--) {
+              if (table.rows[i + r] && table.rows[i + r].cells[j]) {
+                table.rows[i + r].deleteCell(j);
+              }
+            }
+          }
+        }
+        // Set rowspan and colspan of the target cell
+        targetCell.rowSpan = rowspan;
+        targetCell.colSpan = colspan;
+      }
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: 8, j: 3 }, { i: 8, j: 2 }, { i: 8, j: 1 }, { i: 8, j: 4 },  ], css_id: 'tinytable_css_83fqf5km0330sxffdjy4',}, 
+          { positions: [ { i: 2, j: 2 }, { i: 2, j: 4 }, { i: 2, j: 1 }, { i: 2, j: 3 },  ], css_id: 'tinytable_css_x3fvc2pjp1jqyk3uhogx',}, 
+          { positions: [ { i: 6, j: 2 }, { i: 3, j: 1 }, { i: 4, j: 1 }, { i: 6, j: 1 }, { i: 7, j: 1 }, { i: 3, j: 3 }, { i: 1, j: 2 }, { i: 6, j: 3 }, { i: 3, j: 2 }, { i: 4, j: 2 }, { i: 1, j: 1 }, { i: 1, j: 4 }, { i: 7, j: 2 }, { i: 3, j: 4 }, { i: 5, j: 1 }, { i: 1, j: 3 }, { i: 6, j: 4 }, { i: 7, j: 4 }, { i: 4, j: 3 }, { i: 5, j: 3 }, { i: 5, j: 4 }, { i: 7, j: 3 }, { i: 5, j: 2 }, { i: 4, j: 4 },  ], css_id: 'tinytable_css_tiax2kt5s0vrkd0esimi',}, 
+          { positions: [ { i: 0, j: 1 }, { i: 0, j: 4 }, { i: 0, j: 3 }, { i: 0, j: 2 },  ], css_id: 'tinytable_css_z6czjz7uc7e5kphtxkj5',}, 
+          { positions: [ { i: 8, j: 0 },  ], css_id: 'tinytable_css_u4g4be4etfav6w945rz9',}, 
+          { positions: [ { i: 2, j: 0 },  ], css_id: 'tinytable_css_7zex29mm3mrktbljwj00',}, 
+          { positions: [ { i: 1, j: 0 }, { i: 6, j: 0 }, { i: 3, j: 0 }, { i: 4, j: 0 }, { i: 5, j: 0 }, { i: 7, j: 0 },  ], css_id: 'tinytable_css_f4b0lvolxlgq5qk9f180',}, 
+          { positions: [ { i: 0, j: 0 },  ], css_id: 'tinytable_css_sv1hmthtla91nxt3j3ki',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  styleCell_cjfit18vb13dkr574xqa(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
+    </script>
+
+    <style>
+      /* tinytable css entries after */
+      .table td.tinytable_css_83fqf5km0330sxffdjy4, .table th.tinytable_css_83fqf5km0330sxffdjy4 { text-align: center; border-bottom: solid #d3d8dc 0.1em; }
+      .table td.tinytable_css_x3fvc2pjp1jqyk3uhogx, .table th.tinytable_css_x3fvc2pjp1jqyk3uhogx { text-align: center; border-bottom: solid black 0.05em; }
+      .table td.tinytable_css_tiax2kt5s0vrkd0esimi, .table th.tinytable_css_tiax2kt5s0vrkd0esimi { text-align: center; }
+      .table td.tinytable_css_z6czjz7uc7e5kphtxkj5, .table th.tinytable_css_z6czjz7uc7e5kphtxkj5 { text-align: center; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+      .table td.tinytable_css_u4g4be4etfav6w945rz9, .table th.tinytable_css_u4g4be4etfav6w945rz9 { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
+      .table td.tinytable_css_7zex29mm3mrktbljwj00, .table th.tinytable_css_7zex29mm3mrktbljwj00 { text-align: left; border-bottom: solid black 0.05em; }
+      .table td.tinytable_css_f4b0lvolxlgq5qk9f180, .table th.tinytable_css_f4b0lvolxlgq5qk9f180 { text-align: left; }
+      .table td.tinytable_css_sv1hmthtla91nxt3j3ki, .table th.tinytable_css_sv1hmthtla91nxt3j3ki { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+    </style>
+    <div class="container">
+      <table class="table table-borderless" id="tinytable_cjfit18vb13dkr574xqa" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing='true'>
+        <thead>
+        
+              <tr>
+                <th scope="col"> </th>
+                <th scope="col">No matching</th>
+                <th scope="col">Nearest neighbor matching</th>
+                <th scope="col">IPW wih ATE</th>
+                <th scope="col">IPW with ATT</th>
+              </tr>
+        </thead>
+        <tfoot><tr><td colspan='5'>*** P<0.001</td></tr></tfoot>
+        <tbody>
+                <tr>
+                  <td>(Intercept)</td>
+                  <td>7645 [7221, 8069] ***</td>
+                  <td>10549 [9516, 11581] ***</td>
+                  <td>8085 [7639, 8531] ***</td>
+                  <td>10705 [9978, 11432] ***</td>
+                </tr>
+                <tr>
+                  <td>diabetes</td>
+                  <td>9058 [8062, 10054] ***</td>
+                  <td>6184 [4810, 7557] ***</td>
+                  <td>6980 [5888, 8073] ***</td>
+                  <td>5998 [4840, 7156] ***</td>
+                </tr>
+                <tr>
+                  <td>Num.Obs.</td>
+                  <td>22446</td>
+                  <td>6334</td>
+                  <td>22446</td>
+                  <td>22446</td>
+                </tr>
+                <tr>
+                  <td>R2</td>
+                  <td>0.011</td>
+                  <td>0.012</td>
+                  <td>0.011</td>
+                  <td>0.002</td>
+                </tr>
+                <tr>
+                  <td>Log.Lik.</td>
+                  <td>-262842.503</td>
+                  <td>-73817.601</td>
+                  <td>-299527.066</td>
+                  <td>-266362.351</td>
+                </tr>
+                <tr>
+                  <td>F</td>
+                  <td>317.532</td>
+                  <td>77.916</td>
+                  <td>156.822</td>
+                  <td>103.017</td>
+                </tr>
+                <tr>
+                  <td>RMSE</td>
+                  <td>29467.83</td>
+                  <td>27868.31</td>
+                  <td>29477.10</td>
+                  <td>29603.86</td>
+                </tr>
+                <tr>
+                  <td>Std.Errors</td>
+                  <td>HC3</td>
+                  <td>HC3</td>
+                  <td>HC3</td>
+                  <td>HC3</td>
+                </tr>
+        </tbody>
+      </table>
+    </div>
+<!-- hack to avoid NA insertion in last line -->
+</div>
+</div>
+<div id="reference" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Reference</h1>
+<ul>
+<li>Austin PC. An Introduction to Propensity Score Methods for Reducing
+the Effects of Confounding in Observational Studies. Multivariate Behav
+Res. 2011;46(3):399-424.doi:10.1080/00273171.2011.568786.</li>
+<li>Faries D.E., Leon A.C., Maria Haro J., Obenchain R.L. Analysis of
+observational health care data using SAS®. Cary, NC: SAS Institute Inc.;
+2010.</li>
+<li>Zhao QY, Luo JC, Su Y, Zhang YJ, Tu GW, Luo Z. Propensity score
+matching with R: conventional methods and new features. Ann Transl Med.
+2021 May;9(9):812. doi: 10.21037/atm-20-3998. PMID: 34268425; PMCID:
+PMC8246231.</li>
+<li><a
+href="https://rpubs.com/mbounthavong/propensity_score_r">Propensity
+Score Matching in R</a></li>
+<li><a
+href="https://simonejdemyr.com/r-tutorials/statistics/tutorial8.html">R
+Tutorial 8: Propensity Score Matching</a></li>
+</ul>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
