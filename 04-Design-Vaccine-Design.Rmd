@@ -89,7 +89,374 @@ Several challenges are inherent to vaccine trials:
  
 
 
+# Standard Statistical Methods for the Analysis of Immunogenicity Data
 
+Historically, vaccine immunogenicity studies have primarily focused on evaluating the humoral immune response, specifically through the measurement of serum antibody levels. In recent years, however, there has been a growing emphasis on also assessing cellular immunity in such trials. Despite this development, the use of cellular immunity endpoints in vaccine trials largely remains at the investigational stage.
+
+To summarize both humoral and cellular immunity data, four standard statistical measures are commonly used:
+
+1. **Geometric Mean Response** (GMR)
+2. **Geometric Mean Fold Increase** (GMFI)
+3. **Seroprotection Rate**
+4. **Seroconversion Rate**
+
+The **GMR** and **Seroprotection Rate** provide absolute measures of immunogenicity, while the **GMFI** and **Seroconversion Rate** capture within-individual increases following vaccination. 
+
+
+## Geometric Mean Titres and Concentrations
+
+### Geometric Mean Titres (GMT) and Geometric Mean Concentrations (GMC)
+
+Post-vaccination immunogenicity data, whether for humoral or cellular responses, tend to exhibit right-skewed distributions. However, applying a logarithmic transformation to these values often results in an approximately normal distribution, which allows the use of standard parametric statistical methods. For interpretability, the geometric means and confidence intervals are computed by taking the antilog of estimates derived from log-transformed data.
+
+The **Geometric Mean (GM)** is the standard summary statistic for immunogenicity data:
+
+For a set of *n* independent and identically distributed (i.i.d.) immunogenicity values *v₁, v₂, ..., vₙ*, the geometric mean is defined as:
+
+$$
+GM = (v_1 \times v_2 \times \ldots \times v_n)^{1/n}
+$$
+
+Alternatively, it can be expressed as:
+
+$$
+GM = \exp \left( \frac{1}{n} \sum_{i=1}^n \log_e v_i \right)
+$$
+
+The logarithmic base used for the transformation can vary, commonly log₂ or log₁₀, but consistency is crucial. For example, when log₁₀ is used:
+
+$$
+GM = 10^{\frac{1}{n} \sum_{i=1}^n \log_{10} v_i}
+$$
+
+---
+
+### Geometric Mean Titres for Antibody Dilutions
+
+In immunogenicity studies using antibody titres based on reciprocal two-fold serial dilutions (e.g., 1:8, 1:16, 1:32, etc.), a convenient log transformation is applied:
+
+$$
+u_i = \log_2 \left( \frac{t_i}{D/2} \right)
+$$
+
+Where *tᵢ* is the observed titre and *D* is the lowest dilution tested. The transformed *uᵢ* values correspond to dilution steps (1, 2, 3, etc.), simplifying interpretation. The geometric mean of these titres is then:
+
+$$
+GM = \left( \frac{D}{2} \right)^{\frac{1}{n} \sum_{i=1}^n u_i}
+$$
+
+**Illustrative Example: Rubella HI Test**
+
+Rubella virus infection, while often mild in adults, poses significant risks during pregnancy. A haemagglutination inhibition (HI) test is frequently performed to assess immunity. Consider HI titres with a lowest tested dilution of 1:8, resulting in possible titres of 8, 16, 32, 64, etc.
+
+Using the standard log₂ transformation:
+
+* A titre of 8 becomes 1
+* 16 becomes 2
+* 32 becomes 3
+* 64 becomes 4
+
+For titres 8, 8, 16, 32, 64, the GMT is computed as:
+
+$$
+GMT = 4 \times 2^{(1+1+2+3+4)/5} = 18.379
+$$
+
+In this transformation, differences in log-transformed values directly correspond to dilution steps, simplifying interpretation.
+
+---
+
+### Geometric Standard Deviation (GSD) and Confidence Intervals
+
+The **Geometric Standard Deviation (GSD)** is derived by taking the exponential of the standard deviation (SD) of the log-transformed data:
+
+$$
+GSD = \exp(SD)
+$$
+
+This allows calculation of the two-sided 95% confidence interval for the underlying geometric mean (denoted as *ē*) using:
+
+$$
+LCL_e = \frac{GMT}{GSD^{t_{n-1, 1-\alpha/2} / \sqrt{n}}}  
+$$
+
+$$
+UCL_e = GMT \times GSD^{t_{n-1, 1-\alpha/2} / \sqrt{n}}
+$$
+
+Where:
+
+* *tₙ₋₁,₁₋α/2* is the corresponding percentile of the Student’s t-distribution with *(n-1)* degrees of freedom.
+
+**Rubella HI Test Example: Confidence Interval Calculation**
+
+Continuing the Rubella example:
+
+* Sample SD of the log-transformed titres: **0.904**
+* GSD = **exp(0.904) = 2.469**
+* Using *t₄, 0.975 = 2.776* for a 95% confidence interval
+
+The lower and upper confidence limits for the GMT are calculated as:
+
+$$
+LCL_e = \frac{18.379}{2.469^{(2.776/\sqrt{5})}} = 5.98  
+$$
+
+$$
+UCL_e = 18.379 \times 2.469^{(2.776/\sqrt{5})} = 56.4  
+$$
+
+### Single Vaccine Group
+
+When immunogenicity values (*vi*) are log-transformed as *ui = logₑ(vi)* and the *ui* values follow a normal distribution with mean **μ** and variance **σ²**, the **arithmetic mean** of the *ui* values serves as a point estimate for μ. Consequently, the **geometric mean titre (GMT)** or **geometric mean concentration (GMC)** is estimated as:
+
+$$
+GMT = e^{\bar{u}}
+$$
+
+The distribution of the original *vi* values is thus log-normal.
+
+Since the *ui* values are normally distributed, confidence intervals for μ can be calculated using the one-sample *t*-test. The antilog of these limits provides the corresponding confidence intervals for the geometric mean **e**
+
+It is important to note that the **mean** of the log-normal distribution (expected value of *vi*) is not **e**, but:
+
+$$
+E(vi) = e^{μ + \frac{σ^2}{2}}
+$$
+
+A key property of the log-normal distribution is that its **geometric mean** and **median** are both equal to **e**.
+
+**Example Single Vaccine Group**
+
+Consider six IFN-γ (Th1-type) immunogenicity measurements in IU/L:
+**3.51, 9.24, 13.7, 35.2, 47.4, 57.5**
+
+Their natural logarithms are:
+**1.256, 2.224, 2.617, 3.561, 3.859, 4.052**
+
+The arithmetic mean of these log-transformed values is **2.928**, with a standard error of **0.444**. The geometric mean concentration (GMC) is thus:
+
+$$
+GMC = e^{2.928} = 18.7 \, \text{IU/L}
+$$
+
+Using a two-sided 95% confidence interval for μ with *t*(0.975, 5) = 2.571:
+
+$$
+\text{Lower limit} = 2.928 - 2.571(0.444) = 1.786  
+\text{Upper limit} = 2.928 + 2.571(0.444) = 4.070  
+$$
+
+Exponentiating these limits yields the 95% confidence interval for the underlying geometric mean:
+
+$$
+e^{1.786} = 5.97 \quad \text{and} \quad e^{4.070} = 58.6  
+$$
+
+As expected with geometric means, these confidence intervals are asymmetrical.
+
+ 
+### Two Vaccine Groups
+
+When comparing two vaccine groups, statistical inference is performed using a **two-sample *t*-test** applied to the log-transformed immunogenicity values. Point and interval estimates for the difference in means **δ = μ₁ - μ₀** can be transformed back to estimates for the **geometric mean ratio (GMR)**, representing the ratio of the geometric means of the two groups:
+
+$$
+GMR = \frac{GM₁}{GM₀} = e^{\bar{u₁} - \bar{u₀}}
+$$
+
+Where:
+
+* *GM₁* is the geometric mean of the investigational vaccine group
+* *GM₀* is the geometric mean of the control group
+* *ū₁*, *ū₀* are the means of the log-transformed values for the respective groups
+
+The *p*-value from the two-sample *t*-test testing **δ = 0** corresponds to a test of whether **GMR = 1**, i.e., whether the geometric means differ significantly between the groups.
+
+**Example: Two Vaccine Groups**
+
+Assume the six IFN-γ values mentioned earlier are compared to a second group of six values, with:
+
+* Arithmetic mean of log-transformed values: **2.754**
+* Standard error: **0.512**
+
+The geometric mean concentration of the control group is:
+
+$$
+GMC₀ = e^{2.754} = 15.7 \, \text{IU/L}
+$$
+
+The geometric mean ratio (GMR) comparing the investigational group to the control group is:
+
+$$
+GMR = \frac{18.7}{15.7} = e^{2.928 - 2.754} = 1.19  
+$$
+
+The estimated standard error of the difference is **0.677**. The 95% confidence interval for the underlying GMR is:
+
+$$
+\text{Lower limit} = e^{1.19 - 2.228(0.677)} = 0.73  
+$$
+
+$$
+\text{Upper limit} = e^{1.19 + 2.228(0.677)} = 14.9  
+$$
+
+This provides an asymmetric confidence interval for the ratio of geometric means, consistent with the properties of log-normal distributions.
+
+
+## Geometric Mean Fold Increase
+
+In some infectious disease settings, participants may already have measurable pre-vaccination immune responses due to previous infections or vaccinations. A typical example is **influenza**, where most adults have been exposed to influenza viruses during their lifetime. In such cases, post-vaccination immune responses reflect both the effect of vaccination and existing pre-vaccination immunity.
+
+For these scenarios, an alternative to geometric mean titres (GMT) or concentrations (GMC) is the **Geometric Mean Fold Increase (gMFI)**, also referred to as **Mean Fold Increase** or **Geometric Mean Fold Rise**, which specifically quantifies the relative increase in immune response following vaccination at the individual level.
+
+### Single Arm
+
+**Definition and Calculation**
+
+For each individual:
+
+$$
+f_i = \frac{v_{post}}{v_{pre}}
+$$
+
+Where:
+
+* *vₚᵣₑ* = pre-vaccination immunogenicity value
+* *vₚₒₛₜ* = post-vaccination immunogenicity value
+* *fᵢ* = fold increase
+
+The **Geometric Mean Fold Increase (gMFI)** across *n* individuals is calculated as:
+
+$$
+gMFI = \exp \left( \frac{1}{n} \sum_{j=1}^{n} \log_e f_{ij} \right)
+$$
+
+Alternatively, if both pre- and post-vaccination data are available for all subjects:
+
+$$
+gMFI = \frac{GM_{post}}{GM_{pre}}
+$$
+
+Where:
+
+* *GMₚₒₛₜ* = geometric mean of post-vaccination values
+* *GMₚᵣₑ* = geometric mean of pre-vaccination values
+
+**Note:** This relationship holds only if both pre- and post-vaccination data are available for all individuals.
+
+---
+
+**Example-Single Group gMFI Calculation**
+
+In an influenza vaccine trial, pre- and post-vaccination antibody titres for six subjects are recorded as:
+
+| Subject | Pre-Vaccination | Post-Vaccination | Fold Increase |
+| ------- | --------------- | ---------------- | ------------- |
+| 1       | 5               | 40               | 8             |
+| 2       | 5               | 80               | 16            |
+| 3       | 10              | 160              | 16            |
+| 4       | 10              | 320              | 32            |
+| 5       | 20              | 80               | 4             |
+| 6       | 20              | 640              | 32            |
+
+The calculated statistics are:
+
+* **GMₚᵣₑ** = 10.0
+* **GMₚₒₛₜ** = 142.5
+* **gMFI** = 14.25
+* **Geometric Standard Deviation (GSD)** = 2.249
+
+The confidence intervals for the gMFI can be calculated using the same formulas applied to geometric means, as described earlier.
+
+---
+
+### Comparison of Two Groups: gMFI and gMFR
+
+For comparing two vaccine groups, the **Geometric Mean Fold Ratio (gMFR)** is used, representing the ratio of fold increases between the groups.
+
+The relationship between gMFR and geometric means is expressed as:
+
+$$
+gMFR = \frac{gMFI_1}{gMFI_0} = \frac{GMR_{post}}{GMR_{pre}}
+$$
+
+Where:
+
+* *gMFI₁*, *gMFI₀* = gMFI of investigational and control groups, respectively
+* *GMRₚₒₛₜ* = geometric mean ratio of post-vaccination values
+* *GMRₚᵣₑ* = geometric mean ratio of pre-vaccination values
+
+ 
+
+In randomized trials with no significant baseline imbalance (i.e., *GMRₚᵣₑ ≈ 1*), the gMFR effectively approximates *GMRₚₒₛₜ*. Thus, the analysis of fold increases yields results nearly identical to those obtained from analyzing post-vaccination immunogenicity values alone.
+
+---
+
+**Example: Two Group Comparison**
+
+**Experimental Group:**
+
+| Pre-Vaccination | Post-Vaccination | Fold Increase |
+| --------------- | ---------------- | ------------- |
+| 5               | 40               | 8             |
+| 5               | 80               | 16            |
+| 10              | 80               | 8             |
+| 10              | 80               | 8             |
+
+**Control Group:**
+
+| Pre-Vaccination | Post-Vaccination | Fold Increase |
+| --------------- | ---------------- | ------------- |
+| 5               | 80               | 16            |
+| 5               | 80               | 16            |
+| 10              | 80               | 8             |
+| 10              | 160              | 16            |
+
+The calculated statistics are:
+
+* *GMₚᵣₑ* = 7.1 (both groups)
+* *GMₚₒₛₜ* Experimental = 67.27
+* *GMₚₒₛₜ* Control = 95.14
+* *gMFI₁* = 9.51
+* *gMFI₀* = 13.45
+* *gMFR* = 1.4
+* *GMRₚₒₛₜ* = 1.4
+
+The gMFR and GMRₚₒₛₜ are identical due to the absence of baseline imbalance.
+
+**Efficiency Considerations**
+
+When no baseline imbalance exists:
+
+* Using fold increases introduces unnecessary variability because fold increases mathematically involve the difference between log-transformed post- and pre-vaccination values.
+* If the correlation between pre- and post-vaccination values is weak (e.g., correlation < 0.5), the variance of fold increases is larger than the variance of post-vaccination values alone.
+* As a result, analyses based on fold increases often produce larger *p*-values and wider confidence intervals compared to analyses based on post-vaccination data alone.
+
+### Misconception: Do Fold Increases Correct for Baseline Imbalance?
+
+It is a common but incorrect belief that analyzing fold increases eliminates bias due to baseline imbalance. In reality:
+
+* On the log scale:
+
+$$
+\log(f_i) = \log(v_{post}) - \log(v_{pre})
+$$
+
+* Change scores (including fold increases) remain correlated with baseline values, often negatively.
+* For bioassays, higher pre-vaccination values often result in smaller observed fold increases.
+* If there is a baseline imbalance, with one group having lower pre-vaccination values, this group will tend to show artificially inflated fold increases, introducing bias **in favor of the group with lower pre-vaccination values**.
+
+Thus, fold increase analysis does **not** inherently correct for baseline imbalance. The appropriate statistical method for addressing baseline imbalance is **analysis of covariance (ANCOVA)**, which explicitly adjusts for pre-vaccination differences.
+
+## Two Seroresponse Rates
+
+## Analysis of Proportions
+
+
+## Multiple Co-Primary Endpoints and the Intersection–Union Test
+
+## Reverse Cumulative Distribution Plot
 
 # Vaccine Efficacy
 
@@ -361,10 +728,11 @@ Durability trials also provide opportunities for **subgroup analysis**, such as:
 
 # Reference
 
+Nauta, J. (2011). Statistics in clinical vaccine trials. Springer-Verlag.
+
 nQuery Webinar, Sample Sizes for Vaccine Trials, Trial Designs for Assessing Vaccine Efficacy, Safety & Durability, https://www.statsols.com/guides/sample-sizes-for-vaccine-trials
 
 nQuery Webinar, Design and Sample Size for Vaccine Trials, Case Study of COVID-19, https://www.statsols.com/guides/design-and-sample-size-for-vaccine-trials
-
 
 Fleiss, J.L., Levin, B. and Paik, M.C., 2013. Statistical methods for rates and proportions. John Wiley & Sons.
 
