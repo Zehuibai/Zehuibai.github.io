@@ -24,9 +24,9 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 # Sys.setlocale("LC_ALL","English")
 
 ## devtools::install_github("kupietz/kableExtra")
-packages<-c("tidyverse", "kableExtra",  
+packages<-c("tidyverse", "kableExtra", "pandoc", 
             "ggpubr","gridExtra","ggtext",
-            "gt","gtsummary","gtExtras",
+            "gt","gtsummary","gtExtras","survival",
             "sjPlot","DT", "modelsummary")
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
@@ -65,7 +65,7 @@ knitr::include_graphics("./02_Plots/Table_Family.png")
 ### gt Standard
 
 ```{r, echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library("gt")
+# library("gt")
 
 # Create a simple data frame
 data1 = data.frame(
@@ -248,7 +248,7 @@ model %>%
 One easy way to show the results of 2 different models into a single table is to: - create a first table with the first model (logistic regression) - create a second table with the second model (Cox proportional hazards regression) - merge these tables with tbl_merge() - add a spanner for each model with the tab_spanner argument
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-library("survival") 
+# library("survival") 
 data(trial)
 
 model_reglog = glm(response ~ trt + grade, data=trial, family = binomial) %>% 

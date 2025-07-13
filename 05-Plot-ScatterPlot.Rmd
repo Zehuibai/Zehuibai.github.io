@@ -16,7 +16,7 @@ editor_options:
   chunk_output_type: console
 colorlinks: yes
 --- 
-  
+
 
 ```{r, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -30,7 +30,7 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 packages <- c(
   "tidyverse", "kableExtra", "ggpubr", "ggrepel", "grid", "gridExtra", "ggtext", "ggalt",
   "haven", "readxl", "cowplot", "hrbrthemes", "plotly", "viridis", "patchwork",
-  "ggpp", "lme4", "lattice", "gapminder", "forcats", "ggbeeswarm", "showtext"
+  "ggpp", "lme4", "lattice", "gapminder", "forcats", "ggbeeswarm", "showtext","sysfonts"
 )
 
 ipak <- function(pkg){
@@ -937,14 +937,15 @@ HER2_Bin
 ## Multi groups line chart 
 
 ```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
-# library(babynames) # provide the dataset: a dataframe called babynames
+library(babynames) # provide the dataset: a dataframe called babynames
 # library(hrbrthemes)
 # library(viridis)
 
 # Keep only 3 names
-don <- babynames %>% 
-  filter(name %in% c("Ashley", "Patricia", "Helen")) %>%
-  filter(sex=="F")
+don <- babynames::babynames 
+don <- don %>% 
+  dplyr::filter(name %in% c("Ashley", "Patricia", "Helen")) %>%
+  dplyr::filter(sex=="F")
   
 # Plot
 don %>%
