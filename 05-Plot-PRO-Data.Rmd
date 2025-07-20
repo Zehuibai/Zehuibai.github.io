@@ -23,11 +23,6 @@ knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
 # <!-- ---------------------------------------------------------------------- -->
 # <!--                    1. load the required packages                       -->
 # <!-- ---------------------------------------------------------------------- --> 
-
-# if(!require(psych)){install.packages("psych")}
- 
- 
-
 # Define the packages
 packages <- c("tidyverse", "kableExtra", "ggtext", "RCurl", 
               "plyr","scales","forcats","psych",
@@ -54,25 +49,7 @@ ipak(packages)
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 getwd()
 Sys.setlocale("LC_ALL","English")
-
-# convert backslash to forward slash in R
-# gsub('"', "", gsub("\\\\", "/", readClipboard()))
-
-## get the path
-# rstudioapi::getSourceEditorContext()$path
-# dirname(rstudioapi::getSourceEditorContext()$path)
-
-## set working directory
-# getwd()
-# setwd("c:/Users/zbai/Desktop")
-# Sys.setlocale("LC_ALL","English")
-
-## get the R Version
-# paste(R.Version()[c("major", "minor")], collapse = ".")
-
-## convert backslash to forward slash 
-# scan("clipboard",what="string")
-# gsub('"', "", gsub("\\\\", "/", readClipboard())) 
+ 
 
 # Load all r functions
 # The directory where all source code files are saved.
@@ -85,7 +62,778 @@ for(f_path in file_path_vec){source(f_path)}
   
   
 
-# Histogram
+# DLQI
+
+In this month’s dataset, DLQI has been administered in a phase 3 clinical trial to patients with psoriasis. There are two imbalanced treatment groups, with 150 patients randomised to Placebo (Treatment A) and 450 to the active treatment (Treatment B). DLQI responses are recorded at Baseline and Week 16 (although some DLQI assessment is missing at Week 16), allowing the treatment effect in terms of Quality of Life to be assessed. The Psoriasis Area and Severity Index (PASI) is also recorded at baseline.
+
+## Change in mean scores
+
+The dot plot displayed here is a great way to quickly see the effect of treatment on the different DLQI items. For each item and each group, we see mean scores for both Baseline and Week 16, which are coloured differently and consistently to allow patterns to be quickly and easily identified. Whilst it is not something commonly seen, the position of the legend in the middle of the page works really nicely and can be quickly referenced for each plot.
+
+Overall, this is a very clean design and provides a clear message. However, there were some ways in which the panel felt that the layout of this example could be improved. Whilst it is easy to compare within treatment groups, it is not so easy to make comparisons between treatment groups here. The group proposed combining the two treatment groups in a vertical layout, possibly using different colours to differentiate between treatment groups and arrows to indicate the direction of the effect. This would also mean that labels of the different items would not need to be repeated as they currently are. This vertical structure could be accommodated by using less space for the first figure showing effect sizes on overall means. Having this so large is not necessarily a bad thing if it shows key information which needs to be emphasised, but we should be intentional about it when doing things such as this.
+
+Unlike in the previous example, here the items are sorted in the order they appear on the questionnaire. Alternative ways to sort the items could be considered to highlight those which are most interesting, such as sorting by baseline means or by effect size. There are also a few tweaks to the horizontal axes which the group felt should be made. Firstly, it would be better to start from zero on the first dot plot, otherwise the effect size appears to be exaggerated. Further, the horizontal axes and spacing between labels should be made consistent for the two treatment groups, allowing for direct comparison between the two figures.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# Load data
+dql <-  read_csv("./01_Datasets/ww2020_dlqi.csv") 
+ 
+
+# Load library
+library(tidyverse)
+library(ggplot2)
+library(ggthemes)
+library(ggcharts)
+library(ggalt)
+
+# Seperate treatment arms
+new_A <- 
+  dql %>% 
+  filter(TRT=="A")
+new_B <- 
+  dql %>% 
+  filter(TRT=="B")
+
+## Treatment A : Placebo
+
+dtA <- new_A %>%
+  filter(if_all(everything(), ~ !is.na(.))) %>% 
+  # Select relevant variables
+  select(
+    DLQI101, DLQI102, DLQI103, DLQI104, DLQI105,
+    DLQI106, DLQI107, DLQI108, DLQI109, DLQI110,
+    VISIT
+    ) %>%
+  # Summarize mean score for each question grouped by visit
+  # while also renaming variables to indicate the meaning of each score
+  group_by(VISIT) %>%
+  dplyr::summarize(
+    Symptoms = mean(DLQI101, na.rm = T),
+    Embarrassment = mean(DLQI102, na.rm = T),
+   `Shopping and home care` = mean(DLQI103, na.rm = T),
+    Clothes = mean(DLQI104, na.rm = T),
+   `Social and leisure` = mean(DLQI105, na.rm = T),
+    Sport = mean(DLQI106, na.rm = T),
+    `Work and study` = mean(DLQI107, na.rm = T),
+    `Close relationships` = mean(DLQI108, na.rm = T),
+    Sex = mean(DLQI109, na.rm = T),
+    Treatment = mean(DLQI110, na.rm = T)
+   )
+
+# Tidying data
+dtA <- 
+  dtA %>% 
+  pivot_longer(
+    !VISIT,
+    names_to = "Domain",
+    values_to = "Mean_Score"
+    )
+
+# Seperating the visit variable into baseline and week 16
+dtA <-
+  dtA %>% 
+  pivot_wider(
+    names_from = VISIT,
+    values_from = Mean_Score
+    )
+
+# Ensuring the domain levels are ordered the same
+dtA <-
+  dtA %>% 
+  mutate(
+    Domain = factor(Domain,
+                    levels = c("Symptoms", "Embarrassment",
+                               "Shopping and home care",
+                               "Clothes", "Social and leisure",
+                               "Sport", "Work and study",
+                               "Close relationships",
+                               "Sex", "Treatment"))
+    )
+
+# Constructing a dumbbell plot using ggalt package with a ggchart theme
+
+(a <- 
+  ggplot()+
+  geom_dumbbell(
+    data = dtA,
+    aes(
+      y = Domain,
+      x = Baseline,
+      xend = `Week 16`
+      ),
+    size = 1.5,
+    color = "lightgray",
+    size_x = 3,
+    colour_x = "violetred4",
+    size_xend = 3,
+    colour_xend = "maroon1"
+    )
+  + theme_ggcharts(grid = "Y")
+  + labs(
+    title = "Placebo"
+    )
+  + theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.title.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text.y = element_text(size = 9)
+    ))
+
+## Treatment B : Active Treatment
+dtB <- new_B %>%
+  # Remove missing data
+  filter(if_all(everything(), ~ !is.na(.))) %>% 
+  # Select relevant variables
+  select(
+    DLQI101, DLQI102, DLQI103, DLQI104, DLQI105,
+    DLQI106, DLQI107, DLQI108, DLQI109, DLQI110,
+    VISIT
+    ) %>%
+  # Summarize mean score for each question grouped by visit
+  # while also renaming variables to indicate the meaning of each score
+  group_by(VISIT) %>%
+  summarise(
+    Symptoms = mean(DLQI101, na.rm = T),
+    Embarrassment = mean(DLQI102, na.rm = T),
+    `Shopping and home care` = mean(DLQI103, na.rm = T),
+    Clothes = mean(DLQI104, na.rm = T),
+    `Social and leisure` = mean(DLQI105, na.rm = T),
+    Sport = mean(DLQI106, na.rm = T),
+    `Work and study` = mean(DLQI107, na.rm = T),
+    `Close relationships` = mean(DLQI108, na.rm = T),
+    Sex = mean(DLQI109, na.rm = T),
+    Treatment = mean(DLQI110, na.rm = T)
+    )
+
+# Tidying data
+dtB <- 
+  dtB %>% 
+  pivot_longer(
+    !VISIT,
+    names_to = "Domain",
+    values_to = "Mean_Score"
+    )
+
+# Seperating the visit variable into baseline and week 16
+dtB <-
+  dtB %>% 
+  pivot_wider(
+    names_from = VISIT,
+    values_from = Mean_Score
+    )
+
+# Ensuring the domain levels are ordered the same
+dtB <-
+  dtB %>% 
+  mutate(
+    Domain = factor(Domain,
+                    levels = c("Symptoms", "Embarrassment",
+                               "Shopping and home care",
+                               "Clothes", "Social and leisure",
+                               "Sport", "Work and study",
+                               "Close relationships",
+                               "Sex", "Treatment"))
+    )
+
+# Constructing a dumbbell plot using ggalt package with a ggchart theme
+
+(b <- 
+  ggplot()+
+  geom_dumbbell(
+    data = dtB,
+    aes(
+      y = Domain,
+      x = Baseline,
+      xend = `Week 16`
+      ),
+    size = 1.5,
+    color = "lightgray",
+    size_x = 3,
+    colour_x = "violetred4",
+    size_xend = 3,
+    colour_xend = "maroon1")
+  + theme_ggcharts(grid = "Y") 
+  + labs(
+    title = "Active Treatment"
+    ) + theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.title.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text.y = element_text(size = 9)
+        ))
+
+## Mean total score for both treatment arms
+
+totaldt <- 
+  dql %>%
+  # Remove missing data
+  filter(if_all(everything(), ~ !is.na(.))) %>% 
+  # select and summarizing relevant variables
+  select(DLQI_SCORE, TRT, VISIT) %>%
+  group_by(TRT, VISIT) %>%
+  summarise(
+    qtotal = mean(DLQI_SCORE, na.rm = T)
+    )
+
+# Tidying data
+totaldt <- 
+  totaldt %>% 
+  pivot_wider(
+    names_from = VISIT,
+    values_from = qtotal
+    )
+
+totaldt$TRT[totaldt$TRT=="A"] <- "Placebo"
+totaldt$TRT[totaldt$TRT=="B"] <- "Active Treatment"
+
+# Constructing a dumbbell plot using ggcharts
+
+(c <- 
+  dumbbell_chart(
+    data = totaldt,
+    x = TRT,
+    y1 = Baseline,
+    y2 = `Week 16`,
+    line_color = "lightgray",
+    line_size = 3,
+    point_color = c("violetred4", "maroon1"),
+    point_size = 7
+  ) + labs(
+    x = NULL,
+    y = NULL,
+    title = "Dermatological Life Quality Index DLQI",
+    subtitle = "Change in mean scores from Baseline to Week 16  (Top chart is total score)",
+    caption = "Samah Abdelaal"
+    ) + theme(
+    axis.text.y = element_text(face = "bold"),
+    plot.title = element_text(size = 14,
+                              face = "bold"),
+    plot.subtitle = element_text(size = 12),
+    plot.caption = element_text(size = 11,
+                                face = "italic"),
+    legend.position = "bottom"
+    ))
+
+# Compine all three plots
+library(gridExtra)
+
+grid.arrange(c, arrangeGrob(b, a, ncol = 2), nrow = 2)
+```
+
+## Lineplots
+
+These slope graphs provide a clear and meaningful picture of patient level changes in DLQI scores for the different items and treatment groups. Here, the circles are proportional to the percentage of patients with a given response to that item at that visit, and the strips represents the ‘flow’ of patients across response levels between the visits. The decision to make the circles proportional to percentages rather than counts is the correct one here and allows for meaningful comparison between the imbalanced treatment groups.
+
+This is a really nice example of a plot type which we don’t often see and tells a good story. The consistent improvement for the active treatment is clear to see and we see that there is not too much happening in terms of a response for placebo. Whilst we do not get the same level of understanding of marginal distributions that we might with a histrogram, we do still get some notion and this is balanced by the additional level of patient understanding which we have.
+
+The group liked how the flow of patients could easily be seen by the intensity of lines, but felt that either a greater level of ‘minimum’ intensity or a different colour to blue could be used to still allow even a single patient’s movement to be seen, which is currently slightly difficult. However, it was acknowledged that not being able to see a lot within certain items for placebo is in itself meaningful.
+
+The consistent use of colour between plots and titles allows us to easily distinguish between treatment groups, although it was felt that a more telling title may have been used. It is great that item descriptions rather than just numbers are provided, and the panel really liked that we see the effects when certain items are combined together into different domains. Grouping of the ten DLQI items into these six domains is something which is commonly done in clinical practice but is not something which was considered by many of the other examples. It was acknowledged that the inclusion of these additional plots for the six domains justifies keeping the items ordered as they appear on the questionnaire, so we can clearly see which items correspond to which domains. However, there was still some discussion as to whether an alternative ordering of both individual items and domains could be considered.
+
+This example has a long, vertical layout. This would be great for something like a poster, but is maybe less convenient for viewing on screen. There was a feeling that when being presented as a poster, a lighter background may be more suitable.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library(tidyverse)
+library(data.table)
+library(grid)
+library(cowplot)
+library(RCurl)
+
+d <- read_csv("./01_Datasets/ww2020_dlqi.csv") 
+d1a <- d %>%
+  gather(key = PARAMCD,
+         value = AVAL, DLQI101:DLQI_SCORE, factor_key=TRUE) %>%
+  filter(!PARAMCD %in% c("DLQIMCID", "DLQIRESP")) %>%
+  mutate(VISIT = ifelse(VISIT=="Baseline", "Wk 0", "Wk 16"),
+         VISITN = if_else(VISIT=="Wk 0", 0, 1))
+d1a
+
+d1b <- d1a %>%
+  group_by(TRT, PARAMCD, VISITN, VISIT, AVAL) %>%
+  summarise(n = n())%>%
+  mutate(freq = n / sum(n))
+d1b
+
+d1a$TRT <- relevel(as.factor(d1a$TRT), "B")
+d1b$TRT <- relevel(as.factor(d1b$TRT), "B")
+
+
+tit_col = "grey50"
+cap_col = "grey50"
+
+ggplotib <- function(paramcd = NULL,
+                     title = NULL, 
+                     caption = NULL, 
+                     breaks = 0:3,
+                     transparency = 0.01){
+  d1a_2 <- d1a %>%
+    filter(PARAMCD %in% paramcd) %>%
+    group_by(TRT, USUBJID, VISITN, VISIT) %>%
+    summarise(AVAL_SUB = sum(AVAL))
+  
+  d1b_2 <- d1a_2 %>%
+    group_by(TRT, VISITN, VISIT, AVAL_SUB) %>%
+    summarise(n = n())%>%
+    mutate(freq = n / sum(n))
+  p1 <- ggplot() +
+    geom_line(data = d1a_2, aes(x = VISITN, y = AVAL_SUB, group = USUBJID, col=TRT),
+              alpha = transparency, size = 2) +
+    geom_point(data = d1b_2, aes(x = VISITN, y = AVAL_SUB, size = freq, col=TRT)) +
+    facet_grid(cols = vars(TRT)) +
+    scale_x_continuous(breaks = c(0, 1), labels = c("Wk 0", "Wk 16"), limits = c(-0.1,1.1)) +
+    scale_y_continuous(breaks = breaks) +
+    theme_minimal() +
+    labs(x = "", y = "", title = title, subtitle = caption) +
+    theme(panel.grid = element_blank(),
+          title = element_text(size = 12, colour = tit_col),
+          plot.subtitle = element_text(size = 10, colour = cap_col, hjust = 0), 
+          axis.text.x = element_text(size = 12, colour = "grey50"),
+          plot.background = element_rect(fill="black"),
+          strip.text = element_blank()) +
+    guides(color = F, size = F)
+  p1
+}
+
+
+# Unidimensional ----------------------------------------------------------
+p1 <- ggplotib(paramcd = "DLQI101",
+              title="Item 1",
+              caption="Itchy, sore, painful, or stinging skin") +
+  theme(axis.text.y = element_text(colour = "grey50"))
+p1
+p2 <- ggplotib(paramcd = "DLQI102",
+              title="Item 2",
+              caption="Embarassment") + 
+  theme(axis.text.y = element_text(colour = "grey50"))
+p2
+p3 <- ggplotib(paramcd = "DLQI103",
+              title="Item 3",
+              caption="Interference with shopping / home / gardening") + 
+  theme(axis.text.y = element_text(colour = "grey50"))
+p3
+p4 <- ggplotib(paramcd = "DLQI104",
+              title = "Item 4",
+              caption = "Influence on clothing") + 
+  theme(axis.text.y = element_text(colour = "grey50"))
+p4
+p5 <- ggplotib(paramcd = "DLQI105",
+              title = "Item 5",
+              caption = "Social or leisure activities affected") + 
+  theme(axis.text.y = element_text(colour = "grey50"))
+p5
+p6 <- ggplotib(paramcd = "DLQI106",
+              title = "Item 6",
+              caption = "Difficult to do any sport?") +
+  theme(axis.text.y = element_text(colour = "grey50"))
+p6
+p7 <- ggplotib(paramcd = "DLQI107",
+              title = "Item 7",
+              caption = "Prevented you from working / studying?") + 
+  theme(axis.text.y = element_text(colour = "grey50"))
+p7
+p8 <- ggplotib(paramcd = "DLQI108",
+               title = "Item 8",
+               caption = "Problems with partner / close friends / relatives") + 
+  theme(axis.text.y = element_text(colour = "grey50"))
+p8
+p9 <- ggplotib(paramcd = "DLQI109",
+               title = "Item 9",
+               caption = "Sexual difficulties") + 
+  theme(axis.text.y = element_text(colour = "grey50"))
+p9
+p10 <- ggplotib(paramcd = "DLQI110",
+                title = "Item 10",
+                caption = "Problem from treatment") + 
+  theme(axis.text.y = element_text(colour = "grey50"))
+p10
+
+pt <- ggplotib(paramcd = "DLQI_SCORE", 
+               breaks = 0:30, 
+               transparency = 0.02,
+               title = "DLQI",
+               caption = "Total Score") +
+  theme(axis.text.y = element_text(colour = "grey50"))
+pt
+
+# t_b
+tfs <- 24
+x <- 0.05
+t1 <- textGrob(expression(bold("Active treatment") * phantom(bold(" vs. Placebo"))),
+               x = x, y = 0.7, gp = gpar(col = "#F8766D", fontsize = tfs), just = "left")
+t2 <- textGrob(expression(phantom(bold("Active treatment vs.")) * bold(" Placebo")),
+               x = x, y = 0.7, gp = gpar(col = "#00BFC4", fontsize = tfs), just = "left")
+t3 <- textGrob(expression(phantom(bold("Active treatment ")) * bold("vs.") * phantom(bold(" Placebo"))),
+               x = x, y = 0.7, gp = gpar(col = "grey", fontsize = tfs), just = "left")
+t4 <- textGrob(expression("Strips describe the flow of the patients from different categories between visits"),
+               x = x, y = 0.4, gp = gpar(col = "grey", fontsize = 10), just = "left")
+t5 <- textGrob(expression("Circles are proportional to the percentage of patients at every visit"),
+               x = x, y = 0.25, gp = gpar(col = "grey", fontsize = 10), just = "left")
+
+tb <- ggplot(data = d) +
+  theme(panel.grid = element_blank(),
+        plot.background = element_rect(fill="black"))  +
+  coord_cartesian(clip = "off") +
+  annotation_custom(grobTree(t1, t2, t3, t4, t5)) +
+  theme(legend.position = 'none')
+tb
+
+b <- plot_grid(tb, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,
+             nrow = 6, rel_heights = c(0.5, rep(1, 10)))
+b
+# ggsave(plot=b, filename="b.png", path=("~") , width = 6, height = 32, device = "png")   
+
+# Multidimensional --------------------------------------------------------
+p12 <- ggplotib(paramcd = c("DLQI101", "DLQI102"),
+                breaks = 0:6,
+                transparency = 0.015,
+                title="Item 1 + Item 2",
+                caption="Symptoms and feelings") +
+  theme(axis.text.y = element_text(colour = "grey50"))
+p12
+
+# p34 <- ggplotib(paramcd = c("DLQI103", "DLQI104"),
+#                 breaks = 0:6,
+#                 transparency = 0.015,
+#                 title="Item 3 + Item 4",
+#                 caption="Daily activities") +
+#   theme(axis.text.y = element_text(colour = "grey50"))
+# p34
+# 
+# p56 <- ggplotib(paramcd = c("DLQI105", "DLQI106"),
+#                 breaks = 0:6,
+#                 transparency = 0.015,
+#                 title="Item 5 + Item 6",
+#                 caption="Leisures") +
+#   theme(axis.text.y = element_text(colour = "grey50"))
+# p56
+# 
+# p89 <- ggplotib(paramcd = c("DLQI108", "DLQI109"),
+#                 breaks = 0:6,
+#                 transparency = 0.015,
+#                 title="Item 8 + Item 9",
+#                 caption="Interpersonal relationships") +
+#   theme(axis.text.y = element_text(colour = "grey50"))
+# p89
+# 
+# tfs <- 42
+# x <- 0.0175
+# t1 <- textGrob(expression(bold("Active treatment") * phantom(bold(" vs. Placebo"))),
+#                x = x, y = 0.7, gp = gpar(col = "#F8766D", fontsize = tfs), just = "left")
+# t2 <- textGrob(expression(phantom(bold("Active treatment vs.")) * bold(" Placebo")),
+#                x = x, y = 0.7, gp = gpar(col = "#00BFC4", fontsize = tfs), just = "left")
+# t3 <- textGrob(expression(phantom(bold("Active treatment ")) * bold("vs.") * phantom(bold(" Placebo"))),
+#                x = x, y = 0.7, gp = gpar(col = "grey", fontsize = tfs), just = "left")
+# t4 <- textGrob(expression("Strips describe the flow of the patients from different categories between visits"),
+#                x = x, y = 0.4, gp = gpar(col = "grey", fontsize = 10), just = "left")
+# t5 <- textGrob(expression("Circles are proportional to the percentage of patients at every visit"),
+#                x = x, y = 0.25, gp = gpar(col = "grey", fontsize = 10), just = "left")
+# 
+# t <- ggplot(data = d) +
+#   theme(panel.grid = element_blank(),
+#         plot.background = element_rect(fill="black"))  +
+#   coord_cartesian(clip = "off") +
+#   annotation_custom(grobTree(t1, t2, t3, t4, t5)) +
+#   theme(legend.position = 'none')
+# t
+# 
+# t2 <- ggplot(data = d) +
+#   theme(panel.grid = element_blank(),
+#         plot.background = element_rect(fill="black"))  +
+#   theme(legend.position = 'none')
+# t2
+# col1 <- plot_grid(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,
+#                nrow = 10, rel_heights = c(rep(1, 10)))
+# col2 <- plot_grid(p12, p34, p56, p7, p89, p10,
+#                 nrow = 6, rel_heights = c(2, 2, 2, 1, 2, 1))
+# col3 <- plot_grid(pt, t2,
+#                 nrow = 2, rel_heights = c(4, 6))
+# cols <- plot_grid(col1, col2, col3, ncol = 3, rel_widths = c(3, 3, 3))
+# o <- plot_grid(t, cols, nrow = 2, rel_heights = c(0.5, 10))
+# o
+```
+
+
+## Mixed models
+
+we have the results of mixed models visualised in an interactive html document. The figure is split into three columns, allowing us to see all of the effects we may be interested in: treatment by visit; within treatment, between visit differences; between treatment, between treatment differences.
+
+One of the features that is really nice about this example is that, unlike many other examples, it considers an alternative way to sort the different items using a dendrogram. This allows us to quickly see two clear clusters in the items, although it was felt that total score should not have been included in this clustering. It is also great that the distributions are shown around the estimated effects, allowing us to quickly see the uncertainty in these estimates.
+
+There were mixed feelings around the large amount of white space included in some of the columns. In some ways, this could be seen as unnecessary, but it was pointed out that the white space provides a nice level of consistency, allowing us to get an immediate impression of effect sizes on the upper plots which are quite a way from the labels on the horizontal axis. The vertical reference lines included are also really nice for getting a quick impression of effect sizes and how meaningful these are.
+
+Similarly, there were mixed feelings around the level of complexity of this example, with the conclusion being that its appropriateness would largely depend on how technical the audience was. Whilst it may be slightly difficult for a non-technical audience to understand, it was felt that this example would be great for providing a large amount of information to technical audiences, particularly given that tables of values were provided in additional tabs alongside the figure. The group envisaged many applications where similar figures would be great to have, such as meta-analyses and subgroup analyses.
+
+The final thing discussed at length for this example was the representation of the effect sizes. The group really liked that the colours used correspond to those provided in the above text, allowing us to determine treatment groups without the need for a legend. Similarly, it was great to see the different effect sizes consistently pointing either upwards or downwards for the different treatment groups, although it would be beneficial to have this also described in the text. This would allow the figure to be interpreted without having to be able to distinguish between the colours.
+
+The panel highlighted a really nice tool which allows us to see how easily certain colours are distinguished by individuals with different kinds of colour-blindness. Whilst it was shown that the blue and green used here are not too difficult to distinguish for most individuals, the tool was used to identify colours which could be even easier to differentiate between.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+pacman::p_load(rio, tidyverse)
+pacman::p_load(lme4, emmeans)
+pacman::p_load(ggdist, distributional)
+pacman::p_load(gtsummary)
+#devtools::install_github("teunbrand/ggh4x")
+library(ggh4x)
+pacman::p_load(ggdendro)
+pacman::p_load(ggtext)
+pacman::p_load(patchwork)
+pacman::p_load(gt)
+
+df1 <- read_csv("./01_Datasets/ww2020_dlqi.csv") %>% 
+   drop_na(DLQI_SCORE) %>% 
+   mutate(VISIT_i = as.integer(as.factor(VISIT)))
+# fun code to derive change
+df1_chg <- read_csv("./01_Datasets/ww2020_dlqi.csv") %>% 
+   select(USUBJID, VISIT, TRT, starts_with("DLQI")) %>% 
+   arrange(USUBJID, VISIT) %>% 
+   group_by(USUBJID, TRT) %>% 
+   # filter(n() > 1) %>% # keep participants with 2 visits
+   transmute(across(starts_with("DLQI"), ~.x - lag(.x), .names = "{.col}_CHG")) %>%
+   rowwise() %>% 
+   filter( sum(is.na(c_across(starts_with("DLQI")))) < 11 )
+ 
+dl <- c(DLQI101 =	'How Itchy, Sore, Painful, Stinging <br><br>DLQI101',
+        DLQI102 =	'How Embarrassed, Self Conscious <br><br>DLQI102',
+        DLQI103 =	'Interfered Shopping, Home, Yard <br><br>DLQI103',
+        DLQI104 =	'Influenced Clothes You Wear <br><br>DLQI104',
+        DLQI105 =	'Affected Social, Leisure Activity <br><br>DLQI105',
+        DLQI106 =	'Made It Difficult to Do Any Sports <br><br>DLQI106',
+        DLQI107 =	'Prevented Working or Studying <br><br>DLQI107',
+        DLQI108 =	'Problem Partner, Friends, Relative <br><br>DLQI108',
+        DLQI109 =	'Caused Any Sexual Difficulties <br><br>DLQI109',
+        DLQI110 =	'How Much a Problem is Treatment <br><br>DLQI110',
+        DLQI_SCORE =	'**DLQI Total Score** <br><br>DLQI_SCORE')
+
+cl <- c(MEAN  = "TRT by VISIT",
+        DIFF  = "Within TRT between VISIT Differences",
+        DELTA = "Between TRT between VISIT Difference")
+ 
+# Mini Mixed-Model example
+m <- lmer(DLQI_SCORE ~ VISIT*TRT + (1|USUBJID), data = df1)
+e <- emmeans(m, ~ VISIT*TRT)
+s <- eff_size(e, sigma = sigma(m), edf = 700, method = 'identity')
+c <- contrast(e, method = list(diff_a = c(-1, 1,  0, 0),
+                               diff_b = c( 0, 0, -1, 1),
+                               diff_d = c(1, -1, -1, 1)))
+f <- eff_size(c, sigma = sigma(m), edf = 700, method = 'identity')
+
+summary(e, infer = TRUE)
+summary(c, infer = TRUE)
+
+# Mini Repeated Mixed-Model example
+pacman::p_load(nlme)
+m <- gls(DLQI_SCORE ~ VISIT*TRT,
+         data = df1,
+         method = "REML",
+         correlation = nlme::corSymm( form = ~VISIT_i|USUBJID),
+         weights     = nlme::varIdent(form = ~1|VISIT))
+
+e <- emmeans(m, ~ VISIT*TRT, mode = "df.error")
+s <- eff_size(e, sigma = sigma(m), edf = 700, method = 'identity')
+c <- contrast(e, method = list(diff_a = c(-1, 1,  0, 0),
+                               diff_b = c( 0, 0, -1, 1),
+                               diff_d = c(1, -1, -1, 1)))
+f <- eff_size(c, sigma = sigma(m), edf = 700, method = 'identity')
+
+summary(e, infer = TRUE)
+summary(c, infer = TRUE)
+
+# Mini bayesian example
+pacman::p_load(brms)
+m <- brm(DLQI_SCORE ~ VISIT*TRT + (1 | USUBJID), data = df1, family = gaussian())
+e <- emmeans(m, ~ VISIT*TRT, point.est = mean)
+s <- contrast(e, method = list(diff_a = c(-1, 1,  0, 0),
+                               diff_b = c( 0, 0, -1, 1),
+                               diff_d = c(1, -1, -1, 1)))
+
+summary(e, point.est = mean, infer = TRUE)
+summary(s, point.est = mean, infer = TRUE)
+
+df2 <- df1 %>% 
+   pivot_longer(cols = contains("DLQI"),
+                names_to = "VAR",
+                values_to = "VAL") %>% 
+   nest_by(VAR) %>% 
+   mutate(m = list( lmer(VAL ~ VISIT*TRT + (1|USUBJID), data = data) ), 
+          e = list( emmeans(m, ~ VISIT*TRT) ),
+          s = list( eff_size(e, sigma = sigma(m), edf = 700, method = 'identity') ),
+          c = list( contrast(e, method = list(diff_a = c(-1, 1,  0, 0),
+                                              diff_b = c( 0, 0, -1, 1),
+                                              diff_d = c(1, -1, -1, 1))) ),
+          f = list( eff_size(c, sigma = sigma(m), edf = 700, method = 'identity') ),
+          r = list(
+             bind_rows(
+                summary(e, infer = TRUE) %>% as.data.frame(),
+                summary(c, infer = TRUE) %>% as.data.frame() %>% 
+                   rename(emmean = estimate, TRT = contrast) ) %>% 
+                mutate(contrast = paste(VISIT, TRT))
+          ),
+          g = list(
+             bind_rows(
+                summary(s, infer = TRUE) %>% as.data.frame(),
+                summary(f, infer = TRUE) %>% as.data.frame()  )
+          ),
+   )
+
+
+df3 <- df2 %>% 
+   select(VAR, r) %>% 
+   unnest(r) %>% 
+   mutate(contrast = str_remove(contrast, "NA ")) %>% 
+   mutate(GRP = case_when(
+      contrast  %in% c("Baseline A", "Week 16 A",
+                       "Baseline B", "Week 16 B") ~ "MEAN",
+      contrast  %in% c("diff_a", "diff_b")        ~ "DIFF",
+      contrast  %in% c("diff_d")                  ~ "DELTA")
+   ) %>% 
+   mutate(TRT = case_when(
+      contrast  %in% c("Baseline A", "Week 16 A", "diff_a") ~ "A",
+      contrast  %in% c("Baseline B", "Week 16 B", "diff_b") ~ "B")
+   ) %>% 
+   mutate(VISIT = case_when(
+      contrast  %in% c("Baseline A", "Baseline B") ~ "Baseline",
+      contrast  %in% c("Week 16 A", "Week 16 B")   ~ "Week 16")
+   )
+
+df3s <- df2 %>% 
+   select(VAR, g) %>% 
+   unnest(g) %>% 
+   mutate(GRP = case_when(
+      contrast  %in% c("Baseline A", "Week 16 A",
+                       "Baseline B", "Week 16 B") ~ "MEAN",
+      contrast  %in% c("diff_a", "diff_b")        ~ "DIFF",
+      contrast  %in% c("diff_d")                  ~ "DELTA")
+   ) %>% 
+   mutate(TRT = case_when(
+      contrast  %in% c("Baseline A", "Week 16 A", "diff_a") ~ "A",
+      contrast  %in% c("Baseline B", "Week 16 B", "diff_b") ~ "B")
+   ) %>% 
+   mutate(VISIT = case_when(
+      contrast  %in% c("Baseline A", "Baseline B") ~ "Baseline",
+      contrast  %in% c("Week 16 A", "Week 16 B")   ~ "Week 16")
+   ) 
+ 
+y1 <- df1 %>% 
+   #filter(VISIT == "Baseline") %>% 
+   select(starts_with("DLQI"))
+
+c1 <- cor(y1, method="pearson")
+d1 <- as.dist(1-c1)
+h1 <- hclust(d1, method = "complete")
+
+gg_d1 <- ggdendrogram(h1, rotate = TRUE) +
+   labs(title = " ") +
+   theme_dendro() +
+   theme(plot.margin = margin(0, 0, 0, 0, "pt"))
+
+df3s <- df3s %>% 
+   mutate(VAR = factor(VAR, levels = rev(h1$labels[h1$order]) ),
+          GRP = factor(GRP, levels = c("MEAN","DIFF","DELTA")) )
+
+df3 <- df3 %>% 
+   mutate(VAR = factor(VAR, levels = rev(h1$labels[h1$order]) ),
+          GRP = factor(GRP, levels = c("MEAN","DIFF","DELTA")) )
+
+# Figure F1
+gg_f1 <- ggplot(data = df3s,
+                aes(x = effect.size,
+                    y = VAR)) +
+   geom_vline(data = tribble(~GRP, ~VAL,
+                             "MEAN", NA,
+                             "DIFF", 0,
+                             "DELTA",0) %>% 
+                 mutate(GRP = factor(GRP) %>% fct_relevel("MEAN","DIFF","DELTA")), 
+              aes(xintercept = VAL), color = 'gray50' ) +
+   geom_vline(data = df3s %>% 
+                 filter(GRP == "MEAN", VISIT == "Baseline") %>% 
+                 select(GRP, VAR, effect.size) %>% 
+                 group_by(GRP, VAR) %>%
+                 dplyr::summarize(xint = mean(effect.size)),
+              aes(xintercept = xint), color = 'gray50') +
+   stat_dist_halfeye(ggsubset(TRT == "A"),
+                     mapping = aes(fill1 = contrast,
+                                   color1 = contrast,
+                                   dist = dist_student_t(df = df, mu = effect.size, sigma = SE)),
+                     .width = c(0.95),
+                     alpha = 0.5,
+                     justification = -0.10,
+                     size = 1,
+                     side = 'top') +
+   stat_dist_halfeye(ggsubset(TRT == "B"),
+                     mapping = aes(fill2 = contrast,
+                                   color2 = contrast,
+                                   dist = dist_student_t(df = df, mu = effect.size, sigma = SE)),
+                     .width = c(0.95),
+                     alpha = 0.5,
+                     justification = 1.10,
+                     size = 1,
+                     side = 'bottom') +
+   stat_dist_halfeye(ggsubset(GRP == "DELTA"),
+                     mapping = aes(dist = dist_student_t(df = df, mu = effect.size, sigma = SE)),
+                     .width = c(0.95),
+                     size = 1,
+                     side = 'both') +
+   geom_richtext(ggsubset(GRP == "DELTA"),
+                 mapping = aes(y = 1,
+                               x = 3.7,
+                               label = str_glue("{style_ratio(effect.size)} 
+                                             ({style_ratio(lower.CL)}, {style_ratio(upper.CL)}) <br>
+                                              {style_pvalue(p.value, 2, prepend_p = TRUE)}")),
+                 size = 2.5,
+                 hjust = "inward",
+                 color = 'gray75',
+                 text.color = 'black',
+                 fill = 'white') +
+   scale_listed(scalelist = list(
+      scale_fill_manual(values  = RColorBrewer::brewer.pal(9,"Blues")[c(5,7,8)],  aesthetics = "fill1"),
+      scale_fill_manual(values  = RColorBrewer::brewer.pal(9,"Greens")[c(5,7,8)], aesthetics = "fill2"),
+      scale_color_manual(values = RColorBrewer::brewer.pal(9,"Blues")[c(5,7,8)],  aesthetics = "color1"),
+      scale_color_manual(values = RColorBrewer::brewer.pal(9,"Greens")[c(5,7,8)], aesthetics = "color2")), 
+      replaces = c("fill", "fill", "color", "color")) +
+   facet_grid(VAR ~ GRP,
+              scales = 'free_y',
+              switch = 'y',
+              labeller = labeller(VAR = dl, GRP = cl)) +
+   #force_panelsizes(cols = c(3,2,2)) +
+   scale_y_discrete(position = "right") +
+   labs(x = "Standardized effect-size (_Cohen's d_)",
+        y = NULL) +
+   theme_bw() +
+   theme(plot.margin = margin(5.5, 0, 5.5, 5.5, "pt"),
+         legend.position   = "none",
+         strip.text.y.left = element_markdown(angle = 0, hjust = 1),
+         strip.placement   = "outside", 
+         axis.ticks.y.right = element_blank(),
+         axis.text.y.right  = element_blank(),
+         axis.title.x = element_markdown(hjust = 0.5)
+   )
+
+
+gg_f1 + gg_d1 +
+   plot_layout(widths = c(6,1)) +
+   plot_annotation(
+      title     = "Phase 3 Randomized Clinical Trial Mixed-Model Results evaluating quality of life **DLQI Total Scale** & Individual Subscales",
+      subtitle  = "Standardized Effects (MEAN) and 95% CI for 
+      <span style='color:#2171B5;'><b>Placebo (n=150) </b></span> and 
+      <span style='color:#238B45;'><b>Active (n=450) </b></span> at
+      <span style='color:#6BAED6;'>Baseline</span>|<span style='color:#74C476;'>Baseline</span> and 
+      <span style='color:#2171B5;'>Week 16</span>|<span style='color:#238B45;'>Week 16</span>
+      <span style='font-size:8pt; color:black'>vertical lines are mean results at Baseline</span> <br>
+      Standardized Difference (DELTA) and 95% CI between VISIT within TRT (i.e.
+      <span style='color:#238B45;'><b>Active</b></span>
+      <span style='color:#238B45;'>(Week 16</span> -
+      <span style='color:#74C476;'>Baseline)</span>
+      <span style='font-size:8pt; color:black'>overlapping densities to the vertical lines not significant different from 0</span> <br>
+      Standardized Difference (DELTA-DELTA) and 95% CI between TRT between VISIT <br>
+      Hierarchical Clustering dendrogram results of Pearson correlation between **DLQI Total** & Individual Subscales",
+      theme = theme(plot.title.position = "plot",
+                    plot.title    = element_markdown(lineheight = 1.1),
+                    plot.subtitle = element_markdown(lineheight = 1.1))
+   )
+```
+
+## Histogram
+
 
 In data analysis, especially when dealing with questionnaire data, `geom_histogram()` in `ggplot2` can be an essential tool for visualizing the distribution of responses. Histograms are particularly effective for showing the frequency of score occurrences across a range of values, making them ideal for summarizing the results from questionnaires where responses are often scaled (e.g., Likert scales from 1 to 5).
  
@@ -108,8 +856,8 @@ In data analysis, especially when dealing with questionnaire data, `geom_histogr
 5. **Analysis Interpretation**:
    - Histograms allow you to quickly grasp the distribution of responses, identify common and outlier responses, and assess the skewness or symmetry of the data.
    - By comparing histograms from different demographic groups, you can explore how opinions or behaviors differ across these groups, potentially guiding more detailed statistical tests or reporting insights.
-
-## General
+   
+### General
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
 data <- data.frame(
@@ -181,7 +929,7 @@ print(plot3)
 ```
 
 
-## Clean Design 1
+### Clean Design 1
 
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
@@ -278,7 +1026,7 @@ gridExtra::grid.arrange(d, e, nrow = 2)
 ```
 
 
-## Clean Design 2
+### Clean Design 2
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
 dql <- read.csv("./01_Datasets/ww2020_dlqi.csv")
@@ -1630,6 +2378,611 @@ WrightMap
 # WrightMap
 # dev.off()
 ```
+
+# PASI (Psoriasis Area and Severity Index)
+
+Psoriasis is a chronic, inflammatory skin disease. For such diseases, it is of interest to not only compare treatments in terms of patients achieving a response, but also in terms of patients sustaining this response once it is achieved. This is the focus of this month’s challenge: produce a visualization to compare treatments with regards to patients sustaining a response. The synthetic data contains PASI (Psoriasis Area and Severity Index) scores for three treatment groups: two receive an active treatment in different doses; the third receives a comparator. The three arms are balanced, with 300 patients in each. The data contains PASI scores at Baseline and eight follow-up visits, spread over the course of a year. PASI scores can range from 0 to 72, with higher scores indicating a worse condition state. The criteriafor response can be chosen, but typical thresholds include a 75%, 90% or 100% reduction in PASI scores relative to Baseline (PASI75/PASI90/PASI100). More than one threshold could also be considered in the same visualization.
+
+**Sustained response data**
+
+Different approaches could be considered to define a patient as having sustained their response. A simple definition of sustained response could be that having achieved a response at a given visit, a patient then has that response at all subsequent visits. More complex approaches may explore different methods for interpolating between visits.
+
+
+## Lasagna plots
+
+This visualization is based on patient level data and shows the PASI response over time. Each patient is represented by one line and the three groups are presented in three different blocks. The title is very clear and provides the reader with the main message. Furthermore, the color coding is presented (in the sub-title) as well as the imputation strategy. Therefore, it is very informative.
+
+The selection of the colors is very reasonable. The colors go from red (no response) to yellow (PASI100) which makes intentionally sense considering that we are dealing with dermatology data. You can clearly see a step function over time and that the two active doses lead to a quicker response. Furthermore, at the right end of the plots, we see more yellow areas with the active doses than with the comparator.
+
+The sorting of the patients is a challenge here. Even though the panelists considered the sorting as reasonable, there might be other options, for example, sorting by PASI100 at week 52. An interactive tool where the user can select the sorting might be an option and brings a lot of flexibility into this visualization.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+SR_data <- readxl::read_xlsx("./01_Datasets/WWW_SustainedResponse.xlsx")
+
+# Ensuring PASI score variables numeric
+SR_data$BASELINE <- as.numeric(SR_data$BASELINE)
+SR_data$WEEK01 <- as.numeric(SR_data$WEEK01)
+SR_data$WEEK04 <- as.numeric(SR_data$WEEK04)
+SR_data$WEEK08 <- as.numeric(SR_data$WEEK08)
+SR_data$WEEK16 <- as.numeric(SR_data$WEEK16)
+SR_data$WEEK24 <- as.numeric(SR_data$WEEK24)
+SR_data$WEEK32 <- as.numeric(SR_data$WEEK32)
+SR_data$WEEK40 <- as.numeric(SR_data$WEEK40)
+SR_data$WEEK52 <- as.numeric(SR_data$WEEK52)
+
+# Flags for different response levels
+
+# Assigning value 3 for no response at any level
+# A value of 2 for PASI75 response
+# A value of 1 for PASI90 response
+# A value of 0 for complete clearance
+# Using NRI - Missing data assigned value 3
+for(i in 1:length(SR_data$USUBJID)){
+  
+  if(is.na(SR_data$WEEK01[i])==TRUE){SR_data$WEEK01FL[i]=0}
+  else if(SR_data$WEEK01[i]>0.25*SR_data$BASELINE[i]){SR_data$WEEK01FL[i]=0}
+  else if(SR_data$WEEK01[i]>0.1*SR_data$BASELINE[i]){SR_data$WEEK01FL[i]=1}
+  else if(SR_data$WEEK01[i]>0*SR_data$BASELINE[i]){SR_data$WEEK01FL[i]=2}
+  else{SR_data$WEEK01FL[i]=3}
+  
+  if(is.na(SR_data$WEEK04[i])==TRUE){SR_data$WEEK04FL[i]=0}
+  else if(SR_data$WEEK04[i]>0.25*SR_data$BASELINE[i]){SR_data$WEEK04FL[i]=0}
+  else if(SR_data$WEEK04[i]>0.1*SR_data$BASELINE[i]){SR_data$WEEK04FL[i]=1}
+  else if(SR_data$WEEK04[i]>0*SR_data$BASELINE[i]){SR_data$WEEK04FL[i]=2}
+  else{SR_data$WEEK04FL[i]=3}
+  
+  if(is.na(SR_data$WEEK08[i])==TRUE){SR_data$WEEK08FL[i]=0}
+  else if(SR_data$WEEK08[i]>0.25*SR_data$BASELINE[i]){SR_data$WEEK08FL[i]=0}
+  else if(SR_data$WEEK08[i]>0.1*SR_data$BASELINE[i]){SR_data$WEEK08FL[i]=1}
+  else if(SR_data$WEEK08[i]>0*SR_data$BASELINE[i]){SR_data$WEEK08FL[i]=2}
+  else{SR_data$WEEK08FL[i]=3}
+  
+  if(is.na(SR_data$WEEK16[i])==TRUE){SR_data$WEEK16FL[i]=0}
+  else if(SR_data$WEEK16[i]>0.25*SR_data$BASELINE[i]){SR_data$WEEK16FL[i]=0}
+  else if(SR_data$WEEK16[i]>0.1*SR_data$BASELINE[i]){SR_data$WEEK16FL[i]=1}
+  else if(SR_data$WEEK16[i]>0*SR_data$BASELINE[i]){SR_data$WEEK16FL[i]=2}
+  else{SR_data$WEEK16FL[i]=3}
+  
+  if(is.na(SR_data$WEEK24[i])==TRUE){SR_data$WEEK24FL[i]=0}
+  else if(SR_data$WEEK24[i]>0.25*SR_data$BASELINE[i]){SR_data$WEEK24FL[i]=0}
+  else if(SR_data$WEEK24[i]>0.1*SR_data$BASELINE[i]){SR_data$WEEK24FL[i]=1}
+  else if(SR_data$WEEK24[i]>0*SR_data$BASELINE[i]){SR_data$WEEK24FL[i]=2}
+  else{SR_data$WEEK24FL[i]=3}
+  
+  if(is.na(SR_data$WEEK32[i])==TRUE){SR_data$WEEK32FL[i]=0}
+  else if(SR_data$WEEK32[i]>0.25*SR_data$BASELINE[i]){SR_data$WEEK32FL[i]=0}
+  else if(SR_data$WEEK32[i]>0.1*SR_data$BASELINE[i]){SR_data$WEEK32FL[i]=1}
+  else if(SR_data$WEEK32[i]>0*SR_data$BASELINE[i]){SR_data$WEEK32FL[i]=2}
+  else{SR_data$WEEK32FL[i]=3}
+  
+  if(is.na(SR_data$WEEK40[i])==TRUE){SR_data$WEEK40FL[i]=0}
+  else if(SR_data$WEEK40[i]>0.25*SR_data$BASELINE[i]){SR_data$WEEK40FL[i]=0}
+  else if(SR_data$WEEK40[i]>0.1*SR_data$BASELINE[i]){SR_data$WEEK40FL[i]=1}
+  else if(SR_data$WEEK40[i]>0*SR_data$BASELINE[i]){SR_data$WEEK40FL[i]=2}
+  else{SR_data$WEEK40FL[i]=3}
+  
+  if(is.na(SR_data$WEEK52[i])==TRUE){SR_data$WEEK52FL[i]=0}
+  else if(SR_data$WEEK52[i]>0.25*SR_data$BASELINE[i]){SR_data$WEEK52FL[i]=0}
+  else if(SR_data$WEEK52[i]>0.1*SR_data$BASELINE[i]){SR_data$WEEK52FL[i]=1}
+  else if(SR_data$WEEK52[i]>0*SR_data$BASELINE[i]){SR_data$WEEK52FL[i]=2}
+  else{SR_data$WEEK52FL[i]=3}
+  
+}
+
+# Dataset for each treatment arm and sorting by response level at each visit
+
+# Active Treatment Arm Dose 01
+
+actarm01 <- SR_data %>% filter(TRT=='ACTIVE TREATMENT DOSE 01')
+actarm01 <- actarm01[order(actarm01$WEEK01FL, actarm01$WEEK04FL, actarm01$WEEK08FL,
+                           actarm01$WEEK16FL, actarm01$WEEK24FL, actarm01$WEEK32FL,
+                           actarm01$WEEK40FL, actarm01$WEEK52FL),]
+actarm01$subjord <- seq(from=1, to=300)
+actarm01 <- actarm01 %>% dplyr::select(USUBJID, subjord, WEEK01FL, WEEK04FL, WEEK08FL, WEEK16FL,
+                                WEEK24FL, WEEK32FL, WEEK40FL, WEEK52FL)
+
+# Convert to long format
+actarm01 <- gather(actarm01, visit, colour, WEEK01FL:WEEK52FL)
+actarm01 <- actarm01[order(actarm01$subjord),]
+# Evenly spaced bars for each visit
+actarm01$bheight <- 1
+
+act1plot <- ggplot() + scale_y_continuous(limits = c(0, 8), breaks = c(0.5,7.5), 
+                                          labels = c("0.5"="", "7.5" = "")) +   
+  geom_bar(data = actarm01, mapping = aes(x = subjord, y = bheight, fill = colour), stat = "identity", position = position_stack(reverse = TRUE), show.legend = TRUE) +
+  coord_flip() + theme_bw() + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+                                                                                                                          panel.grid.minor = element_blank()) + 
+  theme(axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank()) + labs(x = "", y = "") + 
+  scale_fill_continuous(low="#660025", high="#edbf79", guide=FALSE) + labs(title="       Active Treatment Dose 01")
+
+
+# Active Treatment Dose 02
+
+actarm02 <- SR_data %>% filter(TRT=='ACTIVE TREATMENT DOSE 02')
+actarm02 <- actarm02[order(actarm02$WEEK01FL, actarm02$WEEK04FL, actarm02$WEEK08FL,
+                           actarm02$WEEK16FL, actarm02$WEEK24FL, actarm02$WEEK32FL,
+                           actarm02$WEEK40FL, actarm02$WEEK52FL),]
+actarm02$subjord <- seq(from=1, to=300)
+actarm02 <- actarm02 %>% dplyr::select(USUBJID, subjord, WEEK01FL, WEEK04FL, WEEK08FL, WEEK16FL,
+                                       WEEK24FL, WEEK32FL, WEEK40FL, WEEK52FL)
+
+actarm02 <- gather(actarm02, visit, colour, WEEK01FL:WEEK52FL)
+actarm02 <- actarm02[order(actarm02$subjord),]
+actarm02$bheight <- 1
+
+
+act2plot <- ggplot()  + scale_y_continuous(limits = c(0, 8), breaks = c(0.5, 7.5), 
+                                           labels = c("0.5"="", "7.5" = "")) + 
+  geom_bar(data = actarm02, mapping = aes(x = subjord, y = bheight, fill = colour), stat = "identity", position = position_stack(reverse = TRUE), show.legend = TRUE) +
+  coord_flip() + theme_bw() + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+                                                 panel.grid.minor = element_blank()) + 
+  theme(axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank()) + labs(x = "", y = "") + 
+  scale_fill_continuous(low="#660025", high="#edbf79", guide=FALSE)+ labs(title="       Active Treatment Dose 02")
+
+# Comparator Treatment
+comparm <- SR_data %>% filter(TRT=='COMPARATOR TREATMENT')
+comparm <- comparm[order(comparm$WEEK01FL, comparm$WEEK04FL, comparm$WEEK08FL,
+                         comparm$WEEK16FL, comparm$WEEK24FL, comparm$WEEK32FL,
+                         comparm$WEEK40FL, comparm$WEEK52FL),]
+comparm$subjord <- seq(from=1, to=300)
+comparm <- comparm %>% dplyr::select(USUBJID, subjord, WEEK01FL, WEEK04FL, WEEK08FL, WEEK16FL,
+                                     WEEK24FL, WEEK32FL, WEEK40FL, WEEK52FL)
+
+comparm <- gather(comparm, visit, colour, WEEK01FL:WEEK52FL)
+comparm <- comparm[order(comparm$subjord),]
+comparm$bheight <- 1
+
+
+compplot <- ggplot()  + scale_y_continuous(limits = c(0, 8), breaks = c(0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5), 
+                                           labels = c("0.5"="Week 1", "1.5" = "Week 4", "2.5" = "Week 8", "3.5" = "Week 16",
+                                                      "4.5" = "Week 24", "5.5" = "Week 32", "Week 6.5" = "Week 40", "7.5" = "Week 52")) + 
+  geom_bar(data = comparm, mapping = aes(x = subjord, y = bheight, fill = colour), stat = "identity", position = position_stack(reverse = TRUE), show.legend = TRUE) +
+  coord_flip() + theme_bw() + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+                                                 panel.grid.minor = element_blank()) + 
+  theme(axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank()) + labs(x = "", y = "") + 
+  scale_fill_continuous(low="#660025", high="#edbf79", guide=FALSE)+ labs(title="       Comparator Treatment")
+
+# Plotting together
+                                             
+text1 = paste("Patients receiving the active treatment respond quicker\nand are more likely to sustain this response.\n\n\n")
+text2 = paste("\nEach row represents one patient.")
+text3 = paste("\n\n\nKey:________________________________________________________________________")
+text4 = paste("\n\n\n_____-_No Response__________________________________________________________")
+text5 = paste("\n\n\n____________________-_PASI75 Response_______________________________________")
+text6 = paste("\n\n\n_______________________________________-_PASI90 Response____________________")
+text7 = paste("\n\n\n__________________________________________________________-_PASI100 Response")
+# White overlay to cover coloured underscores used for spacing
+text8 = paste("\n\n\n___________________________________________________________________________________")
+text9 = paste("\n\n\n\n\n\nMissing data was imputed using non-responder imputation (NRI).")
+blankplot <- ggplot() + 
+  annotate("text", x = 4, y = 25, size=6, label = text1, fontface='bold') + 
+  annotate("text", x = 4, y = 25, size=4, label = text2) + 
+  annotate("text", x = 4, y = 25, size=4, label = text3) +
+  annotate("text", x = 4, y = 25, size=4, label = text4, col="#660025", fontface='bold') + 
+  annotate("text", x = 4, y = 25, size=4, label = text5, col="#93483f", fontface='bold') +
+  annotate("text", x = 4, y = 25, size=4, label = text6, col="#c0825c", fontface='bold') +
+  annotate("text", x = 4, y = 25, size=4, label = text7, col="#edbf79", fontface='bold')+
+  annotate("text", x = 4, y = 25, size=4, label = text8, col="white", fontface='bold') +
+  annotate("text", x = 4, y = 25, size=4, label = text8, col="white", fontface='bold') + 
+  annotate("text", x = 4, y = 25, size=4, label = text8, col="white", fontface='bold') +
+  annotate("text", x = 4, y = 25, size=4, label = text8, col="white", fontface='bold') +
+  annotate("text", x = 4, y = 25, size=4, label = text8, col="white", fontface='bold') +
+  annotate("text", x = 4, y = 25, size=4, label = text9) +
+  theme_void()
+
+
+
+# Multiplot function taken from cookbook for r:
+# http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_%28ggplot2%29/
+
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+#Final Plot
+multiplot(blankplot, act1plot, act2plot, compplot)
+```
+
+## BarChart
+
+In the main panel, we see a barplot representing the percentage of responders over time. The groups are color-coded and can be easily distinguished due to the nice choice of colors. The (sub)title and the visualization itself have a clear message. Furthermore, the distance between the bars corresponds to the distance in time which is a nice detail.
+
+This visualization has an interactive part: The user can select the percentage cut-off for response (in the left panel). When you select a different cut-off, the dimension of the y-axis remains the same which makes it very easy to compare the results even between the results based on different cut-offs. Furthermore, you can hover over the bars and it will provide you with additional information about the sustainability of the response.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# --- Parameters ---
+pct_cutoff <- 75  # Set your response cut-off percentage (75, 90, or 100)
+
+# --- Functions ---
+
+# calculate response status
+resp_fnc <- function(x, a){
+  case_when(
+    is.na(x) ~ "M",
+    x <= -a ~ "R",
+    TRUE ~ "N"
+  )
+}
+
+# calculate no. of consecutive visits patient is a responder
+find_max_non_r <- function(r_seq, no_visits){
+  r_seq_week_x <- strsplit(r_seq, "")[[1]][1:no_visits]
+  which_non_r <- which(!(r_seq_week_x == "R"))
+  max_non_r <- ifelse(length(which_non_r) == 0, 0, max(which_non_r))
+  if (max_non_r == no_visits) return("Non-responder")
+  return(paste("Responder: consecutive visits in response =", as.character(no_visits - max_non_r)))
+}
+
+# function for creating hover labels
+create_timepoint_df <- function(df, time_char, TIME_CHAR){
+  df %>% 
+    group_by(TRT, !!sym(time_char)) %>% 
+    summarise(freq_week = paste0(round(sum(freq) / 300 * 100, 1), "%"), .groups = "drop") %>%
+    mutate(cat_resp = paste(!!sym(time_char), freq_week, sep = ": ")) %>% 
+    group_by(TRT) %>% 
+    summarise(label = paste(rev(cat_resp), collapse = "\n"), .groups = "drop") %>% 
+    mutate(timepoint = TIME_CHAR)
+}
+
+# --- Load and clean data ---
+
+df <- readxl::read_xlsx("./01_Datasets/WWW_SustainedResponse.xlsx") %>% as.data.frame()
+
+# Convert WEEK04 to WEEK52 to numeric (columns 5 to 11)
+df[, 4:11] <- lapply(df[, 4:11], as.numeric)
+
+# calculate %change from baseline
+df[, 4:11] <- apply(df[, 4:11], 2, function(x) 100 * (x - df$BASELINE) / df$BASELINE)
+
+# classify response based on threshold
+df[, 4:11] <- apply(df[, 4:11], 2, resp_fnc, a = pct_cutoff)
+
+# --- Frequency and sequence processing ---
+
+df_freq <- df %>%
+  group_by(TRT, WEEK01, WEEK04, WEEK08, WEEK16, WEEK24, WEEK32, WEEK40, WEEK52) %>%
+  summarise(freq = n(), .groups = "drop") %>%
+  mutate(resp_seq = paste0(WEEK01, WEEK04, WEEK08, WEEK16, WEEK24, WEEK32, WEEK40, WEEK52),
+         week_1  = map_chr(resp_seq, find_max_non_r, no_visits = 1),
+         week_4  = map_chr(resp_seq, find_max_non_r, no_visits = 2),
+         week_8  = map_chr(resp_seq, find_max_non_r, no_visits = 3),
+         week_16 = map_chr(resp_seq, find_max_non_r, no_visits = 4),
+         week_24 = map_chr(resp_seq, find_max_non_r, no_visits = 5),
+         week_32 = map_chr(resp_seq, find_max_non_r, no_visits = 6),
+         week_40 = map_chr(resp_seq, find_max_non_r, no_visits = 7),
+         week_52 = map_chr(resp_seq, find_max_non_r, no_visits = 8))
+
+# --- Hover labels ---
+df_labels <- bind_rows(
+  create_timepoint_df(df_freq, "week_1", "WEEK01"),
+  create_timepoint_df(df_freq, "week_4", "WEEK04"),
+  create_timepoint_df(df_freq, "week_8", "WEEK08"),
+  create_timepoint_df(df_freq, "week_16", "WEEK16"),
+  create_timepoint_df(df_freq, "week_24", "WEEK24"),
+  create_timepoint_df(df_freq, "week_32", "WEEK32"),
+  create_timepoint_df(df_freq, "week_40", "WEEK40"),
+  create_timepoint_df(df_freq, "week_52", "WEEK52")
+)
+
+# --- Long format and summarization ---
+
+df_long <- df %>%
+  pivot_longer(cols = starts_with("WEEK"), names_to = "timepoint", values_to = "value")
+
+week_map <- c(WEEK01 = 1, WEEK04 = 4, WEEK08 = 8, WEEK16 = 16, WEEK24 = 24, WEEK32 = 32, WEEK40 = 40, WEEK52 = 52)
+
+df_sum <- df_long %>%
+  group_by(TRT, timepoint) %>%
+  summarise(resp = 100 * mean(value == "R", na.rm = TRUE), .groups = "drop") %>%
+  mutate(timepoint_n = week_map[timepoint]) %>%
+  left_join(df_labels, by = c("TRT", "timepoint"))
+
+# --- Plot ---
+
+p <- ggplot(df_sum, aes(x = timepoint_n, y = resp, fill = TRT, text = label)) +
+  geom_bar(stat = "identity", position = position_dodge(), colour = "black") +
+  ylab("Percentage of responders") +
+  ylim(0, 100) +
+  scale_x_continuous("Week", breaks = unique(df_sum$timepoint_n)) +
+  scale_fill_manual("", values = c("#E41A1C", "#377EB8", "lightgrey")) +
+  theme_minimal()
+
+# Plot with plotly
+plotly::ggplotly(p, tooltip = "text")
+```
+
+
+## Trajectory Clustering
+
+[Link to App](https://vis-sig.github.io/blog/posts/2021-05-09-wonderful-wednesdays-may-2021/images/kml_response%20-%20Agustin%20Calatroni.html) 
+ 
+This is a very comprehensive visualization. Actually, it is not only a visualization, but also a presentation of a statistical analysis. A trajectory clustering has been performed to devide the patients into five different clusters with different characteristics in regards to their PASI percentage changes.
+
+The row A presents the trajectories of all patients. This gives you a first overview over the data. In row B, the trajectories of the five clusters are provided. This gives you an overview over the different characteristics of the clusters. The first cluster seems to contain patients with a quick response and a very good sustainability of the response. This seems to be the cluster with the best performing patients. The second cluster is very similar, however, patients take a little longer until they respond and the overall level of the percentage change seems to be a bit worse. The third cluster is again a bit worse. The forth cluster still shows some improvement in PASI, however, quite many patients do not reach a good PASI response even at week 52. The fifth cluster contains patients who do not seem to improve in regards to the PASI score. (Note that there are only very few patients in this cluster.) Row C shows basically the same information as row B. An average trajectory per cluster is presented. Row D visualizes the number of patients per treatment group in each cluster using a “Waffle Chart”. And row E presents the percentages of patients per treatment group in each cluster.
+
+The boxes below the plots and the footnote provide additional information about the difference between cluster in their treatment composition. This information is further outlined in the second tab of the app. Using a tree, the differences in the treatment composition between the clusters is visualized.
+
+This is a very interesting and useful analysis and visulization. You can see that the first cluster (which was the best one) contains mainly patients in the two active treatment arms. Thus, we can say that those treatments seem to lead to a quicker and a sustained response compared to the comparator. In the “worse” cluster, we see more patients who were in the comparator arm.
+
+One aspect that could be improved is the coloring in row C. Actually, we do not need any color here, because the colors only seem to be different between the clusters. This information is already given by the structure of the columns, though. Furthermore, the colors are very similar to the colors which are used in row D and E to code the treatment arms.
+
+Overall, this is a very elaborated and advanced visualization which provides the user with a lot of information. At the same time, the structure is very clear which makes it easy to understand the message of the visualization.
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+pacman::p_load(tidyverse,ggtext,kml,
+               waffle,readxl,mice,
+               latrend)
+
+d1_w <- read_xlsx("./01_Datasets/WWW_SustainedResponse.xlsx") 
+d1_w[, 4:11] <- lapply(d1_w[, 4:11], as.numeric)
+d1_w <- d1_w %>% 
+   mutate(ID = parse_number(USUBJID),
+          TRTC = factor(TRT, labels = c("D1","D2","C"))) 
+
+
+# write.csv(d1_w, "WWW_SustainedResponse.csv")
+
+d1_l <- d1_w %>% 
+   pivot_longer(cols = c(BASELINE, WEEK01, WEEK04, WEEK08, WEEK16, WEEK24, WEEK32, WEEK40, WEEK52),
+                names_to = "TIMEC",
+                values_to = "PASI") %>% 
+   select(ID, TRTC, TIMEC, PASI) %>% 
+   mutate(TIMEN = ifelse(TIMEC == "BASELINE", 0, parse_number(TIMEC))) %>% 
+   group_by(ID) %>% 
+   mutate(PASI_CHG  =  PASI - PASI[TIMEC == "BASELINE"],
+          PASI_PCHG = 100*(PASI - PASI[TIMEC == "BASELINE"]) / PASI[TIMEC == "BASELINE"]) %>% 
+   ungroup()
+  
+d1_imp  <- mice(d1_w %>% select(-USUBJID, -TRT, -ID), m = 1, maxiter = 500, method = 'pmm', seed = 123)
+d1_comp <- bind_cols( d1_w %>% select(ID),
+                      complete(d1_imp))
+
+d1_l_imp <- d1_comp %>% 
+   pivot_longer(cols = c(BASELINE, WEEK01, WEEK04, WEEK08, WEEK16, WEEK24, WEEK32, WEEK40, WEEK52),
+                names_to = "TIMEC",
+                values_to = "PASI") %>% 
+   select(ID, TRTC, TIMEC, PASI) %>% 
+   mutate(TIMEN = ifelse(TIMEC == "BASELINE", 0, parse_number(TIMEC))) %>% 
+   group_by(ID) %>% 
+   mutate(PASI_CHG  =  PASI - PASI[TIMEN == 0],
+          PASI_PCHG = 100*(PASI - PASI[TIMEN == 0]) / PASI[TIMEN == 0]) %>% 
+   ungroup()
+ 
+
+kmlMethod  <- lcMethodKML(response = "PASI_PCHG", id = "ID", time = "TIMEN", nbRedrawing = 25)
+kmlMethods <- lcMethods(kmlMethod, nClusters = 1:5)
+kmlModels  <- latrendBatch(kmlMethods, data = d1_l_imp, verbose = FALSE)
+kmlModel5  <- subset(kmlModels, nClusters == 5, drop = TRUE)
+clusterNames(kmlModel5) <- c('T2','T3','T1','T4','T5')
+
+t_p <- data.frame(TRAJ   = clusterNames(kmlModel5),
+                  P      = gtsummary::style_percent(
+                     clusterProportions(kmlModel5) %>% as.vector(), 
+                     symbol  = TRUE, digits = 1)) %>% 
+   mutate(TRAJ = TRAJ %>% 
+             fct_relevel('T1', 'T2', 'T3', 'T4', 'T5') ) %>% 
+   mutate(TRAJ_P = str_glue("{TRAJ} ({P})") %>% 
+             fct_relevel('T1', 'T2', 'T3', 'T4', 'T5')) %>% 
+   select(-P)
+
+d_per <- data.frame(ID   = ids(kmlModel5),
+                    TRTC = d1_w$TRTC,
+                    TRAJ = trajectoryAssignments(kmlModel5)) %>% 
+   mutate(TRAJ = TRAJ %>% fct_relevel('T1','T2','T3','T4','T5')) %>%
+   left_join(t_p) %>% 
+   bind_cols(postprob(kmlModel5) %>% 
+                data.frame())
+
+d_vis <- d1_l %>% 
+   left_join(d_per %>% select(ID, TRAJ, TRAJ_P))
+
+d_traj <- clusterTrajectories(kmlModel5, at = seq(0,52)) %>% 
+   as.data.frame() %>% 
+   rename(TRAJ = Cluster) %>% 
+   mutate(TRAJ = TRAJ %>% fct_relevel('T1','T2','T3','T4','T5')) %>% 
+   left_join(t_p)
+
+f0 <- ggplot(data = d_vis,
+             aes(x = TIMEN, y = PASI_PCHG, group = factor(ID))) +
+   geom_line(alpha = 0.20) +
+   scale_x_continuous("Week",
+                      breaks = c(0, 1, 4, 8, 16, 24, 32, 40, 52),
+                      labels = c("B  ","1","4","8","16","24","32","40","52")) +
+   scale_y_continuous("PASI Percent Change",
+                      limits = c(-100, 25),
+                      breaks = c( 25,    0,    -25,   -50,    -75,    -90,    -100),
+                      labels = c('25%', '0%', '-25%', '50%', '-75%', '-90%', '-100%'),
+                      sec.axis = dup_axis(name = "")
+   ) +
+   theme_minimal() +
+   theme(panel.grid.minor = element_blank(),
+         plot.margin = margin(0,0,0,0, 'pt'))
+
+f1 <- ggplot(data = d_vis,
+             aes(x = TIMEN, y = PASI_PCHG, group = factor(ID))) +
+   geom_line(alpha = 0.20) +
+   scale_x_continuous(name = NULL,
+                      breaks = c(0, 1, 4, 8, 16, 24, 32, 40, 52),
+                      labels = c("B  "," 1","4","8","16","24","32","40","52")) +
+   scale_y_continuous("PASI Percent Change",
+                      limits = c(-100, 25),
+                      breaks = c( 25,    0,    -25,   -50,    -75,    -90,    -100),
+                      labels = c('25%', '0%', '-25%', '50%', '-75%', '-90%', '-100%'),
+                      sec.axis = dup_axis(name = "")) +
+   guides(color = FALSE) +
+   facet_wrap(~ TRAJ_P, nrow = 1) +
+   theme_minimal() +
+   theme(panel.grid.minor = element_blank(),
+         plot.margin = margin(0,0,0,0, 'pt')) +
+   theme(
+      strip.background = element_blank(),
+      strip.text = element_textbox(
+         size = 12,
+         color = "black", fill = "gray85", box.color = "gray85",
+         halign = 0.5, linetype = 1, r = unit(5, "pt"), width = unit(1, "npc"),
+         padding = margin(3, 0, 3, 0), margin = margin(3, 3, 3, 3)
+      )
+   )
+
+f2 <- ggplot(data = d_traj,
+             aes(x = TIMEN, y = PASI_PCHG, group = TRAJ_P, color = TRAJ_P)) +
+   geom_line(lwd = 1.5) +
+   scale_x_continuous(name = NULL,
+                      breaks = c(0, 1, 4, 8, 16, 24, 32, 40, 52),
+                      labels = c("B  "," 1","4","8","16","24","32","40","52")) +
+   scale_y_continuous("PASI Percent Change",
+                      limits = c(-100, 0),
+                      breaks = c( 0,    -25,   -50,    -75,    -90,    -100),
+                      labels = c('0%', '-25%', '50%', '-75%', '-90%', '-100%'),
+                      sec.axis = dup_axis(name = "")) +
+   ggthemes::scale_color_tableau(palette = 'Classic Cyclic') +
+   guides(color = FALSE) +
+   facet_wrap(~ TRAJ_P, nrow = 1) +
+   theme_minimal() +
+   theme(panel.grid.minor = element_blank(),
+         strip.background = element_blank(),
+         strip.text.x = element_blank(),
+         plot.margin = margin(0,0,0,0, 'pt'))
+
+d4 <- d_per %>% 
+   dplyr::count(TRAJ_P, TRTC) %>% 
+   mutate(TRTC = fct_rev(TRTC))
+
+f3 <- ggplot(d4, aes(fill = TRTC, values = n)) +
+   geom_waffle(color = "white", size = 0.50, n_rows = 10, flip = TRUE) +
+   facet_wrap(~ TRAJ_P, nrow = 1) +
+   scale_x_discrete() + 
+   scale_y_continuous(name = "Treatment Counts",
+                      labels = function(x) x * 10,
+                      expand = c(0,0),
+                      sec.axis = dup_axis(name = "")) +
+   ggthemes::scale_fill_tableau(palette = 'Miller Stone', direction = -1,
+                                name = NULL,
+                                labels = c("Comparator (C)","TRT: Dose 1 (D1)","TRT: Dose 2 (D2)")) +
+   theme_minimal() +
+   theme(strip.background = element_blank(),
+         strip.text.x = element_blank(),
+         panel.grid   = element_blank(), 
+         axis.ticks.y = element_line(),
+         axis.title.x = element_blank(),
+         axis.text.x  = element_blank(),
+         axis.ticks.x = element_blank(),
+         legend.position = c(0.90, 0.75),
+         plot.margin = margin(0,0,0,0, 'pt')) 
+
+
+f4 <- ggplot(d4, aes(fill = TRTC, y = n, x = 1)) +
+   geom_bar(position="fill", stat="identity") +
+   facet_wrap(~ TRAJ_P, nrow = 1, strip.position = 'bottom',
+              labeller = as_labeller(c(`T1 (29.0%)` = "T1 (n=262) **x**",
+                                       `T2 (30.9%)` = "T2 (n=278) **y**",
+                                       `T3 (30.6%)` = "T3 (n=274) **z**",
+                                       `T4 (8.15%)` = "T4 (n=74)  **z**",
+                                       `T5 (1.33%)` = "T5 (n=12)  **z**"))) +
+   scale_x_continuous(labels = NULL,
+                      breaks = NULL) + 
+   scale_y_continuous(name = "Treatment Percents",
+                      breaks = c( 0,  0.25,  0.50,  0.75,    1),
+                      labels = c('0%', '25%', '50%', '75%', '100%'),
+                      expand = c(0,0),
+                      sec.axis = dup_axis(name = "")) +
+   ggthemes::scale_fill_tableau(palette = 'Miller Stone', direction = -1) +
+   guides(fill = FALSE) +
+   theme_minimal() +
+   theme(strip.background = element_blank(),
+         #strip.text.x = element_blank(),
+         panel.grid   = element_blank(), 
+         axis.ticks.y = element_line(),
+         axis.title.x = element_blank(),
+         axis.text.x  = element_blank(),
+         axis.ticks.x = element_blank(),
+         plot.margin = margin(0,0,0,0, 'pt')) +
+   theme(
+      strip.background = element_blank(),
+      strip.text = element_textbox(
+         size = 12,
+         color = "black", fill = "gray85", box.color = "gray85",
+         halign = 0.5, linetype = 1, r = unit(5, "pt"), width = unit(1, "npc"),
+         padding = margin(3, 0, 3, 0), margin = margin(3, 3, 3, 3)
+      )
+   )
+
+
+df <- data.frame(
+   x = 0.00,
+   y = 1.0,
+   label = "**Figure Legend**: 
+   **A** Individual patients response over time 
+   **B** Individual patients response with 5 trajectories (T1, T2, T3, T4 & T5) cluster solution using a non-parametric k-means for longitudinal data 
+   **C** Grouped patients response with 5 trajectories (T) cluster solution
+   **D** Treatment composition counts by trajectories clusters (Waffle Chart) 
+   **E** Treatment composition percents by trajectories clusters (Stacked Chart w/ pairwise differences#)")
+
+t <- ggplot() +
+   geom_textbox(
+      data = df,
+      aes(x, y, label = label),
+      color = "black", fill = "gray85", box.color = "gray85",
+      width = grid::unit(1.0, "npc"), # 73% of plot panel width
+      hjust = 0, vjust = 1,
+      size = 4
+   ) +
+   scale_x_continuous(expand  = c(0,0),
+                      limits = c(0,1))+
+   scale_y_continuous(expand  = c(0,0),
+                      limits = c(0,1)) +
+   theme_void()
+
+pacman::p_load(patchwork)
+
+(f0 + t)/f1/f2/f3/f4 + 
+   plot_annotation(tag_levels = list(c('A',' ','B','C','D','E')),
+                   caption = '#Trajectories clusters (T) not sharing the same letter (**x**,**y**,**z**) 
+                   are significantly **p<0.01** different (i.e. T1 **x** different than T2 **y**) 
+                   in their treament composition',
+                   theme = theme(plot.caption = element_textbox(size = 12))
+                   )
+```
+
+
 # Responder Rate
 
 In a Phase III study involving patients suffering from hidradenitis suppurativa, an active drug was compared to a placebo. Each group consisted of 200 subjects, and the primary endpoint was the HiSCR, which is a binary endpoint. This endpoint is based on three continuous components:
@@ -1858,7 +3211,7 @@ This is a very advanced app which shows a volcano plot in the main panel and it 
 The app can be found [here](https://vis-sig.github.io/blog/posts/2022-06-06-wonderful-wednesdays-may-2022/images/HiSCR_fig%20-%20Agustin%20Calatroni.html).
 
 ![](./02_Plots/Visualization/PRO/HiSCR_fig.png)
-
+ 
 # Variability plot
 
 In this plot, the variability (represented by the standard deviation) is plotted over time and by treatment group. This is a very good idea to present the stability of the values.
@@ -1889,8 +3242,7 @@ visits <- data.frame(VISITNUM = c('3', '17', '21'),
 
 dataa <- data %>% 
   full_join(visits)
-
-levels(data$TREATMENT)
+ 
 
 ## reorder factor for treatment
 
@@ -2134,30 +3486,7 @@ p
 data <- read.csv("./01_Datasets/MAI.csv")
 ```
 
-
-# Scatter Plot
-
-
-![](./02_Plots/Visualization/PRO/Scatter.png)
-
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-data <- read.csv("./01_Datasets/MAI.csv")
-
-# Scatter plot with regression lines and confidence intervals
-ggplot(data, aes(x = base.mai, y = mai, color = gr)) +
-  geom_point(size = 2) +  # Add points
-  geom_smooth(method = "lm", se = TRUE) +  # Add linear regression lines with confidence intervals
-  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "black") +  # Reference line
-  labs(title = "Scatter Plot",
-       x = "MAI Score at Baseline",
-       y = "MAI Score After 1 Year",
-       color = "Group") +
-  theme_minimal() +
-  theme(legend.position = "top")
-```
-
-
-
+ 
 # Regression model-Prediction of health status (EQ-5D)
 
 The data is based on a study to assess the health status in patients with coronary heart diseases (see Ose et al., 2012). The research question was: what factors are associated with health status in usual primary care?

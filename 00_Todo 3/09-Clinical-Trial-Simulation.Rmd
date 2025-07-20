@@ -1,0 +1,373 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+# Clinical Trial Optimization Simulations
+
+```{r, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                    1. load the required packages                       -->
+# <!-- ---------------------------------------------------------------------- --> 
+
+## if(!require(psych)){install.packages("psych")}
+
+
+packages<-c("tidyverse", "kableExtra", 
+            "gtsummary","Mediana",
+            "Hmisc","htmltools","clinUtils")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                        2. Basic system settings                        -->
+# <!-- ---------------------------------------------------------------------- -->
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+
+
+## Check Vignettes
+# vignette(topic = "mediana", package = "Mediana")
+# vignette(topic = "case-studies", package = "Mediana")
+
+## Citation
+# citation("Mediana")
+```
+
+
+## Introduction
+
+### Clinical Development Programs
+
+The shift in clinical development program (CDP) paradigms from traditional weaknesses to a more comprehensive "Clinical Scenario Evaluation" framework represents a significant evolution in how clinical studies are designed and executed. 
+
+Weaknesses of Traditional Clinical Study Design
+
+1. **Isolated Objectives (Safety vs. Efficacy):** Traditional studies often focus separately on safety or efficacy, which may not provide a complete picture of a treatment's overall benefit-risk profile.
+2. **Simple Design Questions:** Many clinical studies are designed to answer very basic questions, which might not capture the complexity of how a drug performs under varied real-world conditions.
+3. **Fixed Study Designs:** Once a study begins, the design typically remains unchanged, even if initial assumptions prove incorrect or new information emerges.
+4. **Sample Size Calculation (A Priori):** Traditional designs calculate sample sizes based on initial assumptions and expected effect sizes, which might not be adaptable to real-time data gathered during the trial.
+5. **Analytic Solutions (Equations):** Reliance on pre-established statistical methods can limit the flexibility and responsiveness of a study to unexpected results or new scientific insights.
+
+Future CDP Paradigm: "Clinical Scenario Evaluation" Framework
+This new framework proposes several innovative approaches to address the limitations of traditional designs. This new paradigm emphasizes flexibility, adaptiveness, and a more holistic approach to clinical trial design and execution, potentially leading to more effective and efficient development of new therapies.
+
+1. **Backward Induction Techniques:** This strategy involves planning the end goals of a study first and then designing the study to meet these outcomes, ensuring that the final objectives are always in focus.
+2. **Relative Evaluation of Program:** Assessing the clinical development program on multiple fronts:
+   - **Efficiency:** Streamlining processes to reduce time and resource consumption.
+   - **Robustness:** Ensuring the study design can withstand various challenges and uncertainties.
+   - **Validity:** Confirming that the study accurately reflects the real-world efficacy and safety of the treatment.
+   - **Optimization:** Continuously refining study parameters for better outcomes.
+   - **Acceleration:** Speeding up the study process without compromising quality.
+3. **Numerical Solutions (Simulation):** Using advanced simulations to predict outcomes under various scenarios, which can lead to more dynamic and adaptable study designs.
+4. **Quantitative Criteria:** Including statistical measures like type 1 error (false positives), type 2 error (false negatives), costs, and time to provide a more comprehensive evaluation of the study's effectiveness.
+5. **Qualitative Criteria:** Considering factors such as operational feasibility, regulatory acceptance, ethics, and patient centricity to ensure the study is conducted in a socially responsible and compliant manner.
+6. **Scientific Innovation:** Promoting the development of new statistical models, study designs, and overall approaches within clinical development programs to enhance scientific discovery and therapeutic development.
+
+
+### Clinical Scenario Evaluation (CSE)
+
+```{r , echo=FALSE, fig.align="center", out.width = '100%'}  
+knitr::include_graphics("./02_Plots/CTO_CSE Framework.png")   
+```
+
+#### CSE Framework: Key Elements (Benda, 2010)
+
+
+```{r , echo=FALSE, fig.align="center", out.width = '100%'}  
+knitr::include_graphics("./02_Plots/CTO_CSE Benda2010.png")   
+```
+
+The Clinical Scenario Evaluation (CSE) framework, as proposed by Benda in 2010, is a forward-thinking approach to clinical trial design that aims to address the limitations of traditional study methodologies. This framework integrates various key elements to create more robust, flexible, and effective clinical studies. Here's an overview of these key elements according to Benda's proposal:
+
+**1. Scenario Planning**
+Scenario planning involves envisioning multiple potential future outcomes and developing strategies to address each scenario. This allows trial designers to prepare for different possibilities, such as changes in patient responses or unexpected side effects, and adjust the trial parameters accordingly.
+
+**2. Backward Induction**
+This technique starts with the end goals of the clinical trial and works backwards to establish the steps necessary to achieve those goals. By focusing on the desired outcomes from the outset, researchers can design trials that are more likely to meet their objectives and generate meaningful data.
+
+**3. Dynamic Adaptation**
+CSE encourages the use of adaptive trial designs, where the study can evolve in response to interim results. This might include modifying dosages, adding or dropping treatment arms, or adjusting sample sizes based on real-time data analysis, thereby making the trial more responsive and efficient.
+
+**4. Robust and Flexible Design**
+The framework promotes designs that are robust enough to handle unexpected challenges and flexible enough to incorporate new information as it becomes available. This approach reduces the risk of trial failure due to rigid design parameters that don’t reflect the complexities of real-world medical treatment.
+
+**5. Integrated Decision Making**
+Decision-making processes in the CSE framework are integrated across different levels of the trial, from strategic planning to operational execution. This integration ensures that decisions are informed by a comprehensive understanding of both the scientific and logistical aspects of the trial.
+
+**6. Comprehensive Evaluation Metrics**
+CSE calls for the use of both quantitative and qualitative criteria in evaluating the success of a trial. Quantitative metrics might include statistical measures like type 1 and type 2 errors, while qualitative metrics could assess factors like patient satisfaction, ethical considerations, and regulatory compliance.
+
+**7. Stakeholder Engagement**
+Engaging a broad range of stakeholders, including patients, healthcare providers, regulatory bodies, and industry experts, is crucial in the CSE framework. This engagement helps ensure that the trial design considers all relevant perspectives and improves the likelihood of its success and acceptability.
+
+**8. Continuous Learning and Improvement**
+The CSE framework emphasizes the importance of learning from each trial, successful or not, to improve future clinical research. This involves systematic collection and analysis of data not just on clinical outcomes, but also on the performance of the trial design and execution strategies themselves.
+
+#### CSE Framework: Refined Key Elements (Friede, 2010)
+
+```{r , echo=FALSE, fig.align="center", out.width = '100%'}  
+knitr::include_graphics("./02_Plots/CTO_CSE Friede2010.png")   
+```
+ 
+The Clinical Scenario Evaluation (CSE) framework, as refined by Friede in 2010, builds upon the foundational principles introduced by Benda and further elaborates on how clinical trials can be designed and managed more effectively. Friede’s refinements focus on enhancing adaptability, precision, and the comprehensive integration of evolving clinical data and statistical methodologies. Here’s a detailed overview of the refined key elements proposed by Friede:
+
+**1. Enhanced Adaptive Designs**
+Friede emphasizes the importance of adaptive designs in clinical trials, which allow for modifications to the trial procedures based on interim data without compromising the integrity or validity of the study. This can include adjustments in dosing, sample size, or even the primary endpoints, based on ongoing analysis of accumulated data.
+
+**2. Simulation-Based Planning**
+A significant refinement is the use of advanced simulation techniques to anticipate potential scenarios and outcomes before the trial commences. These simulations help in designing more effective trials by predicting the impacts of various changes and ensuring that the study can adapt to unforeseen circumstances.
+
+**3. Precision in Hypothesis Setting**
+The framework calls for more precise hypothesis settings that are closely aligned with the expected clinical scenarios. This involves defining clear, scientifically valid hypotheses that are directly related to the therapeutic context of the study, enhancing the relevance and applicability of the trial results.
+
+**4. Integrated Analysis Frameworks**
+Friede suggests the integration of various statistical and data analysis techniques to handle complex data structures and diverse data sources. This could involve the use of mixed-model approaches, multi-level analysis, and the incorporation of real-world evidence to strengthen the robustness and depth of the study conclusions.
+
+**5. Proactive Risk Management**
+Proactive risk management is highlighted as a crucial element, involving the identification, assessment, and mitigation of potential risks throughout the duration of the trial. This proactive approach helps in maintaining the quality and integrity of the trial under varying clinical and operational conditions.
+
+**6. Stakeholder-Driven Processes**
+Building upon earlier models, Friede underscores the importance of involving all relevant stakeholders, including patients, regulators, and healthcare professionals, in the trial design and decision-making processes. This ensures that the trial is responsive to the needs and expectations of those it aims to serve.
+
+**7. Continuous Quality Improvement**
+The CSE framework refined by Friede advocates for a continuous quality improvement process, where feedback from current and past trials is systematically used to enhance future trial designs. This element encourages a learning healthcare system where each trial contributes to a cumulative improvement in research methodologies.
+
+**8. Ethical and Regulatory Compliance**
+Ensuring that the trial adheres to the highest standards of ethics and meets all regulatory requirements is a foundational element. Friede emphasizes the necessity of integrating ethical considerations into every phase of the trial, from planning to execution and reporting.
+
+### CSE across Three Levels
+
+The Clinical Scenario Evaluation (CSE) framework is a structured approach designed to enhance the planning, execution, and analysis of clinical trials. It emphasizes a comprehensive evaluation across three levels—Program, Trial, and Statistical Analysis—allowing researchers to address complex clinical questions with a high degree of rigor and strategic foresight. Here’s a detailed breakdown of the principles and key questions at each level within the CSE framework:
+
+#### 1. Program Level {-}
+
+At the program level, the focus is on the overarching strategy of a series of clinical trials, including planning and resource allocation. This level considers the broad objectives and logistics that impact multiple trials within a program.
+
+**Key Questions:**
+- **What are the objectives?** Clear definition of what the program aims to achieve, such as proving efficacy, determining safety, or comparing treatments.
+- **What are the different options?** Choices between parallel, staggered, or serial trial designs, each offering different benefits and challenges in terms of time, cost, and resource allocation.
+- **What are the sets of assumptions?** Developing scenarios based on optimistic, realistic, and pessimistic assumptions to prepare for various outcomes.
+- **Drug Supply Considerations:** Decisions on tablet sizes for dose-finding studies.
+- **Preclinical Results:** Timing of toxicity studies in animals to inform trial timing and safety assessments.
+- **Competitor Landscape:** Understanding the market and selecting appropriate reference products for comparison.
+- **Operational Feasibility:** Assessing factors like patient recruitment capabilities and site startup times.
+- **Treatment Effect:** Evaluating expected efficacy and safety profiles based on preclinical and early clinical data.
+
+#### 2. Trial Level {-}
+
+At the trial level, the focus shifts to the design and conduct of individual clinical trials, addressing specific hypotheses within the broader program.
+
+**Key Questions:**
+- **What are the objectives?** Each trial must have clear, specific objectives that align with the overall program goals.
+- **What are endpoints?** Deciding between clinical endpoints (direct measures of clinical benefit) and subclinical endpoints (biomarkers or surrogate endpoints).
+- **What are the alternative designs?** Options include parallel group designs versus crossover designs, and fixed versus adaptive designs.
+- **What intercurrent events are expected?** Planning for events that could affect the conduct or outcomes of the trial.
+- **What is the expected type and degree of missing data?** Planning for data that might be missing completely at random (MCAR), missing at random (MAR), or missing not at random (MNAR).
+- **What factors of the patient population are relevant?** Considering factors like prevalence of the condition, demographic subgroups, and genetic variations.
+- **What is the range of feasible sample sizes?** Determining the minimum and maximum sample sizes that are logistically and statistically appropriate.
+
+#### 3. Analysis Level {-}
+
+At the analysis level, the focus is on the statistical methods used to interpret the data collected during the trial.
+
+**Key Questions:**
+- **What are the objectives?** Defining primary and secondary hypotheses that the analysis needs to address.
+- **What are types of endpoints?** Considering the scale (nominal, ordinal, etc.) and distribution (normal, binomial, etc.) of endpoints, as well as absolute changes versus baseline changes.
+- **What are relevant variable roles should be modeled?** Including covariates, moderators, and mediators in the analysis.
+- **What are the analysis options?** Choosing between nonparametric and parametric methods, fixed effects and mixed effects models.
+- **What are the expected/minimal treatment effects?** Setting expectations for treatment effect sizes (small, medium, large).
+- **Which comparisons should be under control of the global type 1 error?** Ensuring that the risk of false positives is managed across primary and secondary outcomes.
+- **What methods for control of type 1 error are available?** Choosing from clinical, semi-parametric, and parametric methods.
+- **How should intercurrent events (ICEs) be handled?** Deciding on a treatment policy for ICEs, using methods like composite or hypothetical models.
+- **What is the expected type and degree of missing data?** Planning for data management strategies based on the type of missing data.
+- **What statistical framework is used?** Deciding between frequentist and Bayesian approaches.
+ 
+ 
+### Mediana R package
+
+The Mediana R package serves as a comprehensive software implementation of the Clinical Scenario Evaluation (CSE) framework, as introduced by Benda et al. (2010) and Friede et al. (2010). This framework addresses the complexity of sample size calculation and power evaluation in clinical trials by treating them as high-dimensional statistical problems. The CSE framework simplifies this complexity through a structured approach that decomposes the evaluation process into distinct components or models:
+
+1. **Data models** - These define the process of generating trial data, including aspects like sample sizes, outcome distributions, and their parameters. Data models essentially set the stage for how trial data is simulated or collected in a structured manner, reflecting realistic scenarios that might be encountered in actual trials.
+
+2. **Analysis models** - These involve the statistical methods applied to the trial data. This includes the selection of statistical tests, the application of multiplicity adjustments, and other methodological decisions that impact the analysis of trial data. Analysis models focus on the interpretation of the data collected, ensuring that the statistical methods align with the trial's objectives and data characteristics.
+
+3. **Evaluation models** - These specify the criteria for evaluating the performance of the analysis strategies. Evaluation models can incorporate traditional success criteria, such as marginal power, or more complex criteria such as disjunctive power, which may consider multiple outcomes or scenarios. These models help stakeholders understand the effectiveness and robustness of different statistical methods under various conditions.
+
+By integrating these models, the Mediana R package facilitates a thorough and flexible evaluation of clinical trial strategies, aiding in the design and analysis phases by providing a clearer understanding of the implications of different methodological choices. This structured approach is particularly valuable in the planning and execution of clinical trials, ensuring that they are both scientifically rigorous and statistically sound.
+
+
+
+### Specific Modules Explained
+
+This framework aims to enhance the efficiency of clinical trials, especially adaptive trials, by using simulations to determine the most effective sample size and power settings. These simulations account for various complexities and uncertainties inherent in late-stage trials, including Phase II, seamless Phase II/III, and Phase III studies. A graphical user interface (GUI) based on R/Shiny, such as that provided by Mediana Cloud, makes these sophisticated statistical tools accessible to researchers without requiring deep programming knowledge.
+ 
+Each module addresses a different aspect of adaptive trial design and management, allowing researchers to tailor the trial design to specific needs and data insights:
+
+#### Module A: Adaptive Trials with Data-Driven Sample Size Re-estimation (ADSSMod function) {-}
+This module allows for sample size adjustments based on interim data analysis. It’s particularly useful when initial estimates of treatment effect size or variance are uncertain. The function recalculates the required sample size to maintain statistical power as more data becomes available.
+
+#### Module B: Adaptive Trials with Data-Driven Treatment Selection (ADTreatSel function) {-}
+This function facilitates the selection of the most promising treatment(s) during the trial based on interim results. It can be used to drop inferior treatment arms or to concentrate resources on the most effective treatments, thus optimizing trial efficiency and resource use.
+
+#### Module C: Adaptive Trials with Data-Driven Population Selection (ADPopSel function) {-}
+This module focuses on refining the target population for a trial based on emerging data. This could involve focusing on a subgroup of patients who are showing better responses or adjusting inclusion criteria to improve treatment effects.
+
+#### Module D: Optimal Selection of a Futility Stopping Rule (FutRule function) {-}
+This function helps determine the best criteria and timing for stopping a trial early if interim results suggest that continuing is unlikely to demonstrate treatment effectiveness. It helps avoid unnecessary continuation of ineffective or potentially harmful treatments.
+
+#### Module E: Blinded Event Prediction in Event-Driven Trials (EventPred function) {-}
+This module predicts the occurrence of key trial events under blinded conditions. It's crucial for planning and resource allocation in trials where outcomes depend on specific events occurring, such as survival or disease recurrence.
+
+#### Module F: Adaptive Trials with Response-Adaptive Randomization (ADRand function) {-}
+This function adjusts the probability of patient assignment to different treatment arms based on accrued responses. It aims to maximize patient benefit by increasing the likelihood of receiving more effective treatments.
+
+#### Module G: Traditional Trials with Multiple Objectives (MultAdj function) {-}
+This module handles the complexity of trials with multiple objectives, providing statistical adjustments to manage multiple hypotheses testing while controlling for type I error rates.
+
+#### Module H: Cluster-Randomized Trials (ClustRand function) {-}
+Designed for trials where interventions are administered to groups or clusters rather than individual patients, this function accounts for intra-cluster correlation and designs appropriate randomization schemes.
+
+## Data model
+
+### Specify Two Samples
+
+Specify two samples with a continuous endpoint following a normal distribution:
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+library(Mediana)
+# Outcome parameters set 1
+outcome1.placebo = parameters(mean = 0, sd = 70)
+outcome1.treatment = parameters(mean = 40, sd = 70)
+
+# Outcome parameters set 2
+outcome2.placebo = parameters(mean = 0, sd = 70)
+outcome2.treatment = parameters(mean = 50, sd = 70)
+
+# Placebo sample object
+Mediana::Sample(id = "Placebo",
+       outcome.par = parameters(outcome1.placebo, 
+                                outcome2.placebo))
+
+# Treatment sample object
+Mediana::Sample(id = "Treatment",
+       outcome.par = parameters(outcome1.treatment, 
+                                outcome2.treatment))
+```
+
+Specify two samples with a binary endpoint following a binomial distribution:
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# Outcome parameters set
+outcome.placebo = parameters(prop = 0.30)
+outcome.treatment = parameters(prop = 0.50)
+
+# Placebo sample object
+Mediana::Sample(id = "Placebo",
+       outcome.par = parameters(outcome1.placebo))
+
+# Treatment sample object
+Mediana::Sample(id = "Treatment",
+       outcome.par = parameters(outcome1.treatment))
+```
+
+
+Specify two samples with a time-to-event (survival) endpoint following an exponential distribution:
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# Outcome parameters
+median.time.placebo = 6
+rate.placebo = log(2)/median.time.placebo
+outcome.placebo = parameters(rate = rate.placebo)
+
+median.time.treatment = 9
+rate.treatment = log(2)/median.time.treatment
+outcome.treatment = parameters(rate = rate.treatment)
+
+# Placebo sample object
+Mediana::Sample(id = "Placebo",
+       outcome.par = parameters(outcome.placebo))
+
+# Treatment sample object
+Mediana::Sample(id = "Treatment",
+       outcome.par = parameters(outcome.treatment))
+```
+
+Specify three samples with two primary endpoints that follow a binomial and a normal distribution, respectively:
+
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# Variable types
+var.type = list("BinomDist", "NormalDist")
+
+# Outcome distribution parameters
+plac.par = parameters(parameters(prop = 0.3), 
+                         parameters(mean = -0.10, sd = 0.5))
+
+dosel.par = parameters(parameters(prop = 0.40), 
+                       parameters(mean = -0.20, sd = 0.5))
+
+doseh.par = parameters(parameters(prop = 0.50), 
+                       parameters(mean = -0.30, sd = 0.5))
+
+# Correlation between two endpoints
+corr.matrix = matrix(c(1.0, 0.5,
+                       0.5, 1.0), 2, 2)
+
+# Outcome parameters set
+outcome.placebo = parameters(type = var.type, 
+                             par = plac.par, 
+                             corr = corr.matrix)
+
+outcome.dosel = parameters(type = var.type, 
+                           par = dosel.par, 
+                           corr = corr.matrix)
+
+outcome.doseh = parameters(type = var.type, 
+                           par = doseh.par, 
+                           corr = corr.matrix)
+
+# Placebo sample object
+Mediana::Sample(id = list("Plac ACR20", "Plac HAQ-DI"),
+       outcome.par = parameters(outcome.placebo))
+
+# Low Dose sample object
+Mediana::Sample(id = list("DoseL ACR20", "DoseL HAQ-DI"),
+       outcome.par = parameters(outcome.dosel))
+
+# High Dose sample object
+Mediana::Sample(id = list("DoseH ACR20", "DoseH HAQ-DI"),
+       outcome.par = parameters(outcome.doseh))
+```
+
+
+
+## Analysis Model
+
+
+## Evaluation Model
+
+
+
+ 
+## Reference
+
+
+* [Online Manual](https://gpaux.github.io/Mediana/)
+* Dmitrienko, A., Paux, G., Brechenmacher, T. (2016). [Power calculations in clinical trials with complex clinical objectives.] Journal of the Japanese Society of Computational Statistics. 28, 15-50.](https://www.jstage.jst.go.jp/article/jjscs/28/1/28_1411001_213/_article)
+* Dmitrienko, A., Paux, G., Pulkstenis, E., Zhang, J. (2016). [Tradeoff-based optimization criteria in clinical trials with multiple objectives and adaptive designs.] Journal of Biopharmaceutical Statistics. 26, 120-140.](http://www.tandfonline.com/doi/abs/10.1080/10543406.2015.1092032?journalCode=lbps20)
+* Paux, G. and Dmitrienko A. (2018). [Penalty-based approaches to evaluating multiplicity adjustments in clinical trials: Traditional multiplicity problems.] Journal of Biopharmaceutical Statistics. 28, 146-168.(https://doi.org/10.1080/10543406.2017.1397010)
+* Paux, G. and Dmitrienko A. (2018). [Penalty-based approaches to evaluating multiplicity adjustments in clinical trials: Advanced multiplicity problems.] Journal of Biopharmaceutical Statistics. 28, 169-188.(https://doi.org/10.1080/10543406.2017.1397011)
+
+### Vignettes {-}
+
+* [Mediana: an R package for clinical trial simulations](https://cran.r-project.org/web/packages/Mediana/vignettes/mediana.html)
+* vignette(topic = "case-studies", package = "Mediana")

@@ -1,0 +1,140 @@
+# Baseline and Covariate
+
+```{r, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                    1. load the required packages                       -->
+# <!-- ---------------------------------------------------------------------- --> 
+
+## if(!require(psych)){install.packages("psych")}
+
+
+packages<-c("tidyverse", "kableExtra", 
+            "gtsummary","inTextSummaryTable",
+            "Hmisc","htmltools","clinUtils")
+
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(packages)
+ 
+ 
+# <!-- ---------------------------------------------------------------------- -->
+# <!--                        2. Basic system settings                        -->
+# <!-- ---------------------------------------------------------------------- -->
+# setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+```
+
+
+## Baseline 
+
+### Baseline Comparisons
+
+The term 'baseline' here refers to a broad concept of baseline. Baseline balance between treatment groups is of utmost importance. The only way to achieve baseline balance among the treatment groups is through randomized grouping.
+
+In randomized controlled clinical trials, as the treatment and control groups come from the same population, the baseline distribution should theoretically be balanced if randomization is applied correctly. That is, the probability distribution of baseline values should be the same. If individual indicators differ significantly, it can be attributed to random sampling error (by chance). Hence, there is no need for statistical testing of the baseline. There are also no corresponding requirements in ICH-E9.
+
+Moreover, current literature and some trials often use tests of difference for baseline testing. Statistically speaking, the null hypothesis is that the baseline of the treatment group is the same as that of the control group. In fact, not rejecting the null hypothesis does not prove that they come from the same population. The power of testing for baseline comparison is also not considered in research design.
+
+From another perspective, in non-randomized controlled clinical trials, treatment and control groups often come from different populations. Even if there is no statistical difference in the baselines considered, it cannot be said that the two groups are balanced because it is unknown whether characteristics not considered or measured in the trial are balanced, hence the conclusion has a certain level of uncertainty.
+
+Even if we assume (which is practically impossible) that all indicators are balanced (meaning the difference test \( P > \alpha \)), slight variations in certain characteristic indicators can still affect efficacy. For example, in a thrombolytic therapy study, a 1% difference in the history of intracranial hemorrhage at baseline between the treatment and control groups has no statistical significance but can still affect the incidence of hemorrhagic stroke (the primary efficacy indicator). Therefore, a 1% difference here is clinically significant.
+
+### Baseline Adjustments
+
+This section refers to a narrow concept of baseline. When evaluating primary endpoints, if the baseline value is a continuous variable, it is often necessary to consider the impact of the baseline value on prognosis. A common method is to calculate the change from baseline for the observed indicator, which is the difference between the post-treatment observation value and the baseline, including absolute or relative differences.
+
+Let \( y_0 \) represent the baseline of the observed indicator, \( y_1 \) the post-treatment measurement value, \( y_{min} \) the theoretical minimum value of the observed indicator, and \( y_{max} \) the theoretical maximum value.
+
+**(i) Absolute Difference**
+
+When the lower observation value is better:
+
+It represents how much it has decreased after treatment relative to the baseline.
+\[ y = y_0 - y_1 \]
+
+When the higher observation value is better:
+
+It represents how much it has increased after treatment relative to the baseline.
+Absolute differences are commonly used for variables with linear changes. However, many observed indicators do not change linearly, in which case relative differences are required.
+
+**(ii) Relative Difference**
+
+Let's note \( y_{min} \) as the theoretical minimum value of an observed indicator, and \( y_{max} \) as the theoretical maximum value.
+
+When the lower observation value is better:
+\[ y = \frac{y_0 - y_1}{y_0} \quad \text{or} \quad y = \frac{y_0 - y_1}{y_0 - y_{min}} \]
+
+It represents the proportion reduced after treatment relative to the baseline. Here, \( y_0 - y_{min} \) represents how much it could potentially decrease after treatment.
+
+When the higher observation value is better:
+\[ y = \frac{y_1 - y_0}{y_0} \quad \text{or} \quad y = \frac{y_1 - y_0}{y_{max} - y_0} \]
+
+It represents the multiple by which it has increased after treatment relative to the baseline. Here, \( y_{max} - y_0 \) represents how much it could potentially increase after treatment.
+
+When the denominator is zero (either \( y = y_{min} \) or \( y = y_{max} \)), the relative difference cannot be calculated. This should be considered in research design through setting inclusion criteria to avoid such scenarios.
+
+## Covariates
+
+### Controlling for Covariates
+
+Covariates refer to factors that are anticipated to significantly impact the analysis of primary variables before the administration of the trial medication in participants. These variables can be qualitative, quantitative, or ordinal; they can include demographic indicators such as age, weight, race/ethnicity, etc.; the course or severity of a disease; prognostic factors for some diseases recognized on a pathophysiological basis; and other factors such as the center or researcher involved. Broadly speaking, baseline data constitutes covariates.
+
+ICH-E9 explicitly states that the impact of covariates on outcomes must be considered in clinical trials. Particularly for covariates that significantly affect outcomes, their intergroup uniformity must be considered during design, and appropriate statistical methods must be employed for adjustment to enhance estimation accuracy. EMA has issued specific technical guidelines detailing the significance, correction methods, and correct application of controlling covariates. In epidemiological research, covariates are known as confounders. Imbalance in covariates between groups can lead to biased analysis results. There are several methods to ensure covariates are balanced across groups:
+
+1. **Randomization**: Theoretically, with a sufficiently large sample size, complete randomization should minimize the probability of imbalanced distribution of all factors (known and unknown) across treatment groups.
+2. **Stratified Randomization Based on Covariate Values**: In cases of smaller sample sizes, simple randomization may not ensure each factor is distributed equally across treatment groups. Here, stratification based on important baseline variables and utilizing stratified randomization (see Chapter 4) can ensure the distribution of some important covariates is balanced.
+3. **Limiting the Range of Individual Covariate Values in Inclusion Criteria**: This method ensures all participants have the same or similar covariate values. However, by restricting participant conditions, especially when the range is too narrow, the results become non-generalizable, thus limiting the application of this method.
+
+Even with intergroup balance, significant variability in individual covariates can still impact trial outcomes. Hence, control and adjustment for covariates are needed in the analysis of clinical trial data. Common methods for adjusting covariates include analysis of covariance (ANCOVA), multiple regression analysis, and stratified analysis.
+
+It's important to note, even though baseline has already been considered and used in calculating efficacy indicators, it still needs further adjustment in the model as a special covariate, especially for indicators that significantly impact prognosis, because the adjustment in Section I is not complete.
+
+
+### Adjusting for Covariates
+
+Depending on the nature of the covariates and the number of covariates to be considered, different methods must be used for correction. When both the primary outcome variable and the covariates are continuous, the analysis of covariance (ANCOVA) method can be used; when both are categorical, stratified analysis can be applied; and when multiple covariates need to be considered, corresponding statistical models are used for correction.
+
+1. **Analysis of Covariance (ANCOVA) Method**
+When the primary outcome variable is continuous, and covariates are continuous or categorical, correction for covariates can be done using ANCOVA or the general linear model. If the covariate is continuous, there should be a linear relationship between the covariate and the outcome variable, and this relationship should be the same in both the experimental and control groups.
+
+2. **Stratified Analysis Method**
+When both the primary outcome variable and the covariates are categorical, stratified analysis can be used for correction. When the outcome variable is binary and the covariate is categorical, the Mantel-Haenszel test can be applied for stratified analysis, which can also be viewed as a special type of ANCOVA.
+
+3. **Model Method**
+When multiple covariates need to be considered, corresponding statistical models are used for correction. Generally, a general linear model is used when the outcome variable is continuous; logistic regression when the outcome is binary; ordinal logistic regression for ordered categorical outcomes; Cox proportional hazards model for survival outcomes; and Poisson regression for count data outcomes.
+
+If a covariate is binary, it is included in the model in a 0-1 format; if it is multicategorical, dummy variables are used; and if it is continuous, it can be directly included in the model (if linear), or after categorization or ordinal categorization.
+
+
+## Statistical Considerations Regarding Baseline and Covariates
+ 
+1. **Stratified Randomization**: Stratified randomization is used to ensure balance among covariates (stratification factors) across treatment groups. All stratification factors are usually included in the primary analysis model as covariates. In multicenter trials, if stratification by center is performed, the main analysis model should consider the center as a covariate to both assess and correct for center effects. Due to management reasons, block randomization is often used, but block factors are generally not considered as covariates, differing from Fisher's concept of block design.
+
+2. **Adjustment Analysis for Covariates**: The purpose of adjusting for covariates in analysis is not to focus on whether covariates are statistically significant in our study, nor to exclude variables without statistical significance like in epidemiological observational studies. If a covariate is clinically confirmed to be closely associated with the primary outcome, it should be considered a covariate in the primary analysis, regardless of its statistical significance in the study, especially in confirmatory clinical trials.
+
+3. **Baseline Imbalances Post-Randomization**: Imbalances in baseline characteristics found after randomization should not be considered as covariates in the primary analysis. However, as part of a sensitivity analysis, including them as covariates in the primary analysis can test the robustness of the results, especially when there are multiple baseline imbalances.
+
+4. **Post-Randomization Measured Variables**: Variables measured after randomization should not be considered as covariates due to potential influence by treatment factors.
+
+5. **Continuous Baseline Variables**: When the primary variable's baseline is a continuous variable or derived from a continuous variable, regardless of whether the primary variable's form is the original observed value, the change from baseline (absolute or relative), or a categorized variable derived from this (e.g., effective or ineffective), the model must include its baseline as a covariate.
+
+6. **Linear Form or Dichotomization of Covariates**: Without sufficient reason or a priori assumption, covariates are generally included in the model in a simple linear form or after dichotomization, with variable transformation applied as necessary. Choosing complex forms or transforming covariates for model inclusion requires sufficient justification.
+
+7. **Analysis Reporting**: It is recommended that analysis reports present both adjusted and unadjusted results for covariates to assess the robustness of the results. If covariates are categorical, results of subgroup analysis for different categories should be given. For continuous covariates, subgroup results can also be presented after categorizing the baseline.
+
+8. **Interaction with Treatment**: The main analysis generally does not consider the interaction between covariates and treatment. If interaction needs to be considered based on scientific knowledge and experience, its test efficiency and the power of subgroup analysis after stratification by covariates should be considered during design.
+
+9. **Estimation of Missing Baseline Data**: The method for estimating missing baseline data should be determined in advance.  
+
+10. **Pre-Specified Covariates in Analysis Model**: Covariates included in the primary analysis model (including variable transformations and reasons) should be clearly specified in advance in the trial protocol and statistical analysis plan. Covariates should not be overly numerous. Clearly defining, correctly analyzing, and reasonably interpreting in the protocol will aid readers and reviewers in judging the results. Due to the potential for many other effective analyses, only the pre-specified analysis methods are the most credible.
+
+11. **Model Assumption Validity Check**: It is necessary to check the validity of model assumptions when evaluating analysis results. This is crucial for generalized linear models and nonlinear models, as misuse can lead to incorrect estimates of treatment effects. Even under the general linear model, the potential impact of extreme values on results should be considered.
+
+12. **Interpretation of Different Results from Adjusted and Unadjusted Analyses**: Careful and reasonable interpretation is needed when corrected and uncorrected analyses yield different results. Therefore, selecting appropriate covariates and pre-specifying the primary statistical model is crucial.
+
+
