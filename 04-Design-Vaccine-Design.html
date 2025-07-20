@@ -726,7 +726,7 @@ particular emphasis during Phase III and post-marketing surveillance.
 Regulatory agencies employ systems such as the Vaccine Adverse Event
 Reporting System (VAERS) and the Vaccine Safety Datalink (VSD) to
 monitor and evaluate adverse events continuously.</p>
-<p><img src="02_Plots/Vaccine/Vaccine-COVID19Development.jpg" /></p>
+<p><img src="./02_Plots/Vaccine/Vaccine-COVID19Development.jpg" /></p>
 <p>To respond to the COVID-19 emergency, traditional timelines were
 compressed. Normally, vaccine development might take ten years, but
 several COVID-19 vaccines reached approval in just 18 to 20 months. This
@@ -775,14 +775,13 @@ can offer flexibility and efficiency, their application in vaccine
 trials is limited due to the emphasis on safety and the complexity of
 implementing changes mid-trial.</p></li>
 </ul>
-<p><img src="02_Plots/Vaccine/Vaccine-Development.png" /></p>
+<p><img src="./02_Plots/Vaccine/Vaccine-Development.png" /></p>
 </div>
 </div>
-<div
-id="standard-statistical-methods-for-the-analysis-of-immunogenicity-data"
+<div id="statistical-methods-for-the-analysis-of-immunogenicity-data"
 class="section level1" number="2">
-<h1><span class="header-section-number">2</span> Standard Statistical
-Methods for the Analysis of Immunogenicity Data</h1>
+<h1><span class="header-section-number">2</span> Statistical Methods for
+the Analysis of Immunogenicity Data</h1>
 <p>Historically, vaccine immunogenicity studies have primarily focused
 on evaluating the humoral immune response, specifically through the
 measurement of serum antibody levels. In recent years, however, there
@@ -1400,20 +1399,448 @@ seroconverted after vaccination.</p>
 <div id="analysis-of-proportions" class="section level2" number="2.4">
 <h2><span class="header-section-number">2.4</span> Analysis of
 Proportions</h2>
+<p>This section discusses statistical methods for analyzing
+<strong>binary endpoints</strong> in clinical vaccine trials—most
+notably <strong>seroprotection</strong> and
+<strong>seroconversion</strong> rates. However, these methods are
+broadly applicable to other binary outcomes, such as:</p>
+<ul>
+<li>Proportion of subjects reporting local/systemic reactions</li>
+<li>Proportion experiencing adverse vaccine events</li>
+<li>Proportion remaining disease-free post-vaccination</li>
+</ul>
+<div id="single-proportion-analysis" class="section level3"
+number="2.4.1">
+<h3><span class="header-section-number">2.4.1</span> Single Proportion
+Analysis</h3>
+<p>To test a null hypothesis about a single proportion (e.g.,
+probability of seroprotection):</p>
+<ul>
+<li><p><strong>Distribution</strong>: Use the Binomial Distribution
+<span class="math inline">\(B(n, \pi)\)</span>, where:</p>
+<ul>
+<li><span class="math inline">\(n\)</span>: number of observations</li>
+<li><span class="math inline">\(\pi\)</span>: assumed proportion under
+<span class="math inline">\(H_0\)</span></li>
+</ul></li>
+<li><p><strong>One-sided test</strong>: <span class="math inline">\(H_0:
+\pi = \pi_0\)</span> vs. <span class="math inline">\(H_1: \pi &gt;
+\pi_0\)</span> Compute <span class="math inline">\(P(S \geq s \mid
+\pi_0)\)</span>, with <span class="math inline">\(S \sim B(n,
+\pi_0)\)</span></p></li>
+<li><p><strong>In SAS</strong>: Use <code>PROBBNML(π; n; m)</code> to
+calculate tail probabilities.</p></li>
+</ul>
+<p>To calculate confidence Intervals for a Single Proportion</p>
+<p>Three common methods:</p>
+<ol style="list-style-type: decimal">
+<li>Clopper–Pearson (Exact)</li>
+</ol>
+<ul>
+<li>Based on binomial tail probabilities</li>
+<li>Conservative: always ≥ nominal coverage (e.g., 95%)</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Wald Method (Asymptotic)</li>
+</ol>
+<ul>
+<li>Simple, but poor performance near <span class="math inline">\(\pi
+\approx 0\)</span> or <span class="math inline">\(\pi \approx
+1\)</span></li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>Wilson Method (Asymptotic)</li>
+</ol>
+<ul>
+<li>Better average coverage than Wald</li>
+<li>Confidence interval obtained by solving a quadratic inequality</li>
+</ul>
+</div>
+<div id="comparing-two-proportions" class="section level3"
+number="2.4.2">
+<h3><span class="header-section-number">2.4.2</span> Comparing Two
+Proportions</h3>
+<p>Two main comparison metrics:</p>
+<ul>
+<li><strong>Rate Difference (RD)</strong>: <span
+class="math inline">\(r_1 - r_0\)</span></li>
+<li><strong>Rate Ratio (RR)</strong>: <span class="math inline">\(r_1 /
+r_0\)</span></li>
+</ul>
+<p><strong>Hypothesis Testing</strong></p>
+<ul>
+<li><p>Test <span class="math inline">\(H_0: RD = 0\)</span> or <span
+class="math inline">\(H_0: RR = 1\)</span></p></li>
+<li><p>Use:</p>
+<ul>
+<li>Pearson’s Chi-Square</li>
+<li>Fisher’s Exact Test (for small samples)</li>
+<li>Suissa and Shuster Test (exact, more powerful)</li>
+</ul></li>
+</ul>
+<p>To calculate Confidence Intervals</p>
+<p>For Rate Difference:</p>
+<ul>
+<li><p><strong>Wald-type</strong>: <span class="math inline">\(RD \pm
+z_{\alpha/2} \cdot SE(RD)\)</span></p>
+<blockquote>
+<p>Risk of inconsistent test statistic and interval due to differing
+standard error assumptions.</p>
+</blockquote></li>
+<li><p><strong>Wilson-type (Miettinen and Nurminen)</strong>: Solves for
+values of RD satisfying:</p>
+<p><span class="math display">\[
+\frac{RD - RD_0}{SE^*(RD_0)} = \pm z_{\alpha/2}
+\]</span></p>
+<p>Iterative solution using constrained MLEs.</p></li>
+</ul>
+<p>For Rate Ratio:</p>
+<ul>
+<li><p><strong>Wald-type (log-transform)</strong>:</p>
+<p><span class="math display">\[
+CI = \exp\left[ \log(RR) \pm z_{\alpha/2} \cdot SE(\log RR) \right]
+\]</span></p></li>
+<li><p><strong>Wilson-type</strong>: Also iterative, using constrained
+MLEs.</p></li>
+</ul>
+</div>
+<div id="suissa-and-shuster-exact-test" class="section level3"
+number="2.4.3">
+<h3><span class="header-section-number">2.4.3</span> Suissa and Shuster
+Exact Test</h3>
+<p>The Suissa and Shuster Exact Test is a statistical method for
+comparing two proportions, such as two groups in a clinical trial (e.g.,
+treatment vs. placebo). Unlike Fisher’s Exact Test, which conditions on
+the margins (i.e., the row and column totals in a 2x2 contingency
+table), the Suissa and Shuster test conditions only on the sample sizes
+of the two groups, not on the number of events observed. This makes it a
+more flexible and often more powerful test than Fisher’s test,
+particularly when you want to test hypotheses beyond the standard
+“proportions are equal.”</p>
+<p><strong>Key Characteristics:</strong></p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Exact Test</strong>: It does not rely on large-sample
+approximations. The test remains valid regardless of the sample
+size.</p></li>
+<li><p><strong>More Powerful than Fisher’s Test</strong>: Studies have
+shown that the Suissa and Shuster test typically has greater power,
+meaning it’s more likely to detect a true difference when one
+exists.</p></li>
+<li><p><strong>Supports More General Hypotheses</strong>:</p>
+<ul>
+<li>It can test whether the difference in proportions equals a specific
+value other than zero (i.e., H₀: RD = Δ₀).</li>
+<li>It can test whether the relative risk equals a value other than 1
+(i.e., H₀: RR = RR₀).</li>
+<li>Fisher’s test does not support this directly.</li>
+</ul></li>
+<li><p><strong>Enables Exact Confidence Intervals</strong>: Since it
+supports testing a range of null hypotheses, it can be used to derive
+exact confidence intervals by identifying the smallest and largest
+parameter values that would not be rejected at a given significance
+level.</p></li>
+</ol>
+<p><strong>How the Test Works (Conceptually):</strong></p>
+<ul>
+<li><p>First, compute a Z-statistic based on your observed data and the
+hypothesis you’re testing. The formula depends on whether you’re testing
+a difference in proportions (risk difference) or a relative
+risk.</p></li>
+<li><p>Then, generate all possible 2x2 contingency tables for the fixed
+sample sizes. For each of these tables, calculate the same type of
+Z-statistic.</p></li>
+<li><p>The p-value is determined by finding the maximum tail probability
+over a range of assumed null parameter values (e.g., for RD or RR). This
+is why it’s called an “exact” test—it integrates over possible nuisance
+parameter values rather than assuming a fixed one.</p></li>
+<li><p>In practice, the test is implemented by discretizing the possible
+values of the nuisance parameter (e.g., from 0 to 1 in small steps like
+0.001) and computing the p-value at each step.</p></li>
+</ul>
+<p><strong>Procedure (Chan, 1998):</strong></p>
+<ol style="list-style-type: decimal">
+<li><p>Compute Z-statistic under null</p></li>
+<li><p>Enumerate all 2x2 tables and calculate <span
+class="math inline">\(Z_{ij}\)</span></p></li>
+<li><p>Compute P-value:</p>
+<p><span class="math display">\[
+P = \max_{\pi_0 \in D} \Pr(|Z| \geq |Z_{obs}| \mid \pi_0)
+\]</span></p></li>
+</ol>
+<blockquote>
+<p><em>Where <span class="math inline">\(D\)</span> is the domain of
+nuisance parameter <span class="math inline">\(\pi_0\)</span>, divided
+into small increments.</em></p>
+</blockquote>
+<p><strong>Why it is Useful in Vaccine Trials or Safety
+Studies:</strong></p>
+<ul>
+<li><p>Vaccine efficacy trials often deal with low event rates (e.g.,
+infection rates), where approximations like the chi-square test or Wald
+test may perform poorly. The Suissa and Shuster test avoids these
+problems.</p></li>
+<li><p>It remains accurate when group sizes are small or event rates are
+extreme (close to 0 or 1).</p></li>
+</ul>
+<p><strong>Example Use:</strong></p>
+<p>Imagine you conduct a study with 15 participants in each group. The
+vaccine group has 7 people who develop illness, while the placebo group
+has 12. Using Fisher’s exact test, the two-sided p-value might be around
+0.128. But using the Suissa and Shuster test, the p-value might be lower
+(e.g., 0.068), suggesting a stronger signal.</p>
+<p>This difference in power can be crucial when working with small
+sample sizes or in early-phase clinical trials.</p>
+<table>
+<colgroup>
+<col width="24%" />
+<col width="23%" />
+<col width="21%" />
+<col width="30%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Use Case</th>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Clopper–Pearson</strong></td>
+<td>Single proportion</td>
+<td>Exact, conservative</td>
+<td>Wider intervals</td>
+</tr>
+<tr class="even">
+<td><strong>Wald</strong></td>
+<td>Single/two proportions</td>
+<td>Simple</td>
+<td>Poor performance near 0 or 1</td>
+</tr>
+<tr class="odd">
+<td><strong>Wilson</strong></td>
+<td>Single/two proportions</td>
+<td>Good coverage</td>
+<td>Slightly more complex</td>
+</tr>
+<tr class="even">
+<td><strong>Miettinen–Nurminen</strong></td>
+<td>Rate diff./ratio CI</td>
+<td>Accurate, asymptotic</td>
+<td>Needs iteration</td>
+</tr>
+<tr class="odd">
+<td><strong>Suissa–Shuster</strong></td>
+<td>Exact comparison</td>
+<td>Powerful, exact</td>
+<td>Computationally intensive</td>
+</tr>
+<tr class="even">
+<td><strong>Jewell’s Correction</strong></td>
+<td>RR bias correction</td>
+<td>Effective</td>
+<td>No gain in CI coverage</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="multiple-co-primary-endpoints-and-the-intersectionunion-test"
 class="section level2" number="2.5">
 <h2><span class="header-section-number">2.5</span> Multiple Co-Primary
 Endpoints and the Intersection–Union Test</h2>
+<p>In clinical vaccine trials, researchers often need to assess
+<strong>more than one key outcome</strong>, or <strong>co-primary
+endpoints</strong>, to determine whether a vaccine is effective. These
+endpoints may reflect different aspects of vaccine performance—such as
+protection against various disease strains, or different types of immune
+response (e.g., antibody levels and seroprotection).</p>
+<p>Co-primary endpoints are <strong>multiple main outcomes that must all
+be met</strong> to declare the trial a success. For example:</p>
+<ul>
+<li><p>A <strong>combination vaccine</strong> targeting multiple
+serotypes (e.g., pneumococcal vaccine for 10 serotypes) might require
+showing superiority against <strong>each serotype</strong> individually.
+That leads to <strong>10 co-primary endpoints</strong>.</p></li>
+<li><p>A vaccine might need to prove superiority on
+<strong>both</strong>:</p>
+<ul>
+<li><strong>Seroprotection rate</strong> (the proportion of subjects
+above a protective antibody threshold),</li>
+<li>and the <strong>geometric mean response</strong> (a measure of
+average immune strength).</li>
+</ul></li>
+</ul>
+<p>In these cases, a statistically sound method is required to
+<strong>account for multiple testing</strong>, which increases the
+chance of false positives.</p>
+<hr />
+<p><strong>The Multiplicity Problem</strong></p>
+<p>When testing multiple hypotheses (i.e., each endpoint), the chance of
+<strong>at least one false positive</strong> increases. Simply using a
+significance level (α) of 0.05 for each endpoint will no longer maintain
+an overall type I error rate of 5%.</p>
+<p>The <strong>Intersection–Union Test (IU test)</strong> is a
+conservative but commonly used method to address this issue in
+regulatory trials.</p>
+<ul>
+<li>For each endpoint (e.g., each serotype or measure), define a
+<strong>null hypothesis</strong> <span
+class="math inline">\(H_{0i}\)</span>: the experimental vaccine is not
+superior to control on endpoint <em>i</em>.</li>
+<li>Each null hypothesis is tested <strong>individually at significance
+level α</strong> (usually 0.05).</li>
+<li><strong>Only if all</strong> individual hypotheses are rejected, can
+the overall conclusion of vaccine superiority be claimed.</li>
+</ul>
+<p><strong>Mathematically</strong>:</p>
+<ul>
+<li><p>Let there be <em>k</em> co-primary endpoints.</p></li>
+<li><p>The <strong>overall null hypothesis</strong> is the
+<strong>union</strong> of all individual nulls:</p>
+<p><span class="math display">\[
+H_0 = H_{01} \cup H_{02} \cup \cdots \cup H_{0k}
+\]</span></p></li>
+<li><p>The <strong>alternative hypothesis</strong> is their
+<strong>intersection</strong>:</p>
+<p><span class="math display">\[
+H_1 = H_{11} \cap H_{12} \cap \cdots \cap H_{1k}
+\]</span></p></li>
+<li><p>This is why it’s called the <strong>Intersection–Union
+Test</strong>: to reject the union of nulls, all individual nulls must
+be rejected (i.e., prove all endpoints simultaneously).</p></li>
+</ul>
+<hr />
+<p><strong>Advantages of the IU Test</strong></p>
+<ul>
+<li><strong>Simplicity</strong>: Easy to implement and explain, even to
+non-statistical stakeholders.</li>
+<li><strong>No adjustment to α is required</strong> because the approach
+itself controls the family-wise error rate by construction.</li>
+</ul>
+<hr />
+<p><strong>Disadvantages of the IU Test</strong></p>
+<ul>
+<li><p><strong>Conservativeness</strong>: The IU test is often
+<strong>too strict</strong>, meaning it may <strong>fail to detect true
+effects</strong>, especially if endpoints are <strong>not strongly
+correlated</strong>.</p>
+<ul>
+<li>If endpoints are <strong>independent</strong>, the overall
+significance level becomes <span
+class="math inline">\(\alpha^k\)</span>, which is very small for large
+<em>k</em>.</li>
+<li>For example, with α = 0.05 and 5 endpoints, the joint level is <span
+class="math inline">\(0.05^5 = 3.1 \times 10^{-7}\)</span>.</li>
+</ul></li>
+</ul>
+<hr />
+<p><strong>Alternatives to IU: The Min Test</strong></p>
+<p>When the outcomes (endpoints) are assumed to follow a
+<strong>multivariate normal distribution</strong>, an alternative is the
+<strong>Min Test</strong>, which is:</p>
+<ul>
+<li><p>Based on the <strong>minimum</strong> of the individual test
+statistics:</p>
+<p><span class="math display">\[
+Z_{\text{min}} = \min(Z_1, Z_2, ..., Z_k)
+\]</span></p></li>
+<li><p>More <strong>statistically powerful</strong> than the IU test
+under some conditions.</p></li>
+<li><p><strong>Problem</strong>: The test distribution depends on the
+<strong>covariance structure</strong> of the endpoints, making it
+<strong>computationally complex</strong> and <strong>hard to
+generalize</strong>.</p></li>
+</ul>
+<hr />
+<p><strong>Conclusion</strong></p>
+<p>The IU Test is widely accepted in regulatory settings due to its
+<strong>simplicity and conservativeness</strong>, but it may
+<strong>lack statistical power</strong>, especially in cases with many
+co-primary endpoints. More powerful alternatives exist, such as the Min
+Test or other <strong>multivariate modeling approaches</strong>, but
+they require <strong>more assumptions and computational
+effort</strong>.</p>
+<p>Ultimately, the choice depends on <strong>regulatory
+expectations</strong>, <strong>study design</strong>, and the
+<strong>importance of detecting modest effects across multiple
+endpoints</strong>. * <strong>Chuang-Stein et al.</strong> discuss power
+and strategy for designing trials with multiple primary endpoints. *
+<strong>Senn and Bretz</strong> explore the implications of multiple
+testing on drug development and offer insights into alternative
+designs.</p>
 </div>
 <div id="reverse-cumulative-distribution-plot" class="section level2"
 number="2.6">
 <h2><span class="header-section-number">2.6</span> Reverse Cumulative
 Distribution Plot</h2>
+<p>The Reverse Cumulative Distribution (RCD) Plot is a graphical tool
+commonly used to display and compare the distribution of immunogenicity
+values between different vaccine groups. This visualization is
+particularly useful in vaccine trials where understanding the entire
+distribution—not just summary statistics like the mean or median—is
+crucial.</p>
+<p><strong>Concept and Axes</strong></p>
+<ul>
+<li><strong>X-axis</strong>: Represents immunogenicity values, usually
+plotted on a logarithmic scale.</li>
+<li><strong>Y-axis</strong>: Indicates the percentage of subjects who
+have an immunogenicity value greater than or equal to the corresponding
+x-value.</li>
+</ul>
+<p>This format means that the plot shows the <em>reverse</em> of the
+usual cumulative distribution. Instead of showing the proportion of
+subjects <em>below</em> a certain value, it shows the proportion
+<em>above</em>.</p>
+<p><strong>Shape and Interpretation</strong></p>
+<ul>
+<li>The RCD curve starts at <strong>100%</strong> and decreases from
+left to right.</li>
+<li>The curve reflects the <strong>log-transformed immunogenicity
+values</strong>.</li>
+</ul>
+<p>Different curve shapes imply different distribution
+characteristics:</p>
+<ul>
+<li><strong>Steep Middle Section (Curve A)</strong>: Indicates a
+symmetric distribution with low variability. Most subjects cluster
+around the mean.</li>
+<li><strong>Flatter Middle Section (Curve B)</strong>: Implies high
+variability among subjects’ immune responses.</li>
+<li><strong>Rectangular Shape (Curve C)</strong>: Reflects a
+right-skewed distribution. Most subjects have high immune responses with
+a sharp drop at the end.</li>
+<li><strong>Left-Skewed Shape (Curve D)</strong>: Most subjects have low
+responses; the curve declines sharply early and flattens toward the
+end.</li>
+</ul>
+<p><strong>Comparing Groups Using RCD Curves</strong></p>
+<ul>
+<li><p>If one vaccine’s RCD curve lies entirely <strong>above</strong>
+another’s and they do <strong>not intersect</strong> (e.g., A vs. D),
+then the former induces higher immune responses at <strong>every
+percentile</strong>.</p></li>
+<li><p>If the curves <strong>intersect</strong>, interpretation becomes
+more nuanced:</p>
+<ul>
+<li>One vaccine may produce <strong>more high and low
+responses</strong>, while the other is more consistent.</li>
+<li>If the <strong>point of intersection</strong> is <strong>above
+50%</strong>, it favors the curve that descends later (e.g., B over A),
+meaning more than half of the subjects in that group achieved higher
+immunogenicity.</li>
+</ul></li>
+</ul>
+<div class="float">
+<img src="02_Plots/Vaccine/RCD.png"
+alt="The Reverse Cumulative Distribution Plot" />
+<div class="figcaption">The Reverse Cumulative Distribution Plot</div>
 </div>
 </div>
-<div id="vaccine-efficacy" class="section level1" number="3">
-<h1><span class="header-section-number">3</span> Vaccine Efficacy</h1>
+</div>
+<div id="efficacy-analysis" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Efficacy Analysis</h1>
 <div id="assessing-vaccine-efficacy" class="section level2"
 number="3.1">
 <h2><span class="header-section-number">3.1</span> Assessing Vaccine
@@ -1463,10 +1890,452 @@ common or underreported.</li>
 </ul></li>
 </ol>
 </div>
-<div id="vaccine-methods-ssd-sample-size-determination-examples"
+<div id="vaccine-efficacy-hypothesis-into-binomial-testing-framework"
 class="section level2" number="3.2">
-<h2><span class="header-section-number">3.2</span> Vaccine Methods / SSD
-(Sample Size Determination) Examples</h2>
+<h2><span class="header-section-number">3.2</span> Vaccine Efficacy
+Hypothesis into Binomial Testing Framework</h2>
+<p><strong>Goal:</strong> Compare two hypotheses:</p>
+<ul>
+<li><strong>Null Hypothesis (H₀): VE ≤ 0.3</strong> (vaccine provides
+low or no protection)</li>
+<li><strong>Alternative Hypothesis (H₁): VE = 0.6</strong> (vaccine
+provides strong protection)</li>
+</ul>
+<p><strong>Step 1: Define Probabilities</strong></p>
+<ul>
+<li>Let <strong>πₚₗₐcₑbₒ</strong> be the probability of getting
+symptomatic COVID-19 in the <strong>placebo group</strong></li>
+<li>Let <strong>πᵥₐccᵢₙₑ</strong> be the same for the <strong>vaccine
+group</strong></li>
+</ul>
+<p><strong>Step 2: Conditional Probability for Vaccine Case</strong>
+Derive the probability that a <strong>random case</strong> (symptomatic
+COVID-19) comes from the vaccine group, under a given hypothesis
+(VE):</p>
+<p><span class="math display">\[
+P_{H_x}(Vaccine\ Case\ |\ Case) = \frac{π_{Placebo}(1 -
+VE)}{π_{Placebo}(1 - VE) + π_{Placebo}} = \frac{0.08(1 - VE)}{0.08(1 -
+VE) + 0.08}
+\]</span></p>
+<p><strong>Step 3: Plug in VE under each hypothesis</strong></p>
+<ul>
+<li><p>Under <strong>H₀ (VE = 0.3)</strong>, the conditional probability
+becomes:</p>
+<p><span class="math display">\[
+P_{H₀} = \frac{0.08(1 - 0.3)}{0.08(1 - 0.3) + 0.08} = 0.4118
+\]</span></p></li>
+<li><p>Under <strong>H₁ (VE = 0.6)</strong>:</p>
+<p><span class="math display">\[
+P_{H₁} = \frac{0.08(1 - 0.6)}{0.08(1 - 0.6) + 0.08} = 0.2857
+\]</span></p></li>
+</ul>
+<p><strong>Step 4: Modeling the Number of Vaccine Cases</strong>
+Assume:</p>
+<ul>
+<li><strong>N</strong> is the total number of symptomatic cases
+observed.</li>
+<li><strong>V</strong> is the number of those that are in the vaccine
+group.</li>
+</ul>
+<p>Then:</p>
+<ul>
+<li><strong>V ~ Binomial(N, Pₕₓ)</strong> depending on which hypothesis
+is true.</li>
+<li><strong>1 – β = P(V ≥ c | H₁) = 0.9</strong>, meaning we want
+<strong>90% power</strong> to detect a VE of 0.6 if it’s true.</li>
+</ul>
+</div>
+<div id="adjusting-for-imbalance-in-pre-vaccination-state"
+class="section level2" number="3.3">
+<h2><span class="header-section-number">3.3</span> Adjusting for
+Imbalance in Pre-Vaccination State</h2>
+<p><strong>Imbalance in Pre-Vaccination State</strong></p>
+<p>In some vaccine studies, participants already have <strong>non-zero
+antibody levels before vaccination</strong>—this is common in diseases
+requiring repeated immunizations, such as tetanus or pertussis. When
+this happens, the <strong>post-vaccination antibody level</strong>
+reflects both the <strong>effect of the vaccine</strong> and the
+<strong>pre-existing immunity</strong>, which complicates comparisons
+between vaccine groups.</p>
+<p>If there’s an imbalance in pre-vaccination levels between groups,
+then <strong>any difference in post-vaccination values</strong> might
+partly be due to this initial difference—not the vaccine. In such cases,
+the vaccine’s effect may be <strong>overestimated</strong>.</p>
+<p>A common but flawed solution is to analyze <strong>fold
+increases</strong> (post/pre ratios). However, this doesn’t solve the
+problem. If <strong>pre- and post-vaccination levels are positively
+correlated</strong>, then higher pre-vaccination values predict
+both:</p>
+<ul>
+<li>higher post-vaccination values, and</li>
+<li><strong>lower fold increases</strong> (because the baseline is
+larger).</li>
+</ul>
+<p>This means that analyzing fold increases can <strong>introduce
+bias</strong> in the opposite direction.</p>
+<p>Though <strong>statistical theory doesn’t require balanced
+baselines</strong>, correcting for imbalances <strong>increases
+credibility</strong>. Randomization ensures balance <em>on average</em>,
+but imbalances still arise due to chance.</p>
+<hr />
+<p><strong>Adjusting for Baseline Imbalance</strong></p>
+<p>Two major methods are:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Stratification</strong>:</p>
+<ul>
+<li>Participants are grouped into strata based on baseline values.</li>
+<li>In clinical practice, <em>pre-randomization stratification</em> is
+rare due to logistical challenges (e.g., needing two visits: one for
+blood draw and one for randomization).</li>
+<li>A practical alternative is <strong>post-randomization
+stratification</strong>, done at the analysis stage—often using
+<strong>quartiles</strong> of baseline values.</li>
+</ul></li>
+<li><p><strong>Analysis of Covariance (ANCOVA)</strong>:</p>
+<ul>
+<li>Adjusts for baseline differences by modeling post-vaccination values
+<strong>as a function of pre-vaccination levels</strong>.</li>
+<li>This method assumes <strong>parallel regression lines</strong> for
+each group and estimates the treatment effect as the <strong>vertical
+gap between these lines</strong>.</li>
+</ul></li>
+</ol>
+<hr />
+<p>ANCOVA models the relationship between:</p>
+<ul>
+<li><strong>Y</strong>: log-transformed post-vaccination antibody
+level</li>
+<li><strong>X</strong>: log-transformed pre-vaccination level</li>
+</ul>
+<p>Using the model: <strong>Y = β₀ + β₁x + ε</strong></p>
+<p>Here:</p>
+<ul>
+<li>β₀ is the intercept (mean post-vaccination level for seronegative
+individuals),</li>
+<li>β₁ is the slope (how much the log-post level increases with each
+log-pre unit),</li>
+<li>ε is the error term.</li>
+</ul>
+<p>The log-transformed outcome is used to maintain normality and allow
+interpretation in terms of <strong>geometric means</strong>.</p>
+<hr />
+<p><strong>Addressing Heteroscedasticity</strong></p>
+<p>Usually, ANCOVA assumes <strong>constant variance</strong>
+(homoscedasticity). But <strong>variance decreases as pre-vaccination
+levels increase</strong>—called <strong>heteroscedasticity</strong>.
+Ignoring this can lead to <strong>incorrect standard errors and
+p-values</strong>.</p>
+<p>Solution: Model the variance as a function of <strong>x</strong> (the
+pre-vaccination value). One such model:</p>
+<p><strong>σ²ₓ = σ² (1 + c₁x + c₂x²)</strong> An alternative (easier to
+fit in software):</p>
+<p><strong>σ²ₓ = σ² exp(C₁x + C₂x²)</strong></p>
+<p>This model guarantees non-negative variance and gives stable
+estimates.</p>
+<p>SAS Code to model heteroscedasticity:</p>
+<pre class="sas"><code>proc mixed;
+model y = x / solution;
+repeated / local=exp(x x2);
+run;</code></pre>
+<p>This outputs estimates for the regression line and the variance
+model. Comparing models under homoscedasticity vs heteroscedasticity
+shows:</p>
+<ul>
+<li><strong>Slope and intercept</strong> are slightly different.</li>
+<li><strong>Standard errors</strong> are more accurate under
+heteroscedasticity.</li>
+<li><strong>Seronegative-only estimates</strong> are less precise due to
+smaller sample size.</li>
+</ul>
+</div>
+<div id="equivalence-and-noninferiority-vaccine-trials"
+class="section level2" number="3.4">
+<h2><span class="header-section-number">3.4</span> Equivalence and
+Noninferiority Vaccine Trials</h2>
+<div
+id="equivalence-and-noninferiority-trials-with-a-geometric-mean-response"
+class="section level3" number="3.4.1">
+<h3><span class="header-section-number">3.4.1</span> Equivalence and
+Noninferiority Trials with a Geometric Mean Response</h3>
+<p>In many vaccine trials, the <strong>geometric mean</strong> of
+antibody levels (titre or concentration) is used as the outcome. The
+main parameter of interest is the <strong>geometric mean ratio
+(GMR)</strong>:</p>
+<p> <strong>θ = e₁ / e₀</strong></p>
+<p>Where:</p>
+<ul>
+<li><strong>e₁</strong> = geometric mean in the investigational
+group</li>
+<li><strong>e₀</strong> = geometric mean in the control group</li>
+</ul>
+<p>If you log-transform the data, equivalence in terms of GMR
+<strong>θ</strong> translates into equivalence in terms of the
+<strong>difference Δ</strong> of the log-transformed means:</p>
+<p> <strong>Δ = log(e₁) − log(e₀) = log(θ)</strong></p>
+<p>So, if your equivalence range for <strong>θ</strong> is [1/δ, δ],
+then your equivalence range for <strong>Δ</strong> is [−log(δ),
++log(δ)]. The <strong>FDA/CBER</strong> often recommends using
+<strong>0.67 to 1.5</strong> as a standard equivalence margin for
+GMRs.</p>
+<hr />
+<p>Example: Combination Hepatitis A and B Vaccine Trial</p>
+<ul>
+<li><strong>Design</strong>: Combination vaccine vs. separate monovalent
+vaccines</li>
+<li><strong>Sample size</strong> (per protocol): 264 (combination), 269
+(monovalent)</li>
+</ul>
+<p><strong>Hepatitis B (Anti-HBs):</strong></p>
+<ul>
+<li><p><strong>Geometric means</strong>:  Combination: 2099  Monovalent:
+1871  GMR = 2099 / 1871 = <strong>1.12</strong></p></li>
+<li><p><strong>Standard deviation of log titres</strong>:  log(6.8) =
+1.92, log(9.5) = 2.25 → pooled SD = 2.09</p></li>
+<li><p><strong>Standard error of difference</strong>:  SE = 2.09 ×
+√(1/264 + 1/269) = 0.18</p></li>
+<li><p><strong>Test statistic for equivalence</strong>:  Equivalence
+margin (log scale) = ±log(1.5) = ±0.41  Observed difference = log(2099)
+− log(1871) = 7.65 − 7.53 = 0.12  Z_EQ = (0.41 − |0.12|) / 0.18 = 1.61 →
+p = 0.054 (not significant)</p></li>
+<li><p><strong>95% CI for log(θ)</strong>:  0.12 ± 1.964 × 0.18 =
+[−0.23, 0.47]  Exp back to θ scale → CI for GMR = [0.79, 1.60] → does
+<strong>not</strong> lie within [0.67, 1.5]</p></li>
+</ul>
+<p> <strong>Conclusion</strong>: Equivalence <strong>not</strong>
+demonstrated.</p>
+<hr />
+<p><strong>Hepatitis A (Anti-HAV):</strong></p>
+<ul>
+<li><p><strong>Geometric means</strong>:  Combination: 4756  Monovalent:
+2948  GMR = 1.61</p></li>
+<li><p><strong>Log means</strong>:  log(4756) = 8.47, log(2948) = 7.99
+ SDs: log(3.1) = 1.13, log(2.5) = 0.92 → pooled SD = 1.03  SE =
+0.09</p></li>
+<li><p><strong>Lower bound of CI for Δ (noninferiority test)</strong>:
+ Δ = 8.47 − 7.99 = 0.48  Lower bound = 0.48 − 1.964 × 0.09 = 0.30
+ Back-transformed: exp(0.30) = <strong>1.35</strong></p></li>
+</ul>
+<p> <strong>Conclusion</strong>: Lower bound &gt; 0.67 →
+<strong>noninferiority</strong> confirmed</p>
+</div>
+<div id="equivalence-and-noninferiority-with-seroresponse-rates"
+class="section level3" number="3.4.2">
+<h3><span class="header-section-number">3.4.2</span> Equivalence and
+Noninferiority with Seroresponse Rates</h3>
+<p>When the outcome is a <strong>seroconversion rate</strong> or
+<strong>seroprotection rate</strong> (i.e., a binary outcome), the
+parameter of interest is the <strong>risk difference (RD)</strong>.</p>
+<ul>
+<li><strong>Equivalence</strong>: Two-sided CI for RD must lie within
+±margin</li>
+<li><strong>Noninferiority</strong>: One-sided CI lower bound must be
+above −margin</li>
+<li><strong>Margins</strong>: Common values are ±5% or ±10%</li>
+</ul>
+<hr />
+<p><strong>Example (Anti-HAV Seroconversion Rates):</strong></p>
+<ul>
+<li><p><strong>Observed rates</strong>:  Combination: 267 / 269 = 0.993
+ Monovalent: 263 / 264 = 0.996  Risk difference = 0.993 − 0.996 =
+<strong>−0.003</strong></p></li>
+<li><p><strong>95% CI for RD</strong>: [−0.023, +0.014]  Equivalence
+margin = [−0.05, +0.05]</p></li>
+</ul>
+<p> <strong>Conclusion</strong>: CI lies within margin →
+<strong>equivalence confirmed</strong></p>
+<hr />
+<p><strong>SAS Implementation</strong></p>
+<p>To perform the <strong>TOST (Two One-Sided Tests)</strong> approach
+using the <strong>Wilson score method</strong>, use this code:</p>
+<pre class="sas"><code>proc freq;
+  table vaccine*seroconverted /
+  riskdiff(equivalence method=fm margin=0.05) alpha=0.025;
+run;</code></pre>
+<ul>
+<li>The output will give <strong>two P-values</strong> (one for each
+one-sided test).</li>
+<li>If both are &lt;0.025, <strong>equivalence is
+concluded</strong>.</li>
+<li>You can use trial-and-error with <code>margin=</code> to find exact
+CI bounds.</li>
+</ul>
+</div>
+</div>
+<div id="vaccine-lot-consistency-trials" class="section level2"
+number="3.5">
+<h2><span class="header-section-number">3.5</span> Vaccine Lot
+Consistency Trials</h2>
+<p>Before licensing a vaccine, <strong>regulatory agencies</strong> like
+the FDA (CBER) and EMA require proof that <strong>different lots
+(batches)</strong> of the vaccine induce <strong>consistent
+immunogenicity</strong>. This is evaluated via <strong>lot consistency
+trials</strong>, which are a type of <strong>equivalence
+study</strong>.</p>
+<p>Trial Design</p>
+<ul>
+<li>Three <strong>consecutively produced</strong> vaccine lots are
+used.</li>
+<li>Participants are <strong>randomly assigned</strong> to one of the
+three lots.</li>
+<li>After vaccination, <strong>antibody titers</strong> are
+measured.</li>
+<li><strong>Lot consistency is demonstrated</strong> if all
+<strong>pair-wise comparisons</strong> of post-vaccination
+<strong>geometric mean titers (GMTs)</strong> lie within a
+<strong>predefined equivalence range</strong>.</li>
+</ul>
+<table>
+<colgroup>
+<col width="19%" />
+<col width="15%" />
+<col width="42%" />
+<col width="21%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Type</th>
+<th>Key Feature</th>
+<th>Decision Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Confidence Interval</td>
+<td>Estimation</td>
+<td>Requires 3 pairwise GMR CIs within margin</td>
+<td>CI ∈ [lower, upper]</td>
+</tr>
+<tr class="even">
+<td>Wiens &amp; Iglewicz</td>
+<td>Hypothesis Test</td>
+<td>Uses min Z-statistic across pairs</td>
+<td>Zmin &gt; critical value</td>
+</tr>
+</tbody>
+</table>
+<p>Both methods are valid and often give similar conclusions. The
+<strong>CI method</strong> is simpler and more common. The <strong>Wiens
+&amp; Iglewicz test</strong> is more formal but needs careful
+consideration of sample size to control Type I error.</p>
+<div id="confidence-interval-ci-method" class="section level3"
+number="3.5.1">
+<h3><span class="header-section-number">3.5.1</span> Confidence Interval
+(CI) Method</h3>
+<p>The most common method involves calculating <strong>two-sided 95%
+confidence intervals</strong> for all <strong>three pairwise geometric
+mean ratios (GMRs)</strong>.</p>
+<p><strong>Conclusion:</strong> If <strong>all three</strong> CIs are
+entirely within the pre-specified <strong>equivalence margin</strong>,
+lot consistency is declared.</p>
+<p><strong>Example – Influenza Vaccine Trial</strong></p>
+<ul>
+<li><p><strong>Three lots</strong> (n = 123, 123, 117)</p></li>
+<li><p><strong>GMTs</strong> for A-H3N2 strain:</p>
+<ul>
+<li>Lot #1: 192.9 (mean log titer = 5.27)</li>
+<li>Lot #2: 162.2 (mean log titer = 5.02)</li>
+<li>Lot #3: 202.5 (mean log titer = 5.34)</li>
+</ul></li>
+<li><p><strong>Pooled SD</strong>: ~1.585</p></li>
+<li><p><strong>Equivalence margin</strong> (in GMR): 0.35 to
+2.83</p></li>
+</ul>
+<p>Calculations (example: Lot #2 vs Lot #1):</p>
+<ul>
+<li>Difference in log means: 5.02 − 5.27 = −0.25</li>
+<li>Standard error: √(1.585² × 2 / 123) ≈ 0.203</li>
+<li>CI for difference: −0.25 ± 1.97 × 0.203 → [−0.648, 0.148]</li>
+<li>Exponentiating → GMR CI: [0.638, 1.108]</li>
+</ul>
+<p><strong>Results for all pairs</strong>:</p>
+<ul>
+<li>Lot #2 vs Lot #1: [0.638, 1.108]</li>
+<li>Lot #3 vs Lot #1: [0.796, 1.384]</li>
+<li>Lot #3 vs Lot #2: [0.944, 1.651]</li>
+</ul>
+<p><strong>Conclusion</strong>: All three intervals fall within [0.35,
+2.83] → <strong>Lot consistency confirmed</strong>.</p>
+</div>
+<div id="wiens-and-iglewicz-test" class="section level3" number="3.5.2">
+<h3><span class="header-section-number">3.5.2</span> Wiens and Iglewicz
+Test</h3>
+<p>This method treats lot consistency as a <strong>formal hypothesis
+test</strong>:</p>
+<p><strong>Hypotheses:</strong></p>
+<ul>
+<li><strong>H0</strong>: At least one pairwise difference in log means ≥
+equivalence margin (in absolute value)</li>
+<li><strong>H1</strong>: All pairwise differences in log means &lt;
+equivalence margin</li>
+</ul>
+<p><strong>Test Statistic:</strong></p>
+<p>For each pairwise comparison (i, j), define:</p>
+<ul>
+<li>Difference: Dij = x̄j − x̄i</li>
+<li>SE of Dij: SE(Dij)</li>
+<li>Equivalence margin: δ (in log-scale)</li>
+</ul>
+<p>Then compute:</p>
+<p> <strong>Zmin = min over pairs of { (δ − |Dij|) / SE(Dij)
+}</strong></p>
+<ul>
+<li>Zmin is a <strong>one-sided</strong> test statistic.</li>
+<li>If Zmin exceeds the critical value (e.g., z₀.975 = 1.96),
+<strong>reject H0</strong> → lot consistency.</li>
+</ul>
+<p><strong>Example (continued):</strong></p>
+<ul>
+<li><p>Differences:</p>
+<ul>
+<li>D12 = −0.25</li>
+<li>D13 = 0.07</li>
+<li>D23 = 0.32</li>
+</ul></li>
+<li><p>SEs:</p>
+<ul>
+<li>SE(D12) ≈ 0.202</li>
+<li>SE(D13) ≈ 0.203</li>
+<li>SE(D23) ≈ 0.205</li>
+</ul></li>
+<li><p>δ = log(2.83) ≈ 1.5</p></li>
+</ul>
+<p>Then:</p>
+<p>Zmin = min of</p>
+<ul>
+<li>(1.5 − 0.25)/0.202 ≈ 6.19</li>
+<li>(1.5 − 0.07)/0.203 ≈ 7.03</li>
+<li>(1.5 − 0.32)/0.205 ≈ 5.76</li>
+</ul>
+<p><strong>Zmin = 5.76</strong> → exceeds critical value →
+<strong>reject H0</strong> → lot consistency.</p>
+<hr />
+<p><strong>Type I Error Control</strong></p>
+<p>The Wiens &amp; Iglewicz test is <strong>not conservative</strong> by
+default. To ensure Type I error is controlled, the sample size must be
+sufficiently large relative to δ/σ (equivalence margin to SD ratio).</p>
+<p>Rule of thumb (based on equation 6.4):</p>
+<p> <strong>n &gt; 50 / (δ / σ)²</strong></p>
+<p>Example:</p>
+<ul>
+<li>If δ = 1.5, σ = 1.6 → δ/σ = 0.94</li>
+<li>Then required n &gt; 50 / (0.94)² ≈ 57 → met in example</li>
+</ul>
+<p><strong>Simulation studies</strong> confirm:</p>
+<ul>
+<li>Type I error is lowest when the ratio of mean differences is 0 or
+1</li>
+<li>Highest when the ratio is ~0.5</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="sample-size-estimation" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Sample Size
+Estimation</h1>
+<div id="vaccine-sse-methods" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Vaccine SSE
+Methods</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong>Confidence Interval for VE</strong></p>
 <ul>
@@ -1530,68 +2399,501 @@ settings</strong>.</li>
 </ul></li>
 </ol>
 <hr />
-<p><img src="02_Plots/Vaccine/Vaccine-COVID19Example.png" /></p>
+<p><img src="./02_Plots/Vaccine/Vaccine-COVID19Example.png" /></p>
 </div>
-<div id="vaccine-efficacy-hypothesis-into-binomial-testing-framework"
-class="section level2" number="3.3">
-<h2><span class="header-section-number">3.3</span> Vaccine Efficacy
-Hypothesis into Binomial Testing Framework</h2>
-<p><strong>Goal:</strong> Compare two hypotheses:</p>
+<div id="ssd-consideration" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> SSD
+Consideration</h2>
+<div id="comparing-two-geometric-mean-responses" class="section level3"
+number="4.2.1">
+<h3><span class="header-section-number">4.2.1</span> Comparing Two
+Geometric Mean Responses</h3>
+<p>There are many formulas for estimating the sample size in
+parallel-group trials with Normally distributed data. The simplest—but
+least accurate—uses the Normal approximation and can be found in any
+basic statistics textbook. The most accurate approach, which involves no
+approximation, is based on the noncentral t-distribution, as shown in
+Formula of Julious’s book [20]. Sample sizes using this method can be
+estimated using the <code>POWER</code> procedure in SAS.</p>
+<p>Two parameters must be specified:</p>
 <ul>
-<li><strong>Null Hypothesis (H₀): VE ≤ 0.3</strong> (vaccine provides
-low or no protection)</li>
-<li><strong>Alternative Hypothesis (H₁): VE = 0.6</strong> (vaccine
-provides strong protection)</li>
+<li><strong>Δ</strong>: the difference in log-transformed geometric
+means (i.e., log(GMR)).</li>
+<li><strong>σ</strong>: the within-group standard deviation of the
+log-transformed immunogenicity values.</li>
 </ul>
-<p><strong>Step 1: Define Probabilities</strong></p>
+<p>The value of σ can be obtained from previous trials. Alternatively, a
+conservative estimate can be calculated as:</p>
+<p><strong>4σ ≈ log(largest expected immunogenicity value) − log(lowest
+expected immunogenicity value)</strong></p>
+<p>This is based on the rule that approximately 95% of Normally
+distributed data falls within the range <strong>μ ± 2σ</strong>. To get
+a less conservative estimate, the multiplier 4 can be replaced with
+6.</p>
+<p><strong>Example</strong>: Consider a clinical trial comparing a
+licensed influenza vaccine to a new investigational vaccine. The primary
+endpoint is the antibody response measured by the HI test. Suppose the
+investigator expects the new vaccine to be substantially more
+immunogenic, with a geometric mean ratio (GMR) of 2.0. In such trials,
+HI titers &gt;5120 are rare, and the lowest measurable titer is usually
+5. Therefore:</p>
 <ul>
-<li>Let <strong>πₚₗₐcₑbₒ</strong> be the probability of getting
-symptomatic COVID-19 in the <strong>placebo group</strong></li>
-<li>Let <strong>πᵥₐccᵢₙₑ</strong> be the same for the <strong>vaccine
-group</strong></li>
+<li>Δ = logₑ(2.0) ≈ 0.69</li>
+<li>σ = [logₑ(5120) − logₑ(5)] / 4 ≈ 1.73</li>
 </ul>
-<p><strong>Step 2: Conditional Probability for Vaccine Case</strong>
-Derive the probability that a <strong>random case</strong> (symptomatic
-COVID-19) comes from the vaccine group, under a given hypothesis
-(VE):</p>
-<p><span class="math display">\[
-P_{H_x}(Vaccine\ Case\ |\ Case) = \frac{π_{Placebo}(1 -
-VE)}{π_{Placebo}(1 - VE) + π_{Placebo}} = \frac{0.08(1 - VE)}{0.08(1 -
-VE) + 0.08}
-\]</span></p>
-<p><strong>Step 3: Plug in VE under each hypothesis</strong></p>
+<p>The SAS code to estimate the required number of subjects per group to
+achieve a power of 0.9 is:</p>
+<pre class="sas"><code>proc power;
+  meandiff=0.69 stddev=1.73
+  power=0.9 npergroup=.;
+run;</code></pre>
+<p><strong>Output</strong>: 134 subjects per group (268 total) to
+achieve ~90% power.</p>
+</div>
+<div id="comparing-two-proportions-1" class="section level3"
+number="4.2.2">
+<h3><span class="header-section-number">4.2.2</span> Comparing Two
+Proportions</h3>
+<p>There are also many formulas for estimating the sample size required
+to compare two proportions. Most are asymptotic; detailed discussions
+can be found in Chapter 4 of Fleiss, Levin, and Paik [21]. The
+recommended formulas—(4.14) for equal group sizes and (4.19) for unequal
+sizes—are implemented in the SAS <code>POWER</code> procedure.</p>
+<p>For exact power calculations for 2x2 tables, see the work by Hirji et
+al. [22].</p>
+<p><strong>Example</strong>: Now suppose the investigator wants to
+compare seroprotection rates instead of GMTs and expects the rate to
+increase from 0.85 to 0.95. The required sample size for 90% power is
+computed using:</p>
+<pre class="sas"><code>proc power;
+  twosamplefreq test=pchi
+  groupproportions=(0.85,0.95)
+  power=0.9 npergroup=.;
+run;</code></pre>
+<p><strong>Output</strong>: 188 subjects per group to achieve ~90%
+power.</p>
+</div>
+<div
+id="sample-size-estimation-for-trials-with-multiple-co-primary-endpoints"
+class="section level3" number="4.2.3">
+<h3><span class="header-section-number">4.2.3</span> Sample Size
+Estimation for Trials with Multiple Co-Primary Endpoints</h3>
+<p>Estimating power for a trial with multiple co-primary endpoints is
+complex. Power is highly dependent on the <strong>correlation between
+endpoints</strong>. If the endpoints are strongly correlated, power will
+be higher; if weakly correlated, it will be lower. Unfortunately, these
+correlations are often unknown in practice.</p>
+<p>If the objective is to <strong>demonstrate significance for all k
+co-primary endpoints</strong>, a commonly used lower bound for overall
+power <strong>P</strong> is:</p>
+<p><strong>P ≥ Π (Pᵢ), for i = 1 to k</strong> — assuming all endpoints
+are non-negatively correlated.</p>
+<p>If you <strong>don’t</strong> want to assume anything about
+correlation, you can use this alternative bound:</p>
+<p><strong>P ≥ Σ (Pᵢ) − (k − 1)</strong></p>
+<p>If k is large, then each individual power Pᵢ must be close to 1.0 to
+maintain a global power of ≥ 0.8. To achieve 90% overall power, each Pᵢ
+should satisfy:</p>
+<p><strong>Pᵢ ≥ (0.9)^(1/k)</strong></p>
+<p>For example, if k = 5, each endpoint’s power should be at least
+~0.979.</p>
+<p><strong>Example 3.8</strong>: A comparative trial has two co-primary
+endpoints: geometric mean concentration and seroprotection rate. A total
+of 2,150 subjects is planned. Using SAS code from earlier sections:</p>
 <ul>
-<li><p>Under <strong>H₀ (VE = 0.3)</strong>, the conditional probability
-becomes:</p>
-<p><span class="math display">\[
-P_{H₀} = \frac{0.08(1 - 0.3)}{0.08(1 - 0.3) + 0.08} = 0.4118
-\]</span></p></li>
-<li><p>Under <strong>H₁ (VE = 0.6)</strong>:</p>
-<p><span class="math display">\[
-P_{H₁} = \frac{0.08(1 - 0.6)}{0.08(1 - 0.6) + 0.08} = 0.2857
-\]</span></p></li>
+<li>Power for endpoint 1 = 0.93</li>
+<li>Power for endpoint 2 = 0.90</li>
 </ul>
-<p><strong>Step 4: Modeling the Number of Vaccine Cases</strong>
-Assume:</p>
+<p>Under the assumption of non-negative correlation:</p>
+<p><strong>P ≥ 0.93 × 0.90 = 0.837</strong></p>
+<p>Using Equation above instead:</p>
+<p><strong>P ≥ 0.93 + 0.90 − 1 = 0.83</strong></p>
+<hr />
+<p><strong>Monte Carlo Simulation Alternative</strong> If prior trial
+data are available, power can be estimated using simulation. For
+example:</p>
 <ul>
-<li><strong>N</strong> is the total number of symptomatic cases
-observed.</li>
-<li><strong>V</strong> is the number of those that are in the vaccine
-group.</li>
+<li>Simulate 5,000+ trials by drawing random samples of size
+<strong>n</strong> with replacement.</li>
+<li>Count how many simulated trials achieve success on
+<strong>both</strong> endpoints (e.g., seroprotection and seroconversion
+rates exceed predefined thresholds).</li>
+<li>The proportion of “successful” simulations estimates global power
+for sample size <strong>n</strong>.</li>
 </ul>
-<p>Then:</p>
+<p>This method offers flexibility and accounts for complex correlation
+structures.</p>
+</div>
+</div>
+<div id="comparing-two-geometric-mean-responses-1"
+class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Comparing Two
+Geometric Mean Responses</h2>
+<p>When designing a vaccine trial where the <strong>primary
+endpoint</strong> is either <strong>equivalence</strong> or
+<strong>noninferiority</strong> of immunogenicity based on a
+<strong>geometric mean response</strong>—such as a geometric mean titer
+(GMT) or concentration (GMC)—the statistical power of the trial depends
+on several factors:</p>
+<ol style="list-style-type: decimal">
+<li>The <strong>equivalence or noninferiority margin</strong> (denoted
+as delta, δ). This defines how close the responses from the two vaccine
+groups must be for the vaccines to be considered equivalent or for the
+new vaccine to be considered not inferior.</li>
+<li>The <strong>within-group standard deviation</strong> (denoted as
+sigma, σ) of the <strong>log-transformed</strong> immunogenicity
+data.</li>
+<li>The <strong>true difference</strong> between the mean
+log-transformed immunogenicity values of the two groups, delta = μ1 −
+μ0, where μ1 is the mean for the investigational vaccine and μ0 for the
+control.</li>
+</ol>
+<p>The power is especially sensitive to the value of this true
+difference (Δ). If we assume no difference between groups (Δ = 0), the
+required sample size may be underestimated if in reality there is a
+small difference between them. Therefore, it’s advisable not to assume Δ
+= 0 but to include plausible deviations in planning.</p>
+<p><strong>Assumption and Distribution</strong></p>
+<p>It is generally assumed that the <strong>log-transformed
+immunogenicity values follow a Normal distribution</strong>. Power and
+sample size are then calculated based on <strong>noncentral
+t-distributions</strong>.</p>
+<p><strong>Equivalence Trial Power Estimation (Example)</strong></p>
+<p>In the hepatitis B vaccine trial example, the investigator sets:</p>
 <ul>
-<li><strong>V ~ Binomial(N, Pₕₓ)</strong> depending on which hypothesis
-is true.</li>
-<li><strong>1 – β = P(V ≥ c | H₁) = 0.9</strong>, meaning we want
-<strong>90% power</strong> to detect a VE of 0.6 if it’s true.</li>
+<li>Equivalence margin on the log scale: δ = log(1.5) ≈ 0.41</li>
+<li>Within-group standard deviation: σ = 2.0</li>
+<li>Assumed true difference Δ = 0</li>
+<li>Desired power: 0.90</li>
+<li>Significance level (one-sided alpha): 0.025</li>
+</ul>
+<p>SAS Code (for estimating required sample size when Δ = 0):</p>
+<pre><code>proc power;
+twosamplemeans test=equiv_diff alpha=0.025
+meandiff=0 stddev=2.0
+lower=-0.41 upper=0.41
+power=0.9 npergroup=.;
+run;</code></pre>
+<p>Result: 620 subjects per group are needed to achieve 90% power
+assuming no difference between vaccines.</p>
+<p><strong>Robustness Check</strong></p>
+<p>To evaluate how sensitive this estimate is, the investigator also
+calculates power under small deviations from equality:</p>
+<ul>
+<li>Case 1: Geometric mean ratio (GMR) = 0.95 → Δ = log(0.95) ≈
+-0.051</li>
+<li>Case 2: GMR = 0.90 → Δ = log(0.90) ≈ -0.105</li>
+</ul>
+<p>SAS Code:</p>
+<pre><code>proc power;
+twosamplemeans test=equiv_diff alpha=0.025
+meandiff=0, -0.051, -0.105
+stddev=2.0
+lower=-0.41 upper= 0.41
+npergroup=620 power=.;
+run;</code></pre>
+<p>Output:</p>
+<ul>
+<li>Power at Δ = 0: 0.900</li>
+<li>Power at Δ = −0.051: 0.866</li>
+<li>Power at Δ = −0.105: 0.760</li>
+</ul>
+<p>Interpretation: A small deviation from equality (Δ = −0.105 or GMR =
+0.90) reduces the power to 76%. To maintain 90% power under this
+assumption, a larger sample size would be needed—906 subjects per
+group.</p>
+<p><strong>Noninferiority Trial Power Estimation</strong></p>
+<p>Now, suppose the investigator wants to know the sample size for
+demonstrating <strong>noninferiority</strong> of the combination vaccine
+(hepatitis A) to the monovalent one.</p>
+<p>Given:</p>
+<ul>
+<li>Standard deviation: σ = 1.25</li>
+<li>Assumed true difference Δ = 0</li>
+<li>Noninferiority margin (lower bound): −0.41</li>
+<li>Upper bound set to a large value (e.g., 999) since the focus is
+one-sided</li>
+<li>Desired power: 0.90</li>
+</ul>
+<p>SAS Code:</p>
+<pre><code>proc power;
+twosamplemeans test=equiv_diff alpha=0.025
+meandiff=0 stddev=1.25
+lower=-0.41 upper=999
+power=0.9 npergroup=.;
+run;</code></pre>
+<p>Result: The required sample size is 197 subjects per group.</p>
+<p><strong>Conclusion</strong></p>
+<ul>
+<li>Power calculations for equivalence and noninferiority trials
+involving geometric means should <strong>not assume zero
+difference</strong> blindly.</li>
+<li>Assumptions about <strong>standard deviation</strong> and
+<strong>expected difference</strong> (Δ) critically affect the sample
+size.</li>
+<li>Simulation or sensitivity analysis under multiple scenarios is
+highly recommended during trial planning.</li>
+</ul>
+</div>
+<div id="comparing-two-seroresponse-rates" class="section level2"
+number="4.4">
+<h2><span class="header-section-number">4.4</span> Comparing Two
+Seroresponse Rates</h2>
+<p>When planning a <strong>noninferiority clinical vaccine
+trial</strong> with the endpoint being a <strong>seroprotection
+rate</strong> or <strong>seroconversion rate</strong> (i.e., comparing
+two proportions), the <strong>risk difference</strong> is often used as
+the effect measure. In this context, the key objective is to demonstrate
+that the investigational vaccine is not unacceptably worse than the
+control vaccine by more than a specified <strong>noninferiority
+margin</strong> (δ).</p>
+<hr />
+<p><strong>Form of the Hypothesis</strong></p>
+<p>In a noninferiority setting, the null hypothesis typically tested
+is:</p>
+<p><strong>H₀: π₁ − π₀ ≤ −δ</strong> vs. <strong>H₁: π₁ − π₀ &gt;
+−δ</strong></p>
+<p>where:</p>
+<ul>
+<li>π₁ is the seroprotection (or seroconversion) rate of the
+<strong>investigational</strong> vaccine</li>
+<li>π₀ is the rate of the <strong>control</strong> vaccine</li>
+<li>δ is the <strong>noninferiority margin</strong> (e.g., −0.1 means
+the new vaccine cannot be worse by more than 10%)</li>
+</ul>
+<hr />
+<p><strong>Sample Size Estimation Using SAS POWER Procedure</strong></p>
+<p>To estimate the required number of subjects per group that ensures
+adequate <strong>statistical power</strong>, you can use the
+<code>PROC POWER</code> procedure in SAS. Here’s an example:</p>
+<p><strong>Scenario:</strong></p>
+<ul>
+<li>Investigational vaccine seroprotection rate (π₁) = 70%</li>
+<li>Control vaccine rate (π₀) = 75%</li>
+<li>Noninferiority margin δ = −0.1</li>
+<li>Desired power = 90%</li>
+<li>One-sided alpha = 0.025</li>
+</ul>
+<p><strong>SAS Code:</strong></p>
+<pre><code>proc power;
+twosamplefreq test=pchi
+alpha=0.025 sides=1
+groupproportions=(0.75 0.70)
+nullpdifference=-0.10
+power=0.9 npergroup=.;
+run;</code></pre>
+<p><strong>Result:</strong> The computed required sample size is
+<strong>1,674 subjects per group</strong>.</p>
+<p>This result assumes that the <strong>difference in
+proportions</strong> (π₁ − π₀ = −0.05) still lies <strong>within the
+noninferiority bound</strong> of −0.1. If the true difference were
+larger (e.g., −0.09), the required sample size would increase to
+maintain the same power.</p>
+<hr />
+<p><strong>Equivalence Trials (Two-Sided)</strong></p>
+<p>For <strong>equivalence trials</strong>, the hypothesis is
+two-sided:</p>
+<p><strong>H₀: |π₁ − π₀| ≥ δ</strong> vs. <strong>H₁: |π₁ − π₀| &lt;
+δ</strong></p>
+<p>This means the new vaccine must not differ from the control by more
+than δ in either direction.</p>
+<p>While SAS <code>PROC POWER</code> does <strong>not support
+equivalence tests for proportions directly</strong>, the sample size can
+still be calculated using <strong>Formula 12.4</strong> from Julious
+(2004), or programmed manually.</p>
+<hr />
+<p><strong>Key Takeaways:</strong></p>
+<ul>
+<li><p>Sample size for comparing two seroresponse rates is highly
+sensitive to:</p>
+<ul>
+<li>The expected rates</li>
+<li>The noninferiority or equivalence margin</li>
+<li>The significance level (alpha)</li>
+<li>Desired power (commonly 80% or 90%)</li>
+</ul></li>
+<li><p>For noninferiority: <code>PROC POWER</code> with
+<code>twosamplefreq</code> and <code>test=pchi</code> works
+well.</p></li>
+<li><p>For equivalence: Manual programming or external tools are
+required, as SAS does not have a built-in equivalence test for
+proportions using risk differences.</p></li>
+</ul>
+</div>
+<div id="lot-consistency-trials" class="section level2" number="4.5">
+<h2><span class="header-section-number">4.5</span> Lot Consistency
+Trials</h2>
+<p>Lot consistency trials aim to demonstrate that different
+manufacturing batches (lots) of a vaccine produce equivalent immune
+responses. Typically, <strong>three lots</strong> are compared in a
+randomized design using post-vaccination immunogenicity (e.g., geometric
+mean titres of antibodies). The analysis usually involves <strong>three
+pair-wise comparisons</strong>: Lot 1 vs Lot 2, Lot 1 vs Lot 3, and Lot
+2 vs Lot 3.</p>
+<hr />
+<p><strong>Standard Approach to Power Estimation</strong></p>
+<p>The most common approach is:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Estimate power separately</strong> for each pair-wise
+comparison.</li>
+<li><strong>Combine the results</strong> to approximate the
+<strong>overall power</strong>.</li>
+</ol>
+<p>Suppose each comparison is evaluated with an <strong>equivalence
+range</strong>, often in the form of geometric mean ratio (e.g., from
+1/1.5 to 1.5, which equals log2 bounds of ±0.585).</p>
+<p>If all three confidence intervals fall within this range, lot
+consistency is concluded.</p>
+<hr />
+<p><strong>Example Summary</strong></p>
+<p>In a meningococcal vaccine lot consistency study:</p>
+<ul>
+<li>Assume <strong>standard deviation (SD)</strong> of log2-transformed
+titres: √6.15 ≈ 2.48.</li>
+<li>Sample size: <strong>500 subjects per lot</strong>.</li>
+<li>Equivalence margin: ±0.585 (i.e., log2(1.5)).</li>
+<li>Each pair-wise test has identical setup → individual power per
+comparison: <strong>0.963</strong>.</li>
+<li>Assuming <strong>independence</strong>, overall power: 0.963³ ≈
+<strong>0.893</strong>.</li>
+<li>More conservative combination: average power minus overlap → around
+<strong>0.889</strong>.</li>
+</ul>
+<hr />
+<p><strong>Impact of Between-Lot Differences (δ12 and δ13)</strong></p>
+<p>Power drops if you assume the lots have <strong>some
+variation</strong> (i.e., δ12 and δ13 are nonzero). For example:</p>
+<ul>
+<li><p>If δ13 = 0.10 and δ12 = 0.06:</p>
+<ul>
+<li>Power(Lot1 vs Lot2): 0.949</li>
+<li>Power(Lot1 vs Lot3): 0.923</li>
+<li>Power(Lot2 vs Lot3): 0.956</li>
+</ul></li>
+<li><p>Overall power:</p>
+<ul>
+<li>Conservative: (0.949 + 0.923 + 0.956)/2 =
+<strong>0.828</strong></li>
+<li>Independence assumption: 0.949 × 0.923 × 0.956 ≈
+<strong>0.837</strong></li>
+</ul></li>
+</ul>
+<hr />
+<p><strong>Dependence Between Comparisons</strong></p>
+<p>The three comparisons are <strong>not independent</strong>, since the
+difference between Lot2 and Lot3 can be inferred if Lot1 vs Lot2 and
+Lot1 vs Lot3 are known. Therefore:</p>
+<ul>
+<li>Assuming independence <strong>overestimates</strong> power
+slightly.</li>
+<li>Standard approach introduces minor bias but is often
+<strong>acceptable</strong> in practice.</li>
+</ul>
+<hr />
+<p><strong>Alternative: Monte Carlo Simulation</strong></p>
+<p>To address the correlation properly:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Simulate</strong> 5,000+ trials.</p></li>
+<li><p>For each simulation:</p>
+<ul>
+<li><p>Draw three samples of size <em>n</em>:</p>
+<ul>
+<li>Lot1: from N(0, σ²)</li>
+<li>Lot2: from N(δ12, σ²)</li>
+<li>Lot3: from N(δ13, σ²)</li>
+</ul></li>
+<li><p>Calculate three confidence intervals for geometric mean
+ratios.</p></li>
+<li><p>Check if all intervals fall within the equivalence
+range.</p></li>
+</ul></li>
+<li><p><strong>Overall power</strong> = proportion of simulated trials
+that meet all three criteria.</p></li>
+</ol>
+<p>For example, with:</p>
+<ul>
+<li>σ = 2.48</li>
+<li>δ13 = 0.10, δ12 = 0.06</li>
+<li>n = 500 per group</li>
+</ul>
+<p>The <strong>simulated power</strong> = <strong>0.887</strong></p>
+<hr />
+<p><strong>Step 1: Power for Each Pairwise Comparison (δ =
+0)</strong></p>
+<pre class="sas"><code>proc power;
+  twosamplemeans test=equiv_diff
+  alpha = 0.05
+  meandiff = 0
+  stddev = 2.48
+  lower = -0.585  /* log2(1/1.5) */
+  upper = 0.585   /* log2(1.5) */
+  npergroup = 500
+  power = .;
+run;</code></pre>
+<p>This gives the <strong>power for each pairwise test</strong> when
+assuming no between-lot difference (δ = 0). If power ≈ 0.963, the
+<strong>approximate overall power</strong> can be:</p>
+<ul>
+<li>Conservative: (0.963 + 0.963 + 0.963)/2 ≈ 0.889</li>
+<li>Assuming independence: 0.963³ ≈ 0.893</li>
+</ul>
+<hr />
+<p><strong>Step 2: Power for Pairwise Comparisons with Small Differences
+(δ ≠ 0)</strong></p>
+<pre class="sas"><code>proc power;
+  twosamplemeans test=equiv_diff
+  alpha = 0.05
+  meandiff = 0.10 0.06 0.04
+  stddev = 2.48
+  lower = -0.585
+  upper = 0.585
+  npergroup = 500
+  power = .;
+run;</code></pre>
+<p>This code estimates the power for:</p>
+<ul>
+<li>Lot1 vs Lot3: δ = 0.10</li>
+<li>Lot1 vs Lot2: δ = 0.06</li>
+<li>Lot2 vs Lot3: δ = 0.04</li>
+</ul>
+<p>Then combine the results:</p>
+<ul>
+<li>Conservative: (Power1 + Power2 + Power3)/2</li>
+<li>Independent: Power1 × Power2 × Power3</li>
+</ul>
+<hr />
+<p><strong>Optional: Sample Size Estimation for Fixed Power</strong></p>
+<p>You can also compute the <strong>required sample size</strong> per
+lot for a desired power (e.g., 90%):</p>
+<pre class="sas"><code>proc power;
+  twosamplemeans test=equiv_diff
+  alpha = 0.05
+  meandiff = 0
+  stddev = 2.48
+  lower = -0.585
+  upper = 0.585
+  power = 0.90
+  npergroup = .;
+run;</code></pre>
+<hr />
+<p><strong>Conclusion</strong></p>
+<ul>
+<li>Power in lot consistency trials is sensitive to assumptions about
+<strong>between-lot variability</strong>.</li>
+<li><strong>Assuming no variability (δ = 0)</strong> often leads to
+<strong>overly optimistic power</strong>.</li>
+<li>The <strong>standard approximation method</strong> (individual
+pair-wise power + adjustment) is practical but not exact.</li>
+<li><strong>Monte Carlo simulation</strong> is preferred when precise
+power estimation is needed and between-lot differences are
+expected.</li>
 </ul>
 </div>
 </div>
-<div id="vaccine-safety" class="section level1" number="4">
-<h1><span class="header-section-number">4</span> Vaccine Safety</h1>
-<div id="introduction-1" class="section level2" number="4.1">
-<h2><span class="header-section-number">4.1</span> Introduction</h2>
+<div id="vaccine-safety" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Vaccine Safety</h1>
+<div id="introduction-1" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Introduction</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong>Focus on Adverse Events</strong> Vaccine safety revolves
 around the monitoring of <strong>adverse events</strong> (AEs) that
@@ -1634,11 +2936,99 @@ are <strong>self-controlled designs</strong>, such as the
 for evaluating whether the rate of adverse events increases shortly
 after vaccination compared to other periods in the same
 individual.</p></li>
+<li><p><strong>Phases of Clinical Safety Evaluation</strong>:</p>
+<ul>
+<li><strong>Phase I</strong>: Early exploration of safety (no
+statistical testing usually).</li>
+<li><strong>Phase II</strong>: Measures the frequency of
+<strong>local/systemic reactions</strong> and lab abnormalities.</li>
+<li><strong>Phase III</strong>: Focuses on <strong>less common but still
+expected adverse events</strong>.</li>
+<li><strong>Post-licensure</strong>: Attention shifts to <strong>rare
+and serious adverse events</strong>, often using <strong>large
+surveillance systems</strong> like the <strong>CDC’s Vaccine Safety
+Datalink</strong>.</li>
+<li>Even a <strong>small increase in risk</strong> can lead to a
+<strong>large number of additional cases</strong> when vaccines are
+given to large populations.</li>
+<li>For example, if a condition naturally occurs in 0.1% of people and
+the vaccine raises this to 0.2%, that means <strong>1,000 extra cases
+per million people vaccinated</strong>.</li>
+</ul></li>
 </ol>
 </div>
+<div id="vaccine-safety-surveillance" class="section level2"
+number="5.2">
+<h2><span class="header-section-number">5.2</span> Vaccine Safety
+Surveillance</h2>
+<p>Section 9.2: Vaccine Safety Surveillance – Summary Explanation</p>
+<p>Vaccine safety surveillance is essential after a vaccine is licensed
+and released for public use. Its main function is to detect rare or
+serious adverse events that may not have been identified during
+pre-licensure clinical trials.</p>
+<p><strong>Main concepts</strong></p>
+<ol style="list-style-type: decimal">
+<li>Reporting systems</li>
+</ol>
+<p>Vaccine manufacturers are required to report all serious adverse
+events to regulatory authorities. In addition, systems like the U.S.
+Vaccine Adverse Event Reporting System (VAERS) rely on voluntary
+reporting from healthcare providers and the public.</p>
+<p>Strength: The system can detect very rare but serious adverse events
+linked to vaccines.</p>
+<p>Weaknesses: Reports may be incomplete, inconsistent, or biased. There
+is no unvaccinated control group. Events may be coincidental, and
+causality cannot be confirmed. True incidence rates cannot be calculated
+from such data due to underreporting and lack of denominator
+information.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>Coincidental events</li>
+</ol>
+<p>Some adverse events may occur naturally and appear to be linked to
+vaccination purely by coincidence. For example, Sudden Infant Death
+Syndrome (SIDS) affects about 1 in 1,300 infants. Based on timing,
+50–100 SIDS cases might occur shortly after vaccination each year, even
+if vaccines are not the cause. This illustrates the challenge of
+distinguishing correlation from causation.</p>
+<ul>
+<li>Example: Menactra and Guillain-Barré Syndrome (GBS): After the
+meningococcal vaccine Menactra was introduced in 2005, five cases of GBS
+were reported in teens aged 17–18. GBS is a neurological condition that
+may lead to temporary or long-term paralysis. While GBS can be caused by
+infections or other factors, post-licensure surveillance did not
+establish a causal link between Menactra and GBS.</li>
+<li>Example: Rotashield and intussusception: Rotashield, a rotavirus
+vaccine approved in 1998, was withdrawn shortly after approval due to
+cases of intussusception, a serious bowel obstruction. VAERS reported 76
+cases, 70% of which occurred after the first dose. The estimated risk
+was one in every 5,000–9,500 vaccinated infants. Despite its potential
+to save lives in developing countries, the vaccine’s withdrawal in the
+U.S. prevented its global use.</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>Limitations of statistical analysis</li>
+</ol>
+<p>Because surveillance data are observational and subject to many
+biases, standard statistical tests like p-values and confidence
+intervals are not recommended for assessing vaccine risk based solely on
+this data. Ideally, safety signals should be confirmed through
+randomized controlled trials.</p>
+<ol start="4" style="list-style-type: decimal">
+<li>Self-controlled case series method</li>
+</ol>
+<p>This is a specialized statistical method that analyzes only
+individuals who experienced an adverse event (cases). It estimates the
+relative incidence of the event by comparing risk periods and non-risk
+periods within the same individual. The model assumes
+Poisson-distributed event counts and controls for fixed confounders like
+sex or genetics.</p>
+<p>Example: The method was used in the UK to confirm a link between the
+Urabe strain mumps vaccine and aseptic meningitis. As a result, vaccines
+using this strain were withdrawn.</p>
+</div>
 <div id="self-controlled-case-studies" class="section level2"
-number="4.2">
-<h2><span class="header-section-number">4.2</span> Self Controlled Case
+number="5.3">
+<h2><span class="header-section-number">5.3</span> Self Controlled Case
 Studies</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong>Overview</strong> SCCS is a
@@ -1754,12 +3144,183 @@ level.”</p>
 </tbody>
 </table>
 </div>
+<div id="safety-data-and-the-problem-of-multiplicity"
+class="section level2" number="5.4">
+<h2><span class="header-section-number">5.4</span> Safety Data and the
+Problem of Multiplicity</h2>
+<p><strong>Section 9.3: Safety Data and the Problem of Multiplicity –
+Summary Explanation</strong></p>
+<p>The analysis and interpretation of vaccine safety data is complicated
+by the issue of <em>multiplicity</em>—the statistical problem that
+arises when many tests are conducted simultaneously.</p>
+<p><strong>1. Multiplicity Increases False Positives</strong></p>
+<p>When multiple safety variables (like adverse events) are tested at
+once, the chance of finding at least one statistically significant
+result by random chance (type I error) increases. In large datasets,
+even small, clinically irrelevant differences can become statistically
+significant. However, adjusting for multiplicity to reduce false
+positives tends to increase the risk of <em>false negatives</em> (type
+II errors), meaning true safety signals might go undetected.</p>
+<hr />
+<p><strong>2. Approaches to Handle Multiplicity in Safety
+Data</strong></p>
+<p><strong>First approach: No correction</strong></p>
+<ul>
+<li>Many regulators and safety reviewers prefer not adjusting for
+multiplicity in safety analyses.</li>
+<li>The rationale is that false negatives are more dangerous in safety
+than false positives.</li>
+<li>Although the false-positive rate increases, regulatory agencies
+understand this and rarely base decisions solely on such signals.</li>
+<li>Post-marketing studies or further surveillance may be requested for
+clarification.</li>
+</ul>
+<p><strong>Second approach: Control Family-Wise Error Rate
+(FWER)</strong></p>
+<ul>
+<li>Methods like <strong>Bonferroni</strong> or <strong>Holm</strong>
+corrections aim to reduce the chance of even one false positive across
+all tests.</li>
+<li><strong>Bonferroni</strong>: Divide the significance level α by the
+number of tests (e.g., α/m).</li>
+<li><strong>Holm</strong>: A step-wise method testing ordered p-values
+with progressively larger thresholds.</li>
+<li>These methods strongly control type I error but increase false
+negatives. Hence, they are seldom used in vaccine safety analyses.</li>
+</ul>
+<p><strong>Third approach: Control False Discovery Rate
+(FDR)</strong></p>
+<ul>
+<li>Introduced by <strong>Benjamini and Hochberg</strong>, this method
+controls the expected proportion of false positives among all
+significant results.</li>
+<li>It is less strict than FWER methods and thus retains more power
+(more true positives).</li>
+<li>It works by ordering p-values and comparing each to a threshold that
+grows with the number of hypotheses.</li>
+<li>FDR strikes a balance: fewer false positives than uncorrected tests,
+but more true positives than Bonferroni/Holm.</li>
+</ul>
+<p><strong>Example:</strong> If five p-values are all &lt;0.05:</p>
+<ul>
+<li><strong>Bonferroni</strong>: Only the smallest (e.g., p=0.0045) is
+considered significant.</li>
+<li><strong>Holm</strong>: Might flag two.</li>
+<li><strong>FDR</strong>: Might flag all five as significant.</li>
+</ul>
+<p>FDR offers a good compromise between false positive control and
+detection of real safety signals.</p>
+<hr />
+<p><strong>4. Fourth approach: Double FDR</strong></p>
+<ul>
+<li><p><strong>Mehrotra and Heyse</strong> introduced a method for
+hierarchical testing:</p>
+<ul>
+<li><p>First, adverse events are grouped by <strong>body
+systems</strong> (e.g., MedDRA categories).</p></li>
+<li><p>A representative p-value is chosen per body system (e.g., the
+smallest).</p></li>
+<li><p>FDR is applied at two levels:</p>
+<ol style="list-style-type: decimal">
+<li>Across body systems (to control for multiplicity across groups)</li>
+<li>Within each group (for events in the same body system)</li>
+</ol></li>
+</ul></li>
+<li><p>This method helps account for dependencies between related events
+and reduces incorrect flagging.</p></li>
+</ul>
+<p><strong>5. Fifth approach: Bayesian Hierarchical Model</strong></p>
+<ul>
+<li><strong>Berry and Berry</strong> proposed a Bayesian method as an
+alternative to the double FDR.</li>
+<li>It uses a three-level hierarchical mixture model, grouping adverse
+events within body systems.</li>
+<li>It allows sharing of information both <strong>within</strong> and
+<strong>across</strong> groups.</li>
+<li>While complex, it’s powerful and increasingly popular in vaccine
+safety analysis.</li>
+</ul>
 </div>
-<div id="vaccine-durability" class="section level1" number="5">
-<h1><span class="header-section-number">5</span> Vaccine Durability</h1>
-<div id="deferred-vaccine-designs" class="section level2" number="5.1">
-<h2><span class="header-section-number">5.1</span> Deferred Vaccine
-Designs</h2>
+<div id="vaccine-reactogenicity" class="section level2" number="5.5">
+<h2><span class="header-section-number">5.5</span> Vaccine
+Reactogenicity</h2>
+<p><strong>Vaccine Reactogenicity Summary:</strong></p>
+<p>Reactogenicity refers to <strong>common adverse reactions</strong>
+that are expected or attributable to vaccination. These reactions are
+either:</p>
+<ul>
+<li><strong>Local reactions</strong> (at injection site): pain,
+tenderness, swelling, redness, etc.</li>
+<li><strong>Systemic reactions</strong> (generalized responses): fever,
+malaise, fatigue, headache, etc.</li>
+</ul>
+<p>They are generally <strong>collected by diary</strong> over a short
+time (typically 3 or 7 days) after vaccination.</p>
+<p><strong>Severity grading</strong> is usually based on:</p>
+<ul>
+<li><strong>None</strong> = 0 (no interference)</li>
+<li><strong>Mild</strong> = 1 (not interfering with daily
+activities)</li>
+<li><strong>Moderate</strong> = 2 (interferes with daily
+activities)</li>
+<li><strong>Severe</strong> = 3 (prevents daily activities)</li>
+</ul>
+<hr />
+<p><strong>Statistical Analyses of Reactogenicity:</strong></p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Incidence Analysis</strong></p>
+<ul>
+<li>Calculate the <strong>proportion of subjects</strong> reporting each
+reaction at least once.</li>
+<li>Use <strong>Clopper–Pearson confidence intervals</strong>.</li>
+<li>Example: If 3 out of 4,500 subjects report a reaction, and the upper
+95% CI limit is 0.0019, we interpret it as “less than 1 in 500”
+vaccinated individuals.</li>
+</ul></li>
+<li><p><strong>Relative Risk Comparison</strong> (between two
+vaccines)</p>
+<ul>
+<li>Use <strong>risk ratios with confidence intervals</strong> (e.g.,
+Wilson-type).</li>
+<li>Limit: Cannot compute CI when one group has 0 cases.</li>
+</ul></li>
+<li><p><strong>Total Number of Reactions per Subject</strong></p>
+<ul>
+<li>When many reactions are solicited, sum the number reported per
+individual.</li>
+<li>Compare total counts using <strong>Wilcoxon rank-sum test</strong>
+via <code>proc freq</code> and Cochran-Mantel-Haenszel (CMH) statistics
+with rank scores.</li>
+</ul></li>
+</ol>
+<p><strong>SAS Code Example for Total Number of Local
+Reactions:</strong></p>
+<pre class="sas"><code>proc freq;
+  table vaccine*number_of_local_reactions /
+  nopercent nocol cmh scores=rank;
+run;</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li><p><strong>Severity Analysis (Ordinal Scale)</strong></p>
+<ul>
+<li>Reactions rated on a 0–3 scale (none to severe).</li>
+<li>Compare severity across vaccine groups using <strong>Wilcoxon
+rank-sum test</strong> with <strong>modified ridit scores</strong>.</li>
+</ul></li>
+</ol>
+<p><strong>SAS Code Example for Ordinal Severity
+Comparison:</strong></p>
+<pre class="sas"><code>proc freq;
+  table vaccine*tenderness_score /
+  nopercent nocol cmh scores=modridit;
+run;</code></pre>
+<p>Make sure severity scores are numerically ordered (e.g., 0, 1, 2, 3)
+instead of text labels, or SAS will rank them alphabetically, causing
+wrong results.</p>
+</div>
+<div id="vaccine-durability---deferred-vaccine-designs"
+class="section level2" number="5.6">
+<h2><span class="header-section-number">5.6</span> Vaccine Durability -
+Deferred Vaccine Designs</h2>
 <p><strong>Ethical Considerations</strong> Once a vaccine has been shown
 to be effective in early trials, continuing to keep participants in a
 placebo group becomes ethically problematic. Therefore:</p>
@@ -1809,7 +3370,7 @@ gender, comorbidities).</li>
 performance</strong>, contributing to more personalized or targeted
 vaccination strategies.</li>
 </ul>
-<p><img src="02_Plots/Vaccine/Vaccine-Durability.png" /></p>
+<p><img src="./02_Plots/Vaccine/Vaccine-Durability.png" /></p>
 </div>
 </div>
 <div id="reference" class="section level1" number="6">
@@ -1846,7 +3407,7 @@ proportional-hazards regression model. Biometrics, pp.499-503.</p>
 vaccine efficacy. Pharmaceutical statistics, 19(5), pp.636-645.</p>
 <p>Chow, S.C., Shao, J., Wang, H. and Lokhnygina, Y., 2017. Sample size
 calculations in clinical research. CRC press.</p>
-<div id="vaccine-efficacy-1" class="section level2" number="6.1">
+<div id="vaccine-efficacy" class="section level2" number="6.1">
 <h2><span class="header-section-number">6.1</span> Vaccine Efficacy</h2>
 <p>Polack, F.P., Thomas, S.J., Kitchin, N., Absalon, J., Gurtman, A.,
 Lockhart, S., Perez, J.L., Pérez Marc, G., Moreira, E.D., Zerbini, C.
@@ -1905,7 +3466,7 @@ M.H., Turner, D.L. and Turner, R.J., 2021. Efficacy and safety of
 COVID-19 vaccines: a systematic review and meta-analysis of randomized
 clinical trials. Vaccines, 9(5), p.467.</p>
 </div>
-<div id="vaccine-durability-1" class="section level2" number="6.3">
+<div id="vaccine-durability" class="section level2" number="6.3">
 <h2><span class="header-section-number">6.3</span> Vaccine
 Durability</h2>
 <p>Choe, P.G., Kang, C.K., Suh, H.J., Jung, J., Song, K.H., Bang, J.H.,
