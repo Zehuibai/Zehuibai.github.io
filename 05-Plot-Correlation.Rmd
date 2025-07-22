@@ -23,12 +23,12 @@ knitr::opts_chunk$set(echo = TRUE)
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 # getwd()
 # Sys.setlocale("LC_ALL","English")
-
-## devtools::install_github("kupietz/kableExtra")
+ 
+# devtools::install_github("kupietz/kableExtra")
 packages<-c("tidyverse", "kableExtra", "plotly",  
             "haven",
-            "ggpubr","gridExtra","ggtext",
-            "corrgram","GGally")
+            "ggpubr","gridExtra","ggtext","ggforce",
+            "corrgram","corrplot","GGally")
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(new.pkg)) 
@@ -39,9 +39,9 @@ ipak(packages)
 ```
  
 
-## Correlogram using GGally Package
+# Correlogram using GGally Package
 
-### Scatterplot matrix using ggpairs()
+## Scatterplot matrix using ggpairs()
 
 ```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
 # library("GGally")
@@ -57,12 +57,12 @@ data$v5 = -(data$var1 ** 2)
 ggpairs(data, title="correlogram with ggpairs()") 
 
 
-## Split by group
+# Split by group
 data(flea)
 ggpairs(flea, columns = 2:4, ggplot2::aes(colour=species)) 
 ```
 
-### Visualize correlation using ggcorr()
+## Visualize correlation using ggcorr()
 
 ```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
 # library("GGally")
@@ -81,7 +81,7 @@ data$v5 = -(data$var1 ** 2)
 ggcorr(data, method = c("everything", "pearson")) 
 ```
 
-### Change plot types
+## Change plot types
 
 ```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE} 
 # From the help page:
@@ -94,9 +94,9 @@ ggpairs(
 ```
 
 
-## Correlogram using corrgram Package
+# Correlogram using corrgram/corrplot Package
 
-### Scatterplot matrix with ggpairs()
+## Scatterplot matrix with ggpairs()
 
 Relationship can be visualized with different methods:
 
@@ -139,8 +139,247 @@ corrgram(mtcars,
 ```
  
  
+## Succinct summary of the correlations between all of the variables
 
-## Interactive trellis plot (plotly Package)
+This is a succinct summary of the correlations between all of the variables, whether they are based on all data including LOCF imputed or just completers. The use of color in addition to shave of the ellipses is a nice application of redundancy. You do not need to read a legend to realize that blue encodes a positive correlation and red encodes a negative correlation and the level of transparency encodes the magnitude of the correlation.
+
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+
+# read in data
+final_in <- read.csv("./01_Datasets/mediation_data.csv")
+
+#plot on one page
+par(mfrow = c(2, 3))
+par(cex = 0.75)
+
+##-----------------------------------------------------
+# Overall correlations
+title <- "How do all outcomes relate overall?"
+
+corrs <- final_in %>%
+  dplyr::select("itch", "bsa", "redness", "dlqi") %>%
+  filter(complete.cases(.)) %>%
+  dplyr::mutate_all(as.numeric)
+
+M <- cor(corrs)
+col <-
+  colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+corrplot(
+  M,
+  method = "ellipse",
+  col = col(200), tl.cex = 1/par("cex"),
+  type = "upper",
+  order = "hclust",
+  number.cex = .7,
+  title = title,
+  addCoef.col = "black",
+  # Add coefficient of correlation
+  tl.col = "black",
+  tl.srt = 90,
+  # Text label color and rotation
+  # hide correlation coefficient on the principal diagonal
+  diag = FALSE,
+  mar = c(0, 0, 3, 0)
+)
+
+
+
+##-----------------------------------------------------
+## - By Rx arm
+title <- "How do all outcomes relate within Rx?"
+
+corrs <- final_in %>%
+  filter(trt == "Rx") %>%
+  dplyr::select("itch", "bsa", "redness", "dlqi") %>%
+  dplyr::mutate_all(as.numeric)
+M <- cor(corrs)
+col <-
+  colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+
+corrplot(
+  M,
+  method = "ellipse",
+  col = col(200), tl.cex = 1/par("cex"),
+  type = "upper",
+  order = "hclust",
+  number.cex = .7,
+  title = title,
+  addCoef.col = "black",
+  # Add coefficient of correlation
+  tl.col = "black",
+  tl.srt = 90,
+  diag = FALSE,
+  mar = c(0, 0, 3, 0)
+)
+
+
+##-----------------------------------------------------
+# By Placebo
+corrs <- final_in %>%
+  filter(trt == "placebo") %>%
+  dplyr::select("itch", "bsa", "redness", "dlqi") %>%
+  dplyr::mutate_all(as.numeric)
+M <- cor(corrs)
+col <-
+  colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+
+title <- "How do all outcomes relate within Placebo?"
+corrplot(
+  M,
+  method = "ellipse",
+  col = col(200), tl.cex = 1/par("cex"),
+  type = "upper",
+  order = "hclust",
+  number.cex = .7,
+  title = title,
+  addCoef.col = "black",
+  # Add coefficient of correlation
+  tl.col = "black",
+  tl.srt = 90,
+  # Text label color and rotation
+  # hide correlation coefficient on the principal diagonal
+  diag = FALSE,
+  mar = c(0, 0, 3, 0)
+)
+
+
+##-----------------------------------------------------
+# Overall and complete cases
+
+corrs <- final_in %>%
+  filter(itch_locf == FALSE &
+           bsa_locf == FALSE & redness_locf == FALSE & dlqi_locf == FALSE) %>%
+  filter(complete.cases(.)) %>%
+  dplyr::select("itch", "bsa", "redness", "dlqi") %>%
+  dplyr::mutate_all(as.numeric)
+
+M <- cor(corrs)
+
+col <-
+  colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+
+
+
+title <-
+  "How do all outcomes relate overall\n(excluding patients with imputed data)?"
+corrplot(
+  M,
+  method = "ellipse",
+  col = col(200), tl.cex = 1/par("cex"),
+  type = "upper",
+  order = "hclust",
+  number.cex = .7,
+  title = title,
+  addCoef.col = "black",
+  # Add coefficient of correlation
+  tl.col = "black",
+  tl.srt = 90,
+  # Text label color and rotation
+  # hide correlation coefficient on the principal diagonal
+  diag = FALSE,
+  mar = c(0, 0, 3, 0)
+)
+
+
+##-----------------------------------------------------
+## By Rx and complete cases
+corrs <- final_in %>%
+  filter(trt == "Rx") %>%
+  filter(itch_locf == FALSE &
+           bsa_locf == FALSE & redness_locf == FALSE & dlqi_locf == FALSE) %>%
+  filter(complete.cases(.)) %>%
+  dplyr::select("itch", "bsa", "redness", "dlqi") %>%
+  dplyr::mutate_all(as.numeric)
+M <- cor(corrs)
+col <-
+  colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+
+title <- "How do all outcomes relate within Rx?\n(Complete cases)"
+corrplot(
+  M,
+  method = "ellipse",
+  col = col(200), tl.cex = 1/par("cex"),
+  type = "upper",
+  order = "hclust",
+  number.cex = .7,
+  title = title,
+  addCoef.col = "black",
+  # Add coefficient of correlation
+  tl.col = "black",
+  tl.srt = 90,
+  # Text label color and rotation
+  # hide correlation coefficient on the principal diagonal
+  diag = FALSE,
+  mar = c(0, 0, 3, 0)
+)
+
+
+##-----------------------------------------------------
+## Placebo and complete cases
+
+corrs <- final_in %>%
+  filter(trt == "placebo") %>%
+  filter(itch_locf == FALSE &
+           bsa_locf == FALSE & redness_locf == FALSE & dlqi_locf == FALSE) %>%
+  filter(complete.cases(.)) %>%
+  dplyr::select("itch", "bsa", "redness", "dlqi") %>%
+  dplyr::mutate_all(as.numeric)
+M <- cor(corrs)
+col <-
+  colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+
+title <-
+  "How do all outcomes relate within placebo?\n(Complete cases)"
+corrplot(
+  M,
+  method = "ellipse",
+  col = col(200), tl.cex = 1/par("cex"),
+  type = "upper",
+  order = "hclust",
+  number.cex = .7,
+  title = title,
+  addCoef.col = "black",
+  # Add coefficient of correlation
+  tl.col = "black",
+  tl.srt = 90,
+  # Text label color and rotation
+  # hide correlation coefficient on the principal diagonal
+  diag = FALSE,
+  mar = c(0, 0, 3, 0)
+) 
+
+```
+
+# Scatter matrices
+
+These 3 graphics provide an exhaustive amount of information. The 3 graphics address the different ways of treating the missing data. Each graph is a matrix where the upper triangle models the data by treatment and covariate, the lower triangle shows the individual data and the diagonal shows the marginal distributions. The title clearly leads the reader to the conclusion the DLQI is highly correlated with itch and when the reader looks at the panel with two splines, one for each treatment, of DLQI against itch the reader can see that the treatment effect on DLQI is neglible once itch is included in the model.
+
+```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+
+## Save plot
+page_width <- 350
+page_height <- 250
+d_dpi <- 400
+
+## read in data
+final_in <- read.csv("./01_Datasets/mediation_data.csv")
+
+
+## Plot overall
+ggplot(final_in, aes(x = .panel_x, y = .panel_y, colour = trt, fill = trt)) +
+  geom_autopoint(alpha = 0.6) +
+  geom_autodensity(alpha = 0.2) +
+  geom_smooth(method = lm, formula = y ~ splines::bs(x, 3)) +
+  facet_matrix(vars(dlqi, itch, redness, bsa), layer.diag = 2, layer.upper = 3, 
+               grid.y.diag = FALSE) +
+  labs(title = "Itch has a strong positive association with DLQI.",
+       subtitle = "There is evidence that the DLQI treatment effect is mediated through itch.",
+       caption = "\n Cubic splines are presented in the top-right layer regressing y on x.\nScatter-plots of the same relationship are displayed in the bottom-left later.\nThe marginal distribution by treatment are displayed on the diagonal.") +  
+  theme_light(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+# Interactive trellis plot (plotly Package)
 
 
 ```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
@@ -192,7 +431,7 @@ fig2
  
 
 
-## GGally Package
+# GGally Package
 
 
 ```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
