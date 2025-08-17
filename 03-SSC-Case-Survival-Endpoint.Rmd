@@ -1077,6 +1077,257 @@ ssc.onesample.LR(HR = 1.5, sig.level = 0.05, power = 0.8)
 * [Online Calculator 1](https://nshi.jp/en/js/onesurvyr/)
 * [Online Calculator 2][https://stattools.crab.org/Calculators/oneNonParametricSurvival.htm]
 
+
+
+# Survival Group Sequential Design
+
+## Complex Group Sequential Design
+
+1) What “power for survival analysis” depends on
+
+When the endpoint is time-to-event (TTE), power depends on choices you make up front:
+
+* **Design**: two-arm parallel, one-arm, or more complex (e.g., stratified, cluster, group-sequential).
+* **Test/estimator**: log-rank test or Cox PH model (asymptotically equivalent for PH).
+* **Effect measure**: usually a **hazard ratio (HR)**; sometimes a survival probability at a milestone or an RMST difference when hazards are non-proportional.
+* **Assumed survival model**: exponential (constant hazard), Weibull/piecewise exponential (time-varying hazard), or other.
+
+**Core message:** for log-rank/Cox designs, **power is driven primarily by the number of events (E), not the raw sample size (N).** Extra participants who never have the event (because follow-up is short or dropout is high) add little information.
+
+---
+
+2) **Why survival GSDs are trickier than in fixed-sample or continuous outcomes**
+
++ Unknown follow-up means more interim planning uncertainty
+  * Can be difficult to predict time when interim analysis will occur
+  * Higher numbers likely in active cohort when interim analysis occurs
+  * PFS or OS at each look
+  * Planning USSR? – Freidlin & Korn 2017
+
++ Survival GSDs often require additional assumptions
+  * Assume constant effect? NPH?
+
++ Interim Events dependant on two factors
+  * Increase sample size – Biases early trends
+  * Increase time – Biases later trends
+
+---
+
+In details
+
+* **Unknown follow-up times** → more uncertainty in interim planning.
+
+  * In GSDs for binary/continuous outcomes, you can often forecast when an interim will occur because data accrual is tied directly to recruitment.
+  * In survival analysis, **information accrual** depends on **events**, and the timing of events is variable.
+  * **Example**: If recruitment is ahead of schedule, many participants may still be “event-free” at an interim, lowering the observed information fraction.
+
+---
+
+* **Timing of interim looks** is hard to predict.
+
+  * **First look** may occur later/earlier than expected if event rate is slower/faster.
+  * The proportion of patients still on study (active cohort) at the interim can be higher than planned, especially early in the trial.
+
+---
+
+* **Endpoint choice at interim** matters.
+
+  * **PFS (progression-free survival)** can mature earlier than **OS (overall survival)**; deciding which to use for the interim is part of the design.
+* **Planning USSR (Unequal Sample Size Ratios)** — referring to approaches like Freidlin & Korn (2017) for handling unequal numbers of subjects/events at different looks.
+
+---
+
+**Extra assumptions often needed**
+
+* To plan sample size and stopping boundaries, survival GSDs typically assume:
+
+  * **Proportional hazards (constant treatment effect)** — easier to model, but may be violated in reality.
+  * **NPH (non-proportional hazards)** handling requires alternative methods (e.g., weighted log-rank, piecewise models), which complicates design.
+
+---
+
+**Interim events depend on two factors**
+
+1. **Sample size** at the time of interim.
+
+   * If you increase sample size (by faster accrual or extension), early trends can be biased — e.g., treatment effect may appear better or worse due to immature follow-up.
+2. **Follow-up time** for accrued patients.
+
+   * More follow-up yields more events, but if late events differ in hazard ratio from early events (due to delayed effects, crossing hazards, etc.), the interim trend may be biased relative to final.
+   
+---
+
+Therefore, in summary, there is a **real risk** of the study being **underpowered**—failing to detect a true treatment effect—even when one exists. This risk is heightened not only by statistical uncertainties but also by **logistical challenges**:
+
+1. **Uncertain timing of interim analyses**
+
+   * The number of events needed to trigger an interim analysis is unpredictable because event accrual depends on patient follow-up and disease progression, not just recruitment.
+   * Beyond simply knowing *when* an interim will occur, the trial team must also decide *what* endpoint to analyze at each look—e.g., **Progression-Free Survival (PFS)** vs. **Overall Survival (OS)**.
+   * Choosing PFS can lead to earlier data maturity, while OS may require longer follow-up.
+
+2. **Event counts in the active cohort**
+
+   * At each interim analysis, the number of ongoing participants (“active cohort”) who have not yet reached the event can be large, especially early in the trial.
+   * This needs to be factored into power calculations and statistical boundaries.
+
+3. **Sample size re-estimation (SSR) in survival settings**
+
+   * Adaptive designs sometimes include SSR, but in survival trials, interim access to **the shape of survival curves** can raise **trial integrity concerns** (Freidlin & Korn, 2017).
+   * If SSR is based on observed event rates, care must be taken to avoid bias or perceptions of bias.
+
+4. **Additional assumptions for design and analysis**
+
+   * Common survival GSD designs assume **proportional hazards** (constant treatment effect over time).
+   * If **non-proportional hazards (NPH)** are present—e.g., delayed treatment effect or crossing survival curves—these assumptions break down, requiring more complex modeling (e.g., weighted log-rank tests or time-varying Cox models).
+   * Simulation is often invaluable to assess the robustness of the design under different hazard patterns.
+
+5. **Two main ways to increase events at interim**
+
+   * **Increase sample size** → yields more events quickly but can bias estimates toward **early trends** in the data.
+   * **Increase follow-up time** → yields later events but may bias toward **late-trial trends**.
+   * Both strategies can shift the apparent treatment effect depending on when hazards differ most.
+
+**Take-home point:**
+Survival GSDs require careful **assumption setting**, **simulation-based planning**, and **boundary adjustments** to handle the intertwined effects of sample size, follow-up time, endpoint choice, and hazard structure. Failure to address these factors can lead to underpowered or misleading results—even if a real effect exists.
+ 
+  
+## Survival Group Sequential Design Simulation
+
+### Introduction
+
+In survival trials, **Group Sequential Designs** introduce specific complications not present in simpler settings.
+Because **follow-up times are uncertain**, it is difficult to predict when interim analyses will occur. This uncertainty affects:
+
+* The number of events available at each interim look (often higher in the active arm at the time of analysis).
+* Decisions about which endpoint to analyze at each look (e.g., Progression-Free Survival vs. Overall Survival).
+* The integrity of trial operations if interim survival curve shapes become known, especially in sample size re-estimation contexts (Freidlin & Korn, 2017).
+
+Survival GSDs also require **additional statistical assumptions**:
+
+* Whether the treatment effect is constant or if **non-proportional hazards** (NPH) exist.
+* The effect of increasing **sample size** (biases toward early trends) or extending **follow-up time** (biases toward later trends) to boost events.
+ 
+
+Given these complexities, **simulation** is an invaluable tool.
+By generating *synthetic trial data*, GSD simulation allows:
+
+1. **Verification of the planned design** (closed-form assumptions):
+
+   * Type I error (α), Power (1–β), Expected sample size, Stopping time.
+   * Validation of statistical boundaries and stopping rules.
+2. **Exploration of “what-if” scenarios**:
+
+   * Alternative treatment effects (larger/smaller than planned).
+   * Changes to interim analysis timing or information fractions.
+
+Simulations overcome some constraints of purely analytical formulas and are easier to communicate to non-statistical stakeholders.
+
+---
+
+**Regulatory Alignment**
+
+Regulators strongly support simulation for adaptive and complex designs.
+ICH E20 Section 5.2 specifically advises that simulation studies:
+
+* Clearly define and focus on **key objectives**.
+* Assess **key operating characteristics** aligned with the trial’s decision-making needs.
+* Include a **plausible range of scenarios** to robustly evaluate performance.
+
+This regulatory endorsement reinforces simulation as a core part of designing, validating, and defending complex survival GSDs.
+
+---
+
+**In short:**
+Survival GSDs are challenging due to unpredictable event timing, endpoint choice, bias risks, and the need for strong assumptions. Simulation provides a practical and regulator-endorsed way to validate designs, explore alternatives, and ensure trial integrity under a wide range of real-world conditions.
+
+
+### Considerations
+
+ 
+
+**Step 1 – Generating Model Assumptions**
+
+* Define the **target population size** and **accrual process**: total planned subjects, accrual rate (per month/quarter), accrual duration.
+* Specify **dropout processes** and rates (random loss to follow-up, treatment discontinuations).
+* Identify key **event processes**: hazard rates, proportional hazards assumption (PH) vs. non-proportional hazards (NPH), competing risks if applicable.
+* Justify parameter values using literature, prior trials, or registry data.
+
+---
+
+**Step 2 – Survival Design Assumptions**
+
+* **Type of follow-up**: fixed follow-up for all participants or variable follow-up depending on enrollment date.
+* **Maximum follow-up time** or administrative censoring rules.
+* Number of **time points** or interim analyses to evaluate.
+* Structure of accrual and dropouts over time (e.g., constant, ramp-up, seasonal patterns).
+
+---
+
+**Step 3 – GSD Assumptions**
+
+* Select group sequential design **type** (e.g., O’Brien-Fleming, Pocock, Lan-DeMets).
+* Define stopping rules for **efficacy**, **futility**, or both.
+* State the desired **Type I error (α)** and **power (1–β)**.
+* Account for possible bias if design changes after start (adaptive elements).
+
+---
+
+**Step 4 – Boundary / Information Assumptions**
+
+* Determine **information fractions** for each interim look (e.g., 33%, 67%, 100% of planned events).
+* Define statistical boundaries for decision-making (upper/lower Z or p-value limits).
+* Set maximum number of events and/or maximum follow-up time before the final analysis.
+* Plan how to handle event timing uncertainty (e.g., variability in actual information fraction).
+
+---
+
+**Step 5 – Simulation Control Assumptions**
+
+* Decide number of simulated trials (e.g., 10,000 runs) for stable estimates of Type I error, power, expected sample size, and stopping time.
+* Specify random seed control for reproducibility.
+* Define output metrics: probability of stopping at each look, average information at stopping, empirical power, Type I error, bias in estimates.
+
+---
+
+**Key Design Questions**
+
+**1. How to justify population assumptions?**
+
+* Use **historical data** from prior trials in the same indication and patient population.
+* Consult **disease registries** or epidemiological studies for event rates and dropout patterns.
+* Where uncertainty exists, run **sensitivity analyses** across plausible ranges.
+* Engage clinical experts to ensure assumptions are medically credible, not just statistically convenient.
+
+---
+
+**2. How to avoid extrapolation issues?**
+
+* Avoid projecting beyond the observed follow-up or accrual patterns from historical data unless clinically justified.
+* If extrapolation is needed (e.g., for long-term survival), test **multiple survival models** (Exponential, Weibull, log-logistic) to see if conclusions change.
+* Apply **calibration checks** — ensure simulated event curves match known real-world data in the early and mid-term before trusting long-term projections.
+* Document limitations transparently in the trial design report.
+
+---
+
+**3. How to model the survival / accrual process?**
+
+* **Survival process**:
+
+  * Start with a baseline hazard function (Exponential for constant hazard, Weibull for time-varying hazard, piecewise exponential for flexible shapes).
+  * Incorporate hazard ratio for treatment effect; test proportional hazards vs. NPH patterns (e.g., delayed effect, crossing hazards).
+  * Optionally include competing risks if relevant.
+* **Accrual process**:
+
+  * Model constant-rate accrual, stepped increases/decreases, or seasonal patterns depending on operational expectations.
+  * Allow for staggered site activation to mimic real recruitment behavior.
+* **Dropout process**:
+
+  * Random dropout (constant hazard) or time-dependent dropout rates.
+  * Ensure dropouts are independent of treatment effect unless modeling informative censoring.
+ 
+ 
+
+
 # Reference
 
 * Chow S, Shao J, Wang H. 2008. Sample Size Calculations in Clinical Research. 2nd Ed. Chapman & Hall/CRC Biostatistics Series. 
@@ -1227,6 +1478,63 @@ ssc.onesample.LR(HR = 1.5, sig.level = 0.05, power = 0.8)
 
 
 
+## Survival Analysis
+
+Cox, D.R. and Oakes, D., 1984. Analysis of survival data. CRC press.
+Cox, D.R., 1972. Regression models and life‐tables. Journal of the Royal Statistical Society: Series B (Methodological), 34(2), 187-202.
+Collett, D., 2015. Modelling survival data in medical research. CRC press.
+Fleming, T.R. and Harrington, D.P., 2013. Counting processes and survival analysis. John Wiley & Sons.
+Klein, J.P., Van Houwelingen, H.C., Ibrahim, J.G. and Scheike, T.H. eds., 2016. Handbook of survival analysis. CRC Press.
+Andersen, P.K., Borgan, O., Gill, R.D. and Keiding, N., 2012. Statistical models based on counting processes. Springer Science & Business Media.
+Lin, H. and Zelterman, D., 2002. Modeling survival data: extending the Cox model.
+Klein, J.P. and Moeschberger, M.L., 2003. Survival analysis: techniques for censored and truncated data. New York: Springer.
+Lemeshow, S., May, S. and Hosmer Jr, D.W., 2011. Applied survival analysis: regression modeling of time-to-event data. John Wiley & Sons.
+Aalen, O., Borgan, O. and Gjessing, H., 2008. Survival and event history analysis: a process point of view. Springer Science & Business Media.
+U.S. Food and Drug Administration, Clinical Trial Endpoints for the Approval of Cancer Drugs and Biologics. December 2018 Available from: http://www.fda.gov/downloads/Drugs/GuidanceComplianceRegulatoryInformation/Guidances/ucm071590.pdf
+
+
+## GSD
+
+Haybittle, J.L. (1971) Repeated assessment of results in clinical trials of cancer treatment. The British Journal of Radiology 44: 793-797. 
+Peto, R., M.C. Pike, P. Armitage, N.E. Breslow, D.R. Cox, S.V. Howard, N. Mantel, K. McPherson, J. Peto, and P.G. Smith. (1976). Design and analysis of randomized clinical trials requiring prolonged observation of each patient. I. Introduction and design. British Journal of Cancer 34 (6): 585–612.
+O'Brien, P.C. & Fleming, T.R. (1979). A multiple testing procedure for clinical trials. Biometrics, 35, 549-556. 
+Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. Biometrika, 64(2), 191–199. 
+Whitehead, J. & Stratton, I. (1983) Group Sequential clinical trials with triangular continuation regions. Biometrics, 39, 227-236.
+Whitehead, J. (2001). “Use of the Triangular Test in Sequential Clinical Trials.” In Handbook of Statistics in Clinical Oncology,  211–228. New York: Marcel Dekker.
+Lan, K. K. G., & DeMets, D. L. (1983). Discrete Sequential Boundaries for Clinical Trials. Biometrika, 70(3), 659–663. 
+Kim, K., and DeMets, D. L. (1987). “Design and Analysis of Group Sequential Tests Based on the Type I Error Spending Rate Function.” Biometrika 74:149–154.
+Hwang IK, Shih WJ, and DeCani JS (1990). Group sequential designs using a family of type I error probability spending functions. Statistics in Medicine, 9, 1439-1445.
+Lan, K. K. G., W. F. Rosenberger, and J. M. Lachin. (1993). Use of Spending Functions for Occasional or Continuous Monitoring of Data in Clinical Trials. Statistics in Medicine 12 (23):2219–31..
+Demets, D. L., & Lan, K. G. (1994). Interim analysis: the alpha spending function approach. Statistics in medicine, 13(13‐14), 1341-1352.
+Wang SK and Tsiatis AA (1987). Approximately optimal one-parameter boundaries for group sequential trials. Biometrics, 43, 193-99.
+Pampallona S, Tsiatis AA and Kim K (2001). Interim monitoring of group sequential trials using spending functions for the type I and type II error probabilities. Drug Information Journal, 35, 1113-1121.
+Emerson, S. S., and Fleming, T. R. (1989). “Symmetric Group Sequential Designs.” Biometrics 45:905–923.
+Kittelson, J. M., and Emerson, S. S. (1999). “A Unifying Family of Group Sequential Test Designs.” Biometrics 55:874–882.
+
+
+
+
+
+
+
+
+
+## GSD & Simulation
+
+Jennison, C., & Turnbull, B. W. (1999). Group sequential methods with applications to clinical trials. CRC Press. 
+Gsponer T, Gerber F, Bornkamp B, Ohlssen D, Vandemeulebroecke M, Schmidli H (2014). A Practical Guide to Bayesian Group Sequential Designs. Pharmaceutical Statistics, 13(1) 71-80
+Berry, S. M., Carlin, B. P., Lee, J. J., & Muller, P. (2010). Bayesian adaptive methods for clinical trials. CRC press. 
+ICH E20 Draft Guidance - https://www.ema.europa.eu/en/documents/scientific-guideline/ich-e20-guideline-adaptive-designs-clinical-trials-step-2b_en.pdf
+Bauer, P., Bretz, F., Dragalin, V., König, F. and Wassmer, G., (2016). Twenty‐five years of confirmatory adaptive designs: opportunities and pitfalls. Statistics in Medicine, 35(3), pp.325-347.
+Kelly, P. J., Roshini Sooriyarachchi, M., Stallard, N., & Todd, S. (2005). A practical comparison of group-sequential and adaptive designs. Journal of Biopharmaceutical Statistics, 15(4), 719-738.
+Cui, L., Hung, H. J., & Wang, S. J. (1999). Modification of sample size in group sequential clinical trials. Biometrics, 55(3), 853-857.
+Mehta, C. R., and Tsiatis, A. A. (2001). “Flexible Sample Size Considerations under Information Based Interim Monitoring.” Drug Information Journal 35:1095–1112.
+Chen, Y. J., DeMets, D. L., & Gordon Lan, K. K. (2004). Increasing the sample size when the unblinded interim result is promising. Statistics in medicine, 23(7), 1023-1038. 
+Freidlin, B., & Korn, E. L. (2017). Sample size adjustment designs with time-to-event outcomes: a caution. Clinical Trials, 14(6), 597-604.
+Muller, H-H. and Schafer, H. (2001). Adaptive group sequential designs for clinical trials: Combining the advantages of adaptive and of classical group sequential approaches. Biometrics, 57, 886-891.
+Wassmer, G. (2006). Planning and analyzing adaptive group sequential survival trials. Biometrical Journal: Journal of Mathematical Methods in Biosciences, 48(4), 714-729.
+Zelen, M. (1969). Play the winner rule and the controlled clinical trial. Journal of the American Statistical Association, 64(325), 131-146. 
+Ghosh, P., Liu, L. and Mehta, C., (2020). Adaptive multiarm multistage clinical trials. Statistics in Medicine
 
 
 
