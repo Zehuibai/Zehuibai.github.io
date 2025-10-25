@@ -3308,7 +3308,9 @@ dat<-read_xlsx("./01_Datasets/WWW_APR2025.xlsx", 1) %>%
 
 ## Animated bar chart
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+![](./02_Plots/Visualization/AEs/Animated_bar.gif)
+
+```
 bign <- dat %>%
   filter(AVISITN==1) %>%
   group_by(TRT) %>%
@@ -3344,14 +3346,24 @@ bar<-prop %>%
         legend.title = element_text(size=30),
         legend.key.size = unit(2, "cm"))
 
-animate(bar, nframes=19, fps=1, width=1920, height=1080, renderer=gifski_renderer())
-# anim_save("bar.gif")
+animate(
+  bar,
+  nframes = 19,
+  fps = 1,
+  width = 900,
+  height = 500,
+  renderer = gifski_renderer(loop = TRUE)
+)
+
+anim_save("./02_Plots/Visualization/AEs/Animated_bar.gif")
 ```
 
 
 ## Animated line plot
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+![](./02_Plots/Visualization/AEs/Animated_line.gif)
+
+``` 
 bign <- dat %>%
   filter(AVISITN==1) %>%
   group_by(TRT) %>%
@@ -3391,7 +3403,7 @@ line<-prop %>%
         strip.text = element_text(size=30))
  
 animate(line, nframes=19, fps=1.9, width=1920, height=1080, renderer=gifski_renderer())
-# anim_save("line.gif")
+anim_save("./02_Plots/Visualization/AEs/Animated_line.gif")
 ```
 
 ## Static line plot
@@ -3570,6 +3582,53 @@ combined
 ## Stacked area charts
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# ---- Reverse order so "High Response" appears on top ----
+resp_levels <- c("High Response", "Response", "Low Response", "No Response")
+
+resp_colors <- c(
+  "No Response"   = "#bdbdbd",
+  "Low Response"  = "#9ecae1",
+  "Response"      = "#3182bd",
+  "High Response" = "#08519c"
+)
+
+# ---- Prepare data ----
+dat2 <- dat %>%
+  mutate(
+    AVISITN = as.integer(AVISITN),
+    AVALC = factor(AVALC, levels = resp_levels)
+  )
+
+# ---- Summarize to get percentage per treatment, visit, and response ----
+prop_df <- dat2 %>%
+  group_by(TRT, AVISITN, AVALC) %>%
+  summarise(n = n(), .groups = "drop_last") %>%
+  mutate(perc = n / sum(n)) %>%
+  ungroup()
+
+# ---- Plot stacked area ----
+ggplot(prop_df, aes(x = AVISITN, y = perc, fill = AVALC)) +
+  geom_area(color = "white", size = 0.3, alpha = 0.9) +
+  facet_wrap(~TRT, ncol = 2) +
+  scale_fill_manual(values = resp_colors, name = "Response Level", drop = FALSE) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(breaks = seq(min(dat2$AVISITN), max(dat2$AVISITN), by = 2)) +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    legend.position = "right",
+    strip.text = element_text(face = "bold", size = 12),
+    axis.title.x = element_text(size = 12, margin = margin(t = 8)),
+    axis.title.y = element_text(size = 12, margin = margin(r = 8)),
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    legend.title = element_text(size = 11),
+    legend.text = element_text(size = 10)
+  ) +
+  labs(
+    title = "A higher percentage of patients receiving Drug B achieved High Response at all visits",
+    x = "Analysis Visit",
+    y = "Proportion of Patients"
+  )
 ```
 
 # Variability plot
@@ -4068,7 +4127,9 @@ plot_grid(title, Faceted_graphs,
 
 
 # Reference
- 
+
+SIG (2025, April 9). VIS-SIG Blog: Wonderful Wednesday April 2025 (61). Retrieved from https://graphicsprinciples.github.io/posts/2025-04-09-wonderful-wednesday-april-2025/
+
 SIG (2023, Sept. 13). VIS-SIG Blog: Wonderful Wednesdays September 2023. Retrieved from https://graphicsprinciples.github.io/posts/2023-12-17-wonderful-wednesdays-september-2023/
 
 SIG (2023, June 11). VIS-SIG Blog: Visualisation SIG Showcase. Retrieved from https://graphicsprinciples.github.io/posts/2023-05-14-visualisation-sig-showcase/
