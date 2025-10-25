@@ -3277,7 +3277,300 @@ This is a very advanced app which shows a volcano plot in the main panel and it 
 The app can be found [here](https://vis-sig.github.io/blog/posts/2022-06-06-wonderful-wednesdays-may-2022/images/HiSCR_fig%20-%20Agustin%20Calatroni.html).
 
 ![](./02_Plots/Visualization/PRO/HiSCR_fig.png)
+# Responder Markov Trace
 
+Example from [PSI Webinar](https://vis-sig.github.io/blog/posts/2025-04-09-wonderful-wednesday-april-2025/)
+
+
+Data set:
+
+* 500 subjects randomised 1:1 to Drug A or Drug B
+* Patients start in a state of No Response at Visit 1, and transition between four possible health states up to Visit 20 (No Response, Low Response, Response, High Response)
+
+The Challenge:
+
+* Visualise the efficacy of the two treatments with respect to state occupancy over time.
+
+Options:
+
+* Compare the treatments at an aggregate level (%s in each state over time)
+* Visualise response gain/maintenance/loss over time at a patient level
+* Explore decisions which may be made based on patient behaviour – e.g., if rules were introduced to discontinue subjects with suboptimal efficacy, how might different treatment discontinuation rules impact the numbers of subjects discontinuing each treatment?
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+if(!require("pacman")) install.packages("pacman")
+p_load("tidyverse", "this.path", "readxl", "gganimate", "gifski")
+
+dat<-read_xlsx("./01_Datasets/WWW_APR2025.xlsx", 1) %>%
+  mutate(AVALC = reorder(AVALC, AVAL, decreasing = TRUE))
+```
+
+
+## Animated bar chart
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+bign <- dat %>%
+  filter(AVISITN==1) %>%
+  group_by(TRT) %>%
+  mutate(N=n()) %>%
+  select(TRT, N) %>%
+  distinct()
+
+#Proportion of subjects at each level at each time
+prop <- dat %>%
+  merge(bign) %>%
+  group_by(TRT, AVISITN, AVALC) %>%
+  mutate(count = n(), prp=count/N, perc = round(100*prp, 2)) %>%
+  select(TRT, AVISITN, AVALC, AVAL, count, prp, perc) %>%
+  distinct()
+
+#Animated bar plot
+bar<-prop %>%
+  filter(AVISITN != 1) %>%
+  ggplot(aes(x=reorder(AVALC, AVAL), y=perc, group=TRT, fill=TRT)) +
+  geom_bar(stat="identity", position="dodge") +
+  ylim(c(0,60)) +
+  transition_time(AVISITN) +
+  enter_grow() +
+  exit_fade() +
+  labs(x="Response", 
+       y="Percentage of Responsders", 
+       title="Visit: {frame_time}",
+       fill = "Treatment") +
+  theme(axis.text = element_text(size=20),
+        axis.title = element_text(size=30),
+        plot.title = element_text(size=40),
+        legend.text = element_text(size=30),
+        legend.title = element_text(size=30),
+        legend.key.size = unit(2, "cm"))
+
+animate(bar, nframes=19, fps=1, width=1920, height=1080, renderer=gifski_renderer())
+# anim_save("bar.gif")
+```
+
+
+## Animated line plot
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+bign <- dat %>%
+  filter(AVISITN==1) %>%
+  group_by(TRT) %>%
+  mutate(N=n()) %>%
+  select(TRT, N) %>%
+  distinct()
+
+#Proportion of subjects at each level at each time
+prop <- dat %>%
+  merge(bign) %>%
+  group_by(TRT, AVISITN, AVALC) %>%
+  mutate(count = n(), prp=count/N, perc = round(100*prp, 2)) %>%
+  select(TRT, AVISITN, AVALC, AVAL, count, prp, perc) %>%
+  distinct()
+
+#Animated moving line plot
+line<-prop %>%
+  filter(AVISITN != 1) %>%
+  ggplot(aes(x=AVISITN, y=prp, col=TRT)) +
+  geom_point(size=10) +
+  geom_line(linewidth=5) +
+  facet_wrap(~AVALC) +
+  scale_x_continuous(breaks=c(2,5,10,15,20)) +
+  ylim(c(0,0.6)) +
+  transition_reveal(AVISITN) +
+  ease_aes("sine-in-out") +
+  labs(x="Visit", 
+       y="Proportion of Patients", 
+       title="Visit: {frame_along}",
+       col="Treatment") +
+  theme(axis.text = element_text(size=20),
+        axis.title = element_text(size=30),
+        plot.title = element_text(size=40),
+        legend.text = element_text(size=30),
+        legend.title = element_text(size=30),
+        legend.key.size = unit(2, "cm"),
+        strip.text = element_text(size=30))
+ 
+animate(line, nframes=19, fps=1.9, width=1920, height=1080, renderer=gifski_renderer())
+# anim_save("line.gif")
+```
+
+## Static line plot
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+bign <- dat %>%
+  filter(AVISITN==1) %>%
+  group_by(TRT) %>%
+  mutate(N=n()) %>%
+  select(TRT, N) %>%
+  distinct()
+
+#Proportion of subjects at each level at each time
+prop <- dat %>%
+  merge(bign) %>%
+  group_by(TRT, AVISITN, AVALC) %>%
+  mutate(count = n(), prp=count/N, perc = round(100*prp, 2)) %>%
+  select(TRT, AVISITN, AVALC, AVAL, count, prp, perc) %>%
+  distinct()
+
+#Non-animated fitted line facet plots
+line_static<-prop %>%
+  filter(AVISITN != 1) %>%
+  ggplot(aes(x=AVISITN, y=perc, group=TRT, col=TRT)) +
+  geom_point(alpha=0.5) +
+  geom_smooth(method="lm", se=FALSE) +
+  xlim(0,20) +
+  ylim(0,60) +
+  xlab("Visit Number") +
+  ylab("% of subjects") +
+  labs(col="Treatment") +
+  facet_wrap(~AVALC) +
+  theme(panel.grid.minor = element_blank())
+
+line_static
+# ggsave("line_static.png", line_static, width=1920, height=1080, units="px")
+```
+
+
+## Heat map
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# Ensure proper ordering
+dat <- dat %>%
+  mutate(
+    AVISITN = as.numeric(AVISITN),
+    USUBJID = fct_rev(factor(USUBJID))
+  )
+
+# Define color palette for responses
+resp_colors <- c(
+  "No Response"   = "#d73027",  # red
+  "Low Response"  = "#fc8d59",  # orange
+  "Response"      = "#fee08b",  # yellow
+  "High Response" = "#1a9850"   # green
+)
+
+# Create heatmap with numeric x-axis
+ggplot(dat, aes(x = AVISITN, y = USUBJID, fill = AVALC)) +
+  geom_tile() +
+  facet_wrap(~ TRT, nrow = 1, scales = "free_x") +
+  scale_fill_manual(values = resp_colors, name = NULL) +
+  scale_x_continuous(
+    breaks = pretty(unique(dat$AVISITN),n = 10),  # auto-simplified numeric labels
+    expand = c(0, 0)
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid = element_blank(),
+    strip.text = element_text(face = "bold", size = 12),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    legend.position = "right"
+  ) +
+  labs(
+    title = "Patient Response Over Time by Treatment",
+    x = "Visit (Numeric)",
+    y = "Subjects"
+  )
+```
+
+## Sankey diagrams
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+# ---- Color palette and levels ----
+resp_levels <- c("No Response", "Low Response", "Response", "High Response")
+resp_colors <- c(
+  "No Response"   = "#d73027",
+  "Low Response"  = "#fc8d59",
+  "Response"      = "#fee08b",
+  "High Response" = "#1a9850"
+)
+
+# ---- Prepare data ----
+dat2 <- dat %>%
+  mutate(
+    AVISITN = as.integer(AVISITN),
+    AVALC   = factor(AVALC, levels = resp_levels),
+    Visit   = paste0("Visit ", AVISITN)
+  )
+
+# ---- Build wide subject-by-visit ----
+wide_df <- dat2 %>%
+  arrange(TRT, USUBJID, AVISITN) %>%
+  select(TRT, USUBJID, Visit, AVALC) %>%
+  pivot_wider(names_from = Visit, values_from = AVALC)
+
+# Drop incomplete subjects (for simpler continuous flow)
+complete_df <- wide_df %>% tidyr::drop_na()
+
+# ---- Convert to lodes form for ggalluvial ----
+all_visits <- paste0("Visit ", sort(unique(dat2$AVISITN)))
+
+lodes <- to_lodes_form(
+  complete_df,
+  axes = all_visits,
+  key = "Visit",
+  value = "Response",
+  id = "USUBJID"
+) %>%
+  mutate(
+    TRT = factor(TRT),
+    Response = factor(Response, levels = resp_levels),
+    Visit = factor(Visit, levels = all_visits),
+    y = 1
+  )
+
+# ---- Plot function per treatment ----
+plot_sankey_trt <- function(trt_label) {
+  df <- lodes %>% filter(TRT == trt_label)
+  
+  ggplot(df,
+         aes(x = Visit,
+             stratum = Response,
+             alluvium = USUBJID,
+             y = y,
+             fill = Response)) +
+    geom_flow(stat = "alluvium", lode.guidance = "front",
+              color = "transparent", alpha = 0.65) +
+    geom_stratum(width = 0.08, color = "white") +
+    geom_text(stat = "stratum",
+              aes(label = after_stat(stratum)),
+              size = 3.2, vjust = -0.6) +
+    scale_fill_manual(values = resp_colors, drop = FALSE, name = NULL) +
+    scale_y_continuous(expand = c(0, 0)) +
+    theme_minimal(base_size = 12) +
+    theme(
+      panel.grid = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      legend.position = "bottom",
+      plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+      plot.margin = margin(10, 15, 10, 15)
+    ) +
+    labs(
+      title = paste("Response Over Time –", trt_label),
+      x = NULL,
+      y = "Subjects (equal weight)"
+    )
+}
+
+# ---- Build Sankeys per treatment ----
+trs <- unique(dat2$TRT)
+plots <- lapply(trs, plot_sankey_trt)
+
+combined <- wrap_plots(plots, ncol = 1) +
+  plot_annotation(
+    title = "Response Transitions Across Visits by Treatment (Fully Colored)",
+    theme = theme(plot.title = element_text(size = 16, hjust = 0.5, face = "bold"))
+  )
+
+# ---- Display ----
+combined
+```
+
+## Stacked area charts
+
+```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```
 
 # Variability plot
 
@@ -3286,72 +3579,78 @@ In this plot, the variability (represented by the standard deviation) is plotted
 The title is very nicely done. The first line provides already a very clear message. The second line uses a smaller font size and provides additional information. This plot is very clear and easy to read. Only the coloring could be chosen in a different way as already discussed above.
 
 ```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
-Orange <- "#EF7F04"
-Green <- "#68B937"
-Blue <- "#00A6CB"
-Grey <- "#4E5053"
-Darkblue <- "#003569"
-Yellow <- "#FFBB2D"
+# ---- Color palette and category levels ----
+resp_levels <- c("No Response", "Low Response", "Response", "High Response")
+resp_colors <- c(
+  "No Response"   = "#d73027",
+  "Low Response"  = "#fc8d59",
+  "Response"      = "#fee08b",
+  "High Response" = "#1a9850"
+)
 
-## Read in dataset ----
+# ---- Prepare data ----
+dat2 <- dat %>%
+  mutate(
+    AVISITN = as.integer(AVISITN),
+    AVALC   = factor(AVALC, levels = resp_levels)
+  )
 
-data <- read_csv('./01_Datasets/simulated_data.csv')
+# ---- Build transition data between consecutive visits ----
+transitions <- dat2 %>%
+  arrange(TRT, USUBJID, AVISITN) %>%
+  group_by(TRT, USUBJID) %>%
+  mutate(next_AVALC = lead(AVALC),
+         next_visit = lead(AVISITN)) %>%
+  ungroup() %>%
+  filter(!is.na(next_AVALC)) %>%
+  dplyr::count(TRT, AVISITN, AVALC, next_AVALC, next_visit, name = "Freq")
 
-data$VISITNUM <- as.character(data$VISITNUM)
-data$TREATMENT <- as.factor(data$TREATMENT)
+# ---- Aggregate flows per visit (category-level) ----
+flows <- transitions %>%
+  mutate(
+    Visit = paste0("Visit ", AVISITN),
+    Next  = paste0("Visit ", next_visit)
+  )
 
-## Set up data frame for changing visitnum to visit name
+# ---- Function to plot Sankey per treatment ----
+plot_sankey_by_trt <- function(trt_label) {
+  df <- flows %>% filter(TRT == trt_label)
+  
+  ggplot(df,
+         aes(axis1 = AVALC, axis2 = next_AVALC, y = Freq)) +
+    geom_alluvium(aes(fill = AVALC), width = 1/12, alpha = 0.7, knot.pos = 0.4) +
+    geom_stratum(width = 1/12, color = "white", fill = "grey95") +
+    geom_text(stat = "stratum", aes(label = after_stat(stratum)), size = 3.5, vjust = -0.5) +
+    scale_fill_manual(values = resp_colors, name = NULL) +
+    scale_x_discrete(
+      limits = unique(c(df$Visit, tail(df$Next, 1))),
+      labels = paste("Visit", sort(unique(c(df$AVISITN, df$next_visit)))),
+      expand = c(0.03, 0.03)
+    ) +
+    theme_minimal(base_size = 12) +
+    theme(
+      panel.grid = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      legend.position = "bottom",
+      plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+      plot.margin = margin(5, 10, 5, 10)
+    ) +
+    labs(title = paste("Response Over Time –", trt_label))
+}
 
-visits <- data.frame(VISITNUM = c('3', '17', '21'),
-                     Visit = c('Baseline', 'Week 26', 'Week 52'))
+# ---- Build plots ----
+trs <- unique(dat2$TRT)
+plots <- lapply(trs, plot_sankey_by_trt)
 
-## join it on
+combined <- wrap_plots(plots, ncol = 1) +
+  plot_annotation(
+    title = "Response Transitions Across Visits by Treatment (Category Level)",
+    theme = theme(plot.title = element_text(size = 16, hjust = 0.5))
+  )
 
-dataa <- data %>% 
-  full_join(visits)
- 
+combined
 
-## reorder factor for treatment
-
-
-dataa$Treatment <- factor(dataa$TREATMENT, levels = c("Rx high", "Rx medium", "Rx low", "SOC"))
-
-## Add in mean and sd for each patient and visit combination ----
-
-data1 <- dataa %>% 
-  group_by(SUBJID, Visit, Treatment) %>% 
-  summarise(mean_cgmsim = mean(Simulated_CGMValue), sd_cgmsim = sd(Simulated_CGMValue), 
-            mean_cgm = mean(Original_CGMValue), sd_cgm = sd(Simulated_CGMValue),
-            med_cgm = median(Original_CGMValue), iqr_cgm = IQR(Original_CGMValue),
-            med_cgmsim = median(Simulated_CGMValue), iqr_cgmsim = IQR(Simulated_CGMValue))
-
-
-
-
-# plotdata <- ggplot(data= data1, aes(x=mean_cgmsim, y = sd_cgmsim, colour= TREATMENT, shape= Visit))
-# plotdata <- ggplot(data= data1, aes(x=mean_cgm, y = sd_cgm, colour= TREATMENT, shape= VISITNUM))
-plotdata <- ggplot(data= data1, aes(x=mean_cgmsim, y = sd_cgmsim, colour= Treatment))
-# plotdata <- ggplot(data= data1, aes(x=med_cgmsim, y = iqr_cgmsim, colour= TREATMENT))
-
-
-plotdata + geom_point() +
-  ggtitle('Medium treatment dose leads to glucose levels within a safe range,') +
-  xlab('Mean glucose levels per patient (mg/dL)') +
-  ylab('Variablity of glucose measurements per patient (Standard Deviation)') +
-  scale_colour_manual(values = c(Green, Blue, Darkblue, Orange)) +
-  geom_vline(aes(xintercept=140), linetype=2, colour=Grey) +
-  facet_wrap(vars(Visit),labeller = labeller(Visit = label_wrap_gen(55))) +
-  labs(caption = "Glucose levels between 72 and 140 mg/dL are considered to indicate good glycemic control",
-       subtitle = "and decreased variability compared to SOC and other treatment doses") +
-  theme_bw() +
-  theme(panel.background = element_blank(), axis.line = element_blank(),
-        axis.text=element_text(size=12),
-        axis.title=element_text(size=14),
-        # legend.position="none",
-        legend.title = element_text(size=14),
-        legend.text= element_text(size=12),
-        plot.title = element_text(size=18, face="bold"),
-        plot.subtitle = element_text(size=14, face="bold"))
 ```
 
 # Clinical Improvement 
