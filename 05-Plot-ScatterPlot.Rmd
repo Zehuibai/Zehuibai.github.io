@@ -17,9 +17,16 @@ editor_options:
 colorlinks: yes
 --- 
 
-
-```{r, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  error   = FALSE,
+  echo    = TRUE,
+  cache = TRUE,
+  fig.width = 10, 
+  fig.height = 6
+)
 
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 # getwd()
@@ -90,7 +97,7 @@ ggplot(data = iris, mapping = aes(x = Petal.Length, y = Petal.Width, shape = Spe
 
 ## geom_smooth
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # display different aesthetics in different layers
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
   geom_point(mapping = aes(color = class)) + 
@@ -138,7 +145,7 @@ ggplot(mpg, aes(cty, hwy))+
 ## Exploratory exposure-response analysis
  
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # Read in data
 my_data <- 
   read_csv("./01_Datasets/401_case1_PKPDdataset_ard.csv") %>%
@@ -154,7 +161,7 @@ my_data %>%
 ```
 
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # Define custom breaks and labels
 lbr <- scales::trans_breaks("log10", function(x) 10^x)
 llb <- scales::trans_format("log10", scales::math_format(10^.x))
@@ -180,7 +187,7 @@ my_data %>%
 ```
 
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # Cleveland, William S. 1979. “Robust Locally Weighted Regression and Smoothing Scatterplots.” Journal of the American Statistical Association 74 (368): 829–36. https://doi.org/10.1080/01621459.1979.10481038
 # https://graphicsprinciples.github.io/tutorial-case-studies/posts/401-case1-eda/401-case1-eda.html
 my_data %>%
@@ -255,7 +262,7 @@ ggplot(mtcars, aes(disp, mpg)) +
 # Quadrant Counts
 
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # library(ggpp)
 
 set.seed(4321)
@@ -369,7 +376,7 @@ ggplot(mpg, aes(cty, hwy)) +
 
 ## XY plots
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # library("lme4") # data sleepstudy
 # library("lattice")
 
@@ -459,7 +466,7 @@ ggplot(relig_summary, aes(tvhours, fct_reorder(relig, tvhours))) +
 
 ## Diverging Dot Plot
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # Data Prep
 data("mtcars")  # load data
 mtcars$`car name` <- rownames(mtcars)  # create new column for car names
@@ -511,7 +518,7 @@ ggplot(mtcars, aes(x=`car name`, y=mpg_z, label=mpg_z)) +
 
 ## Alternative using ggbur
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # library(ggpubr)
 # https://rpkgs.datanovia.com/ggpubr/
 data("mtcars")
@@ -584,7 +591,7 @@ ggdotchart(dfm, x = "name", y = "mpg",
 
 ## Residuals vs. Fitted Plot
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 #fit regression model
 fit <- lm(mpg ~ qsec, data=mtcars) 
 
@@ -619,7 +626,7 @@ ggplot(fit, aes(x = .fitted, y = .stdresid)) +
  
 ## Plot actual and predicted values
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 #fit regression model
 d <- mtcars
 fit <- lm(mpg ~ hp, data = d) 
@@ -640,7 +647,7 @@ ggplot(d, aes(x = hp, y = mpg)) +
 Color mapped to residual with sign taken into account.  i.e., whether actual value is greater or less than predicted
  
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 ggplot(d, aes(x = hp, y = mpg)) +
   geom_smooth(method = "lm", se = FALSE, formula = y ~ x,color = "lightgrey") +
   geom_segment(aes(xend = hp, yend = predicted), alpha = .2) +
@@ -659,7 +666,7 @@ For more details see (here)[https://drsimonj.svbtle.com/visualising-residuals]
 ## Normal Probability Plot
 
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 #fit regression model
 fit <- lm(mpg ~ qsec, data=mtcars) 
 
@@ -680,7 +687,7 @@ qq_plot
 
 ## Histogram of Residuals
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 #fit regression model
 fit <- lm(mpg ~ qsec, data=mtcars) 
 
@@ -698,7 +705,7 @@ p.hist
 
 ## Basic 
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # The dataset is provided in the gapminder library
 # library("gapminder")
 data <- gapminder %>% filter(year=="2007") %>% dplyr::select(-year)
@@ -736,7 +743,7 @@ data %>%
 
 ## Interactive Version
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # Libraries
 # library(ggplot2)
 # library(dplyr)
@@ -850,7 +857,7 @@ options(warn=0)
 
 ## General
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # Read excel data
 # library("readxl")
 Cepheid_D01 <- read_excel("./01_Datasets/lab_figure.xlsx")
@@ -908,7 +915,7 @@ options(warn=-1)
 
 ## By Subgroup
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # Beeswarm HER2 by ER Status
 ER_central.labs <- c("ER status: negative","ER status: positive")
 names(ER_central.labs) <- c("negative", "positive")
@@ -932,11 +939,315 @@ HER2_Bin
 ```
 
 
+# Mean Effect Comparing Groups
+
+There was a recently publication of a trial on treatment of patients with hyperkalemia. 
+
+> SIG (2025, June 11). VIS-SIG Blog: Wonderful Wednesday June 2025 (63). Retrieved from https://graphicsprinciples.github.io/posts/2025-06-11-wonderful-wednesday-june-2025
+
+## Summary Level
+
+```{r}
+dat <- read.csv(paste0("./01_Datasets/","fig2data.csv"))
+# dat <- read.csv("https://raw.githubusercontent.com/VIS-SIG/Wonderful-Wednesdays/refs/heads/master/data/2025/2025-05-14/fig2data.csv")
+
+dat2 <- dat[,c(-1,-4)] # remove unnecessary columns
+names(dat2)[c(1,2)] <- c("visitNum","serumK_exact")
+```
+
+### Line Graph
+
+```{r} 
+## dat2 列: visitNum, serumK_exact, stat (mean/llc/ulc), treat (SZC group/SPS group)
+
+jitter  <- 0.1
+week    <- c(0, 1, 2, 4, 6, 8)
+x_szc   <- week - jitter
+x_sps   <- week + jitter
+
+szc <- subset(dat2, treat == "SZC group")
+sps <- subset(dat2, treat == "SPS group")
+
+szc_mean <- szc$serumK_exact[szc$stat == "mean"]
+szc_llc  <- szc$serumK_exact[szc$stat == "llc"]
+szc_ulc  <- szc$serumK_exact[szc$stat == "ulc"]
+
+sps_mean <- sps$serumK_exact[sps$stat == "mean"]
+sps_llc  <- sps$serumK_exact[sps$stat == "llc"]
+sps_ulc  <- sps$serumK_exact[sps$stat == "ulc"]
+
+## Plot SZC
+plot(x_szc, szc_mean,
+     type = "l",
+     xlab = "Week", xaxt = "n",
+     ylab = "Serum K (mEq/l)",
+     xlim = c(-0.5, 8.5), ylim = c(0, 6),
+     col = "orange", lwd = 2)
+
+points(x_szc, szc_mean, col = "orange", pch = 16)
+
+arrows(x0 = x_szc, y0 = szc_ulc,
+       x1 = x_szc, y1 = szc_llc,
+       angle = 90, code = 3, lwd = 2,
+       length = 0.025, col = "orange")
+
+## Plot SPS
+lines(x_sps, sps_mean, col = "blue", lwd = 2)
+points(x_sps, sps_mean, col = "blue", pch = 16)
+
+arrows(x0 = x_sps, y0 = sps_ulc,
+       x1 = x_sps, y1 = sps_llc,
+       angle = 90, code = 3, lwd = 2,
+       length = 0.025, col = "blue")
+
+ 
+abline(h = 5, col = "black")
+text(2, 4, "Normokalemia",  col = "black")
+text(2, 6, "Hyperkalemia", col = "black")
+
+## x Axis
+axis(1,
+     at     = week,
+     labels = c("Baseline", "1", "2", "4", "6", "8"),
+     xlim   = c(-0.5, 8.5))
+
+legend("bottomleft",
+       legend = c("SZC group (N = 60) (mean and 95% CI)",
+                  "SPS group (N = 60) (mean and 95% CI)"),
+       col    = c("orange", "blue"),
+       lwd    = 2, bty = "n")
+
+title(expression(bold(paste(phantom("SZC"),
+                            " treatment resolves Hyperkalemia faster and more effective"))),
+      line = 3)
+title(main = expression(bold(paste("SZC",
+                                   phantom(" treatment resolves Hyperkalemia faster and more effective")))),
+      col.main = "orange", line = 3)
+
+title(expression(paste("Mean serum potassium levels were significantly lower in the ",
+                       phantom("SZC"), " compared to ", phantom("SPS"),
+                       " group (p < 0.05)")),
+      line = 2, cex.main = 0.8)
+title(expression(paste(phantom("Mean serum potassium levels were significantly lower in the "),
+                       "SZC", phantom(" compared to SPS group (p < 0.05)"))),
+      line = 2, cex.main = 0.8, col.main = "orange")
+title(expression(paste(phantom("Mean serum potassium levels were significantly lower in the SZC compared to "),
+                       "SPS", phantom(" group (p < 0.05)"))),
+      line = 2, cex.main = 0.8, col.main = "blue")
+
+```
+
+### Bar chart
+
+```{r}
+datChange <- cbind(dat2,dat2$serumK - 5)
+names(datChange) <- c(names(dat2),"change")
+datChange$visitNum2 <- c()
+datChange$visitNum2[datChange$visit == "Baseline"] <- 0
+datChange$visitNum2[datChange$visit == "1st week"] <- 1
+datChange$visitNum2[datChange$visit == "2nd week"] <- 2
+datChange$visitNum2[datChange$visit == "4th week"] <- 4
+datChange$visitNum2[datChange$visit == "6th week"] <- 6
+datChange$visitNum2[datChange$visit == "8th week"] <- 8
+ 
+ggplot(datChange[datChange$stat == "mean",], aes(x = visitNum2, y = change, fill = treat)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(name = "Group",values = c("SPS group" =  "blue", "SZC group" =  "orange")) +
+  labs(title = "SZC treatment resolves Hyperkalemia (> 5 mEq/l) faster and more effective", x = "Week", y = "Serum K (mEq/l)") +
+  scale_x_continuous(
+    breaks = c(0,1,2,4,6,8),
+    labels = c("Baseline","1","2","4","6","8"),
+    minor_breaks = NULL,
+    limits = c(-0.5,8.5) 
+  )  +
+  scale_y_continuous(
+    breaks = seq(-1,1,0.25),
+    labels = seq(4,6,0.25),
+    minor_breaks = NULL,
+    limits = c(-1, 1) 
+  ) +
+  geom_hline(yintercept = 0, color = "black", linetype = "solid", linewidth = 1) +
+  geom_vline(xintercept = 2, color = "orange", linetype = "dashed", linewidth = 1) +
+  annotate("text", x = 2.5, y = -0.5, label = "SZC group reaches Normokalemia at 2 weeks", colour = "orange") +
+  geom_vline(xintercept = 6, color = "blue", linetype = "dashed", linewidth = 1) +
+  annotate("text", x = 5.5, y = -0.75, label = "SPS group reaches Normokalemia at 6 weeks", colour = "blue") +
+  theme_minimal()
+```
+
+
+### Confidence bands
+
+```{r}
+data_wide_summary <- dat %>%
+  select(visit, treat, stat, serumK) %>%
+  pivot_wider(
+    id_cols = c(visit, treat),    # Columns that uniquely identify each row in the new wide format
+    names_from = stat,            # The column whose values ("llc", "ulc", "mean") will become new column names
+    values_from = serumK) 
+
+data_wide_summary
+
+# plot
+
+ggplot(data_wide_summary, aes(x = factor(visit, level = c("Baseline", "1st week","2nd week","4th week","6th week","8th week")), 
+   y = mean, 
+   group = treat, 
+   color = treat)) +
+   geom_ribbon(aes(ymin=llc, ymax=ulc, fill = treat), alpha = 0.3, linetype = 0) +
+   geom_line(size = 1.5) +
+   geom_hline(yintercept = 5, linetype = "dashed", color = "gray", size = 1) +
+   labs(
+   title = "Serum potassium changes. Comparison of two treatments for hyperkalemia.",
+   subtitle = "Data from Elsayed et al. (2025)",
+   caption = "Plotted by Melisa Castellanos for ~Wonderful Wednesday Challenge~ by PSI.
+              SCZ = sodium zirconium cyclosilicate. SPS = sodium polystyrene sulfonate.
+              LLC = lower limit of confidence. ULC = Upper limit of confidence. 
+              In this new visualization, the treatment arms are shown within the same plot making comparison easier.",
+   x = "Visit",
+   y = "Serum K (mEq/L)",
+   fill = "LLC - ULC",
+   color = "Treatment Arm Mean"
+   ) +
+  theme_minimal() +
+  scale_color_manual(values = c("SZC group" = "darkblue", # Line of treatment 1
+                                "SPS group" = "darkgreen")) + # line treatment 2
+  scale_fill_manual(values = c("SZC group" = "lightblue", # A lighter shade of blue for SZC group's band
+                               "SPS group" = "lightgreen"))  # A lighter shade of red for SPS group's band
+```
+
+## Patient Level
+
+> SIG (2025, July 9). VIS-SIG Blog: Wonderful Wednesday July 2025 (64). Retrieved from https://graphicsprinciples.github.io/posts/2025-07-09-wonderful-wednesday-july-2025/
+> https://rpubs.com/thomas-weissensteiner/1334093
+
+```{r}
+HyKal_simData <- 
+  read.csv("./01_Datasets/serum_potassium_study_data.csv") %>% 
+  # Avoid confusion with the function "group"
+  rename(., Treatment = Group)
+```
+
+### Weekly measurements of serum potassium levels in patients receiving SPS or SZC
+
+```{r}
+# Normal serum K[+] as defined in reference 2
+normokalemia <- c(4, 4.9)
+
+# K_threshold is set based on results in chunk 3
+K_threshold <- 5.2
+
+# Number of patients in each treatment group
+N_group <- 
+  HyKal_simData %>% 
+  group_by(Treatment) %>% 
+  dplyr::summarize(., N = unique(Patient_ID) %>% length )
+    
+HyKal_simData %>%
+  # Add a column showing whether baseline levels were below or above K_threshold
+  mutate(
+    K_base = case_when(
+      Serum_Potassium_mEq_L < K_threshold & Time_Point == "Baseline" 
+        ~ paste0(Treatment, ".K_low"), 
+      Serum_Potassium_mEq_L >= K_threshold & Time_Point == "Baseline" 
+        ~ paste0(Treatment, ".K_high"),
+      .default = NA_character_
+      ) %>% factor()
+    ) %>% 
+  group_by(Patient_ID) %>%
+  fill(K_base, .direction = "downup") %>% 
+  # Add patient numbers in each treatment group, and a column showing whether serum K[+] levels were normal at any time during treatment
+  left_join(., N_group) %>% 
+  mutate(
+    hyKal = ifelse(
+      Serum_Potassium_mEq_L <= max(normokalemia), 
+      Week, NA),
+    hyKal = if (all(is.na(hyKal[-1]))) "Yes" else "No",
+    color = paste(K_base, hyKal, sep = "_") %>% factor(),
+    Treatment = paste0(Treatment, " (N = ", N, ")") 
+    ) %>% 
+  ungroup() %>%
+
+  ggplot(
+    aes(
+      x = Week, 
+      y = Serum_Potassium_mEq_L,
+      group = Patient_ID,
+      color = color,
+      size = K_base
+      )
+    ) +
+  geom_ribbon(
+    inherit.aes = FALSE,
+    aes(
+      x = Week,
+      ymin = min(normokalemia), 
+      ymax = max(normokalemia)),
+      fill = "lightgrey",
+      alpha = 0.7
+      ) +
+  geom_line() +
+  annotate(
+    "text", 
+    label = "Normal range",
+    size = 3,
+    x = 0.3, 
+    y = range(normokalemia) %>% sum()/2,
+    angle = 90  
+    ) +
+  scale_color_manual(
+    values = c(
+      SPS.K_low_No = "#27C8F5", SPS.K_high_No = "#4795A8", 
+      SPS.K_low_Yes = "#551182", SPS.K_high_Yes = "#CC2DB7",  
+      SZC.K_high_No = "#F58E27", SZC.K_low_No = "#A34018"
+      # Levels that do not exist in this data set:
+      # SZC.K_low_Yes = "#551182", SZC.K_high_Yes = "#CC2DB7",  
+      ) 
+    ) +
+  scale_size_manual(values = c(0.7 ,1.4 , 0.7, 1.4) ) +
+  scale_y_continuous(
+    breaks = c(4:6, K_threshold),
+    minor_breaks = NULL,
+    ) +
+  facet_wrap(.~Treatment) +
+  labs(
+    title = "Serum potassium levels vs. week of treatment in individual patients receiving SPS or SZC",
+    y = "Serum K[+] (mEq/L)",
+    caption = paste("Darker and thicker lines represent patients with a baseline serum K[+] below the", K_threshold, "mEq/L threshold (purple y-axis tick label). \nPurple lines indicate patients who never achieved normokalemia. See the following figures for an explanation.")
+    ) +
+  theme_light() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.text.y = element_text(
+      face = c("plain", "plain", "plain", "bold"),
+      color = c("black", "black", "black", "#CC2DB7")),
+    strip.background = element_blank(),
+    strip.text.x = element_text(
+      color = "black",
+      size = 11
+      ),
+    plot.caption = element_text(hjust = 0, size = 8),
+    legend.position = "none"
+    ) 
+```
+
+### Defining the outcomes to be visualised
+
+At the previous PSI webinar, it was noted that patients treated with SPS required on average approximately five weeks to reach normokalemia, whereas those receiving SZC achieved normokalemia after about 1.5 weeks. Highlighting these time points was suggested as a potential improvement to the figure. Accordingly, the analysis estimates the time at which each individual first entered the normal serum K[+] range and compares the mean times between treatment groups.
+
+However, the first crossing into the normal range depends not only on the treatment effect but also on the patient’s baseline serum K[+] level. Baseline levels of serum K[+] may also act as a covariate associated with the type and/or magnitude of the treatment response. Therefore, treatment response is evaluated as a separate outcome and modelled as a linear function of serum K[+] over time. Although change from baseline could also be considered, with only one baseline measurement per patient, the “rate of change” appears to be a more suitable metric for quantifying the efficacy of each drug in lowering serum K[+] concentrations.
+
+Serum K[+] measurements in individual patients fluctuated substantially over time, particularly in the SPS group. Consequently, estimates of the response rate or the time at which normokalemia is reached are uncertain and may even be unsuitable for comparing the two treatment groups. A more clinically meaningful outcome may therefore be the total duration during the trial in which patients remain within the normokalemic range.
+
+For more details, please check
+
+https://rpubs.com/thomas-weissensteiner/1334093
+
+
 # Line Plot
 
 ## Multi groups line chart 
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 library(babynames) # provide the dataset: a dataframe called babynames
 # library(hrbrthemes)
 # library(viridis)
@@ -959,7 +1270,7 @@ don %>%
 
 ## Line chart annotation 
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # Reference: https://r-graph-gallery.com/line_chart_annotation.html
 # library(plotly)
 # library(hrbrthemes)
@@ -982,7 +1293,7 @@ data %>%
 
 ## Dual Y axis
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # library(patchwork) # To display 2 charts together
 # library(hrbrthemes)
 
@@ -1033,7 +1344,7 @@ ggplot(data, aes(x=day)) +
 
 ## Advanced Theme Setting
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # Reference https://r-graph-gallery.com/web-line-chart-with-labels-at-end-of-line.html
 # Load packages
 # library(ggrepel)
@@ -1246,7 +1557,7 @@ Disease activity varied widely between groups and visits, in the periods before 
 *"Change following Intervention" (right subplot)*  
 Nevertheless, I added a summary of mean disease index scores before and after intervention. My assumption was that visits 1-5 were meant to establish a baseline value, to which levels at visits 6 and 7 were to be compared. Treatment groups are shown in the order of their change in median values of their mean disease indices before and after intervention, from greatest decrease (group "F", left) to greatest increase (group "G", right).
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # library(dplyr)        # version 1.1.4  # general grammar
 # library(purrr)        # version 1.0.2  # set_names, list_rbind
 # library(tidyr)        # version 1.3.1  # pivot_longer, pivot_wider
@@ -1442,7 +1753,7 @@ The first was a hypothetical target range for the disease index. The aim of trea
 
 My second additional parameter were the intervals at which the visits were scheduled. This should give a better impression of the variability of the disease index over time, in particular if the visits were not evenly spaced.
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 
 # Intervals at which visits 1-7 took place (e.g. weeks)
 visitIntervals <- c(0, 2, 4, 8, 12, 16, 24)
@@ -1618,7 +1929,7 @@ ggarrange(
  
 # Scatter Plots and Densities
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # library(haven)
 # library(dplyr)
 # library(tidyr)
@@ -1736,7 +2047,7 @@ p2
 
 ## Linear Scala
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 my_data <- read_csv("./01_Datasets/402_case2_PKdataset.csv") %>%
   filter(CMT == 2 & DOSE == 300 & PART == 1 & STUDY == 1) %>%
   mutate(
@@ -1783,7 +2094,7 @@ my_data %>%
 ## Log Scale
 
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # Mean (95% CI) error bars, log scale
 my_data %>%
   ggplot(aes(
@@ -1826,7 +2137,7 @@ my_data %>%
 ## Cmax, Ctrough and AUClast
 
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 theme_set(theme_bw(base_size = 10))
 
 # Plot cmax, ctrough, AUClast dots (95% CI) in separate panels
@@ -1890,7 +2201,7 @@ grid.arrange(arrangeGrob(gg1, gg2, gg3, nrow = 1), nrow = 1)
 
 
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 Cmax2  <- Cmax %>%
   mutate(DV = Cmax,
          logDV = log(Cmax),
@@ -1985,7 +2296,7 @@ PKmetrics %>%
 
 ## Post-hoc subgroup analyses
 
-```{r, message = FALSE, error = FALSE, warning = FALSE, cache=TRUE}
+```{r}
 # Read in data and define order for factors.
 # Dervie visit time in weeks from hours
 # Define informative label for plotting subgroups
@@ -2096,6 +2407,10 @@ ggplotly(p, tooltip="text")
 
 
 # Reference
+
+SIG (2025, July 9). VIS-SIG Blog: Wonderful Wednesday July 2025 (64). Retrieved from https://graphicsprinciples.github.io/posts/2025-07-09-wonderful-wednesday-july-2025/
+
+SIG (2025, June 11). VIS-SIG Blog: Wonderful Wednesday June 2025 (63). Retrieved from https://graphicsprinciples.github.io/posts/2025-06-11-wonderful-wednesday-june-2025/
 
  [Statistics notes: Analysing controlled trials with baseline and follow up measurements.](https://doi.org/10.1136/bmj.323.7321.1123)  
 Vickers AJ, Altman DG. BMJ. 2001 Nov 10;323(7321):1123-4.

@@ -17,19 +17,30 @@ editor_options:
 colorlinks: yes
 ---
 
-```{r setup, include=FALSE, echo = FALSE,message = FALSE, error = FALSE, warning = FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  error   = FALSE,
+  echo    = TRUE,
+  cache = TRUE,
+  fig.width = 10, 
+  fig.height = 6
+)
+ 
 rm(list = ls())
+
 # <!-- ---------------------------------------------------------------------- -->
 # <!--                    1. load the required packages                       -->
 # <!-- ---------------------------------------------------------------------- --> 
+# remotes::install_github("davidsjoberg/ggstream")
 # Define the packages
 packages <- c("tidyverse", "kableExtra", "ggtext", "RCurl", "here",
               "plyr","scales","forcats","psych",
               "ggplot2", "ggrepel", "cowplot", "lubridate", "readxl", 
               "plotly","shiny","gt",
               "gridExtra", "patchwork", "reshape2", "grid", "ggthemes", 
-              "ggcharts","ggpubr","ggridges",
+              "ggcharts","ggpubr","ggridges","ggstream",
               "polycor", "ggalluvial","RColorBrewer","viridis")
  
  
@@ -72,7 +83,7 @@ Overall, this is a very clean design and provides a clear message. However, ther
 
 Unlike in the previous example, here the items are sorted in the order they appear on the questionnaire. Alternative ways to sort the items could be considered to highlight those which are most interesting, such as sorting by baseline means or by effect size. There are also a few tweaks to the horizontal axes which the group felt should be made. Firstly, it would be better to start from zero on the first dot plot, otherwise the effect size appears to be exaggerated. Further, the horizontal axes and spacing between labels should be made consistent for the two treatment groups, allowing for direct comparison between the two figures.
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 # Load data
 dql <-  read_csv("./01_Datasets/ww2020_dlqi.csv") 
  
@@ -330,7 +341,7 @@ The consistent use of colour between plots and titles allows us to easily distin
 
 This example has a long, vertical layout. This would be great for something like a poster, but is maybe less convenient for viewing on screen. There was a feeling that when being presented as a poster, a lighter background may be more suitable.
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 library(tidyverse)
 library(data.table)
 library(grid)
@@ -565,7 +576,7 @@ The final thing discussed at length for this example was the representation of t
 
 The panel highlighted a really nice tool which allows us to see how easily certain colours are distinguished by individuals with different kinds of colour-blindness. Whilst it was shown that the blue and green used here are not too difficult to distinguish for most individuals, the tool was used to identify colours which could be even easier to differentiate between.
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 pacman::p_load(rio, tidyverse)
 pacman::p_load(lme4, emmeans)
 pacman::p_load(ggdist, distributional)
@@ -835,7 +846,7 @@ gg_f1 + gg_d1 +
 This graphic is similar to the first one except it uses a barchart instead of a lollipop chart and it includes a completers analysis. The title explains the results and the reference line for the marginal treatment effect provides a good reference for the reader.
 
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 # Read in the data set:
 dat <- read.csv("./01_Datasets/mediation_data.csv")
 
@@ -925,7 +936,7 @@ In data analysis, especially when dealing with questionnaire data, `geom_histogr
    
 ### General
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 data <- data.frame(
   Group = c(rep("Active Treatment", 200), rep("Placebo", 200)),
   Time = c(rep("Baseline", 100), rep("Week 16", 100), rep("Baseline", 100), rep("Week 16", 100)),
@@ -998,7 +1009,7 @@ print(plot3)
 ### Clean Design 1
 
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 dql <- read.csv("./01_Datasets/ww2020_dlqi.csv")
 
 attach(dql)
@@ -1094,7 +1105,7 @@ gridExtra::grid.arrange(d, e, nrow = 2)
 
 ### Clean Design 2
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 dql <- read.csv("./01_Datasets/ww2020_dlqi.csv")
 
 attach(dql)
@@ -1198,7 +1209,7 @@ gridExtra::grid.arrange(d, e, nrow = 2, heights = c(1.5,1))
 
 The clinical global impression – severity scale (CGI-S) is a 7-point scale that requires the clinician to rate the severity of the patient’s illness at the time of assessment, relative to the clinician’s past experience with patients who have the same diagnosis. The challenge was to provide data visualisations to show this data and also to provide comparisons between the different groups (e.g. based on response differences or odds ratios for the different response categories) using Clinical Global Impression Data.
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE} 
+```{r} 
 plot.fun <- function(dat, name, v.just = 1.5, gci.s = "<=3", y.max = 100,
                      title.text = "The <span style = 'color: #08519C'>Active</span> and
          <span style = 'color: #BDD7E7'>Comparator</span> result in similar clinical global impression",
@@ -1315,7 +1326,7 @@ The **Clinical Global Impressions-Improvement (CGI-I)** scale is a widely used t
 
 *Annotation (circling Site 4 in red) and sorting (Site 4 in the upper left hand corner) to make clear that Site 4 is a visual outlier. The visual idiom is a stacked bar chart, one color for each questionnaire. Stacked barcharts are limited when comparing any of the components except the one on the bottom. For the purpose of this data viz challenge, it was only necessary to compare the totals, ie the heights of the stacked bars. This is easy to do for the stacked bars from a visual perception point of view. But the colors for the different components (Q1, Q2, Q3 and Q4) can be distracting.*
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 data <- read.csv("./01_Datasets/PROdata.csv")
 
 # Convert data to long format for easier plotting with ggplot2
@@ -1355,7 +1366,7 @@ Leverage visual analytics to identify data issues. Consider 4 questions on a Lik
 *We can clearly see that Site 4 is a visual outlier. The Active data for Site 4 looks like it belongs with the Control data from the other sites and likewise the Contorl data for Site 4 looks like it belo9ngs with the Active data from the other sites. Color and a useful title are used to highlight the difference.*
 
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 
 PROdata.vert <- read.csv("./01_Datasets/PROdata.csv")
 
@@ -1662,7 +1673,7 @@ In general, the graph contains a lot of information and takes some time to under
 This graph includes stacked density plots, sometimes known as a ridgeline plot. This graph type is useful where there are approximately 4-8 categories with a natural ordering, which is the case in this example. The graph is also showing patient level data as transparent dots on the X axis, and reference lines have been added. There is a lot of overplotting of the dots, so the opacity of dots is representing the data density at each value on the X-axis.
  
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 WW_data <- read.csv("./01_Datasets/WWW_example_minimal_clinical_improvement.csv")
 
 # library(tidyverse)
@@ -1785,7 +1796,7 @@ rcc
 
 This graph used a different approach, showing only the patient-level data within each category as a scatter plot, with added jittering. The trend between categories is clear, and the number of patients can be compared between groups visually. It was noted that some people find it hard to compare distributions from scatter plots, so a hybrid of scatter plot and a elements showing the distribution, e.g. boxplot or density plot, may have been useful. However the author of the graph mentioned that this graph was intended to be used at the first step of an assessment, to answer the question “is CGI a good enough measure to investigate the meaningful change threshold”
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 # library(tidyverse)
 # library(ggridges)
 # library(polycor)
@@ -1845,7 +1856,7 @@ The EORTC QLQ-C30 is a 30-item questionnaire that has been designed for use in a
 
 ## Line graphs
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE} 
+```{r} 
 # library(dplyr)
 # library(tidyr)
 # library(ggplot2)
@@ -1909,7 +1920,7 @@ ggplot(data=d2, aes(x=AVISITN, y=AVAL, group=LASTVISC, color=LASTVISC)) +
 
 ![](./02_Plots/Visualization/PRO/Missing1.png)
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE} 
+```{r} 
 # library(dplyr)
 # library(tidyr)
 # library(ggplot2)
@@ -1978,7 +1989,7 @@ This figure of change from baseline in QLQ-C30 over time is showing patient-leve
 
 The use of faint grey gridlines is quite effective. The possibility of using a greyscale for the patient-level data was discussed, because the colour isn’t coding any information and this would make the line plot of mean over time stand out, but it was agreed this would make the patient-level data difficult to distinguish against the gridlines. Some design improvements were suggested, making some of the labels a little larger, and there is also some scope for decluttering the graph, e.g. removing the Y-axis label from the right panel.
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 # library(tidyverse)
 # library(lubridate)
 # library(dplyr)
@@ -2115,7 +2126,7 @@ This visualization displays the distribution of the individual items over each o
 
 The visualization allows the viewer to quickly identify the greater severities observed on Day 4, and to compare the individual items on each day. This provides a nice overview of the data which is quick and easy to understand. The use of darker shades to represent darker colours is intuitive.
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 library(tidyverse)
 library(mirt)
 library(ggpubr)
@@ -2284,7 +2295,7 @@ Response_Distributions
 
 This waterfall plot displays the individual change score of each patient. The bars are coloured by the patients’ self-reported conditions, allowing us to easily see the tools’ ability to detect change. 
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 #Clear environment
 rm(list=ls())
 
@@ -2367,7 +2378,7 @@ This final visualization has two features: a histogram displaying the underlying
 Again, the plot takes a moment to interpret, but once understood provides a message that is easy to understand. It may help the viewer understood more quickly if the vertical gridlines were continued up to the histogram (or alternatively if the x-axis was positioned between the two plots) to make clear that the two aspects of the visual are connected.
 
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 dat <--read.csv("./01_Datasets/sdq_raw.csv")
 
 ### Make dataset for each timepoint ====
@@ -2462,7 +2473,7 @@ The selection of the colors is very reasonable. The colors go from red (no respo
 
 The sorting of the patients is a challenge here. Even though the panelists considered the sorting as reasonable, there might be other options, for example, sorting by PASI100 at week 52. An interactive tool where the user can select the sorting might be an option and brings a lot of flexibility into this visualization.
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 SR_data <- readxl::read_xlsx("./01_Datasets/WWW_SustainedResponse.xlsx")
 
 # Ensuring PASI score variables numeric
@@ -2693,7 +2704,7 @@ In the main panel, we see a barplot representing the percentage of responders ov
 
 This visualization has an interactive part: The user can select the percentage cut-off for response (in the left panel). When you select a different cut-off, the dimension of the y-axis remains the same which makes it very easy to compare the results even between the results based on different cut-offs. Furthermore, you can hover over the bars and it will provide you with additional information about the sustainability of the response.
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 # --- Parameters ---
 pct_cutoff <- 75  # Set your response cut-off percentage (75, 90, or 100)
 
@@ -2812,7 +2823,7 @@ One aspect that could be improved is the coloring in row C. Actually, we do not 
 
 Overall, this is a very elaborated and advanced visualization which provides the user with a lot of information. At the same time, the structure is very clear which makes it easy to understand the message of the visualization.
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 pacman::p_load(tidyverse,ggtext,kml,
                waffle,readxl,mice,
                latrend)
@@ -3049,6 +3060,339 @@ pacman::p_load(patchwork)
 ```
 
 
+# Daily GC Doses Levels 
+
+Macrophage activation syndrome (MAS) is a severe, potentially life-threatening condition involving a massive inflammatory response that overwhelms the whole body. It mainly affects children and symptoms include: fever, tiredness, low energy, headaches, confusion, seizures, enlarged lymph nodes, liver and spleen problems and bleeding disorders.
+
+Current standard therapy includes high dose glucocorticoid (GC) treatment, although these have significant side effects including reduced growth rate, cataracts, mood changes and weight gain. Long term exposure to GC causes significant harm, especially in children.
+
+* The data provided are based on two pooled open-label studies in children (n=39) with a diagnosis of MAS disease currently receiving GC treatment.
+* The data include daily GC doses levels for the 56 day interventional period, and also weekly average GC doses (week 1-8).
+* Clinically important thresholds are 1.0, 0.5 and 0.2 mg/kg/day
+
+> SIG (2025, May 14). VIS-SIG Blog: Wonderful Wednesday May 2025 (62). Retrieved from https://graphicsprinciples.github.io/posts/2025-05-14-wonderful-wednesday-may-2025/
+
+```{r}
+# WW_GCdose <- read.csv("https://raw.githubusercontent.com/VIS-SIG/Wonderful-Wednesdays/refs/heads/master/data/2025/2025-04-09/WW_GCdose.csv")
+
+WW_GCdose <- read.csv("./01_Datasets/WW_GCdose.csv")
+dat <- read.csv("./01_Datasets/WW_GCdose.csv")
+# WW_GCdose %>% {print(as_tibble(.), n = nrow(.) )}
+```
+
+## Line Graph
+
+```{r}
+## 1. Summarise to mean dose per day
+mean_gc <- WW_GCdose %>%
+  group_by(ASTDY) %>%
+  summarise(mean_dose = mean(AVAL1, na.rm = TRUE), .groups = "drop") %>%
+  mutate(
+    dose_cat = cut(
+      mean_dose,
+      breaks = c(-Inf, 0.2, 0.5, 1, Inf),
+      labels = c("<0.2", "0.2–0.5", "0.5–1.0", "≥1.0"),
+      right = FALSE
+    )
+  )
+
+## 2. Thresholds for reference lines
+thr_df <- tibble::tibble(
+  thr = c(1.0, 0.5, 0.2),
+  col = c("#E41A1C", "#FF7F00", "#4DAF4A")  # red, orange, green
+)
+
+## 3. Week background stripes (0–56 days → 8 weeks)
+week_df <- tibble::tibble(
+  week    = 1:8,
+  xmin    = (week - 1) * 7,
+  xmax    = week * 7,
+  label_x = (week - 1) * 7 + 3.5
+)
+
+max_y <- max(mean_gc$mean_dose, na.rm = TRUE)
+
+ggplot(mean_gc, aes(x = ASTDY, y = mean_dose)) +
+  ## week shading
+  geom_rect(
+    data = week_df,
+    inherit.aes = FALSE,
+    aes(xmin = xmin - 0.5, xmax = xmax + 0.5),
+    ymin = -Inf, ymax = Inf,
+    fill = "grey90", alpha = 0.4
+  ) +
+  ## week labels
+  geom_text(
+    data = week_df,
+    inherit.aes = FALSE,
+    aes(x = label_x, y = max_y * 1.06,
+        label = paste("Week", week)),
+    fontface = "bold"
+  ) +
+  ## line and points
+  geom_line(size = 1, colour = "grey40") +
+  geom_point(aes(colour = dose_cat), size = 2.8) +
+  ## reference threshold lines (no legend)
+  geom_hline(
+    data = thr_df,
+    aes(yintercept = thr, colour = I(col)),
+    linetype = "dashed"
+  ) +
+  ## colour scale only for point categories
+  scale_colour_manual(
+    name = "GC Dose (mg/kg/day)",
+    values = c(
+      "≥1.0"    = "#E41A1C",
+      "0.5–1.0" = "#FF7F00",
+      "0.2–0.5" = "#FFD92F",
+      "<0.2"    = "#4DAF4A"
+    )
+  ) +
+  ## x-axis: BL for day 0, then 1–56
+  scale_x_continuous(
+    name   = "Day",
+    breaks = 0:56,
+    labels = c("BL", 1:56),
+    expand = expansion(mult = c(0.01, 0.02))
+  ) +
+  labs(
+    title    = "Mean GC Dose",
+    subtitle = "Clinically important thresholds: 1.0, 0.5, and 0.2 mg/kg/day",
+    y        = "Mean GC Dose (mg/kg/day)"
+  ) +
+  coord_cartesian(ylim = c(0, max_y * 1.1)) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    legend.position  = c(0.9, 0.35),
+    legend.box.background = element_rect(fill = "white", colour = "grey80"),
+    plot.margin = margin(15, 30, 15, 15)
+  )
+```
+
+
+## Somers’ D measure the time correlation
+
+
+Somers’ D is a non-parametric measure of correlation related to Goodman-Kruskal’s Gamma and Kendall’s Tau-b. In contrast to the latter, the asymmetric Somers’ D coefficient is appropriate where of the variables being dependent on the other
+
+The correlation coefficients for GC dose vs. time, including their 95% CIs, were negative for all subjects but one. The median Somers’ D across all patients was -0.817 (95% CI: -0.898 - -0.722). Strength of correlation seemed not associated with the total length of time patients received GC pulse therapy, probably because the frequency of the high-dose outliers/pulses decreased over the treatment period.
+
+```{r}
+library(DescTools)    # version 0.99.58 # SomersDelta
+WW_GCdose_somersD <- 
+  WW_GCdose %>% 
+  mutate(
+    pulses = ifelse(
+        AVAL1 < 10, 0, 1
+        )
+    ) %>% 
+  split (.$SUBJID) %>%
+  # Compute correlation for time after the start of treatment (d0: baseline)
+  lapply(function(df) filter(df, !ASTDY == 0) ) %>%          
+  lapply( function(x) 
+    c(
+      pulses = sum(x$pulses),
+      SomersDelta(
+        x = x$ASTDY, 
+        y = x$AVAL1,
+        direction = "column", 
+        conf.level = 0.95
+        )
+      )
+    ) %>% 
+  bind_rows(.id = "SUBJID") %>% 
+  arrange(somers) %>% 
+  mutate(SUBJID = factor (SUBJID, levels = unique(SUBJID)))
+
+WW_GCdose_somersD %>% 
+  rbind(
+    .,
+    select(., !c(SUBJID, pulses)) %>% 
+      apply(., 2, median) %>% t %>% 
+      data.frame(SUBJID = "\nAll     \n(median)", pulses = NA)
+    ) %>% 
+  ggplot(
+    aes(
+      y = SUBJID,
+      x = somers,
+      color = pulses
+      )
+    ) +
+  geom_point(
+    size = 2.5
+  ) +
+  geom_errorbarh(
+    aes(
+      xmin = lwr.ci,
+      xmax = upr.ci
+      )
+    ) +
+  scale_y_discrete(limits=rev) +
+  scale_color_gradient(
+    low = "#4aa2e6", 
+    high = "#c7505c",
+    na.value = "black",
+    name = "Glucocorticoid \npulses: \ntotal days on \n>= 10mg/kg/d" 
+    ) +
+  ylab("Subject ID") +
+  xlab("Somers' D") +
+  labs(
+    title = "Correlation between glucocorticoid dose and interventional time in individual subjects,\nwith varying total length of pulse therapy",
+    caption = "Asymetric Somers' D with 95% CIs, dependent variable is glucocorticoid dose\n56d follow-up, except for subjects #11 (55d) and #36 (25d)") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(
+      hjust = 0.5,
+      vjust = 3
+      ),
+    plot.caption = element_text(
+      hjust = 0.5,
+      vjust = -3
+      ),
+    legend.title = element_text(size = 9)
+    )
+```
+
+## Stacked bar chart
+
+```{r}
+datWeeks <- unique(dat[,c("SUBJID","AVISITN","AVISIT","AVAL2")])
+
+# Calculate the percentage of subjects per day with GC values between 0.2, 0.5, 1 or above 1
+percDay <- matrix(NA, nrow = 57,ncol = 5)
+j = 0
+for (i in unique(dat$ASTDY)){
+  j = j + 1
+  datDay <- dat[dat$ASTDY == i,]
+  percDay[j,1] <- i
+  percDay[j,2] <- sum(datDay$AVAL1 < 0.2)/nrow(datDay) *100
+  percDay[j,3] <- sum(0.2 <= datDay$AVAL1 & datDay$AVAL1 < 0.5)/nrow(datDay)*100
+  percDay[j,4] <- sum(0.5 <= datDay$AVAL1 & datDay$AVAL1 < 1)/nrow(datDay)*100
+  percDay[j,5] <- sum(datDay$AVAL1 >= 1)/nrow(datDay)*100
+  
+}
+
+# transform data to long format as needed for stacked barchart
+percDay2 <- as.data.frame(percDay)
+data_long <- percDay2 %>%
+  gather(key = "GClevel", value = "Value",-1)
+
+# Create the stacked bar chart
+# png(filename ="StackedBarchartGCdoseGroups.png")
+ggplot(data_long, aes(x = V1, y = Value, fill = GClevel)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("V5" =  "#08519C", "V4" = "#4292C6","V3" = "#9ECAE1",V2 = "#DEEBF7"),
+                    labels = c("V5" = ">= 1", "V4" = "0.5-1","V3" = "0.2-0.5","V2" = "<0.2")) +
+  labs(x = "Days", y = "Percentage of Subjects") +
+  labs(fill = "GC doses (mg/kg/day)")+
+  scale_x_continuous(
+    breaks = seq(0,60,10),
+    limits = c(0, 60) # Specify the positions of the ticks
+  ) +
+  scale_y_continuous(
+    breaks = seq(0,100,10),limits = c(0, 101)  # Specify the positions of the ticks
+  ) +
+  theme_minimal() +
+  theme(
+    # panel.background = element_blank(), # Remove the gray background
+    # panel.grid.major = element_blank(), # Remove major grid lines
+    panel.grid.minor = element_blank(), # Remove minor grid lines
+    
+    axis.ticks.y.right = element_blank(),  # Remove ticks on the right
+    axis.ticks.x.top = element_blank(),    # Remove ticks on the top
+    axis.line.y.right = element_blank(),   # Remove axis line on the right
+    axis.line.x.top = element_blank()      # Remove axis line on the top
+  )
+# dev.off() 
+```
+
+## Streamgraph
+
+```{r}
+daily <- dat %>%
+  mutate(
+    dl = case_when(
+      AVAL2 <= 0.2 ~ "4",
+      AVAL2 <= 0.5 ~ "3",
+      AVAL2 <= 1.0 ~ "2",
+      AVAL2 > 1.0 ~ "1"
+    )
+  ) %>%
+  dplyr::count(ASTDY, dl) %>%
+  tidyr::complete(ASTDY=1:56, dl = c("1", "2", "3", "4"), fill = list(n=0)) %>%
+  select(ASTDY, dl, n)
+
+colours <- c("#fef0d9", "#fdcc8a", "#fc8d59", "#d7301f")
+daily$dl <- as.factor(daily$dl)
+
+p0 <- ggplot(daily, aes(x = ASTDY, y = n, fill = dl)) +
+   scale_fill_manual(values = rev(colours),
+                    labels = rev(c("<= 0.2", "> 0.2 and <= 0.5", "> 0.5 and <=1.0", "> 1.0")),
+                    name = "GC Dose (mg/kg/day)") +
+  scale_x_continuous("Study Day",
+                     limits = c(0, 56),
+                   expand=c(0,0)) +
+  labs(title="<b>Use of <span style='color:#d7301f'>High Dose GC</span> Reduces Steadily Over Time, With Stable Dose Achieved by Week 8</span></b>") +
+
+  theme_minimal(base_size = 16) +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    plot.title = element_markdown(colour = "black",
+                                  size = 16)
+  )
+
+p1 <- p0 +  geom_stream(type = "proportional") +
+  scale_y_continuous(name="Proportion", expand=c(0,0)) 
+p1
+# ggsave(file.path(out, "GC_Streamgraph_prop.png"), plot = p1, width = 12, height = 8, dpi = 300)
+```
+
+## Sankey diagram
+
+```{r}
+weekly <- dat %>%
+   dplyr::mutate(
+    dl = case_when(
+      AVAL2 <= 0.2 ~ "4",
+      AVAL2 <= 0.5 ~ "3",
+      AVAL2 <= 1.0 ~ "2",
+      AVAL2 > 1.0 ~ "1"
+    )
+  ) %>%
+  group_by(SUBJID, AVISITN) %>%
+  filter(!duplicated(AVAL2)) %>%
+  ungroup()
+
+colours <- c("#fef0d9", "#fdcc8a", "#fc8d59", "#d7301f")
+weekly$dl <- as.factor(weekly$dl)
+weekly$AVISITN <- as.factor(weekly$AVISITN)
+
+ggplot(data=weekly, aes(x = AVISITN, stratum = dl, alluvium=SUBJID, fill=dl)) +
+  geom_flow(color = "black", aes.flow = "forward") +
+  geom_stratum() +
+  scale_x_discrete("Week", 
+                   limits = c("0", "1", "2", "3", "4","5", "6", "7","8"),
+                   labels = c("0" = "BL", "1" = "1", "2" = "2", "3" = "3", "4" = "4", "5" = "5", "6" = "6", "7" = "7","8" = "8"),
+                   expand=c(0,0)) +
+  scale_y_continuous("Number of Patients", 
+                     expand=c(0,0)) +  
+  scale_fill_manual(values = rev(colours),
+                    labels = rev(c("<= 0.2", "> 0.2 and <= 0.5", "> 0.5 and <=1.0", "> 1.0")),
+                    name = "GC Dose (mg/kg/day)") +
+  labs(title="<b>Use of <span style='color:#d7301f'>High Dose GC</span> Reduces Steadily After Week 2, With Stable Dose Achieved by Week 8</span></b>") +
+  theme_minimal(base_size = 18) +
+  theme(panel.grid.major = element_blank(),
+        panel.background = element_rect(fill = "white", color = NA),
+        plot.background = element_rect(fill = "white", color = NA),
+        plot.title = element_markdown(colour = "black",
+                                      size = 16)
+        )
+
+```
+
+
 # Responder Rate
 
 In a Phase III study involving patients suffering from hidradenitis suppurativa, an active drug was compared to a placebo. Each group consisted of 200 subjects, and the primary endpoint was the HiSCR, which is a binary endpoint. This endpoint is based on three continuous components:
@@ -3083,7 +3427,7 @@ Slide can be found [here](https://vis-sig.github.io/blog/posts/2022-06-06-wonder
 
 This visualization shows nicely that the difference between the groups is rather small, if the percentage change to be reached is large (focusing on the first part of the HiSCR responder definition). This is done by presenting a line plot for both groups using two different colors. There are three graphs. Each one of them keeps the second and/or the third part of the definition of a HiSCR responder fixed. Overall, it is a very clean visualization which very nicely tackles the challenge of showing the impact of chaning the definition of HiSCR response. 
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 # library(tidyverse)
 # library(ggtext)
 
@@ -3297,7 +3641,7 @@ Options:
 * Visualise response gain/maintenance/loss over time at a patient level
 * Explore decisions which may be made based on patient behaviour – e.g., if rules were introduced to discontinue subjects with suboptimal efficacy, how might different treatment discontinuation rules impact the numbers of subjects discontinuing each treatment?
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 if(!require("pacman")) install.packages("pacman")
 p_load("tidyverse", "this.path", "readxl", "gganimate", "gifski")
 
@@ -3408,7 +3752,7 @@ anim_save("./02_Plots/Visualization/AEs/Animated_line.gif")
 
 ## Static line plot
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 bign <- dat %>%
   filter(AVISITN==1) %>%
   group_by(TRT) %>%
@@ -3445,7 +3789,7 @@ line_static
 
 ## Heat map
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 # Ensure proper ordering
 dat <- dat %>%
   mutate(
@@ -3487,7 +3831,7 @@ ggplot(dat, aes(x = AVISITN, y = USUBJID, fill = AVALC)) +
 
 ## Sankey diagrams
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 # ---- Color palette and levels ----
 resp_levels <- c("No Response", "Low Response", "Response", "High Response")
 resp_colors <- c(
@@ -3581,7 +3925,7 @@ combined
 
 ## Stacked area charts
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 # ---- Reverse order so "High Response" appears on top ----
 resp_levels <- c("High Response", "Response", "Low Response", "No Response")
 
@@ -3637,7 +3981,7 @@ In this plot, the variability (represented by the standard deviation) is plotted
 
 The title is very nicely done. The first line provides already a very clear message. The second line uses a smaller font size and provides additional information. This plot is very clear and easy to read. Only the coloring could be chosen in a different way as already discussed above.
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 # ---- Color palette and category levels ----
 resp_levels <- c("No Response", "Low Response", "Response", "High Response")
 resp_colors <- c(
@@ -3718,7 +4062,7 @@ The data reflects a phase III study - active vs placebo and the endpoint was Ord
 
 The shiny app can be found [here](https://bonorico.shinyapps.io/oscicovid)
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 # packages
 pacman::p_load(rio, tidyverse) 
 pacman::p_load(RColorBrewer, ggtext)
@@ -3790,7 +4134,7 @@ design <- "11114
 
 # Lollipop/forest plot
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 # dat <- read.csv("./01_Datasets/CGI_S_3_groups_csv.csv")
 
 # library(RCurl)
@@ -3907,7 +4251,7 @@ p
 
 ![](./02_Plots/Visualization/PRO/Dumbbell2.png)
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 data <- read.csv("./01_Datasets/MAI.csv")
 ```
 
@@ -3939,7 +4283,7 @@ The graph is very well designed with little to no visual clutter, which helps to
 
 To further highlight the difference between the two groups, it could be helpful to fill the area between the two curves using the color of the more satisfied group (or vice versa). This could even be shown as an additional bar chart below this visualization. This would facilitate comparing subgroup differences at the various cut-offs.
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 ### Load data
 data <- data.frame(read_csv("./01_Datasets/Satisfaction_wW2005.csv"))
 data$smoker <- ifelse(data$smoker == "Y", "Smoker", ifelse(data$smoker == "N", "Non-smoker", NA))
@@ -3973,7 +4317,7 @@ ggplot(data = data_n, aes(x = satisfaction, colour = group)) +
 
 ## Bar plots
 
-```{r,echo = T,message = FALSE, error = FALSE, warning = FALSE}
+```{r}
 # library(tidyverse) 
 # library(viridis)
 # library(RColorBrewer)
@@ -4127,6 +4471,8 @@ plot_grid(title, Faceted_graphs,
 
 
 # Reference
+
+SIG (2025, May 14). VIS-SIG Blog: Wonderful Wednesday May 2025 (62). Retrieved from https://graphicsprinciples.github.io/posts/2025-05-14-wonderful-wednesday-may-2025/
 
 SIG (2025, April 9). VIS-SIG Blog: Wonderful Wednesday April 2025 (61). Retrieved from https://graphicsprinciples.github.io/posts/2025-04-09-wonderful-wednesday-april-2025/
 
